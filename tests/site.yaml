@@ -1,0 +1,15 @@
+name: Flipsite Tests
+languages: en,sv,fi
+slugs:
+  features:
+    sv: funktioner
+    fi: toiminnot
+  pricing:
+    sv: priser
+    fi: hinnat
+pages:
+  home:
+  features:
+  pricing:
+
+

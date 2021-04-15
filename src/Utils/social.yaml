@@ -1,0 +1,76 @@
+---
+facebook:
+  name: Facebook
+  color: "#4172B8"
+  icon: simple-icons/facebook.svg
+  url: https://facebook.com/{handle}
+github:
+  name: GitHub
+  color: "#181717"
+  icon: simple-icons/github.svg
+  url: https://github.com/{handle}
+linkedin:
+  name: LinkedIn
+  color: "#0077B5"
+  icon: simple-icons/linkedin.svg
+  url: https://linkedin.com/{handle}
+instagram:
+  name: Instagram
+  color: "#E4405F"
+  icon: simple-icons/instagram.svg
+  url: https://instagram.com/{handle}
+email:
+  name: E-Mail
+  color: "#1f96f0"
+  icon: zondicons/envelope
+  url: mailto:{handle}
+maps:
+  name: Google Maps
+  color: "#4285F4"
+  icon: zondicons/location
+  url: '{handle}'
+messenger:
+  name: Messenger
+  color: "#00B2FF"
+  icon: simple-icons/messenger.svg
+  url: https://m.me/{handle}
+phone:
+  name: Phone
+  color: "#5ec640"
+  icon: zondicons/phone
+  url: tel:{handle}
+pinterest:
+  name: Pinterest
+  color: "#BD081C"
+  icon: simple-icons/pinterest.svg
+  url: https://www.pinterest.com/{{handle}}
+slack:
+  name: Slack
+  color: "#4A154B"
+  icon: simple-icons/slack.svg
+  url: "{handle}"
+soundcloud:
+  name: SoundCloud
+  color: "#FF3300"
+  icon: simple-icons/soundcloud.svg
+  url: https://soundcloud.com/{handle}
+twitter:
+  name: Twitter
+  color: "#1DA1F2"
+  icon: simple-icons/twitter.svg
+  url: https://twitter.com/{handle}
+vimeo-livestream:
+  name: Vimeo Livestream
+  color: "#0A0A20"
+  icon: simple-icons/vimeo.svg
+  url: https://livestream.com/{handle}
+whatsapp:
+  name: WhatsApp
+  color: "#25D366"
+  icon: simple-icons/whatsapp.svg
+  url: https://wa.me/{handle}
+youtube:
+  name: YouTube
+  color: "#FF0000"
+  icon: simple-icons/youtube.svg
+  url: https://youtube.com/{handle}
