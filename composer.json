@@ -1,7 +1,7 @@
 {
     "name": "flipsite/flipsite",
     "license": "Apache-2.0",
-    "description": "Flipsite",
+    "description": "Static website compiler that scores 100/100 on all Lighthouse tests",
     "type": "library",
     "authors": [
         {
