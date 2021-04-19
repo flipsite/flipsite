@@ -36,7 +36,8 @@
         "symfony/console": "^5.2",
         "symfony/filesystem": "^5.0",
         "symfony/web-server-bundle": "^4.4",
-        "symfony/yaml": "^v5.0"
+        "symfony/yaml": "^v5.0",
+        "twig/twig": "^3.3"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.12.25",
