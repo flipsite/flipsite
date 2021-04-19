@@ -49,7 +49,7 @@ Example websites built with Flipsite:
 - [https://wecke.fi](https://wecke.fi)
 - [https://knegarn.ax](https://knegarn.ax)
 - [https://getabetong.ax](https://getabetong.ax)
-- [https://github.com/flipsite/hogmansmaleri.ax](https://github.com/flipsite/hogmansmaleri.ax)
+- [https://hogmansmaleri.ax/](https://hogmansmaleri.ax/)
 
 ## License
 
