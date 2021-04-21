@@ -120,6 +120,9 @@ final class Reader
             'keywords'    => $this->get('keywords', $language),
             'author'      => $this->get('author', $language),
         ];
+        if (!isset($this->data['generator'])) {
+            $meta['generator'] = $this->enviroment->getGenerator();
+        }
         $all = $this->data['pages'][$page];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';

@@ -53,6 +53,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $elements[] = $this->meta('description', $meta['description'] ?? null);
         $elements[] = $this->meta('keywords', $meta['keywords']);
         $elements[] = $this->meta('author', $meta['author'] ?? null);
+        $elements[] = $this->meta('generator', $meta['generator'] ?? null);
 
         $elements[] = $this->og('og:title', $title);
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
