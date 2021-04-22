@@ -105,7 +105,10 @@ class SectionBuilder
             unset($style['container']);
         }
 
-        $cols      = $this->normalizeCol0($data, ['cols']);
+        $cols = $this->normalizeCol0($data, ['cols', 'options']);
+        if (isset($data['options'])) {
+            $cols = $this->applyOptions($cols, $data['options']);
+        }
         $colsStyle = $this->normalizeCol0($style, ['container', 'cols', 'colsAll', 'colsOdd', 'colsEven']);
         $colsEven  = ArrayHelper::merge($style['colsAll'] ?? [], $style['colsEven'] ?? []);
         $colsOdd   = ArrayHelper::merge($style['colsAll'] ?? [], $style['colsOdd'] ?? []);
@@ -144,6 +147,13 @@ class SectionBuilder
 
     private function normalizeCol0(array $data, array $notIn) : array
     {
+        if (isset($data['cols']) && ArrayHelper::isAssociative($data['cols'])) {
+            $cols         = $data['cols'];
+            $data['cols'] = [];
+            foreach ($cols as $col) {
+                $data['cols'][] = $col;
+            }
+        }
         $col0 = array_filter($data, function ($key) use ($notIn) {
             return !in_array($key, $notIn);
         }, ARRAY_FILTER_USE_KEY);
@@ -174,5 +184,26 @@ class SectionBuilder
             }
         }
         return $list;
+    }
+
+    private function applyOptions(array $cols, array $options) : array
+    {
+        if (isset($options['sort'])) {
+            $sort      = explode(' ', $options['sort']);
+            $direction = mb_strtolower($sort[1] ?? 'asc');
+            $attr      = $sort[0];
+            usort($cols, function ($a, $b) use ($attr) {
+                return $a[$attr] <=> $b[$attr];
+            });
+            if ('desc' === $direction) {
+                $cols = array_reverse($cols);
+            }
+        }
+        $start = $options['start'] ?? 0;
+        $count = $options['count'] ?? null;
+        if ($start || $count) {
+            $cols = array_slice($cols, $start, $count);
+        }
+        return $cols;
     }
 }
