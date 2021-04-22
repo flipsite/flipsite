@@ -123,6 +123,9 @@ class SectionBuilder
                 $col['cols'] = $col;
             }
             if (isset($col['cols'])) {
+                if (isset($col['options'])) {
+                    $col['cols'] = $this->applyOptions($col['cols'], $col['options']);
+                }
                 $container->addChild($this->getContainer($col['cols'], $colStyle));
             } else {
                 $colContainerStyle = $colStyle['container'] ?? [];
@@ -147,13 +150,6 @@ class SectionBuilder
 
     private function normalizeCol0(array $data, array $notIn) : array
     {
-        if (isset($data['cols']) && ArrayHelper::isAssociative($data['cols'])) {
-            $cols         = $data['cols'];
-            $data['cols'] = [];
-            foreach ($cols as $col) {
-                $data['cols'][] = $col;
-            }
-        }
         $col0 = array_filter($data, function ($key) use ($notIn) {
             return !in_array($key, $notIn);
         }, ARRAY_FILTER_USE_KEY);
