@@ -16,6 +16,14 @@ auto-rows-auto: grid-auto-rows:auto
 auto-rows-fr: grid-auto-rows:minmax(0,1fr)
 auto-rows-max: grid-auto-rows:max-content
 auto-rows-min: grid-auto-rows:min-content
+backdrop-filter: --tw-backdrop-blur:blur(0px);--tw-backdrop-brightness:brightness(1);--tw-backdrop-contrast:contrast(1);--tw-backdrop-grayscale:grayscale(0);--tw-backdrop-hue-rotate:hue-rotate(0deg);--tw-backdrop-invert:invert(0);--tw-backdrop-opacity:opacity(1);--tw-backdrop-saturate:saturate(1);--tw-backdrop-sepia:sepia(0);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
+backdrop-filter-none: backdrop-filter:none
+backdrop-invert-0: --tw-backdrop-invert:invert(0)
+backdrop-invert: --tw-backdrop-invert:invert(1)
+backdrop-grayscale-0: --tw-backdrop-grayscale:grayscale(0)
+backdrop-grayscale: --tw-backdrop-grayscale:grayscale(1)
+backdrop-sepia-0: --tw-backdrop-sepia:sepia(0)
+backdrop-sepia: --tw-backdrop-sepia:sepia(1)
 bg-auto: background-size:auto
 bg-clip-border: -webkit-background-clip:border-box
 bg-clip-content: -webkit-background-clip:content-box
@@ -76,8 +84,8 @@ ease-in: transition-timing-function:cubic-bezier(0.4,0,1,1)
 ease-linear: transition-timing-function:linear
 ease-out: transition-timing-function:cubic-bezier(0,0,0.2,1)
 fill-current: fill:currentColor
-filter-none: none;
-filter: "--b:0;--br:100%;--c:100%;--g:0;--h:0deg;--i:0%;--o:100%;--s:100%;--se:0%;filter:blur(var(--b)) brightness(var(--br)) contrast(var(--c)) grayscale(var(--g)) hue-rotate(var(--h)) invert(var(--i)) opacity(var(--o)) saturate(var(--s)) sepia(var(--se));"
+filter: '--tw-blur:blur(0);--tw-brightness:brightness(1);--tw-contrast:contrast(1);--tw-grayscale:grayscale(0);--tw-hue-rotate:hue-rotate(0deg);--tw-invert:invert(0);--tw-saturate:saturate(1);--tw-sepia:sepia(0);--tw-drop-shadow:drop-shadow(0 0 #0000);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)'
+filter-none: filter:none
 fixed: position:fixed
 flex-1: flex:1 1 0%
 flex-auto: flex:1 1 auto
@@ -99,6 +107,8 @@ float-left: float:left
 float-none: float:none
 float-right: float:right
 flow-root: display:flow-root
+grayscale-0: --tw-grayscale:grayscale(0)
+grayscale: --tw-grayscale:grayscale(1)
 grid-flow-col-dense: grid-auto-flow:column dense
 grid-flow-col: grid-auto-flow:column
 grid-flow-row-dense: grid-auto-flow:row dense
@@ -110,6 +120,8 @@ inline-block: display:inline-block
 inline-flex: display:inline-flex
 inline-grid: display:inline-grid
 inline: display:inline
+invert-0: --tw-invert:invert(0)
+inver: --tw-invert:invert(1)
 invisible: visibility:hidden
 italic: font-style:italic
 items-baseline: align-items:baseline
@@ -211,6 +223,8 @@ self-center: align-self:center
 self-end: align-self:flex-end
 self-start: align-self:flex-start
 self-stretch: align-self:stretch
+sepia-0: --tw-sepia:sepia(0)
+sepia: --tw-sepia:sepia(1)
 sr-only: position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0
 static: position:static
 sticky: position:sticky
