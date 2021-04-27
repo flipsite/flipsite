@@ -122,6 +122,17 @@ final class Tailwind implements CallbackInterface
             return null;
         }
         $first = ucfirst($args[0]);
+        if (isset($args[2])) {
+            $third     = ucfirst((string) $args[2]);
+            $second    = ucfirst((string) $args[1]);
+            $ruleClass = 'Flipsite\Style\Rules\Rule'.$first.$second.$third;
+            if (class_exists($ruleClass)) {
+                array_shift($args);
+                array_shift($args);
+                array_shift($args);
+                return new $ruleClass($args, $negative, $this->config, $this);
+            }
+        }
         if (isset($args[1])) {
             $second    = ucfirst((string) $args[1]);
             $ruleClass = 'Flipsite\Style\Rules\Rule'.$first.$second;

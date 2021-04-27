@@ -12,7 +12,7 @@ final class RuleRotate extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->getConfig('rotate', $args[0]);
-        $value ??= $args[0].'deg';
+        $value ??= UnitHelper::angle($args[0]);
         $this->setDeclaration('--tw-rotate', $value);
     }
 }
