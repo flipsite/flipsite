@@ -16,6 +16,11 @@ abstract class AbstractRuleHueRotate extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $this->setDeclaration($this->properties[0], 'hue-rotate('.UnitHelper::angle($args[0]).')');
+        $value = UnitHelper::angle($args[0]);
+        if ($this->negative) {
+            $value          = '-'.$value;
+            $this->negative = false;
+        }
+        $this->setDeclaration($this->properties[0], 'hue-rotate('.$value.')');
     }
 }
