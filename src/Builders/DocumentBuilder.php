@@ -15,6 +15,7 @@ final class DocumentBuilder extends AbstractDocumentBuilder
 
     public function getDocument() : Document
     {
+        $this->document->addStyle($this->reader->get('theme.components.html'));
         $this->document->getChild('body')->addChild(new Element('svg', true));
         foreach ($this->sections as $area => $sections) {
             if (null === $this->layout) {
