@@ -50,12 +50,15 @@ trait MarkdownTrait
     private function addUrlsToMarkdown(string $html) : string
     {
         $matches = [];
-        preg_match_all('/\s{1}href=(["\'])(.*?)\1/', $html, $matches);
-        $hrefs = array_unique($matches[2]);
+        preg_match_all('/href="(.*?)"/', $html, $matches);
+        if (0 === count($matches[1])) {
+            return $html;
+        }
+        $hrefs = array_unique($matches[1]);
         foreach ($hrefs as $href) {
             $external = false;
             $newHref  = $this->url($href, $external);
-            $html     = str_replace(' href="'.$href.'"', ' href="'.$newHref.'"', $html);
+            $html     = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
         }
         return $html;
     }
