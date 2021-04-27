@@ -121,7 +121,7 @@ inline-flex: display:inline-flex
 inline-grid: display:inline-grid
 inline: display:inline
 invert-0: --tw-invert:invert(0)
-inver: --tw-invert:invert(1)
+invert: --tw-invert:invert(1)
 invisible: visibility:hidden
 italic: font-style:italic
 items-baseline: align-items:baseline
