@@ -46,20 +46,21 @@ class ComponentBuilder
     {
         $tmp   = explode(':', $type);
         $type  = $tmp[0];
-        $flags = isset($tmp[1]) ? explode(',', $tmp[1]) : [];
+        $flags = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
         $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style);
 
-        $variants = isset($style['variants']) ? array_keys($style['variants']) : null;
-        $variant  = 'DEFAULT';
+        $variants     = isset($style['variants']) ? array_keys($style['variants']) : null;
+        $variantFound = false;
         if ($variants) {
             foreach ($flags as $flag) {
                 if (in_array($flag, $variants)) {
-                    $variant = $flag;
+                    $style        = ArrayHelper::merge($style, $style['variants'][$flag]);
+                    $variantFound = true;
                 }
             }
-        }
-        if (isset($style['variants'][$variant])) {
-            $style = ArrayHelper::merge($style, $style['variants'][$variant]);
+            if (!$variantFound) {
+                $style = ArrayHelper::merge($style, $style['variants']['DEFAULT'] ?? []);
+            }
         }
         unset($style['variants']);
 
