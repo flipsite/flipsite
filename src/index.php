@@ -103,8 +103,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $sectionBuilder = new SectionBuilder(
             $enviroment,
             $componentBuilder,
-            $reader->get('theme.components.section'),
-            $reader->get('theme.components.container')
+            $reader->get('theme')
         );
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);

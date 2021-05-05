@@ -13,7 +13,11 @@ final class RuleMaxW extends AbstractRule
     {
         $value = null;
         if (isset($args[1]) && 'screen' === $args[0]) {
-            $value = $this->getConfig('screens', $args[1]);
+            $tmp   = explode('/', $args[1]);
+            $value = $this->getConfig('screens', $tmp[0]);
+            if (isset($tmp[1])) {
+                $value = intval(floatval($value) / floatval($tmp[1])).'px';
+            }
         }
         $value ??= $this->getConfig('maxWidth', $args[0]);
         $value ??= $this->checkCallbacks('size', $args);

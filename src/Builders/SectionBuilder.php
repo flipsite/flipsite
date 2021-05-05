@@ -8,35 +8,23 @@ use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Element;
 use Flipsite\Components\Event;
 use Flipsite\Enviroment;
-use Flipsite\Exceptions\SectionDataFormatException;
 use Flipsite\Utils\ArrayHelper;
 
 class SectionBuilder
 {
     private Enviroment $enviroment;
     private ComponentBuilder $componentBuilder;
-    private ?array $sectionStyle;
-    private ?array $containerStyle;
+    private ?array $theme;
 
-    public function __construct(Enviroment $enviroment, ComponentBuilder $componentBuilder, ?array $sectionStyle = null, array $containerStyle = null)
+    public function __construct(Enviroment $enviroment, ComponentBuilder $componentBuilder, ?array $theme = null)
     {
         $this->enviroment       = $enviroment;
         $this->componentBuilder = $componentBuilder;
-        $this->sectionStyle     = $sectionStyle;
-        $this->containerStyle   = $containerStyle;
+        $this->theme            = $theme;
     }
 
     public function getSection(array $data) : ?AbstractElement
     {
-        assert(!isset($data['style']) || is_array($data['style']), new SectionDataFormatException($data, 'style', 'array'));
-        if (is_array($data['style'] ?? false) && !ArrayHelper::isAssociative($data['style'])) {
-            $data['style'] = ArrayHelper::merge(...$data['style']);
-        }
-        $sectionStyle = $data['style']['section'] ?? [];
-        unset($data['style']['section']);
-        if (null !== $this->sectionStyle) {
-            $sectionStyle = ArrayHelper::merge($this->sectionStyle, $sectionStyle);
-        }
         if (isset($data['script'])) {
             foreach ($data['script'] as $type => $script) {
                 foreach ($script as $id => $script) {
@@ -51,34 +39,44 @@ class SectionBuilder
         $id = $data['id'] ?? null;
         unset($data['id']);
 
+        $style = $this->getStyle($data['style'] ?? []);
+        unset($data['style']);
+
         $wrapper = null;
-        if (isset($sectionStyle['wrapper'])) {
-            $wrapper = new Element($sectionStyle['wrapper']['type'] ?? 'div');
-            unset($sectionStyle['wrapper']['type']);
-            $wrapper->addStyle($sectionStyle['wrapper']);
+        $empty   = $style['section']['wrapper']['empty'] ?? false;
+        if (!$empty && isset($style['section']['wrapper']) && count($style['section']['wrapper'])) {
+            $wrapper = new Element($style['section']['wrapper']['type'] ?? 'div');
+            unset($style['section']['wrapper']['type']);
+            $wrapper->addStyle($style['section']['wrapper']);
             if ($id) {
                 $wrapper->setAttribute('id', $id);
                 $id = false;
             }
         }
-        $section = new Element($sectionStyle['type'] ?? 'section');
-        unset($sectionStyle['type']);
+
+        $container = null;
+        $empty     = $style['section']['container']['empty'] ?? false;
+        if (!$empty && isset($style['section']['container'])) {
+            $container = new Element($style['section']['container']['type'] ?? 'div');
+            unset($style['section']['container']['type']);
+            $container->addStyle($style['section']['container']);
+        }
+
+        $section = new Element($style['section']['type'] ?? 'section');
+        unset($style['section']['type']);
         if ($id) {
             $section->setAttribute('id', $id);
-            $id = false;
         }
-        $section->addStyle($sectionStyle);
+        $section->addStyle($style['section'] ?? []);
+        unset($style['section']);
 
-        $style = $data['style'] ?? [];
-        unset($data['style']);
-
-        // Add default root container style
-        if (null !== $this->containerStyle) {
-            $style['container'] = ArrayHelper::merge($this->containerStyle, $style['container'] ?? []);
+        $children = $this->getComponents($data, $style);
+        if ($container) {
+            $section->addChild($container);
+            $container->addChildren($children);
+        } else {
+            $section->addChildren($children);
         }
-
-        $container = $this->getContainer($data, $style);
-        $section->addChild($container);
 
         if ($wrapper) {
             $wrapper->addChild($section);
@@ -87,119 +85,38 @@ class SectionBuilder
         return $section;
     }
 
-    private function getContainer(array $data, array $style) : AbstractElement
+    private function getStyle($style) : array
     {
-        if (!ArrayHelper::isAssociative($data)) {
-            $data = ['cols' => $data];
+        if (is_string($style)) {
+            $style = ['inherit' => [$style]];
         }
-        if (isset($style['template'])) {
-            $t = new Template($data, $style['template']);
-            unset($style['template']);
-            $data = $t->apply();
+        if (!is_array($style)) {
+            $style = [];
         }
 
-        $container = new Element($style['container']['type'] ?? 'div');
-        if (isset($style['container'])) {
-            unset($style['container']['type']);
-            $container->addStyle($style['container']);
-            unset($style['container']);
-        }
-
-        $cols = $this->normalizeCol0($data, ['cols', 'options']);
-        if (isset($data['options'])) {
-            $cols = $this->applyOptions($cols, $data['options']);
-        }
-        $colsStyle = $this->normalizeCol0($style, ['container', 'cols', 'colsAll', 'colsOdd', 'colsEven']);
-        $colsEven  = ArrayHelper::merge($style['colsAll'] ?? [], $style['colsEven'] ?? []);
-        $colsOdd   = ArrayHelper::merge($style['colsAll'] ?? [], $style['colsOdd'] ?? []);
-        foreach ($cols as $i => $col) {
-            $colStyle = ArrayHelper::merge(0 == $i % 2 ? $colsEven : $colsOdd, $colsStyle[$i] ?? []);
-            if (isset($colStyle['template'])) {
-                $t = new Template($col, $colStyle['template']);
-                unset($colStyle['template']);
-                $col = $t->apply();
-            }
-            if (!ArrayHelper::isAssociative($col)) {
-                $col['cols'] = $col;
-            }
-            if (isset($col['cols'])) {
-                if (isset($col['options'])) {
-                    $col['cols'] = $this->applyOptions($col['cols'], $col['options']);
-                }
-                $container->addChild($this->getContainer($col['cols'], $colStyle));
-            } else {
-                $colContainerStyle = $colStyle['container'] ?? [];
-                unset($colStyle['container']);
-                $components = $this->getComponents($col, $colStyle);
-                if ((count($components) > 1 && count($cols) > 1) || count($colContainerStyle)) {
-                    $colContainer = new Element($colContainerStyle['type'] ?? 'div');
-                    if (count($colContainerStyle)) {
-                        unset($colContainerStyle['type']);
-                        $colContainer->addStyle($colContainerStyle);
-                    }
-                    $colContainer->addChildren($components);
-                    $container->addChild($colContainer);
-                } else {
-                    $container->addChildren($components);
-                }
+        if (isset($style['inherit'])) {
+            while (count($style['inherit'])) {
+                $inherited = array_shift($style['inherit']);
+                $style     = ArrayHelper::merge($this->theme['style'][$inherited] ?? [], $style);
             }
         }
 
-        return $container;
+        $style['section'] = ArrayHelper::merge($this->theme['components']['section'] ?? [], $style['section'] ?? []);
+        return $style;
     }
 
-    private function normalizeCol0(array $data, array $notIn) : array
+    private function getComponents(array $sectionData, array $style) : array
     {
-        $col0 = array_filter($data, function ($key) use ($notIn) {
-            return !in_array($key, $notIn);
-        }, ARRAY_FILTER_USE_KEY);
-        $cols = $data['cols'] ?? [];
-        if (count($col0)) {
-            $cols[0] = ArrayHelper::merge($cols[0] ?? [], $col0);
-        }
-        ksort($cols);
-        return $cols;
-    }
-
-    private function getComponents(array $components, array $style) : array
-    {
-        $list = [];
-        foreach ($components as $type => $data) {
+        $components = [];
+        foreach ($sectionData as $type => $data) {
             if (null === $data) {
                 continue;
             }
-            $flags = [];
-            $tmp   = explode('|', $type);
-            $type  = array_shift($tmp);
-            foreach ($tmp as $flag) {
-                $flags[$flag] = true;
-            }
-            $component = $this->componentBuilder->build($type, $data, $style[$type] ?? [], $flags);
+            $component = $this->componentBuilder->build($type, $data, $style[$type] ?? []);
             if (null !== $component) {
-                $list[] = $component;
+                $components[] = $component;
             }
         }
-        return $list;
-    }
-
-    private function applyOptions(array $cols, array $options) : array
-    {
-        if (isset($options['sort'])) {
-            $sort      = explode(' ', $options['sort']);
-            $direction = mb_strtolower($sort[1] ?? 'asc');
-            $attr      = $sort[0];
-            usort($cols, function ($a, $b) use ($attr) {
-                return $a[$attr] <=> $b[$attr];
-            });
-            if ('desc' === $direction) {
-                $cols = array_reverse($cols);
-            }
-        }
-        $start = $options['start'] ?? 0;
-        $count = $options['count'] ?? null;
-        if ($start || $count) {
-            $cols = array_slice($cols, $start, $count);
-        }
-        return $cols;
+        return $components;
     }
 }

@@ -21,9 +21,9 @@ class ComponentBuilder
     private Reader $reader;
     private Path $path;
     private ImageHandler $imageHandler;
-    private array $listeners    = [];
-    private array $factories    = [];
-    private array $defaultStyle = [];
+    private array $listeners      = [];
+    private array $factories      = [];
+    private array $componentStyle = [];
 
     public function __construct(Enviroment $enviroment, Reader $reader, Path $path)
     {
@@ -34,7 +34,7 @@ class ComponentBuilder
             $enviroment->getImageSources(),
             $enviroment->getImgDir()
         );
-        $this->defaultStyle = $reader->get('theme.components') ?? [];
+        $this->componentStyle = $reader->get('theme.components') ?? [];
     }
 
     public function addFactory(AbstractComponentFactory $factory) : void
@@ -42,13 +42,30 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(string $type, $data, array $style, array $flags = []) : ?AbstractComponent
+    public function build(string $type, $data, array $style) : ?AbstractComponent
     {
-        if (($style['inherit'] ?? true) && isset($this->defaultStyle[$type])) {
-            $style = ArrayHelper::merge($this->defaultStyle[$type], $style);
+        $tmp   = explode(':', $type);
+        $type  = $tmp[0];
+        $flags = isset($tmp[1]) ? explode(',', $tmp[1]) : [];
+        $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style);
+
+        $variants = isset($style['variants']) ? array_keys($style['variants']) : null;
+        $variant  = 'DEFAULT';
+        if ($variants) {
+            foreach ($flags as $flag) {
+                if (in_array($flag, $variants)) {
+                    $variant = $flag;
+                }
+            }
         }
+        if (isset($style['variants'][$variant])) {
+            $style = ArrayHelper::merge($style, $style['variants'][$variant]);
+        }
+        unset($style['variants']);
+
         $type = $style['type'] ?? $type;
         unset($style['type']);
+
         // Check external factories
         foreach ($this->factories as $factory) {
             $component = $factory->get($type);
