@@ -16,8 +16,8 @@ final class Grid extends AbstractComponent
     public function build(array $data, array $style, array $flags) : void
     {
         $this->addStyle($style['container'] ?? []);
-        if (count($flags)) {
-            $data = $this->addType($flags[0], $data);
+        if (isset($style['colType']) || count($flags)) {
+            $data = $this->addType($style['colType'] ?? $flags[0], $data);
         }
         foreach ($data as $i => $col) {
             $colStyle   = $this->getColStyle($i, $style);

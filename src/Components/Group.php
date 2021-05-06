@@ -17,7 +17,7 @@ final class Group extends AbstractComponent
             $this->setAttribute('id', $data['id']);
             unset($data['id']);
         }
-        $this->addStyle($style['container']);
+        $this->addStyle($style['container'] ?? []);
         foreach ($data as $key => $val) {
             $type      = $style[$key]['type'] ?? $key;
             $component = $this->builder->build($type, $val, $style[$key] ?? []);

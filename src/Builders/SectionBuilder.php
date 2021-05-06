@@ -96,8 +96,23 @@ class SectionBuilder
 
         if (isset($style['inherit'])) {
             while (count($style['inherit'])) {
-                $inherited = array_shift($style['inherit']);
-                $style     = ArrayHelper::merge($this->theme['style'][$inherited] ?? [], $style);
+                $inherited      = array_shift($style['inherit']);
+                $tmp            = explode(':', $inherited);
+                $variants       = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
+                $inherited      = $tmp[0];
+                $inheritedStyle = $this->theme['style'][$inherited] ?? [];
+                $variantFound   = false;
+                foreach ($variants as $variant) {
+                    if (isset($inheritedStyle['variants'][$variant])) {
+                        $inheritedStyle = ArrayHelper::merge($inheritedStyle, $inheritedStyle['variants'][$variant]);
+                        $variantFound   = true;
+                    }
+                }
+                if (!$variantFound && isset($inheritedStyle['variants']['DEFAULT'])) {
+                    $inheritedStyle = ArrayHelper::merge($inheritedStyle, $inheritedStyle['variants']['DEFAULT']);
+                }
+                unset($inheritedStyle['variants']);
+                $style = ArrayHelper::merge($inheritedStyle, $style);
             }
         }
 

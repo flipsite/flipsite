@@ -58,6 +58,12 @@ class ComponentBuilder
                     $variantFound = true;
                 }
             }
+            if (isset($data['variant'])) {
+                foreach (explode('+', $data['variant']) as $variant) {
+                    $style        = ArrayHelper::merge($style, $style['variants'][$variant]);
+                    $variantFound = true;
+                }
+            }
             if (!$variantFound) {
                 $style = ArrayHelper::merge($style, $style['variants']['DEFAULT'] ?? []);
             }
