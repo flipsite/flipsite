@@ -42,12 +42,17 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(string $type, $data, array $style) : ?AbstractComponent
+    public function build(string $type, $data, array $style, string $appearance = 'light') : ?AbstractComponent
     {
         $tmp   = explode(':', $type);
         $type  = $tmp[0];
         $flags = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
         $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style);
+
+        if ('dark' === $appearance && isset($style['dark'])) {
+            $style = ArrayHelper::merge($style, $style['dark']);
+            unset($style['dark']);
+        }
 
         $variants     = isset($style['variants']) ? array_keys($style['variants']) : null;
         $variantFound = false;
@@ -96,7 +101,7 @@ class ComponentBuilder
                     $component->addSlugs($this->reader->getSlugs());
                 }
 
-                $component->with($data, $style, $flags);
+                $component->with($data, $style, $flags, $appearance);
                 return $component;
             }
         }

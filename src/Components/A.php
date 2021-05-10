@@ -11,13 +11,14 @@ final class A extends AbstractComponent
 
     protected string $type = 'a';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
     {
         if (isset($data['id'])) {
             $this->setAttribute('id', $data['id']);
             unset($data['id']);
         }
         $this->addStyle($style);
+
         $external = false;
         $this->setAttribute('href', $this->url($data['url'], $external));
         if ($external) {
@@ -31,7 +32,7 @@ final class A extends AbstractComponent
         ];
         foreach ($data as $key => $val) {
             $type      = $style[$key]['type'] ?? $fallback[$key] ?? $key;
-            $component = $this->builder->build($type, $val, $style[$key] ?? []);
+            $component = $this->builder->build($type, $val, $style[$key] ?? [], $appearance);
             if (null !== $component) {
                 $this->addChild($component);
             }

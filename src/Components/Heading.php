@@ -9,7 +9,7 @@ final class Heading extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
     {
         $tag  = null;
         $tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
@@ -18,7 +18,8 @@ final class Heading extends AbstractComponent
                 $tag = $flag;
             }
         }
-        $this->type = $data['tag'] ?? $tag ?? 'h2';
+
+        $this->type = $data['tag'] ?? $tag ?? $style['tag'] ?? 'h2';
 
         $content = $this->getMarkdownLine($data['value'] ?? $data['text'], $style['markdown'] ?? null);
         $this->addStyle($style);

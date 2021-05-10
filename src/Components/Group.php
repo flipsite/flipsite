@@ -11,7 +11,7 @@ final class Group extends AbstractComponent
 
     protected string $type = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
     {
         if (isset($data['id'])) {
             $this->setAttribute('id', $data['id']);
@@ -20,7 +20,7 @@ final class Group extends AbstractComponent
         $this->addStyle($style['container'] ?? []);
         foreach ($data as $key => $val) {
             $type      = $style[$key]['type'] ?? $key;
-            $component = $this->builder->build($type, $val, $style[$key] ?? []);
+            $component = $this->builder->build($type, $val, $style[$key] ?? [], $appearance);
             if (null !== $component) {
                 $this->addChild($component);
             }

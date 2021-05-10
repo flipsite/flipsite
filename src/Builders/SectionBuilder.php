@@ -39,8 +39,9 @@ class SectionBuilder
         $id = $data['id'] ?? null;
         unset($data['id']);
 
-        $style = $this->getStyle($data['style'] ?? []);
-        unset($data['style']);
+        $style      = $this->getStyle($data['style'] ?? $data['style:dark'] ?? []);
+        $appearance = isset($data['style:dark']) ? 'dark' : $this->theme['appearance'] ?? 'light';
+        unset($data['style'],$data['style:dark']);
 
         $wrapper = null;
         $empty   = $style['section']['wrapper']['empty'] ?? false;
@@ -70,7 +71,7 @@ class SectionBuilder
         $section->addStyle($style['section'] ?? []);
         unset($style['section']);
 
-        $children = $this->getComponents($data, $style);
+        $children = $this->getComponents($data, $style, $appearance);
         if ($container) {
             $section->addChild($container);
             $container->addChildren($children);
@@ -114,20 +115,21 @@ class SectionBuilder
                 unset($inheritedStyle['variants']);
                 $style = ArrayHelper::merge($inheritedStyle, $style);
             }
+            unset($style['inherit']);
         }
 
         $style['section'] = ArrayHelper::merge($this->theme['components']['section'] ?? [], $style['section'] ?? []);
         return $style;
     }
 
-    private function getComponents(array $sectionData, array $style) : array
+    private function getComponents(array $sectionData, array $style, string $appearance) : array
     {
         $components = [];
         foreach ($sectionData as $type => $data) {
             if (null === $data) {
                 continue;
             }
-            $component = $this->componentBuilder->build($type, $data, $style[$type] ?? []);
+            $component = $this->componentBuilder->build($type, $data, $style[$type] ?? [], $appearance);
             if (null !== $component) {
                 $components[] = $component;
             }

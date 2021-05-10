@@ -13,7 +13,7 @@ final class Grid extends AbstractComponent
 
     protected string $type = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
     {
         $this->addStyle($style['container'] ?? []);
         if (isset($style['colType']) || count($flags)) {
@@ -23,7 +23,12 @@ final class Grid extends AbstractComponent
             $colStyle   = $this->getColStyle($i, $style);
             $components = [];
             foreach ($col as $componentType => $componentData) {
-                $components[] = $this->builder->build($componentType, $componentData, $colStyle[$componentType] ?? []);
+                $componentStyle = $colStyle[$componentType] ?? [];
+                if (mb_strpos($componentType, ':')) {
+                    $tmp            = explode(':', $componentType);
+                    $componentStyle = ArrayHelper::merge($colStyle[$tmp[0]] ?? [], $componentStyle);
+                }
+                $components[] = $this->builder->build($componentType, $componentData, $componentStyle, $appearance);
             }
             if (isset($colStyle['container'])) {
                 $col = new Element($colStyle['container']['type'] ?? 'div');
