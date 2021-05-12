@@ -6,10 +6,10 @@ namespace Flipsite\Components;
 
 abstract class AbstractComponent extends AbstractElement
 {
-    public function with($data, ?array $style = null, array $flags) : void
+    public function with($data, ?array $style = null, array $flags, string $appearance = 'light') : void
     {
         $style = $style ?? [];
-        $this->build($this->normalize($data), $style, $flags);
+        $this->build($this->normalize($data), $style, $flags, $appearance);
     }
 
     abstract public function build(array $data, array $style, array $flags) : void;
