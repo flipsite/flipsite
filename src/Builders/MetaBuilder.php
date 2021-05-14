@@ -74,6 +74,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
         $elements[] = $this->og('og:url', trim($server.$page, '/'));
         $elements[] = $this->og('og:site_name', $name);
+        $elements[] = $this->og('og:type', 'website');
 
         // Twitter meta
         $elements[] = $this->meta('twitter:card', 'summary_large_image');
