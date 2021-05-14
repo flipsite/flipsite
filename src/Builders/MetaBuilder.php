@@ -46,6 +46,8 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         } else {
             $title = $name;
         }
+
+        $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
 
         $elements = [];
