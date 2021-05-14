@@ -46,16 +46,20 @@ abstract class AbstractElement
         return $this->children;
     }
 
-    public function setAttribute(string $attr, $value) : self
+    public function setAttribute(string $attr, $value, bool $append = false) : self
     {
-        $this->attributes[$attr] = $value;
+        if ($append && isset($this->attributes[$attr])) {
+            $this->attributes[$attr].= ' '.$value;
+        } else {
+            $this->attributes[$attr] = $value;
+        }
         return $this;
     }
 
-    public function setAttributes(array $attributes) : self
+    public function setAttributes(array $attributes, bool $append = false) : self
     {
         foreach ($attributes as $attr => $value) {
-            $this->setAttribute($attr, $value);
+            $this->setAttribute($attr, $value, $append);
         }
         return $this;
     }
