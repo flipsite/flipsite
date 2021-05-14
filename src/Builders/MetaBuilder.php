@@ -52,11 +52,13 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
         $elements = [];
 
+        // HTML meta tags
         $elements[] = $this->meta('description', $meta['description'] ?? null);
         $elements[] = $this->meta('keywords', $meta['keywords']);
         $elements[] = $this->meta('author', $meta['author'] ?? null);
         $elements[] = $this->meta('generator', $meta['generator'] ?? null);
 
+        // Facebook opengraph tags
         $elements[] = $this->og('og:title', $title);
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
 
@@ -73,12 +75,9 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $elements[] = $this->og('og:url', trim($server.$page, '/'));
         $elements[] = $this->og('og:site_name', $name);
 
-        // twitter
-//         <meta name="twitter:card" content="summary" />
-        // <meta name="twitter:site" content="@flickr" />
-        // <meta name="twitter:title" content="Small Island Developing States Photo Submission" />
-        // <meta name="twitter:description" content="View the album on Flickr." />
-        // <meta name="twitter:image" content="https://farm6.staticflickr.com/5510/14338202952_93595258ff_z.jpg" />
+        // Twitter meta
+        $elements[] = $this->meta('twitter:card', 'summary_large_image');
+        $elements[] = $this->meta('twitter:image:alt', $title);
 
         foreach ($elements as $el) {
             if (null !== $el) {
