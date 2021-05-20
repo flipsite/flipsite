@@ -80,10 +80,10 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Parse request path to determine language and requested page
     $path = new Path($args['path'] ?? '',
-            $reader->getDefaultLanguage(),
-            $reader->getLanguages(),
-            $reader->getSlugs()
-        );
+        $reader->getDefaultLanguage(),
+        $reader->getLanguages(),
+        $reader->getSlugs()
+    );
 
     // Check if the requested path needs to redirect
     $redirect = $path->getRedirect();

@@ -39,6 +39,7 @@ final class Reader
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
+        $this->data['pages'] = $this->expandPages($this->data['pages']);
         $this->parseLanguages();
         $this->slugs = new Slugs(
             array_keys($this->data['pages'] ?? []),
@@ -213,5 +214,74 @@ final class Reader
             $this->languages[]     = new Language($language);
             $this->languageCodes[] = $language;
         }
+    }
+
+    private function expandPages(array $pages) : array
+    {
+        $expandedPages = [];
+        foreach ($pages as $page => $pageData) {
+            if (false !== mb_strpos($page, '[')) {
+                $matches = [];
+                preg_match_all('/\[([^\[\]]*)\]/', $page, $matches);
+                $params       = $matches[0];
+                $permutations = $this->getPermutations(0, count($params), $pageData['data']);
+                // TODO add support for localized slugs
+                foreach ($permutations as $permutation) {
+                    $expandedPage = $page;
+                    $sections     = $pageData['sections'];
+                    foreach ($params as $i => $param) {
+                        $expandedPage = str_replace($param, $permutation[$i], $expandedPage);
+                        $sections     = ArrayHelper::strReplace($param, $permutation[$i], $sections);
+                    }
+                    $dataMapper                   = new DataMapper();
+                    $expandedPages[$expandedPage] = $dataMapper->apply($sections, $pageData['data']);
+                }
+            } else {
+                $expandedPages[$page] = $pageData;
+            }
+        }
+
+        return $expandedPages;
+    }
+
+    private function getPermutations(int $level, int $max, array $data, array $parents = []) : array
+    {
+        $permutations = [];
+        foreach ($data as $key => $val) {
+            if ($level < $max - 1 && is_array($val) && isset($val['data'])) {
+                $permutations = array_merge($permutations, $this->getPermutations($level + 1, $max, $val['data'], array_merge($parents, [$key])));
+            } else {
+                $permutations[] = array_merge($parents, [$key]);
+            }
+        }
+        return $permutations;
+    }
+}
+
+class DataMapper
+{
+    public function apply(array $tpl, array $data) : array
+    {
+        $dot = new \Adbar\Dot($data);
+        return $this->search($tpl, $dot);
+    }
+
+    private function search(array $tpl, \Adbar\Dot $dot) : array
+    {
+        foreach ($tpl as $attr => &$value) {
+            if (is_array($value)) {
+                $value = $this->search($value, $dot);
+            } elseif (false !== mb_strpos($value, '{data.')) {
+                $matches = [];
+                preg_match('/\{data\.(.*?)\}/', $value, $matches);
+                $replace = $dot->get($matches[1]);
+                if (is_array($replace)) {
+                    $value = $replace;
+                } else {
+                    $value = str_replace($matches[0], $dot->get($matches[1]), $value);
+                }
+            }
+        }
+        return $tpl;
     }
 }

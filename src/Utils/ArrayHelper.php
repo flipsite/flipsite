@@ -84,4 +84,16 @@ final class ArrayHelper
         }
         return $array;
     }
+
+    public static function strReplace(string $search, string $replace, array $array) : array
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = self::strReplace($search, $replace, $value);
+            } elseif (is_string($value)) {
+                $value = str_replace($search, $replace, $value);
+            }
+        }
+        return $array;
+    }
 }

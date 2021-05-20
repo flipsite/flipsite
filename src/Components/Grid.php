@@ -16,9 +16,13 @@ final class Grid extends AbstractComponent
     public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
     {
         $this->addStyle($style['container'] ?? []);
+        if (isset($data['colTpl'])) {
+            $data = $this->mapData($data['colTpl'], $data['colData']);
+        }
         if (isset($style['colType']) || count($flags)) {
             $data = $this->addType($style['colType'] ?? $flags[0], $data);
         }
+
         foreach ($data as $i => $col) {
             $colStyle   = $this->getColStyle($i, $style);
             $components = [];
@@ -60,5 +64,29 @@ final class Grid extends AbstractComponent
             $oddEven = $style['colsOdd'] ?? [];
         }
         return ArrayHelper::merge($all, $oddEven, $style['cols'][$index] ?? []);
+    }
+
+    private function mapData(array $tpl, array $list) : array
+    {
+        $data = [];
+        foreach ($list as $key => $itemData) {
+            $itemData['key'] = $key;
+            $data[]          = $this->applyTpl($tpl, new \Adbar\Dot($itemData));
+        }
+        return $data;
+    }
+
+    private function applyTpl(array $tpl, \Adbar\Dot $data)
+    {
+        foreach ($tpl as $attr => &$value) {
+            if (is_array($value)) {
+                $value = $this->applyTpl($value, $data);
+            } elseif (false !== mb_strpos($value, '{colData.')) {
+                $matches = [];
+                preg_match('/\{colData\.(.*?)\}/', $value, $matches);
+                $value = str_replace($matches[0], $data->get($matches[1]), $value);
+            }
+        }
+        return $tpl;
     }
 }
