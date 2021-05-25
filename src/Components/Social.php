@@ -10,6 +10,8 @@ use Flipsite\Utils\SocialHelper;
 final class Social extends AbstractComponent
 {
     use Traits\BuilderTrait;
+    use Traits\ReaderTrait;
+    use Traits\PathTrait;
 
     protected string $type = 'div';
 
@@ -17,9 +19,10 @@ final class Social extends AbstractComponent
     {
         $this->addStyle($style['container'] ?? []);
         foreach ($data as $item) {
-            $a = $this->builder->build('a', $item, $style);
+            $a = $this->builder->build('a', $item['data'], $style);
             $a->setAttribute('target', '_blank');
             $a->setAttribute('rel', 'noopener noreferrer');
+            $a->addStyle($style[$item['type']] ?? []);
             $this->addChild($a);
         }
     }
@@ -27,36 +30,15 @@ final class Social extends AbstractComponent
     protected function normalize($items) : array
     {
         if (ArrayHelper::isAssociative($items)) {
-            $obj   = $items;
-            $items = [];
+            $name     = $this->reader->get('name');
+            $language = $this->path->getLanguage();
+            $obj      = $items;
+            $items    = [];
             foreach ($obj as $type => $handle) {
-                $item = SocialHelper::getData($type, $handle);
-                unset($item['color']);
-
-                //$item['text'] = ''
-
-                // $args = explode('|', $url);
-                // $url  = array_shift($args);
-                // if (is_string($value)) {
-                //     $item = [
-                //         'url' => $data['url'],
-                //         'icon' =>
-                //     ];
-                // } else {
-                //     if (!isset($value['text'])) {
-                //         $item = ['text' => $value];
-                //     } else {
-                //         $item = $value;
-                //     }
-                //     if (!isset($item['url'])) {
-                //         $item['url'] = $url;
-                //     }
-                // }
-                // // Inline options, e.g. |exact
-                // foreach ($args as $attr) {
-                //     $item[$attr] = true;
-                // }
-                $items[] = $item;
+                $items[] = [
+                    'type' => $type,
+                    'data' => SocialHelper::getData($type, $handle, $name, $language),
+                ];
             }
         }
         return $items;

@@ -10,7 +10,7 @@ final class SocialHelper
 {
     public static array $data = [];
 
-    public static function getData(string $type, $handle = null) : ?array
+    public static function getData(string $type, string $handle, string $name, Language $language) : ?array
     {
         self::loadData();
         $data = self::$data[$type] ?? null;
@@ -18,7 +18,8 @@ final class SocialHelper
             return null;
         }
         if (is_string($handle) || is_numeric($handle)) {
-            $data['url'] = str_replace('{handle}', $handle, $data['url']);
+            $data['url']  = str_replace('{handle}', $handle, $data['url']);
+            $data['text'] = $name.' '.$data['name'];
         }
         return $data;
     }
