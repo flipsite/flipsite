@@ -18,8 +18,8 @@ final class SocialHelper
             return null;
         }
         if (is_string($handle) || is_numeric($handle)) {
-            $data['url']  = str_replace('{handle}', $handle, $data['url']);
-            $data['text'] = $name.' '.$data['name'];
+            $data['url'] = str_replace('{handle}', $handle, $data['url']);
+            $data['sr']  = $name.' '.$data['name'];
         }
         return $data;
     }
