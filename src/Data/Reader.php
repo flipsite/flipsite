@@ -278,7 +278,7 @@ class DataMapper
                 if (is_array($replace)) {
                     $value = $replace;
                 } else {
-                    $value = str_replace($matches[0], $dot->get($matches[1]), $value);
+                    $value = str_replace($matches[0], $dot->get($matches[1]) ?? '', $value);
                 }
             }
         }

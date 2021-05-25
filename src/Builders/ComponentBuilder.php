@@ -44,6 +44,11 @@ class ComponentBuilder
 
     public function build(string $type, $data, array $style, string $appearance = 'light') : ?AbstractComponent
     {
+        if (isset($data['if'])) {
+            if ($this->handleIf(is_array($data['if']) ? $data['if'] : ['isset' => $data['if']])) {
+                return null;
+            }
+        }
         $tmp   = explode(':', $type);
         $type  = $tmp[0];
         $flags = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
@@ -119,5 +124,13 @@ class ComponentBuilder
         foreach ($this->listeners as $listener) {
             $listener->handleComponentEvent($event);
         }
+    }
+
+    private function handleIf(array $if) : bool
+    {
+        if (isset($if['isset']) && !$if['isset']) {
+            return true;
+        }
+        return false;
     }
 }

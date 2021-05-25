@@ -28,15 +28,17 @@ final class Breadcrumb extends AbstractComponent
                 ];
             }
             $a = $this->builder->build('a', $item, $style);
-            $this->addChild($a);
-            if ($url === $last) {
-                $a->addStyle($style['current'] ?? []);
-                $a->setAttribute('aria-current', 'page');
-            } else {
-                $span = new Element('span', true);
-                $span->addStyle($style['separator'] ?? []);
-                $span->setContent($separator);
-                $this->addChild($span);
+            if (null !== $a) {
+                $this->addChild($a);
+                if ($url === $last) {
+                    $a->addStyle($style['current'] ?? []);
+                    $a->setAttribute('aria-current', 'page');
+                } else {
+                    $span = new Element('span', true);
+                    $span->addStyle($style['separator'] ?? []);
+                    $span->setContent($separator);
+                    $this->addChild($span);
+                }
             }
         }
     }

@@ -19,8 +19,7 @@ final class Table extends AbstractComponent
         if (is_string($header)) {
             $header = explode(',', $header);
         }
-        $records = [];
-        $rows    = $data['rows'] ?? null;
+        $records = $data['rows'] ?? [];
         if (isset($data['import']) && mb_strpos($data['import'], '.csv')) {
             $filename = $this->enviroment->getSiteDir().'/'.$data['import'];
             if (file_exists($filename)) {
