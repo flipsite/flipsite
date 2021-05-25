@@ -37,6 +37,14 @@ class CssMiddleware implements MiddlewareInterface
         $classes  = HtmlParser::getClasses($html);
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../../Style/config.yaml'));
+
+        // Overwrite keyframe definitions instead of merge
+        foreach ($this->theme['keyframes'] ?? [] as $keyframe => $definition) {
+            if (isset($config['keyframes'][$keyframe])) {
+                $config['keyframes'][$keyframe] = $definition;
+                unset($config['keyframes'][$keyframe]);
+            }
+        }
         $config = ArrayHelper::merge($config, $this->theme ?? []);
         $fonts  = $config['fonts'] ?? [];
 

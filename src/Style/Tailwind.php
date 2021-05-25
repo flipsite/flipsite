@@ -72,7 +72,7 @@ final class Tailwind implements CallbackInterface
         }
 
         // Keyframes
-        $pattern = '/animation\:([a-z]+)\s{1}/';
+        $pattern = '/animation\:([a-z0-9\-\_]+)\s{1}/';
         $matches = [];
         preg_match_all($pattern, $css, $matches);
         if (count($matches[1])) {
