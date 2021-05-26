@@ -88,6 +88,8 @@ final class ContactDetails extends AbstractComponent
                         'url'  => 'mailto:'.$val,
                     ];
                     break;
+                default:
+                    $items[$attr] = $val;
             }
         }
         return $items;
