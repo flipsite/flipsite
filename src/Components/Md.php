@@ -29,10 +29,10 @@ final class Md extends AbstractComponent
         $html = $this->content;
         $html = str_replace("\n", ' ', $html);
         $tags = explode('-#-#-#-', str_replace('> <', '>-#-#-#-<', $html));
-        $html = '';
-        foreach ($tags as $tag) {
-            $html .= $i.wordwrap($tag, 80, "\n".$i)."\n";
-        }
+        // $html = '';
+        // foreach ($tags as $tag) {
+        //     $html .= $i.wordwrap($tag, 80, "\n".$i)."\n";
+        // }
         return $html;
     }
 }
