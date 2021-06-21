@@ -10,11 +10,14 @@ class ComponentFactory extends AbstractComponentFactory
     {
         switch ($type) {
             case 'plain':
+            case 'text':
                 return new PlainText();
             case 'mdline':
                 return new MdLine();
             case 'image':
                 return new Picture();
+            case 'icon':
+                return new Svg();
             default:
                 $class = 'Flipsite\\Components\\'.ucfirst($type);
                 if (class_exists($class)) {

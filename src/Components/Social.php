@@ -19,7 +19,8 @@ final class Social extends AbstractComponent
     {
         $this->addStyle($style['container'] ?? []);
         foreach ($data as $item) {
-            $a = $this->builder->build('a', $item['data'], ArrayHelper::Merge($style, $style[$item['type']] ?? []));
+            $itemStyle = ArrayHelper::Merge($style, $style[$item['type']] ?? []);
+            $a = $this->builder->build('a', $item['data'], ['a' => $itemStyle]);
             $a->setAttribute('target', '_blank');
             $a->setAttribute('rel', 'noopener noreferrer');
             $this->addChild($a);

@@ -25,7 +25,7 @@ final class Youtube extends AbstractComponent
             'frameborder'     => '0',
             'allow'           => 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
             'allowfullscreen' => true,
-            'data-src'        => '//www.youtube.com/embed/'.$data['id'].'?autoplay=1&mute=1',
+            'data-src'        => '//www.youtube.com/embed/'.$data['vid'].'?autoplay=1&mute=1',
             'title'           => $data['title'],
         ]);
         $this->addChild($iframe);
@@ -35,7 +35,7 @@ final class Youtube extends AbstractComponent
 
     protected function normalize($data) : array
     {
-        if (!isset($data['id'])) {
+        if (!isset($data['vid'])) {
             throw new \Exception('YouTube ID missing');
         }
         if (!isset($data['title'])) {

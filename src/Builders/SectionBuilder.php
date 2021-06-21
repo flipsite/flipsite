@@ -39,9 +39,14 @@ class SectionBuilder
         $id = $data['id'] ?? null;
         unset($data['id']);
 
-        $style      = $this->getStyle($data['style'] ?? $data['style:dark'] ?? []);
+        $style      = $this->getStyle($data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? []);
         $appearance = isset($data['style:dark']) ? 'dark' : $this->theme['appearance'] ?? 'light';
         unset($data['style'],$data['style:dark']);
+
+        if ('dark' === $appearance) {
+            $style = ArrayHelper::merge($style, $style['dark']);
+            unset($style['dark']);
+        }
 
         $wrapper = null;
         $empty   = $style['section']['wrapper']['empty'] ?? false;
@@ -71,12 +76,12 @@ class SectionBuilder
         $section->addStyle($style['section'] ?? []);
         unset($style['section']);
 
-        $children = $this->getComponents($data, $style, $appearance);
+        $components = $this->componentBuilder->buildGroup($data, $style, $appearance);
         if ($container) {
             $section->addChild($container);
-            $container->addChildren($children);
+            $container->addChildren($components);
         } else {
-            $section->addChildren($children);
+            $section->addChildren($components);
         }
 
         if ($wrapper) {
@@ -120,20 +125,5 @@ class SectionBuilder
 
         $style['section'] = ArrayHelper::merge($this->theme['components']['section'] ?? [], $style['section'] ?? []);
         return $style;
-    }
-
-    private function getComponents(array $sectionData, array $style, string $appearance) : array
-    {
-        $components = [];
-        foreach ($sectionData as $type => $data) {
-            if (null === $data) {
-                continue;
-            }
-            $component = $this->componentBuilder->build($type, $data, $style[$type] ?? [], $appearance);
-            if (null !== $component) {
-                $components[] = $component;
-            }
-        }
-        return $components;
     }
 }

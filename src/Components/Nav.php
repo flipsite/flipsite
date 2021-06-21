@@ -17,10 +17,11 @@ final class Nav extends AbstractComponent
     {
         $items = $this->addIsActive($data, $this->path->getPage());
         $this->addStyle($style['container'] ?? []);
+        unset($style['container']);
         foreach ($items as $item) {
             $isActive = $item['isActive'];
             unset($item['isActive']);
-            $a = $this->builder->build('a', $item, $style);
+            $a = $this->builder->build('a', $item, ['a' => $style]);
             if ($isActive && isset($style['active'])) {
                 $a->addStyle($style['active']);
             }

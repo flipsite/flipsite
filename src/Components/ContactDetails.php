@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 final class ContactDetails extends AbstractComponent
 {
     use Traits\BuilderTrait;
@@ -17,11 +19,11 @@ final class ContactDetails extends AbstractComponent
         foreach ($data as $item) {
             $li = new Element('li');
             $li->addStyle($style['li'] ?? []);
-            $icon = $this->builder->build('svg', $item['icon'], $style['icon'] ?? [], $appearance);
+            $icon = $this->builder->build('svg', $item['icon'], ['svg' => ($style['icon'] ?? [])], $appearance);
             $li->addChild($icon);
             if (isset($item['url'])) {
                 unset($item['icon']);
-                $a = $this->builder->build('a', $item, $style['link'] ?? [], $appearance);
+                $a = $this->builder->build('a', $item, ['a'=>$style['link'] ?? []], $appearance);
                 $li->addChild($a);
             } else {
                 $span = new Element('span');
@@ -70,16 +72,22 @@ final class ContactDetails extends AbstractComponent
                     }
                     break;
                 case 'phone':
+                    $phones = !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
                     $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
-                    try {
-                        $numberProto = $phoneUtil->parse($val, '');
-                    } catch (\libphonenumber\NumberParseException $e) {
+                    foreach ($phones as $phone) {
+                        if (is_string($phone)) {
+                            $phone = ['number' => $phone];
+                        }
+                        try {
+                            $numberProto = $phoneUtil->parse($phone['number'], '');
+                        } catch (\libphonenumber\NumberParseException $e) {
+                        }
+                        $items[] = [
+                            'icon' => 'zondicons/phone',
+                            'text' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
+                            'url'  => $phone['number'],
+                        ];
                     }
-                    $items[$attr] = [
-                        'icon' => 'zondicons/phone',
-                        'text' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                        'url'  => 'tel:'.$val,
-                    ];
                     break;
                 case 'email':
                     $items[$attr] = [
@@ -92,10 +100,7 @@ final class ContactDetails extends AbstractComponent
                     $items[$attr] = $val;
             }
         }
+        unset($items['country'],$items['zip'],$items['maps'],$items['city']);
         return $items;
-    }
-
-    private function getAddress(array $data) : array
-    {
     }
 }

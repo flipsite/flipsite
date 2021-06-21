@@ -11,7 +11,6 @@ use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
 use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
-use Flipsite\Exceptions\ComponentNotFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 
@@ -42,6 +41,21 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
+    public function buildGroup(array $data, array $style, string $appearance) : array
+    {
+        $components = [];
+        foreach ($data as $type => $componentData) {
+            if (null === $componentData) {
+                continue;
+            }
+            $component = $this->build($type, $componentData, $style ?? [], $appearance);
+            if (null !== $component) {
+                $components[] = $component;
+            }
+        }
+        return $components;
+    }
+
     public function build(string $type, $data, array $style, string $appearance = 'light') : ?AbstractComponent
     {
         if (isset($data['if'])) {
@@ -52,7 +66,7 @@ class ComponentBuilder
         $tmp   = explode(':', $type);
         $type  = $tmp[0];
         $flags = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
-        $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style);
+        $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
 
         if ('dark' === $appearance && isset($style['dark'])) {
             $style = ArrayHelper::merge($style, $style['dark']);
@@ -105,13 +119,21 @@ class ComponentBuilder
                 if (method_exists($component, 'addSlugs')) {
                     $component->addSlugs($this->reader->getSlugs());
                 }
-
+                $id = false;
+                if (isset($data['id'])) {
+                    $id = $data['id'];
+                    unset($data['id']);
+                }
                 $component->with($data, $style, $flags, $appearance);
+                if (null !== $component) {
+                    if ($id) {
+                        $component->setAttribute('id', $id);
+                    }
+                }
                 return $component;
             }
         }
         return null;
-        //throw new ComponentNotFoundException($type, $data);
     }
 
     public function addListener(ComponentListenerInterface $listener) : void
@@ -124,6 +146,21 @@ class ComponentBuilder
         foreach ($this->listeners as $listener) {
             $listener->handleComponentEvent($event);
         }
+    }
+
+    private function getComponents(array $data, array $style, string $appearance) : array
+    {
+        $components = [];
+        foreach ($data as $type => $componentData) {
+            if (null === $componentData) {
+                continue;
+            }
+            $component = $this->componentBuilder->build($type, $componentData, $style ?? [], $appearance);
+            if (null !== $component) {
+                $components[] = $component;
+            }
+        }
+        return $components;
     }
 
     private function handleIf(array $if) : bool
