@@ -11,7 +11,7 @@ final class Breadcrumb extends AbstractComponent
 
     protected string $type = 'nav';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         $this->setAttribute('aria-label', 'breadcrumb');

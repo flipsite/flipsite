@@ -12,7 +12,7 @@ final class Table extends AbstractComponent
     use Traits\EnviromentTrait;
     protected string $type = 'table';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         $header = $data['header'] ?? null;

@@ -9,7 +9,7 @@ final class MdLine extends AbstractComponent
     use Traits\MarkdownTrait;
     protected string $type = '';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->content = $this->getMarkdownLine($data['value'], $style['markdown'] ?? null);
     }

@@ -7,11 +7,12 @@ namespace Flipsite\Components;
 final class Paragraph extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    protected string $type = 'p';
+    protected string $tag = 'p';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        $this->setContent($this->getMarkdownLine($data['value'] ?? $data, $style['markdown'] ?? null));
-        $this->addStyle($style);
+        $markdown = $this->getMarkdownLine($data->get('value'), $data->getStyle('markdown'));
+        $this->setContent($markdown);
+        $this->addStyle($data->getStyle());
     }
 }

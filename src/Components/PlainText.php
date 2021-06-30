@@ -8,9 +8,9 @@ final class PlainText extends AbstractComponent
 {
     protected string $plainText;
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        $this->plainText = $data['value'];
+        $this->plainText = $data->get('value');
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string

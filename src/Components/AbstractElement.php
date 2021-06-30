@@ -10,7 +10,7 @@ abstract class AbstractElement
 {
     protected bool $empty       = false;
     protected bool $oneline     = false;
-    protected string $type      = '';
+    protected string $tag       = '';
     protected array $children   = [];
     protected string $content   = '';
     protected array $attributes = [];
@@ -49,7 +49,7 @@ abstract class AbstractElement
     public function setAttribute(string $attr, $value, bool $append = false) : self
     {
         if ($append && isset($this->attributes[$attr])) {
-            $this->attributes[$attr].= ' '.$value;
+            $this->attributes[$attr] .= ' '.$value;
         } else {
             $this->attributes[$attr] = $value;
         }
@@ -119,12 +119,12 @@ abstract class AbstractElement
         }
         $html = '';
         $i    = str_repeat(' ', $indentation * $level);
-        if ('' === $this->type) {
+        if ('' === $this->tag) {
             $html .= $i.wordwrap($this->content, 80, $i."\n");
             $html .= "\n";
             return $html;
         }
-        $html = $i.'<'.$this->type.$this->renderAttributes().'>';
+        $html = $i.'<'.$this->tag.$this->renderAttributes().'>';
         if ($this->empty) {
             return $html."\n";
         }
@@ -144,9 +144,9 @@ abstract class AbstractElement
             }
         }
         if (!$this->oneline && !$oneline) {
-            $html .= $i.'</'.$this->type.'>'."\n";
+            $html .= $i.'</'.$this->tag.'>'."\n";
         } else {
-            $html .= '</'.$this->type.'>'."\n";
+            $html .= '</'.$this->tag.'>'."\n";
         }
         return $html;
     }

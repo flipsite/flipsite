@@ -10,7 +10,7 @@ final class Iframe extends AbstractComponent
     protected bool $oneline = true;
     protected string $type  = 'iframe';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style);
         $this->setAttributes($data);

@@ -10,15 +10,16 @@ final class Md extends AbstractComponent
     use Traits\EnviromentTrait;
     protected string $type = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        if (mb_strpos($data['value'], '.md')) {
-            $filename = $this->enviroment->getSiteDir().'/'.$data['value'];
+        $value = $data->get('value');
+        if (mb_strpos($value, '.md')) {
+            $filename = $this->enviroment->getSiteDir().'/'.$value;
             if (file_exists($filename)) {
                 $markdown = file_get_contents($filename);
             }
         } else {
-            $markdown = $data['value'];
+            $markdown = $value;
         }
         $this->content = $this->getMarkdown($markdown ?? '', $style ?? null);
     }

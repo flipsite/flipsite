@@ -6,12 +6,12 @@ namespace Flipsite\Components;
 
 final class Sr extends AbstractComponent
 {
-    protected string $type  = 'span';
+    protected string $tag   = 'span';
     protected bool $oneline = true;
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
         $this->addStyle(['screenReaders' => 'sr-only']);
-        $this->setContent($data['text'] ?? $data['value']);
+        $this->setContent($data->get('text') ?? $data->get('value'));
     }
 }

@@ -8,12 +8,12 @@ final class Tag extends AbstractComponent
 {
     public function __construct(string $tag)
     {
-        $this->type = $tag;
+        $this->tag = $tag;
     }
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        $this->setContent($data['value'] ?? $data);
-        $this->addStyle($style);
+        $this->setContent($data->get('value'));
+        $this->addStyle($data->getStyle());
     }
 }

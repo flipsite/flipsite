@@ -8,7 +8,7 @@ final class Polygon extends AbstractComponent
 {
     protected string $type = 'svg';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         //$this->setContent($data['value'] ?? $data);
         $this->addStyle($style);

@@ -9,19 +9,19 @@ final class A extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
 
-    protected string $type = 'a';
+    protected string $tag = 'a';
 
-    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style);
+        $this->addStyle($data->getStyle());
         $external = false;
-        $this->setAttribute('href', $this->url($data['url'], $external));
+        $this->setAttribute('href', $this->url($data->get('url'), $external));
         if ($external) {
             $this->setAttribute('target', '_blank');
             $this->setAttribute('rel', 'noopener noreferrer');
         }
-        unset($data['url']);
-        $components = $this->builder->buildGroup($data, $style, $appearance);
+        $data->unset('url');
+        $components = $this->builder->build($data->get(), $data->getStyle(), $data->getAppearance());
         $this->addChildren($components);
     }
 }

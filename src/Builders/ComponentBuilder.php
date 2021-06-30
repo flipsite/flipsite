@@ -7,6 +7,7 @@ namespace Flipsite\Builders;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
+use Flipsite\Components\ComponentData;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
 use Flipsite\Data\Reader;
@@ -41,14 +42,20 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function buildGroup(array $data, array $style, string $appearance) : array
+    public function build(array $data, array $style, string $appearance) : array
     {
         $components = [];
         foreach ($data as $type => $componentData) {
             if (null === $componentData) {
                 continue;
             }
-            $component = $this->build($type, $componentData, $style ?? [], $appearance);
+            if (isset($componentData['if'])) {
+                if ($this->handleIf(is_array($componentData['if']) ? $componentData['if'] : ['isset' => $componentData['if']])) {
+                    return null;
+                }
+                unset($componentData['if']);
+            }
+            $component = $this->getComponent($type, $componentData, $style, $appearance);
             if (null !== $component) {
                 $components[] = $component;
             }
@@ -56,48 +63,43 @@ class ComponentBuilder
         return $components;
     }
 
-    public function build(string $type, $data, array $style, string $appearance = 'light') : ?AbstractComponent
+    public function addListener(ComponentListenerInterface $listener) : void
     {
-        if (isset($data['if'])) {
-            if ($this->handleIf(is_array($data['if']) ? $data['if'] : ['isset' => $data['if']])) {
-                return null;
-            }
+        $this->listeners[] = $listener;
+    }
+
+    public function dispatch(Event $event) : void
+    {
+        foreach ($this->listeners as $listener) {
+            $listener->handleComponentEvent($event);
         }
-        $tmp   = explode(':', $type);
-        $type  = $tmp[0];
-        $flags = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
-        $style = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
+    }
 
-        if ('dark' === $appearance && isset($style['dark'])) {
-            $style = ArrayHelper::merge($style, $style['dark']);
-            unset($style['dark']);
+    private function getComponent(string $type, $data, array $style, string $appearance) : ?AbstractComponent
+    {
+        // Figure out component type
+        $flags          = explode(':', $type);
+        $type           = array_shift($flags);
+        $componentStyle = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
+        $componentType  = $componentStyle['type'] ?? $type;
+
+        // Get component from factory
+        $component = $this->buildComponent($componentType);
+        if (null === $component) {
+            return null;
         }
-
-        $variants     = isset($style['variants']) ? array_keys($style['variants']) : null;
-        $variantFound = false;
-        if ($variants) {
-            foreach ($flags as $flag) {
-                if (in_array($flag, $variants)) {
-                    $style        = ArrayHelper::merge($style, $style['variants'][$flag]);
-                    $variantFound = true;
-                }
-            }
-            if (isset($data['variant'])) {
-                foreach (explode('+', $data['variant']) as $variant) {
-                    $style        = ArrayHelper::merge($style, $style['variants'][$variant]);
-                    $variantFound = true;
-                }
-            }
-            if (!$variantFound) {
-                $style = ArrayHelper::merge($style, $style['variants']['DEFAULT'] ?? []);
-            }
+        $componentData = new ComponentData($flags, $data, $componentStyle, $appearance);
+        $id            = $componentData->getId();
+        if ($id) {
+            $component->setAttribute('id', $id);
         }
-        unset($style['variants']);
+        $component->with($componentData);
+        return $component;
+    }
 
-        $type = $style['type'] ?? $type;
-        unset($style['type']);
-
-        // Check external factories
+    private function buildComponent(string $type) : ?AbstractComponent
+    {
+        //Check external factories
         foreach ($this->factories as $factory) {
             $component = $factory->get($type);
             if (null !== $component) {
@@ -119,48 +121,10 @@ class ComponentBuilder
                 if (method_exists($component, 'addSlugs')) {
                     $component->addSlugs($this->reader->getSlugs());
                 }
-                $id = false;
-                if (isset($data['id'])) {
-                    $id = $data['id'];
-                    unset($data['id']);
-                }
-                $component->with($data, $style, $flags, $appearance);
-                if (null !== $component) {
-                    if ($id) {
-                        $component->setAttribute('id', $id);
-                    }
-                }
                 return $component;
             }
         }
         return null;
-    }
-
-    public function addListener(ComponentListenerInterface $listener) : void
-    {
-        $this->listeners[] = $listener;
-    }
-
-    public function dispatch(Event $event) : void
-    {
-        foreach ($this->listeners as $listener) {
-            $listener->handleComponentEvent($event);
-        }
-    }
-
-    private function getComponents(array $data, array $style, string $appearance) : array
-    {
-        $components = [];
-        foreach ($data as $type => $componentData) {
-            if (null === $componentData) {
-                continue;
-            }
-            $component = $this->componentBuilder->build($type, $componentData, $style ?? [], $appearance);
-            if (null !== $component) {
-                $components[] = $component;
-            }
-        }
-        return $components;
     }
 
     private function handleIf(array $if) : bool

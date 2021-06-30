@@ -9,12 +9,12 @@ final class Group extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
 
-    protected string $type = 'div';
+    protected string $tag = 'div';
 
-    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style['container'] ?? []);
-        $components = $this->builder->buildGroup($data, $style, $appearance);
+        $this->addStyle($data->getStyle('container'));
+        $components = $this->builder->build($data->get(), $data->getStyle(), $data->getAppearance());
         $this->addChildren($components);
     }
 }

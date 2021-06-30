@@ -9,7 +9,7 @@ final class Li extends AbstractComponent
     use Traits\BuilderTrait;
     protected string $type = 'li';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         if (null !== $style) {
             $this->addStyle($style);

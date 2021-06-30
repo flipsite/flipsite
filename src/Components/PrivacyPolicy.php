@@ -9,7 +9,7 @@ final class PrivacyPolicy extends AbstractComponent
     use Traits\MarkdownTrait;
     protected string $type = 'article';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         $filter = new \Twig\TwigFilter('s', function (string $string) : string {

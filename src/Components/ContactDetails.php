@@ -13,7 +13,7 @@ final class ContactDetails extends AbstractComponent
 
     protected string $type = 'ul';
 
-    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
+    public function build(array $data, array $style, string $appearance = 'light') : void
     {
         $this->addStyle($style['container'] ?? []);
         foreach ($data as $item) {
@@ -23,7 +23,7 @@ final class ContactDetails extends AbstractComponent
             $li->addChild($icon);
             if (isset($item['url'])) {
                 unset($item['icon']);
-                $a = $this->builder->build('a', $item, ['a'=>$style['link'] ?? []], $appearance);
+                $a = $this->builder->build('a', $item, ['a' => $style['link'] ?? []], $appearance);
                 $li->addChild($a);
             } else {
                 $span = new Element('span');
@@ -72,7 +72,7 @@ final class ContactDetails extends AbstractComponent
                     }
                     break;
                 case 'phone':
-                    $phones = !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
+                    $phones    = !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
                     $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
                     foreach ($phones as $phone) {
                         if (is_string($phone)) {

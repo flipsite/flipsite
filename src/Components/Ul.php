@@ -11,7 +11,7 @@ final class Ul extends AbstractComponent
     use Traits\BuilderTrait;
     protected string $type = 'ul';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         foreach ($data as $item) {

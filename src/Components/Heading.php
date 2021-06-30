@@ -9,37 +9,21 @@ final class Heading extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
 
-    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
+    public function with(ComponentData $data) : void
     {
-        $tag  = null;
-        $tags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-        foreach ($flags as $flag) {
-            if (in_array($flag, $tags)) {
-                $tag = $flag;
-            }
+        $this->tag = $data->getTag() ?? 'h2';
+        $markdown  = $this->getMarkdownLine($data->get('text') ?? $data->get('value'), $data->getStyle('markdown'));
+        $this->addStyle($data->getStyle());
+        if ('h1' === $this->tag) {
+            $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
         }
-
-        $this->type = $data['tag'] ?? $tag ?? $style['tag'] ?? 'h2';
-
-        $content = $this->getMarkdownLine($data['value'] ?? $data['text'], $style['markdown'] ?? null);
-        $this->addStyle($style);
-        if ('h1' === $this->type) {
-            $this->builder->dispatch(new Event('h1', '', strip_tags($content)));
-        }
-        if (isset($data['name']) || ($flags['name'] ?? false)) {
-            $name = $data['name'] ?? $this->toKebab($data['value']);
-            $a    = new Element('a');
-            $a->setContent($content);
-            $a->setAttribute('name', $name);
-            $a->addStyle($style['name'] ?? []);
+        if ($data->get('name')) {
+            $a = new Element('a');
+            $a->setContent($markdown);
+            $a->setAttribute('name', $data->get('name'));
             $this->addChild($a);
         } else {
-            $this->setContent($content);
+            $this->setContent($markdown);
         }
-    }
-
-    private function toKebab(string $string) : string
-    {
-        return str_replace(' ', '-', mb_strtolower($string));
     }
 }

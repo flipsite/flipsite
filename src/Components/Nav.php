@@ -11,21 +11,20 @@ final class Nav extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\PathTrait;
 
-    protected string $type = 'nav';
+    protected string $tag = 'nav';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        $items = $this->addIsActive($data, $this->path->getPage());
-        $this->addStyle($style['container'] ?? []);
-        unset($style['container']);
-        foreach ($items as $item) {
-            $isActive = $item['isActive'];
-            unset($item['isActive']);
-            $a = $this->builder->build('a', $item, ['a' => $style]);
-            if ($isActive && isset($style['active'])) {
-                $a->addStyle($style['active']);
+        $items = $this->normalize($data->get());
+        $items = $this->addIsActive($items, $this->path->getPage());
+        $this->addStyle($data->getStyle('container'));
+        foreach ($items as &$item) {
+            if ($item['isActive']) {
+                $item['style'] = $data->getStyle('active');
             }
-            $this->addChild($a);
+            unset($item['isActive']);
+            $components = $this->builder->build(['a' => $item], ['a' => $data->getStyle()], $data->getAppearance());
+            $this->addChildren($components);
         }
     }
 

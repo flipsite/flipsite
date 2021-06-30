@@ -15,8 +15,10 @@ class ComponentFactory extends AbstractComponentFactory
             case 'mdline':
                 return new MdLine();
             case 'image':
+            case 'picture':
                 return new Picture();
             case 'icon':
+            case 'svg':
                 return new Svg();
             default:
                 $class = 'Flipsite\\Components\\'.ucfirst($type);
@@ -37,6 +39,7 @@ class ComponentFactory extends AbstractComponentFactory
             'span',
             'div',
             'small',
+            'blockquote',
             'cite',
         ]);
     }

@@ -6,7 +6,7 @@ namespace Flipsite\Components;
 
 final class Document extends AbstractElement
 {
-    protected string $type = 'html';
+    protected string $tag = 'html';
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
     {

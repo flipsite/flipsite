@@ -11,39 +11,75 @@ final class Grid extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
 
-    protected string $type = 'div';
+    protected string $tag = 'div';
 
-    public function build(array $data, array $style, array $flags, string $appearance = 'light') : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style['container'] ?? []);
-        if (isset($data['colTpl'])) {
-            $data = $this->mapData($data['colTpl'], $data['colData']);
-        }
-        if (isset($style['colType']) || count($flags)) {
-            $data = $this->addType($style['colType'] ?? $flags[0], $data);
-        }
+        $this->addStyle($data->getStyle('container'));
+        $this->tag = $data->getTag() ?? 'div';
+        $type      = implode(':', $data->getFlags());
 
-        foreach ($data as $i => $col) {
-            $colStyle   = $this->getColStyle($i, $style);
-            $components = [];
-            foreach ($col as $componentType => $componentData) {
-                $componentStyle = $colStyle[$componentType] ?? [];
-                if (mb_strpos($componentType, ':')) {
-                    $tmp            = explode(':', $componentType);
-                    $componentStyle = ArrayHelper::merge($colStyle[$tmp[0]] ?? [], $componentStyle);
-                }
-                $components[] = $this->builder->build($componentType, $componentData, $componentStyle, $appearance);
-            }
-            if (isset($colStyle['container'])) {
-                $col = new Element($colStyle['container']['type'] ?? 'div');
-                unset($colStyle['container']['type']);
-                $col->addStyle($colStyle['container']);
+        foreach ($data->get() as $i => $colData) {
+            $colStyle = $this->getColStyle($i, $data->getStyle());
+            if ($type) {
+                $components = $this->builder->build([$type => $colData], [$type => $colStyle], $data->getAppearance());
+                $this->addChildren($components);
+            } else {
+                $containerStyle = $colStyle['container'] ?? [];
+                unset($colStyle['container']);
+                $components = $this->builder->build($colData, $colStyle, $data->getAppearance());
+                $col        = new Element('div');
+                $col->addStyle($containerStyle);
                 $col->addChildren($components);
                 $this->addChild($col);
-            } else {
-                $this->addChildren($components);
             }
         }
+
+        //$type = implode(':', $data->getFlags()) ?? 'group';
+        // if ($type) {
+
+        // } else {
+        //     foreach ($data->getData() as $item) {
+        //     //$components[] = $this->builder->build($item, [], 'light');
+        //     //$this->addChildren($components);
+        // }
+        // }
+
+        // foreach ($data->getData() as $item) {
+        //     //$components[] = $this->builder->build($item, [], 'light');
+        //     //$this->addChildren($components);
+        //}
+
+        // unset($style['container']);
+        // if (isset($data['colTpl'])) {
+        //     $data = $this->mapData($data['colTpl'], $data['colData']);
+        // }
+        // if (isset($style['colType']) || count($flags)) {
+        //     $data = $this->addType($style['colType'] ?? $flags[0], $data);
+        // }
+
+        // foreach ($data as $i => $col) {
+        //     $colStyle = $this->getColStyle($i, $style);
+        //     print_r($colStyle);
+        //     $components = [];
+        //     foreach ($col as $componentType => $componentData) {
+        //         $componentStyle = $colStyle[$componentType] ?? [];
+        //         if (mb_strpos($componentType, ':')) {
+        //             $tmp            = explode(':', $componentType);
+        //             $componentStyle = ArrayHelper::merge($colStyle[$tmp[0]] ?? [], $componentStyle);
+        //         }
+        //         $components[] = $this->builder->build($componentType, $componentData, $componentStyle, $appearance);
+        //     }
+        //     if (isset($colStyle['container'])) {
+        //         $col = new Element($colStyle['container']['type'] ?? 'div');
+        //         unset($colStyle['container']['type']);
+        //         $col->addStyle($colStyle['container']);
+        //         $col->addChildren($components);
+        //         $this->addChild($col);
+        //     } else {
+        //         $this->addChildren($components);
+        //     }
+        // }
     }
 
     private function addType(string $type, array $data) : array

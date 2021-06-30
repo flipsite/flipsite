@@ -13,17 +13,16 @@ final class Social extends AbstractComponent
     use Traits\ReaderTrait;
     use Traits\PathTrait;
 
-    protected string $type = 'div';
+    protected string $tag = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style['container'] ?? []);
-        foreach ($data as $item) {
-            $itemStyle = ArrayHelper::Merge($style, $style[$item['type']] ?? []);
-            $a = $this->builder->build('a', $item['data'], ['a' => $itemStyle]);
-            $a->setAttribute('target', '_blank');
-            $a->setAttribute('rel', 'noopener noreferrer');
-            $this->addChild($a);
+        $items = $this->normalize($data->get());
+        $this->addStyle($data->getStyle('container'));
+        foreach ($items as $item) {
+            $style      = ArrayHelper::merge($data->getStyle(), $data->getStyle($item['type']));
+            $components = $this->builder->build(['a' => $item['data']], ['a' => $style], $data->getAppearance());
+            $this->addChildren($components);
         }
     }
 

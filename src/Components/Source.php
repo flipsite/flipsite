@@ -6,7 +6,7 @@ namespace Flipsite\Components;
 
 final class Source extends AbstractElement
 {
-    protected string $type  = 'source';
+    protected string $tag   = 'source';
     protected array $srcset = [];
     protected array $sizes  = [];
 

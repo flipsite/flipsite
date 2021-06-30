@@ -4,48 +4,40 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
-use Flipsite\Utils\ArrayHelper;
-
 final class Picture extends AbstractComponent
 {
     use Traits\EnviromentTrait;
     use Traits\ImageHandlerTrait;
-    protected string $type = 'picture';
+    protected string $tag = 'picture';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function with(ComponentData $data) : void
     {
-        if (isset($data['style'])) {
-            $style = ArrayHelper::merge($style ?? [], $data['style']);
-        }
         $basePath = $this->enviroment->getBasePath();
-        if ($this->isSvg($data['value'])) {
-            $imageContext = $this->imageHandler->getContext($data['value'], []);
-            $options      = $style['options'] ?? [];
+        $src      = $data->get('value');
+        $options  = $this->getOptions($data->getStyle('options'));
+        if ($this->isSvg($src)) {
+            $imageContext = $this->imageHandler->getContext($src, []);
         } else {
-            $options      = $this->getOptions($style['options'] ?? []);
-            $imageContext = $this->imageHandler->getContext($data['value'], $options);
-            unset($style['options']);
-            $this->addStyle($style['container'] ?? []);
-
+            $imageContext = $this->imageHandler->getContext($src, $options);
+            $this->addStyle($data->getStyle('container'));
             foreach ($imageContext->getSources() as $source) {
                 $sourceEl = new Source($source->type);
                 foreach ($source->srcset as $srcset) {
                     $sourceEl->addSrcset($srcset->variant, $basePath.'/img/'.$srcset->src);
                 }
-                foreach ($options['sizes'] as $size) {
+                foreach ($options['sizes'] ?? [] as $size) {
                     $sourceEl->addSize($size);
                 }
                 $this->addChild($sourceEl);
             }
         }
-
         $img = new Element('img', true, true);
         $img->setAttribute('src', $basePath.'/img/'.$imageContext->getSrc());
         $img->setAttribute('loading', $options['loading'] ?? 'lazy');
-        $img->setAttribute('alt', $data['alt'] ?? '');
+        $img->setAttribute('alt', $data->get('alt'));
         $img->setAttribute('width', (string) $imageContext->getWidth());
         $img->setAttribute('height', (string) $imageContext->getHeight());
-        $img->addStyle($style);
+        $img->addStyle($data->getStyle());
         $this->addChild($img);
     }
 

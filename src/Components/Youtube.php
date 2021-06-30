@@ -10,7 +10,7 @@ final class Youtube extends AbstractComponent
 
     protected string $type = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         $this->setAttribute('onclick', 'youtube(this)');

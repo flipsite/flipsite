@@ -9,7 +9,7 @@ final class Toggle extends AbstractComponent
     use Traits\BuilderTrait;
     protected string $type = 'div';
 
-    public function build(array $data, array $style, array $flags) : void
+    public function build(array $data, array $style) : void
     {
         $this->addStyle($style['container'] ?? []);
         $this->setAttribute('onclick', "toggle(this);toggle(document.getElementById('".$data['target']."'))");

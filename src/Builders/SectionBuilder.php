@@ -63,20 +63,20 @@ class SectionBuilder
         $container = null;
         $empty     = $style['section']['container']['empty'] ?? false;
         if (!$empty && isset($style['section']['container'])) {
-            $container = new Element($style['section']['container']['type'] ?? 'div');
-            unset($style['section']['container']['type']);
+            $container = new Element($style['section']['container']['tag'] ?? 'div');
+            unset($style['section']['container']['tag']);
             $container->addStyle($style['section']['container']);
         }
 
-        $section = new Element($style['section']['type'] ?? 'section');
-        unset($style['section']['type']);
+        $section = new Element($style['section']['tag'] ?? 'section');
+        unset($style['section']['tag']);
         if ($id) {
             $section->setAttribute('id', $id);
         }
         $section->addStyle($style['section'] ?? []);
         unset($style['section']);
 
-        $components = $this->componentBuilder->buildGroup($data, $style, $appearance);
+        $components = $this->componentBuilder->build($data, $style, $appearance);
         if ($container) {
             $section->addChild($container);
             $container->addChildren($components);
