@@ -11,7 +11,7 @@ final class Paragraph extends AbstractComponent
 
     public function with(ComponentData $data) : void
     {
-        $markdown = $this->getMarkdownLine($data->get('value'), $data->getStyle('markdown'));
+        $markdown  = $this->getMarkdownLine($data->get('text') ?? $data->get('value'), $data->getStyle('markdown'));
         $this->setContent($markdown);
         $this->addStyle($data->getStyle());
     }

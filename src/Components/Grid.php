@@ -28,7 +28,8 @@ final class Grid extends AbstractComponent
                 $containerStyle = $colStyle['container'] ?? [];
                 unset($colStyle['container']);
                 $components = $this->builder->build($colData, $colStyle, $data->getAppearance());
-                $col        = new Element('div');
+                $col        = new Element($containerStyle['tag'] ?? 'div');
+                unset($containerStyle['tag']);
                 $col->addStyle($containerStyle);
                 $col->addChildren($components);
                 $this->addChild($col);

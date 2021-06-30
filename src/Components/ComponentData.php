@@ -17,9 +17,11 @@ final class ComponentData
 
     public function __construct(array $flags, $data, array $style, string $appearance)
     {
-        $dataStyle        = false;
         $this->appearance = $appearance;
-        if (is_string($data)) {
+        $dataStyle        = false;
+        if (is_bool($data)) {
+            $this->data = ['value' => true];
+        } else if (is_string($data)) {
             $this->data = ['value' => $data];
         } elseif (ArrayHelper::isAssociative($data)) {
             $this->id  = $data['id']    ?? null;
@@ -30,9 +32,9 @@ final class ComponentData
         } else {
             $this->data = $data;
         }
-
-        if (('dark' === $appearance || in_array('dark', $flags)) && isset($style['dark'])) {
-            $style = ArrayHelper::merge($style, $style['dark']);
+        if ('dark' === $appearance || in_array('dark', $flags)) {
+            $this->appearance = 'dark';
+            $style = ArrayHelper::merge($style, $style['dark'] ?? []);
         }
         unset($style['dark']);
         $flags = array_diff($flags, ['dark']);

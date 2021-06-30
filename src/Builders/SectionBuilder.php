@@ -43,9 +43,9 @@ class SectionBuilder
         $appearance = isset($data['style:dark']) ? 'dark' : $this->theme['appearance'] ?? 'light';
         unset($data['style'],$data['style:dark']);
 
-        if ('dark' === $appearance && isset($style['dark'])) {
-            $style = ArrayHelper::merge($style, $style['dark']);
-            unset($style['dark']);
+        if ('dark' === $appearance && isset($style['section']['dark'])) {
+            $style['section'] = ArrayHelper::merge($style['section'], $style['section']['dark']);
+            unset($style['section']['dark']);
         }
 
         $wrapper = null;

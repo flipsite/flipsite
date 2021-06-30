@@ -6,11 +6,11 @@ namespace Flipsite\Components;
 
 final class Divider extends AbstractComponent
 {
-    protected string $type = 'hr';
+    protected string $tag = 'hr';
     protected bool $empty  = true;
 
-    public function build(array $data, array $style) : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style);
+        $this->addStyle($data->getStyle());
     }
 }
