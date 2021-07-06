@@ -8,12 +8,12 @@ final class Iframe extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected bool $oneline = true;
-    protected string $type  = 'iframe';
+    protected string $tag  = 'iframe';
 
-    public function build(array $data, array $style) : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style);
-        $this->setAttributes($data);
+        $this->addStyle($data->getStyle());
+        $this->setAttributes($data->get());
     }
 
     public function normalize($data) : array
