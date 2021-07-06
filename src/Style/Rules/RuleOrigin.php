@@ -11,7 +11,7 @@ final class RuleOrigin extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $value = $this->getConfig('transformOrigin', $args[0]);
+        $value = $this->getConfig('transformOrigin', implode('-',$args));
         $this->setDeclaration('transform-origin', $value);
     }
 }
