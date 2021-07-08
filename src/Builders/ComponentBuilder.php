@@ -82,6 +82,12 @@ class ComponentBuilder
         $type           = array_shift($flags);
         $componentStyle = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
         $componentType  = $componentStyle['type'] ?? $type;
+        unset($componentStyle['type']);
+
+        if (strpos($componentType,':')) {
+            $flags          = explode(':', $componentType);
+            $componentType           = array_shift($flags);
+        }
 
         // Get component from factory
         $component = $this->buildComponent($componentType);
