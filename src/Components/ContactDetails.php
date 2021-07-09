@@ -11,25 +11,28 @@ final class ContactDetails extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\PathTrait;
 
-    protected string $type = 'ul';
+    protected string $tag = 'ul';
 
-    public function build(array $data, array $style, string $appearance = 'light') : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style['container'] ?? []);
-        foreach ($data as $item) {
+        $this->addStyle($data->getStyle('container'));
+        $style = $data->getStyle();
+        unset($style['container']);
+        foreach ($this->normalize($data->get()) as $item) {
             $li = new Element('li');
-            $li->addStyle($style['li'] ?? []);
-            $icon = $this->builder->build('svg', $item['icon'], ['svg' => ($style['icon'] ?? [])], $appearance);
-            $li->addChild($icon);
-            if (isset($item['url'])) {
-                unset($item['icon']);
-                $a = $this->builder->build('a', $item, ['a' => $style['link'] ?? []], $appearance);
-                $li->addChild($a);
-            } else {
-                $span = new Element('span');
-                $span->setContent($item['text']);
-                $li->addChild($span);
-            }
+            $li->addStyle($data->getStyle('li'));
+            $components = $this->builder->build($item, $data->getStyle(), $data->getAppearance());
+            $li->addChildren($components);
+
+            // if (isset($item['url'])) {
+            //     unset($item['icon']);
+            //     $a = $this->builder->build('a', $item, ['a' => $style['link'] ?? []], $appearance);
+            //     $li->addChild($a);
+            // } else {
+            //     $span = new Element('span');
+            //     $span->setContent($item['text']);
+            //     $li->addChild($span);
+            // }
             $this->addChild($li);
         }
     }
@@ -65,16 +68,16 @@ final class ContactDetails extends AbstractComponent
                     $address                            = $addressFormatter->formatAddress(false);
                     $items[$attr]                       = [
                         'icon' => 'zondicons/location',
-                        'text' => str_replace("\n", '<br>', $address),
+                        'text' => str_replace("\n", ', ', $address),
                     ];
                     if (isset($data['maps'])) {
                         $items[$attr]['url'] = $data['maps'];
                     }
                     break;
                 case 'phone':
-                    $phones    = !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
+                    $phones    = is_array($data['phone']) && !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
                     $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
-                    foreach ($phones as $phone) {
+                    foreach ($phones as $i => $phone) {
                         if (is_string($phone)) {
                             $phone = ['number' => $phone];
                         }
@@ -82,10 +85,10 @@ final class ContactDetails extends AbstractComponent
                             $numberProto = $phoneUtil->parse($phone['number'], '');
                         } catch (\libphonenumber\NumberParseException $e) {
                         }
-                        $items[] = [
+                        $items['phone'.$i] = [
                             'icon' => 'zondicons/phone',
                             'text' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                            'url'  => $phone['number'],
+                            'url'  => 'tel:'.$phone['number'],
                         ];
                     }
                     break;
@@ -96,11 +99,19 @@ final class ContactDetails extends AbstractComponent
                         'url'  => 'mailto:'.$val,
                     ];
                     break;
-                default:
-                    $items[$attr] = $val;
             }
         }
         unset($items['country'],$items['zip'],$items['maps'],$items['city']);
+        foreach ($items as $key => $item) {
+            if (isset($item['url'])) {
+                $item['a'] = [
+                    'text' => $item['text'],
+                    'url' => $item['url'],
+                ];
+                unset($item['text'],$item['url']);
+                $items[$key] = $item;
+            }
+        }
         return $items;
     }
 }
