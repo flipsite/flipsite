@@ -36,7 +36,7 @@ final class Social extends AbstractComponent
             foreach ($obj as $type => $handle) {
                 $items[] = [
                     'type' => $type,
-                    'data' => SocialHelper::getData($type, $handle, $name, $language),
+                    'data' => SocialHelper::getData($type, (string)$handle, $name, $language),
                 ];
             }
         }
