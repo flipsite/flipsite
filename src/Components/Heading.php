@@ -12,6 +12,12 @@ final class Heading extends AbstractComponent
     public function with(ComponentData $data) : void
     {
         $this->tag = $data->getTag() ?? 'h2';
+        $flags = $data->getFlags();
+        foreach ($flags as $flag) {
+            if (in_array($flag, ['h1','h2','h3','h4','h5','h6'])) {
+                $this->tag = $flag;
+            }
+        }
         $markdown  = $this->getMarkdownLine($data->get('text') ?? $data->get('value'), $data->getStyle('markdown'));
         $this->addStyle($data->getStyle());
         if ('h1' === $this->tag) {
