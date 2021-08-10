@@ -109,7 +109,11 @@ final class Reader
             if ('default' !== $type || $this->hideSection($section, $language)) {
                 continue;
             }
-            $sections[] = $section;
+            if (isset($section['repeat'])) {
+                $sections = array_merge($sections, $this->getRepeated($section));
+            } else {
+                $sections[] = $section;
+            }
         }
         return $this->localize($sections, $language);
     }
@@ -255,6 +259,28 @@ final class Reader
             }
         }
         return $permutations;
+    }
+
+    private function getRepeated(array $data) : array
+    {
+        $repeat = $data['repeat'];
+        foreach ($repeat as $key => &$val) {
+            $val['key'] = $key;
+        }
+        unset($data['repeat']);
+        if (!isset($data['sections'])) {
+            $sections = [$data];
+        } else {
+            $sections = $data['sections'];
+        }
+
+        $dataMapper                   = new DataMapper();
+        $repeated = [];
+        foreach ($repeat as $data) {
+            $repeated = array_merge($repeated, $dataMapper->apply($sections, $data));
+        }
+
+        return $repeated;
     }
 }
 
