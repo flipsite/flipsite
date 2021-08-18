@@ -22,6 +22,9 @@ final class Md extends AbstractComponent
         } else {
             $markdown = $value;
         }
+        $containerStyle = $data->getStyle('container');
+        $style = $data->getStyle();
+        unset($style['container']);
         $this->content = $this->getMarkdown($markdown ?? '', $style ?? null);
         $containerStyle = $data->getStyle('container');
         if ($containerStyle) {
