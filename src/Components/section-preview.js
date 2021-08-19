@@ -7,7 +7,7 @@ ready(function(){
     var maxHeight = 0;
     sections.forEach(function(el) {
       el.parentNode.parentNode.style.height = 'auto'
-      var w = 1280;
+      var w = window.innerWidth;
       el.style.width = w+'px';
       var scale = el.parentNode.offsetWidth / w;
       el.style.transform = 'scale('+(scale*100.0)+'%)';
