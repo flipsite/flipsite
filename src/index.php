@@ -56,7 +56,8 @@ $app->get('/img[/{file:.*}]', function (Request $request, Response $response, ar
     $enviroment = $this->get('enviroment');
     $handler = new ImageHandler(
         $enviroment->getImageSources(),
-        $enviroment->getImgDir());
+        $enviroment->getImgDir()
+    );
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
 
@@ -79,7 +80,8 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $reader = $this->get('reader');
 
     // Parse request path to determine language and requested page
-    $path = new Path($args['path'] ?? '',
+    $path = new Path(
+        $args['path'] ?? '',
         $reader->getDefaultLanguage(),
         $reader->getLanguages(),
         $reader->getSlugs()
@@ -101,10 +103,10 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $componentBuilder->addFactory(new $class($componentBuilder));
     }
     $sectionBuilder = new SectionBuilder(
-            $enviroment,
-            $componentBuilder,
-            $reader->get('theme')
-        );
+        $enviroment,
+        $componentBuilder,
+        $reader->get('theme')
+    );
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
     $componentBuilder->addListener($metaBuilder);

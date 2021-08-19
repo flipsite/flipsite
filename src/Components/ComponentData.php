@@ -21,7 +21,7 @@ final class ComponentData
         $dataStyle        = false;
         if (is_bool($data)) {
             $this->data = ['value' => true];
-        } else if (is_string($data)) {
+        } elseif (is_string($data)) {
             $this->data = ['value' => $data];
         } elseif (ArrayHelper::isAssociative($data)) {
             $this->id  = $data['id']    ?? null;
@@ -59,8 +59,10 @@ final class ComponentData
                 $style = ArrayHelper::merge($style, $style['variants']['DEFAULT']);
             }
         }
-        if ($dataStyle) {
+        if (is_array($dataStyle)) {
             $style = ArrayHelper::merge($style, $dataStyle);
+        } elseif (is_string($dataStyle)) {
+            $this->data['style'] = $dataStyle;
         }
         unset($style['variants']);
 

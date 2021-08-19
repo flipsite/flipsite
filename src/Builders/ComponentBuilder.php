@@ -21,6 +21,7 @@ class ComponentBuilder
     private Reader $reader;
     private Path $path;
     private ImageHandler $imageHandler;
+    private ?SectionBuilder $sectionBuilder = null;
     private array $listeners      = [];
     private array $factories      = [];
     private array $componentStyle = [];
@@ -84,7 +85,7 @@ class ComponentBuilder
         $componentType  = $componentStyle['type'] ?? $type;
         unset($componentStyle['type']);
 
-        if (strpos($componentType,':')) {
+        if (strpos($componentType, ':')) {
             $flags          = explode(':', $componentType);
             $componentType           = array_shift($flags);
         }
@@ -111,6 +112,16 @@ class ComponentBuilder
             if (null !== $component) {
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);
+                }
+                if (method_exists($component, 'addSectionBuilder')) {
+                    if (null === $this->sectionBuilder) {
+                        $this->sectionBuilder = new SectionBuilder(
+                            $this->enviroment,
+                            $this,
+                            $this->reader->get('theme')
+                        );
+                    }
+                    $component->addSectionBuilder($this->sectionBuilder);
                 }
                 if (method_exists($component, 'addEnviroment')) {
                     $component->addEnviroment($this->enviroment);
