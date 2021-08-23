@@ -74,10 +74,14 @@ final class ComponentData
         $this->flags = $flags;
     }
 
-    public function get(?string $key = null)
+    public function get(?string $key = null, bool $unset = false)
     {
         if (null !== $key) {
-            return $this->data[$key] ?? null;
+            $data = $this->data[$key] ?? null;
+            if ($unset) {
+                unset($this->data[$key]);
+            }
+            return $data;
         }
         return $this->data;
     }

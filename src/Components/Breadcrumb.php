@@ -9,36 +9,35 @@ final class Breadcrumb extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\PathTrait;
 
-    protected string $type = 'nav';
+    protected string $tag = 'nav';
 
-    public function build(array $data, array $style) : void
+    public function with(ComponentData $data) : void
     {
-        $this->addStyle($style['container'] ?? []);
+        $this->addStyle($data->getStyle('container'));
         $this->setAttribute('aria-label', 'breadcrumb');
-        $separator = $data['separator'] ?? '/';
-        unset($data['separator']);
-        $keys = array_keys($data);
+        $separator = $data->get('separator', true) ?? '/';
+        $keys = array_keys($data->get());
         $keys = array_reverse($keys);
         $last = $keys[0];
-        foreach ($data as $url => $item) {
+        foreach ($data->get() as $url => $item) {
             if (is_string($item)) {
                 $item = [
                     'text' => $item,
                     'url'  => $url,
                 ];
             }
-            $a = $this->builder->build('a', $item, $style);
-            if (null !== $a) {
+            $components = $this->builder->build(['a' => $item], ['a' => $data->getStyle()], $data->getAppearance());
+            $a = $components[0];
+            if ($url === $last) {
+                $a->addStyle($data->getStyle('current'));
+                $a->setAttribute('aria-current', 'page');
                 $this->addChild($a);
-                if ($url === $last) {
-                    $a->addStyle($style['current'] ?? []);
-                    $a->setAttribute('aria-current', 'page');
-                } else {
-                    $span = new Element('span', true);
-                    $span->addStyle($style['separator'] ?? []);
-                    $span->setContent($separator);
-                    $this->addChild($span);
-                }
+            } else {
+                $this->addChild($a);
+                $span = new Element('span', true);
+                $span->addStyle($data->getStyle('separator'));
+                $span->setContent($separator);
+                $this->addChild($span);
             }
         }
     }

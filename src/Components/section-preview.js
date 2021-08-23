@@ -25,10 +25,6 @@ ready(function(){
       var box = el.parentNode;
       var offsetY = (maxHeight - box.offsetHeight)/2;
       box.style.transform = 'translateY('+offsetY+'px)';
-
-
-
-
     });
   }
   window.onresize = windowSizeChange;

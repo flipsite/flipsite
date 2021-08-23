@@ -234,8 +234,8 @@ final class Reader
                     $expandedPage = $page;
                     $sections     = $pageData['sections'];
                     foreach ($params as $i => $param) {
-                        $expandedPage = str_replace($param, $permutation[$i], $expandedPage);
-                        $sections     = ArrayHelper::strReplace($param, $permutation[$i], $sections);
+                        $expandedPage = str_replace($param, (string)$permutation[$i], $expandedPage);
+                        $sections     = ArrayHelper::strReplace($param, (string)$permutation[$i], $sections);
                     }
                     $dataMapper                   = new DataMapper();
                     $expandedPages[$expandedPage] = $dataMapper->apply($sections, $pageData['data']);

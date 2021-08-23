@@ -19,14 +19,20 @@ final class Grid extends AbstractComponent
         $this->tag = $data->getTag() ?? 'div';
         $type      = implode(':', $data->getFlags());
 
-        foreach ($data->get() as $i => $colData) {
+        $cols = $data->get();
+        if (isset($cols['colData'])) {
+            $colData = $this->addKey($cols['colData']);
+            $colTpl = $cols['colTpl'];
+            $cols = $this->mapData($colTpl, $colData);
+        }
+
+        foreach ($cols as $i => $colData) {
             $colStyle = $this->getColStyle($i, $data->getStyle());
             if ($type) {
                 $components = $this->builder->build([$type => $colData], [$type => $colStyle], $data->getAppearance());
                 $this->addChildren($components);
             } else {
                 $containerStyle = $colStyle['container'] ?? [];
-                unset($colStyle['container']);
                 $components = $this->builder->build($colData, $colStyle, $data->getAppearance());
                 $col        = new Element($containerStyle['tag'] ?? 'div');
                 unset($containerStyle['tag']);
@@ -83,6 +89,16 @@ final class Grid extends AbstractComponent
         // }
     }
 
+    private function addKey(array $data) : array
+    {
+        $data_ = $data;
+        $data = [];
+        foreach ($data_ as $key => $value) {
+            $value['key'] = $key;
+            $data[] = $value;
+        }
+        return $data;
+    }
     private function addType(string $type, array $data) : array
     {
         $components = [];
@@ -107,8 +123,7 @@ final class Grid extends AbstractComponent
     {
         $data = [];
         foreach ($list as $key => $itemData) {
-            $itemData['key'] = $key;
-            $data[]          = $this->applyTpl($tpl, new \Adbar\Dot($itemData));
+            $data[] = $this->applyTpl($tpl, new \Adbar\Dot($itemData));
         }
         return $data;
     }
@@ -118,10 +133,19 @@ final class Grid extends AbstractComponent
         foreach ($tpl as $attr => &$value) {
             if (is_array($value)) {
                 $value = $this->applyTpl($value, $data);
-            } elseif (false !== mb_strpos($value, '{colData.')) {
-                $matches = [];
-                preg_match('/\{colData\.(.*?)\}/', $value, $matches);
-                $value = str_replace($matches[0], $data->get($matches[1]), $value);
+            } elseif (false !== mb_strpos((string)$value, '{colData')) {
+                if ((string)$value === '{colData}') {
+                    $value = $data->all();
+                } else {
+                    $matches = [];
+                    preg_match('/\{colData\.(.*?)\}/', (string)$value, $matches);
+                    $replaceWith = $data->get($matches[1]);
+                    if (is_array($replaceWith)) {
+                        $value = $replaceWith;
+                    } else {
+                        $value = str_replace($matches[0], (string)$replaceWith, (string)$value);
+                    }
+                }
             }
         }
         return $tpl;

@@ -6,21 +6,35 @@ namespace Flipsite\Components;
 
 class SectionPreview extends AbstractComponent
 {
+    use Traits\UrlTrait;
     use Traits\BuilderTrait;
     use Traits\SectionBuilderTrait;
     private AbstractElement $element;
 
     public function with(ComponentData $data) : void
     {
-        $this->element = new Element('div');
+        $external = false;
+        $url = $data->get('url', true);
+        if (null !== $url) {
+            $url = $this->url($url, $external);
+            if ('#missing' === $url) {
+                $url = null;
+            }
+        }
+        $this->element = new Element($url ? 'a' : 'div');
         $this->element->addStyle($data->getStyle('container'));
+        if ($url) {
+            $this->element->addStyle($data->getStyle('link'));
+            $this->element->setAttribute('href', $url);
+        }
+
 
         $section = new Element('div');
         $section->addStyle($data->getStyle('section'));
         $this->element->addChild($section);
 
         $resize = new Element('div');
-        $resize->addChild($this->sectionBuilder->getSection($data->get()));
+        $resize->addChild($this->sectionBuilder->getSection($data->get('section')));
         $resize->setAttribute('data-contain', true);
 
         $section->addChild($resize);

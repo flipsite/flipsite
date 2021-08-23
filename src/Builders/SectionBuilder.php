@@ -25,6 +25,10 @@ class SectionBuilder
 
     public function getSection(array $data) : ?AbstractElement
     {
+        if (isset($data['root'])) {
+            $data = array_merge($data, $data['root']);
+            unset($data['root']);
+        }
         if (isset($data['script'])) {
             foreach ($data['script'] as $type => $script) {
                 foreach ($script as $id => $script) {
@@ -98,6 +102,11 @@ class SectionBuilder
         }
         if (!is_array($style)) {
             $style = [];
+        }
+        if (isset($style['root'])) {
+            $root = $style['root'];
+            unset($style['root']);
+            $style = ArrayHelper::merge($root, $style);
         }
 
         if (isset($style['inherit'])) {
