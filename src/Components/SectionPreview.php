@@ -21,11 +21,11 @@ class SectionPreview extends AbstractComponent
                 $url = null;
             }
         }
-        $this->element = new Element($url ? 'a' : 'div');
+        $this->element = new Element('div');
         $this->element->addStyle($data->getStyle('container'));
         if ($url) {
             $this->element->addStyle($data->getStyle('link'));
-            $this->element->setAttribute('href', $url);
+            $this->element->setAttribute('data-href', $url);
         }
 
 

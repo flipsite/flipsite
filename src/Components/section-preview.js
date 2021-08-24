@@ -29,4 +29,9 @@ ready(function(){
   }
   window.onresize = windowSizeChange;
   windowSizeChange();
+  document.querySelectorAll('[data-href]').forEach(function(el){
+    el.onclick = function(){
+      window.location = el.getAttribute('data-href')
+    }
+  });
 });

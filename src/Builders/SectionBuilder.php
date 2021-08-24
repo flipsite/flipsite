@@ -45,6 +45,10 @@ class SectionBuilder
 
         $style      = $this->getStyle($data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? []);
         $appearance = isset($data['style:dark']) ? 'dark' : $this->theme['appearance'] ?? 'light';
+        if (isset($style['appearance'])) {
+            $appearance = $style['appearance'];
+            unset($style['appearance']);
+        }
         unset($data['style'],$data['style:dark']);
 
         if ('dark' === $appearance && isset($style['section']['dark'])) {
