@@ -106,7 +106,7 @@ final class ComponentData
         return $this->id;
     }
 
-    public function getStyle(?string $key = null) : array
+    public function getStyle(?string $key = null) : array|string
     {
         if (null !== $key) {
             return $this->style[$key] ?? [];

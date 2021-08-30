@@ -18,6 +18,9 @@ final class Grid extends AbstractComponent
         $this->addStyle($data->getStyle('container'));
         $this->tag = $data->getTag() ?? 'div';
         $type      = implode(':', $data->getFlags());
+        if ($data->getStyle('colType')) {
+            $type = $data->getStyle('colType');
+        }
 
         $cols = $data->get();
         if (isset($cols['colData'])) {
