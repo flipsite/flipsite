@@ -115,6 +115,8 @@ cursor:
   text: text
   move: move
   not-allowed': not-allowed
+divideWidth:
+  DEFAULT: 1px
 dropShadow:
   sm: 0 1px 1px rgba(0,0,0,0.05)
   DEFAULT:

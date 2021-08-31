@@ -120,6 +120,8 @@ class CssMiddleware implements MiddlewareInterface
             '--tw-saturate'            => '--ai',
             '--tw-sepia'               => '--aj',
             '--tw-drop-shadow'         => '--ak',
+            '--tw-divide-x-reverse'    => '--al',
+            '--tw-divide-y-reverse'    => '--am',
         ];
         foreach ($vars as $search => $replace) {
             $css = str_replace($search, $replace, $css);
