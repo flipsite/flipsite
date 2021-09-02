@@ -28,13 +28,16 @@ final class RuleDivide extends AbstractRule
             if ('reverse' === ($args[0] ?? '')) {
                 $this->setDeclaration('--tw-divide-'.$direction.'-reverse', 1);
             } else {
-                array_shift($args);
                 $value = $this->getConfig('divideWidth', $args[0] ?? 'DEFAULT');
                 $value ??= $this->checkCallbacks('size', $args);
                 $this->setDeclaration('--tw-divide-'.$direction.'-reverse', 0);
-                $borders = 'x' === $direction ? ['left','right'] :['bottom','top'];
-                $this->setDeclaration('border-'.$borders[0].'-width', 'calc('.$value.' * var(--tw-divide-'.$direction.'-reverse))');
-                $this->setDeclaration('border-'.$borders[1].'-width', 'calc('.$value.' * calc(1 - var(--tw-divide-'.$direction.'-reverse)))');
+                if ('x' === $direction) {
+                    $this->setDeclaration('border-right-width', 'calc('.$value.' * var(--tw-divide-x-reverse))');
+                    $this->setDeclaration('border-left-width', 'calc('.$value.' * calc(1 - var(--tw-divide-x-reverse)))');
+                } else {
+                    $this->setDeclaration('border-top-width', 'calc('.$value.' * calc(1 - var(--tw-divide-y-reverse)))');
+                    $this->setDeclaration('border-bottom-width', 'calc('.$value.' * var(--tw-divide-y-reverse))');
+                }
             }
         }
     }

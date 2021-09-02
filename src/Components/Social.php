@@ -21,6 +21,8 @@ final class Social extends AbstractComponent
         $this->addStyle($data->getStyle('container'));
         foreach ($items as $item) {
             $style      = ArrayHelper::merge($data->getStyle(), $data->getStyle($item['type']));
+            $item['data']['svg'] = $item['data']['icon'];
+            unset($item['data']['icon']);
             $components = $this->builder->build(['a' => $item['data']], ['a' => $style], $data->getAppearance());
             $this->addChildren($components);
         }

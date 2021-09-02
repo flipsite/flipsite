@@ -9,7 +9,7 @@ final class Md extends AbstractComponent
     use Traits\MarkdownTrait;
     use Traits\EnviromentTrait;
     protected string $type = 'div';
-    private Element $container;
+    private ?Element $container = null;
 
     public function with(ComponentData $data) : void
     {

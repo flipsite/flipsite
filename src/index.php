@@ -25,6 +25,7 @@ use League\Container\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
+use Flipsite\Utils\StyleAppearanceHelper;
 
 require_once getenv('VENDOR_DIR').'/autoload.php';
 require_once 'polyfills.php';
@@ -128,7 +129,12 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $document = $documentBuilder->getDocument();
 
     // Add body class
-    $document->getChild('body')->addStyle($reader->get('theme.components.body'));
+    $bodyStyle = StyleAppearanceHelper::apply(
+        $reader->get('theme.components.body'),
+        $reader->get('theme.appearance') ?? 'light'
+    );
+    $document->getChild('body')->addStyle($bodyStyle);
+
 
     // Add Meta
     $document = $metaBuilder->getDocument($document);

@@ -9,6 +9,7 @@ use Flipsite\Components\Element;
 use Flipsite\Components\Event;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\StyleAppearanceHelper;
 
 class SectionBuilder
 {
@@ -51,10 +52,8 @@ class SectionBuilder
         }
         unset($data['style'],$data['style:dark']);
 
-        if ('dark' === $appearance && isset($style['section']['dark'])) {
-            $style['section'] = ArrayHelper::merge($style['section'], $style['section']['dark']);
-            unset($style['section']['dark']);
-        }
+        $style['section'] = StyleAppearanceHelper::apply($style['section'], $appearance);
+        unset($style['section']['dark']);
 
         $wrapper = null;
         $empty   = $style['section']['wrapper']['empty'] ?? false;

@@ -14,6 +14,7 @@ use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
+use Flipsite\Utils\StyleAppearanceHelper;
 
 class ComponentBuilder
 {

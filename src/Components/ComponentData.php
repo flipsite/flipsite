@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\StyleAppearanceHelper;
 
 final class ComponentData
 {
@@ -32,12 +33,18 @@ final class ComponentData
         } else {
             $this->data = $data;
         }
-        if ('dark' === $appearance || in_array('dark', $flags)) {
-            $this->appearance = 'dark';
-            $style = ArrayHelper::merge($style, $style['dark'] ?? []);
+
+        if (in_array('dark', $flags)) {
+            $this->appearance  = 'dark';
+            $flags = array_diff($flags, ['dark']);
+        } elseif (in_array('auto', $flags)) {
+            $this->appearance  = 'auto';
+            $flags = array_diff($flags, ['auto']);
         }
+
+        $style = StyleAppearanceHelper::apply($style, $this->appearance);
         unset($style['dark']);
-        $flags = array_diff($flags, ['dark']);
+
 
         if (isset($data['variant'])) {
             $variant = $data['variant'];

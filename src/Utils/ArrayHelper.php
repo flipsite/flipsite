@@ -96,4 +96,18 @@ final class ArrayHelper
         }
         return $array;
     }
+
+    public static function addPrefix(array $array, string $prefix) : array
+    {
+        $new = [];
+        foreach ($array as $key => $val) {
+            if (is_string($val)) {
+                $val = $prefix.$val;
+            } elseif (is_array($val)) {
+                $val = self::addPrefix($val, $prefix);
+            }
+            $new[$prefix.$key] = $val;
+        }
+        return $new;
+    }
 }
