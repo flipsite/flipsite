@@ -24,6 +24,7 @@ before:
         bgColor: bg-white
         paddingY: py-5
         paddingX: px-5
+        border: border-b
         container:
           display: flex
           justifyContent: justify-between
@@ -63,6 +64,7 @@ pages:
           current:
             textColor: text-black
             fontWeight: font-normal
+          text.type: span
   flipsite/sections:
     -
       breadcrumb:
@@ -219,11 +221,13 @@ pages:
                   borderRadius: rounded
                   textSize: text-3.5
                   padding: p-3.5
+                  overflow: overflow-hidden
                 attr.textColor: text-primary-300
                 string.textColor: text-white
                 number.textColor: text-blue-200
                 literal.textColor: text-blue-200
                 bullet.textColor: text-white
+
   flipsite/components:
     -
       breadcrumb:

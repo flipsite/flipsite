@@ -29,3 +29,23 @@
         alignItems: items-center
         spaceX: space-x-6|15
       active.textColor: text-primary
+-
+  site:
+    nav:sm:
+      -
+        url: en
+        text: In English
+      -
+        url: fi
+        text: Suomeksi
+      -
+        url: sv
+        text: På Svenska
+  style:
+    section:
+      paddingY: py-2
+    nav:
+      container:
+        display: flex
+        justifyContent: justify-center md:justify-end
+        spaceY: space-x-5

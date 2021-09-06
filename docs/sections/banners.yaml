@@ -1,0 +1,9 @@
+-
+  site:
+    paragraph:sm: 👷🏽‍♂️ Very important message. [Read more](#)
+  style:
+    section:
+      paddingY: py-3
+      bgColor: bg-yellow
+      container:
+        textAlign: text-center

@@ -18,3 +18,8 @@ footers:
   name: Footers
   data: $sections/footers.yaml
   count: 1
+banners:
+  item: banner
+  name: Banners
+  data: $sections/banners.yaml
+  count: 1

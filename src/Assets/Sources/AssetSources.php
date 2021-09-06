@@ -21,16 +21,22 @@ final class AssetSources
 
     public function getFilename(string $src) : ?string
     {
-        // Check content directory
-        if (file_exists($this->siteDir.'/assets/'.$src)) {
-            return $this->siteDir.'/assets/'.$src;
-        }
-        if (mb_strpos($src, '.webp')) {
-            $filename = $this->siteDir.'/assets/'.$src;
-            foreach (['jpg', 'png'] as $ext) {
-                $alt = str_replace('.webp', '.'.$ext, $filename);
-                if (file_exists($alt)) {
-                    return $alt;
+        $assetDirs = [
+            $this->siteDir.'/assets/',
+            __DIR__.'/../../../docs/assets/'
+        ];
+
+        foreach ($assetDirs as $assetDir) {
+            if (file_exists($assetDir.$src)) {
+                return $assetDir.$src;
+            }
+            if (mb_strpos($src, '.webp')) {
+                $filename = $assetDir.$src;
+                foreach (['jpg', 'png'] as $ext) {
+                    $alt = str_replace('.webp', '.'.$ext, $filename);
+                    if (file_exists($alt)) {
+                        return $alt;
+                    }
                 }
             }
         }
@@ -41,7 +47,6 @@ final class AssetSources
         if (isset($this->sources[$type])) {
             return $this->sources[$type]->resolve($asset);
         }
-        $filename = $this->siteDir.'/assets/'.$src;
 
         $class = str_replace(' ', '', ucwords(str_replace('-', ' ', ucfirst($type))));
         $class = 'Flipsite\Icons\\'.$class;
@@ -53,10 +58,8 @@ final class AssetSources
             if (!file_exists($filename)) {
                 throw new \Flipsite\Exceptions\AssetNotFoundException($asset, $filename);
             }
+            return $filename;
         }
-        if (!file_exists($filename)) {
-            throw new \Flipsite\Exceptions\AssetNotFoundException($asset, $filename);
-        }
-        return $filename;
+        throw new \Flipsite\Exceptions\AssetNotFoundException($asset, $src);
     }
 }
