@@ -131,7 +131,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Add body class
     $bodyStyle = StyleAppearanceHelper::apply(
-        $reader->get('theme.components.body'),
+        $reader->get('theme.components.body') ?? [],
         $reader->get('theme.appearance') ?? 'light'
     );
     $document->getChild('body')->addStyle($bodyStyle);
