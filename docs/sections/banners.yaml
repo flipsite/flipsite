@@ -1,9 +1,20 @@
 -
   site:
-    paragraph:sm: 👷🏽‍♂️ Very important message. [Read more](#)
+    heading:xs: 👷🏽‍♂️ Very important message. [Read more](#)
   style:
+    appearance: dark
     section:
       paddingY: py-3
-      bgColor: bg-yellow
+      bgColor: bg-primary
+      container:
+        textAlign: text-center
+-
+  site:
+    heading:xs: 👷🏽‍♂️ WARNING Very important message. [Read more](#)
+  style:
+    appearance: dark
+    section:
+      paddingY: py-3
+      bgColor: bg-red
       container:
         textAlign: text-center

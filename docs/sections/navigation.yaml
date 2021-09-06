@@ -49,3 +49,35 @@
         display: flex
         justifyContent: justify-center md:justify-end
         spaceY: space-x-5
+-
+  site:
+    logo:
+      svg: flipsite.svg
+      sr: Flipsite
+      url: home
+    nav:
+      features: Features
+      pricing: Pricing
+      contact: Contact
+      about: About
+  style:
+    section:
+      paddingY: py-3.5
+      paddingX: px-3.5 md:px-6|15
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+        display: flex flex-col items-center
+        spaceY: space-y-3.5 md:space-y-0
+        flexDirection: flex-col md:flex-row
+        justifyContent: md:justify-between
+    logo.svg.width: w-25
+    nav:
+      container:
+        width: w-full md:w-auto
+        display: flex
+        justifyContent: justify-around md:justify-center
+        alignItems: items-center
+        spaceX: space-x-1 md:space-x-6|15
+      active.textColor: text-primary
+      textOverflow: truncate
