@@ -207,7 +207,7 @@ pages:
                   fontWeight: font-light
                   markdown:
                     code:
-                      bgColor: bg-pink-o20
+                      bgColor: bg-primary-o20
                       textColor: text-primary-600
                       padding: px-1 py-0.5
                       marginX: mx-0.5
@@ -219,7 +219,7 @@ pages:
                   borderRadius: rounded
                   textSize: text-3.5
                   padding: p-3.5
-                attr.textColor: text-pink-300
+                attr.textColor: text-primary-300
                 string.textColor: text-white
                 number.textColor: text-blue-200
                 literal.textColor: text-blue-200
