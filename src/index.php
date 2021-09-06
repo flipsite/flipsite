@@ -8,6 +8,7 @@ use Flipsite\App\Middleware\DiagnosticsMiddleware;
 use Flipsite\App\Middleware\ExpiresMiddleware;
 use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
+use Flipsite\App\Middleware\FlipsiteMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Builders\AnalyticsBuilder;
 use Flipsite\Builders\ComponentBuilder;
@@ -163,6 +164,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     return $response->withHeader('Content-type', 'text/html');
 })->add($cssMw)->add($svgMw)->add($offlineMw)->add($diagnosticsMw);
+if ('localhost' === getenv('APP_ENV')) {
+    $app->add(new FlipsiteMiddleware($container->get('reader')));
+}
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));

@@ -1,0 +1,43 @@
+-
+  site:
+    content:
+      tagline: Welcome to Flipsite
+      heading:lg: Build websites in minutes that score 100% on speed, SEO and accessibility.
+      paragraph:lg: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+      buttons:
+        button:primary:
+          url: flipsite
+          text: Documentation
+        button:link:
+          url: features
+          text: Learn More
+    image: placeholder.png
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+        display: grid
+        gridTemplateCols: lg:grid-cols-2
+        alignItems: items-center
+        gapX: gap-x-6|15
+        gapY: gap-y-10|30
+    content:
+      type: group
+      container:
+        spaceY: space-y-7
+      buttons:
+        type: group
+        container:
+          spaceX: space-x-7
+    image:
+      objectFit: object-cover
+      options:
+        aspectRatio: 16by9
+        sizes:
+          - (min-width:768px) 600px
+          - 300px
+      width: w-full
+      height: h-full
+      container:
+        selfAlign: self-stretch

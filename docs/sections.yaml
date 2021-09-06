@@ -1,0 +1,20 @@
+navigation:
+  item: nav
+  name: Navigation
+  data: $sections/navigation.yaml
+  count: 1
+heroes:
+  item: hero
+  name: Heroes
+  data: $sections/heroes.yaml
+  count: 1
+content:
+  item: content
+  name: Content
+  data: $sections/content.yaml
+  count: 3
+footers:
+  item: footer
+  name: Footers
+  data: $sections/footers.yaml
+  count: 1

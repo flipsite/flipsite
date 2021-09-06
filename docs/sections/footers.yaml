@@ -1,0 +1,9 @@
+-
+  site:
+    paragraph:xs: ©2020 Flipsite
+  style:
+    section:
+      paddingY: py-6|15
+      container:
+        textAlign: text-center
+        marginX: mx-auto

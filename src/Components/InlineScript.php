@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
-final class Script extends AbstractElement
+final class InlineScript extends AbstractElement
 {
     protected string $type = 'script';
 

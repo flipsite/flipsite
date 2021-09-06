@@ -15,6 +15,10 @@ final class A extends AbstractComponent
     {
         $this->addStyle($data->getStyle());
         $external = false;
+        $onclick = $data->get('onclick', true);
+        if ($onclick) {
+            $this->setAttribute('onclick', $onclick);
+        }
         $this->setAttribute('href', $this->url($data->get('url'), $external));
         if ($external) {
             $this->setAttribute('target', '_blank');

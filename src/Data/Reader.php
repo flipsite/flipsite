@@ -33,12 +33,17 @@ final class Reader
     public function __construct(Enviroment $enviroment)
     {
         $this->enviroment = $enviroment;
-        $siteDir          = $this->enviroment->getSiteDir();
+        $siteDir = $this->enviroment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
-            $this->data = YamlExpander::parseFile($siteDir.'/site.yaml');
+            $this->loadSite(YamlExpander::parseFile($siteDir.'/site.yaml'));
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
+    }
+
+    public function loadSite(array $yaml)
+    {
+        $this->data = $yaml;
         $this->data['pages'] = $this->expandPages($this->data['pages']);
         $this->parseLanguages();
         $this->slugs = new Slugs(
@@ -125,9 +130,6 @@ final class Reader
             'keywords'    => $this->get('keywords', $language),
             'author'      => $this->get('author', $language),
         ];
-        if (!isset($this->data['generator'])) {
-            $meta['generator'] = $this->enviroment->getGenerator();
-        }
         $all = $this->data['pages'][$page];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';

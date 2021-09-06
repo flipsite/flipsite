@@ -1,0 +1,117 @@
+-
+  site:
+    image: placeholder.png
+    grid:
+      -
+        header:
+          icon:sm: zondicons/checkmark
+          heading:sm: Built for professionals
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen.
+      -
+        header:
+          icon:sm: zondicons/dashboard
+          heading:sm: Built for professionals
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen.
+      -
+        header:
+          icon:sm: zondicons/trophy
+          heading:sm: Built for professionals
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen.
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+        display: grid
+        gridTemplateCols: lg:grid-cols-2
+        alignItems: items-center
+        gapX: gap-x-6|15
+        gapY: gap-y-10|30
+    grid:
+      container:
+        spaceY: space-y-7
+      colsAll:
+        container:
+          spaceY: space-y-2
+        header:
+          type: group
+          container:
+            display: flex
+            alignItems: items-center
+            spaceX: space-x-3.5
+    image:
+      objectFit: object-cover
+      options:
+        aspectRatio: 16by9
+        sizes:
+          - (min-width:768px) 600px
+          - 300px
+      width: w-full
+      height: h-full
+      container:
+        selfAlign: self-stretch
+-
+  site:
+    icon:xl: zondicons/bolt
+    paragraph:md: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen. No useless div elements, no useless CSS selectors, images of exactly the right size for the device & screen, automatically lazy loading external fonts, videos and other resources etc. And the DOM structure is so beautiful even yo mama and any accessibility tool can read it.
+    button:link:
+      url: flipsite
+      text: Learn More
+  style:
+    section:
+      container:
+        maxWidth: max-w-screen-md
+        marginX: mx-auto
+        textAlign: text-center
+        spaceY: space-y-7
+-
+  site:
+    header:
+      heading:lg: Build sites people love
+      paragraph:md: Sites built with flipsite are responsive out of the box, they take into account special cases like the iPhone X notch, they have automatic dark mode support and deliver the right sized (retina and non-retina) images to the right device.
+    grid:
+      -
+        icon:md: zondicons/mobile-devices
+        heading:sm: Responsive, Usable
+      -
+        icon:md: zondicons/keyboard
+        heading:sm: YAML for structure and style
+      -
+        icon:md: zondicons/plugin
+        heading:sm: Design System
+      -
+        icon:md: zondicons/dashboard
+        heading:sm: Speed and more speed
+    image: placeholder.png
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-lg
+        spaceY: space-y-6|15
+        textAlign: text-center
+      paddingY: pt-10|30
+    header:
+      type: group
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-sm
+        spaceY: space-y-7
+    grid:
+      container:
+        display: grid
+        gridTemplateCols: grid-cols-2 sm:grid-cols-4
+        gap: gap-6|15
+      colsAll:
+        container:
+          spaceY: space-y-3.5
+    image:
+      container:
+        display: block
+      borderRadius: rounded-t
+      options:
+        aspectRatio: 21by9
+        sizes:
+          - (min-width:768px) 600px
+          - 300px
+      width: w-full

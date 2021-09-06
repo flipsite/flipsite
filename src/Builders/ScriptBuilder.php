@@ -7,7 +7,7 @@ namespace Flipsite\Builders;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Document;
 use Flipsite\Components\Event;
-use Flipsite\Components\Script;
+use Flipsite\Components\InlineScript;
 
 class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
 {
@@ -19,7 +19,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         if (0 === count($this->global) && 0 === count($this->ready)) {
             return $document;
         }
-        $script = new Script();
+        $script = new InlineScript();
         foreach ($this->global as $code) {
             $script->addCode($code);
         }
