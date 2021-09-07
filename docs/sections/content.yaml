@@ -315,22 +315,64 @@
           width: w-full
           options:
             aspectRatio: 16by9
-# -
-#   site:
-#     group:
-#       heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
-#       paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
-#       button:link:
-#         url: '#'
-#         text: Learn more
-#     video:
-#       type: youtube
-#       id: 9bZkp7q19f0
-#       poster: placeholder.png
-#       aspectRatio: 16by9
-#       icon: simpleicons/youtube
-#   style:
-#     section:
-#       container:
-#         display: grid
-#         gridTemplateCols: grid-cols-2
+-
+  site:
+    content:
+      heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
+      paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+      button:link:
+        url: '#'
+        text: Learn more
+    video:
+      type: youtube
+      vid: 9bZkp7q19f0
+      title: Video title, needed for accessibility
+      poster: placeholder.png
+      play: simpleicons/youtube
+  style:
+    section:
+      container:
+        display: grid
+        gridTemplateCols: grid-cols-2
+        maxWidth: max-w-screen-lg
+        marginX: mx-auto
+        alignItems: items-center
+        gap: gap-6|15
+    content:
+      type: group
+      container.spaceY: space-y-3.5
+    video:
+      container:
+        width: w-full
+        borderRadius: rounded
+        position: relative
+        paddingY: pt-9/16
+        overflow: overflow-hidden
+        bgColor: bg-primary-800
+        group: group
+        cursor: hover:cursor-pointer
+      iframe:
+        position: absolute
+        inset: inset-0
+        height: h-full
+        width: w-full
+        display: hidden
+      poster:
+        position: absolute
+        inset: inset-0
+        height: h-full
+        width: w-full
+        objectFit: object-cover
+        opacity: opacity-50 group-hover:opacity-60
+      play:
+        position: absolute
+        width: w-14
+        height: h-14
+        zIndex: z-10
+        top: top-1/2
+        left: left-1/2
+        marginX: -ml-7
+        marginY: -mt-7
+        fill: fill-current
+        textColor: text-white
+
