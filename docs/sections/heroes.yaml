@@ -14,8 +14,8 @@
     image: placeholder.png
   style:
     section:
-      paddingY: pt-10|30 md:py-10|30
-      paddingX: null
+      paddingY: pt-10|30 lg:py-10|30
+      paddingX: px-6|15 lg:px-0
       container:
         display: grid
         gridTemplateCols: lg:grid-cols-2
@@ -25,11 +25,10 @@
       type: group
       container:
         spaceY: space-y-7
-        marginX: mx-auto md:mx-0
-        maxWidth: max-w-screen-md md:max-w-screen-xl/2
-        justifySelf: justify-self-end
+        maxWidth: max-w-screen-md lg:max-w-screen-xl/2
+        justifySelf: justify-self-center md:justify-self-end
         textAlign: text-center
-        paddingX: px-6|15 xl:pl-0
+        paddingX: px-6|15 2xl:pl-0
         paddingY: lg:py-7 xl:py-10|30
       buttons:
         type: group
