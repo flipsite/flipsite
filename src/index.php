@@ -78,6 +78,50 @@ $app->get('/robots.txt', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'text/plain');
 });
 
+$app->get('/api/pages', function (Request $request, Response $response) {
+    $yaml = Symfony\Component\Yaml\Yaml::parseFile('/Users/Henrik/Sites/flipsite-example/site.yaml');
+
+    $yaml = Symfony\Component\Yaml\Yaml::dump($yaml, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+
+    $matches = [];
+    preg_match_all("/\s*\\'{1}[a-zA-Z:]+\\'{1}\:/", $yaml, $matches);
+
+    foreach ($matches[0] as $match) {
+        $with = str_replace("'", '', $match);
+        $yaml = str_replace($match, $with, $yaml);
+    }
+    preg_match_all("/\:\s{1}\'[a-zA-Z]{1}.*\'/", $yaml, $matches);
+
+    foreach ($matches[0] as $match) {
+        if (strpos($match, "''") === false) {
+            $with = ltrim($match, ": '");
+            $with = rtrim($with, "'");
+            $yaml = str_replace($match, ': '.$with, $yaml);
+        }
+    }
+
+    print_r($yaml);
+
+
+
+    $reader = $this->get('reader');
+    $pages = array_keys($reader->get('pages'));
+    $response->getBody()->write(json_encode($pages));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+$app->post('/api/pages/{page}/sections', function (Request $request, Response $response, array $args) {
+    // $reader = $this->get('reader');
+    // $pages = array_keys($reader->get('pages'));
+    // $response->getBody()->write(json_encode($pages));
+    // return $response->withHeader('Content-Type', 'application/json');
+});
+$app->post('/api/theme/style/{style}', function (Request $request, Response $response, array $args) {
+    // $reader = $this->get('reader');
+    // $pages = array_keys($reader->get('pages'));
+    // $response->getBody()->write(json_encode($pages));
+    // return $response->withHeader('Content-Type', 'application/json');
+});
+
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
     $reader = $this->get('reader');
 
@@ -104,6 +148,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class($componentBuilder));
     }
+
     $sectionBuilder = new SectionBuilder(
         $enviroment,
         $componentBuilder,

@@ -13,6 +13,11 @@ content:
   name: Content
   data: $sections/content.yaml
   count: 6
+pricing:
+  item: price
+  name: Pricing
+  data: $sections/pricing.yaml
+  count: 1
 footers:
   item: footer
   name: Footers

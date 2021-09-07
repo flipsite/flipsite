@@ -1,0 +1,94 @@
+-
+  site:
+    header:
+      heading:lg: Pricing
+      paragraph: Extend an existing design, build your own sections and components and style them with ease.
+    grid:
+      -
+        tagline: Beginner
+        heading:xl: Free
+        ul:
+          -
+            marker: zondicons/checkmark
+            text: First feature
+          -
+            marker: zondicons/checkmark
+            text: Second feature
+          -
+            marker: zondicons/checkmark
+            text: Third feature
+        button:primary:
+          url: '#'
+          text: Button
+      -
+        tagline: Basic
+        heading:xl: 50*€*
+        ul:
+          -
+            marker: zondicons/checkmark
+            text: First feature
+          -
+            marker: zondicons/checkmark
+            text: Second feature
+          -
+            marker: zondicons/checkmark
+            text: Third feature
+          -
+            marker: zondicons/checkmark
+            text: Fourth feature
+        button:primary:
+          url: '#'
+          text: Button
+      -
+        tagline: Pro
+        heading:xl: 100*€*
+        ul:
+          -
+            marker: zondicons/checkmark
+            text: First feature
+          -
+            marker: zondicons/checkmark
+            text: Second feature
+          -
+            marker: zondicons/checkmark
+            text: Third feature
+          -
+            marker: zondicons/checkmark
+            text: Fourth feature
+          -
+            marker: zondicons/checkmark
+            text: Fifth feature
+        button:primary:
+          url: '#'
+          text: Button
+  style:
+    section:
+      maxWidth: max-w-screen-xs md:max-w-screen-xl
+      marginX: mx-auto
+      spaceY: space-y-6|15
+    header:
+      type: group
+      container:
+        spaceY: space-y-3.5
+        textAlign: text-center
+    grid:
+      container:
+        display: grid
+        gapY: gap-6|15
+        gridTemplateCols: md:grid-cols-3
+      colsAll:
+        container:
+          boxShadow: shadow
+          overflow: overflow-hidden
+          borderRadius: rounded
+          padding: p-7
+          spaceY: space-y-3.5
+        heading:
+          markdown:
+            em:
+              textColor: text-primary
+              fontStyle: not-italic
+              fontWeight: font-light
+              textSize: text-10
+        ul.container.height: h-45|50
+

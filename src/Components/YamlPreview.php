@@ -44,15 +44,11 @@ final class YamlPreview extends AbstractComponent
             $highlighted = implode("\n", $rows);
         }
 
-        $highlighted = str_replace("'", '', $highlighted);
-        $highlighted = str_replace("#", "'#'", $highlighted);
 
 
 
         $pre->setContent($this->addClasses($highlighted, $data->getStyle()));
         $this->addChild($pre);
-
-        $this->builder->dispatch(new Event('global-script', 'yaml-preview', file_get_contents(__DIR__.'/yaml-preview.js')));
     }
 
     private function addClasses(string $html, array $style) : string

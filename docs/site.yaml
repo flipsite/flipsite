@@ -91,7 +91,7 @@ pages:
         grid:
           container:
             display: grid
-            gridTemplateCols: grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4
+            gridTemplateCols: grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5
             gap: gap-5
           colsAll:
             sectionPreview:
@@ -170,26 +170,24 @@ pages:
           -
             group:
               paragraph: Add as page section in `site.yaml`
-              button:link:
-                text: Copy
-                url: '#'
-                onclick: copyYaml(this)
+              # button:link:
+              #   text: Copy
+              #   url: '#'
+              #   onclick: copyYaml(this)
             yamlPreview:
               root: '{data.[category].data.[section].site}'
               style: '{data.[category].item}[section]'
-              options.indent: '      '
           -
             group:
               paragraph: Add to `style` in `theme.yaml`
-              button:link:
-                text: Copy
-                url: '#'
-                onclick: copyYaml(this)
+              # button:link:
+              #   text: Copy
+              #   url: '#'
+              #   onclick: copyYaml(this)
             yamlPreview:
               root: '{data.[category].data.[section].style}'
               options:
                 wrap: '{data.[category].item}[section]'
-                indent: '  '
         style:
           section:
             paddingX: px-5

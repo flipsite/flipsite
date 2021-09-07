@@ -112,7 +112,11 @@ class SectionBuilder
             $style = ArrayHelper::merge($root, $style);
         }
 
+
         if (isset($style['inherit'])) {
+            if (is_string($style['inherit'])) {
+                $style['inherit'] = [$style['inherit']];
+            }
             while (count($style['inherit'])) {
                 $inherited      = array_shift($style['inherit']);
                 $tmp            = explode(':', $inherited);
