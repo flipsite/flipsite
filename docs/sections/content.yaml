@@ -115,3 +115,203 @@
           - (min-width:768px) 600px
           - 300px
       width: w-full
+-
+  site:
+    header:
+      heading:lg: Build websites that are lightning fast!
+    images:
+      - placeholder.png
+      - placeholder.png
+      - placeholder.png
+    grid:
+      -
+        heading:md: Build fast websites!
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen. No useless div elements, no useless CSS selectors
+      -
+        heading:md: Build fast websites!
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen. No useless div elements, no useless CSS selectors
+      -
+        heading:md: Build fast websites!
+        paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen. No useless div elements, no useless CSS selectors
+  style:
+    section:
+      container:
+        display: grid
+        gridTemplateCols: lg:grid-cols-2
+        gap: gap-6|15
+      maxWidth: max-w-screen-xl
+      marginX: mx-auto
+    header:
+      type: group
+      container:
+        colSpan: lg:col-span-2
+        marginX: mx-auto
+        maxWidth: max-w-screen-md
+        textAlign: text-center
+    images:
+      type: grid
+      colType: image
+      container:
+        display: grid
+        gridTemplateCols: grid-cols-2
+        gap: gap-2.5
+      colsAll:
+        width: w-full
+        objectFit: object-cover
+        options:
+          aspectRatio: 1by1
+          sizes:
+            - (min-width:768px) 600px
+            - 300px
+      cols.0:
+        options:
+          aspectRatio: 2by1
+          sizes:
+            - (min-width:768px) 900px
+            - 450px
+        container:
+          colSpan: col-span-2
+    grid:
+      container:
+        selfAlign: self-center
+        spaceY: space-y-6|15
+      colsAll:
+        container:
+          spaceY: space-y-3.5
+-
+  site:
+    grid:
+      -
+        image: placeholder.png
+        group:
+          heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
+          paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+          button:link:
+            url: '#'
+            text: Learn more
+      -
+        image: placeholder.png
+        group:
+          heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
+          paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+          button:link:
+            url: '#'
+            text: Learn more
+      -
+        image: placeholder.png
+        group:
+          heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
+          paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+          button:link:
+            url: '#'
+            text: Learn more
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+    grid:
+      container:
+        display: grid
+        spaceY: space-y-10|30
+      colsAll:
+        container:
+          display: grid
+          gridTemplateCols: md:grid-cols-5
+          gap: gap-6|15
+          alignItems: items-center
+        image:
+          container:
+            colSpan: md:col-span-2
+          width: w-full
+          options:
+            aspectRatio: 16by9
+        group.container:
+          spaceY: space-y-3.5
+          colSpan: md:col-span-3
+      colsOdd:
+        image.container:
+          gridPos: md:col-start-4 md:row-start-1
+-
+  site:
+    image: placeholder.png
+    group:
+      heading:lg: Built for professionals
+      paragraph:lg: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+      button:primary:
+        url: '#'
+        text: Learn more
+  style:
+    section:
+
+      paddingX: px-5|16 md:pl-0 md:pr-5|16 2xl:px-5|16
+      container:
+        display: grid md:flex
+        gap: gap-6|15
+        alignItems: items-center
+        maxWidth: max-w-screen-2xl
+        marginX: 2xl:mx-auto
+    group:
+      container:
+        spaceY: space-y-3.5
+        width: md:w-130
+        paddingX: md:py-6|15
+    image:
+      container:
+        width: md:w-full
+        selfAlign: md:self-stretch
+      borderRadius: md:rounded-l-0 md:rounded-r 2xl:rounded
+      width: w-full
+      height: h-full
+      objectFit: md:object-cover md:object-right
+      options:
+        aspectRatio: 16by9
+-
+  site:
+    grid:
+      -
+        image: placeholder.png
+        heading:sm: Build websites in minutes that score 100% on speed, SEO and accessibility.
+        paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+        button:link:
+          url: '#'
+          text: Learn more
+      -
+        image: placeholder.png
+        heading:sm: Build websites in minutes that score 100% on speed, SEO and accessibility.
+        paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+        button:link:
+          url: '#'
+          text: Learn more
+      -
+        image: placeholder.png
+        heading:sm: Build websites in minutes that score 100% on speed, SEO and accessibility.
+        paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+        button:link:
+          url: '#'
+          text: Learn more
+      -
+        image: placeholder.png
+        heading:sm: Build websites in minutes that score 100% on speed, SEO and accessibility.
+        paragraph: Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
+        button:link:
+          url: '#'
+          text: Learn more
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-md xl:max-w-screen-xl
+    grid:
+      container:
+        display: grid
+        gridTemplateCols: sm:grid-cols-2 xl:grid-cols-4
+        gapX: gap-x-6|15
+        gapY: gap-y-10|30
+      colsAll:
+        container:
+          spaceY: space-y-3.5
+        image:
+          width: w-full
+          options:
+            aspectRatio: 16by9

@@ -81,3 +81,28 @@
         spaceX: space-x-1 md:space-x-6|15
       active.textColor: text-primary
       textOverflow: truncate
+-
+  site:
+    nav:
+      flipsite: Features
+      pricing: Pricing
+      contact: Contact
+      about: About
+  style:
+    section:
+      paddingY: py-3.5
+      paddingX: px-3.5 md:px-6|15
+    nav:
+      container:
+        width: w-full md:w-auto
+        display: flex
+        justifyContent: justify-around md:justify-center
+        alignItems: items-center
+        spaceX: space-x-1 md:space-x-6|15
+      paddingX: px-2
+      borderRadius: rounded-full
+      bgColor: hover:bg-primary-o10
+      active:
+        textColor: text-white
+        bgColor: bg-primary
+      textOverflow: truncate

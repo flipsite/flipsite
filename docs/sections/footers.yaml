@@ -13,3 +13,56 @@
         spaceY: space-y-3.5
         textAlign: text-center
         marginX: mx-auto
+-
+  site:
+    group:
+      logo:
+        svg: flipsite.svg
+        sr: Flipsite
+        url: home
+      paragraph: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen.
+    grid:
+      -
+        heading:xs: Category One
+        nav:sitemap:
+          first: First Link
+          second: Second Link
+          third: Third Lik
+          fourth: Fourth Link
+      -
+        heading:xs: Category Two
+        nav:sitemap:
+          first: First Link
+          second: Second Link
+          third: Third Lik
+          fourth: Fourth Link
+          fifth: Fifth Link
+      -
+        heading:xs: Category Three
+        nav:sitemap:
+          first: First Link
+          second: Second Link
+          third: Third Link
+  style:
+    section.container:
+      maxWidth: max-w-screen-xl
+      marginX: mx-auto
+      display: md:flex
+      justifyContent: justify-between
+    group:
+      container.width: md:w-1/3
+      logo.svg.width: w-20
+    grid:
+      container:
+        width: md:w-2/3
+        display: flex
+        justifyContent: justify-between md:justify-end
+        spaceX: md:space-x-10|30
+        marginY: mt-6|15 md:mt-0
+      colsAll.nav:
+        container:
+          marginY: mt-3.5
+          spaceY: space-y-2
+        display: block
+
+

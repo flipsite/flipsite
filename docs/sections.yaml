@@ -2,7 +2,7 @@ navigation:
   item: nav
   name: Navigation
   data: $sections/navigation.yaml
-  count: 3
+  count: 4
 heroes:
   item: hero
   name: Heroes
@@ -12,12 +12,12 @@ content:
   item: content
   name: Content
   data: $sections/content.yaml
-  count: 3
+  count: 6
 footers:
   item: footer
   name: Footers
   data: $sections/footers.yaml
-  count: 1
+  count: 2
 banners:
   item: banner
   name: Banners

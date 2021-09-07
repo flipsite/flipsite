@@ -14,24 +14,30 @@
     image: placeholder.png
   style:
     section:
+      paddingY: pt-10|30 md:py-10|30
+      paddingX: null
       container:
-        marginX: mx-auto
-        maxWidth: max-w-screen-xl
         display: grid
         gridTemplateCols: lg:grid-cols-2
         alignItems: items-center
-        gapX: gap-x-6|15
         gapY: gap-y-10|30
     content:
       type: group
       container:
         spaceY: space-y-7
+        marginX: mx-auto md:mx-0
+        maxWidth: max-w-screen-md md:max-w-screen-xl/2
+        justifySelf: justify-self-end
+        textAlign: text-center
+        paddingX: px-6|15 xl:pl-0
+        paddingY: lg:py-7 xl:py-10|30
       buttons:
         type: group
         container:
           spaceX: space-x-7
     image:
       objectFit: object-cover
+      borderRadius: rounded-t md:rounded-l md:rounded-tr-0
       options:
         aspectRatio: 16by9
         sizes:
