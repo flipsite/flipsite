@@ -103,6 +103,7 @@ final class ArrayHelper
         foreach ($array as $key => $val) {
             if (is_string($val)) {
                 $val = $prefix.$val;
+                $val = str_replace(' ', ' '.$prefix, $val);
                 $new[$prefix.$key] = $val;
             } elseif (is_array($val)) {
                 $val = self::addPrefix($val, $prefix);
