@@ -9,6 +9,7 @@ ready(function(){
       pageLink.removeAttribute('href');
       pageLink.onclick = function(e) {
         postData(e.target.innerHTML);
+        e.target.remove();
       }
       buttons.appendChild(pageLink);
     }

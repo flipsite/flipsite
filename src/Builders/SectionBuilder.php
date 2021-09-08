@@ -120,7 +120,6 @@ class SectionBuilder
             $style = ArrayHelper::merge($root, $style);
         }
 
-
         if (isset($style['inherit'])) {
             if (is_string($style['inherit'])) {
                 $style['inherit'] = [$style['inherit']];
@@ -148,6 +147,7 @@ class SectionBuilder
         }
 
         $style['section'] = ArrayHelper::merge($this->theme['components']['section'] ?? [], $style['section'] ?? []);
+
         return $style;
     }
 }

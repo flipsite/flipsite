@@ -15,6 +15,23 @@
         marginX: mx-auto
 -
   site:
+    paragraph:xs: ©2020 Flipsite
+    social:
+      facebook: flipsiteio
+      twitter: flipsiteio
+      email: info@flipsite.io
+      phone: '+358503828498'
+  style:
+    section:
+      paddingY: py-6|15
+      container:
+        display: flex
+        justifyContent: justify-between
+        alignItems: items-center
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+-
+  site:
     group:
       logo:
         svg: flipsite.svg
@@ -44,11 +61,12 @@
           second: Second Link
           third: Third Link
   style:
-    section.container:
-      maxWidth: max-w-screen-xl
-      marginX: mx-auto
-      display: md:flex
-      justifyContent: justify-between
+    section:
+      container:
+        maxWidth: max-w-screen-xl
+        marginX: mx-auto
+        display: md:flex
+        justifyContent: justify-between
     group:
       container.width: md:w-1/3
       logo.svg.width: w-20

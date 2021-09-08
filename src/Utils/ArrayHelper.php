@@ -103,10 +103,11 @@ final class ArrayHelper
         foreach ($array as $key => $val) {
             if (is_string($val)) {
                 $val = $prefix.$val;
+                $new[$prefix.$key] = $val;
             } elseif (is_array($val)) {
                 $val = self::addPrefix($val, $prefix);
+                $new[$key] = $val;
             }
-            $new[$prefix.$key] = $val;
         }
         return $new;
     }

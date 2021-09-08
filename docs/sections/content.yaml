@@ -513,4 +513,39 @@
           container:
             spaceY: space-y-3.5
             padding: p-3.5
+-
+  site:
+    content:
+      heading:md: Build websites in minutes that score 100% on speed, SEO and accessibility.
+      paragraph: This section has multiple variants for left/right/top/bottom
+      button:primary:
+        url: '#'
+        text: Learn more
+    image: placeholder.png
+  style:
+    section:
+      container:
+        marginX: mx-auto
+        maxWidth: max-w-screen-xl
+        display: grid
+        gridTemplateCols: md:grid-cols-2
+        alignItems: items-center
+        gap: gap-6|15
+    content:
+      type: group
+      container:
+        spaceY: space-y-3.5
+    image:
+      width: w-full
+      options:
+        aspectRatio: 16by9
+        sizes:
+          - (min-width:768px) 600px
+          - 300px
+    variants:
+      DEFAULT:
+        image.container:
+          colStart: md:col-start-1
+          bgColor: bg-red
+
 

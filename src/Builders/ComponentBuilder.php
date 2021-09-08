@@ -82,7 +82,11 @@ class ComponentBuilder
         // Figure out component type
         $flags          = explode(':', $type);
         $type           = array_shift($flags);
-        $componentStyle = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
+        if (!isset($style[$type]['inherit']) || $style[$type]['inherit']) {
+            $componentStyle = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
+        } else {
+            $componentStyle = $style[$type] ?? [];
+        }
         $componentType  = $componentStyle['type'] ?? $type;
         unset($componentStyle['type']);
 

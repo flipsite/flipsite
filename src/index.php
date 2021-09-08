@@ -88,7 +88,7 @@ $app->get('/api/pages', function (Request $request, Response $response) {
 
 
 $app->post('/api/sections/{page}', function (Request $request, Response $response, array $args) {
-    $page = str_replace('-', '/', $args['page']);
+    $page = $args['page'];
     $body = $request->getParsedBody();
 
     $enviroment = $this->get('enviroment');

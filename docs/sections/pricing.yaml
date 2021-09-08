@@ -63,9 +63,10 @@
           text: Button
   style:
     section:
-      maxWidth: max-w-screen-xs md:max-w-screen-xl
-      marginX: mx-auto
-      spaceY: space-y-6|15
+      container:
+        maxWidth: max-w-screen-xs md:max-w-screen-xl
+        marginX: mx-auto
+        spaceY: space-y-6|15
     header:
       type: group
       container:
