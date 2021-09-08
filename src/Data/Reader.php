@@ -120,7 +120,7 @@ final class Reader
                 $sections[] = $section;
             }
         }
-        return $this->localize($sections, $language);
+        return $this->localize($sections ?? [], $language) ?? [];
     }
 
     public function getMeta(string $page, Language $language) : ?array
@@ -130,7 +130,7 @@ final class Reader
             'keywords'    => $this->get('keywords', $language),
             'author'      => $this->get('author', $language),
         ];
-        $all = $this->data['pages'][$page];
+        $all = $this->data['pages'][$page] ?? [];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';
             if ('meta' === $type) {
@@ -222,8 +222,11 @@ final class Reader
         }
     }
 
-    private function expandPages(array $pages) : array
+    private function expandPages(?array $pages) : array
     {
+        if (null === $pages) {
+            return [];
+        }
         $expandedPages = [];
         foreach ($pages as $page => $pageData) {
             if (false !== mb_strpos($page, '[')) {

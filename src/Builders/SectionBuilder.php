@@ -32,10 +32,18 @@ class SectionBuilder
         }
         if (isset($data['script'])) {
             foreach ($data['script'] as $type => $script) {
+                if (is_string($script)) {
+                    $script = [$script];
+                }
                 foreach ($script as $id => $script) {
                     $filename = $this->enviroment->getSiteDir().'/'.$script;
                     if (file_exists($filename)) {
                         $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
+                    } else {
+                        $filename = $this->enviroment->getVendorDir().'/flipsite/flipsite/docs/'.$script;
+                        if (file_exists($filename)) {
+                            $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
+                        }
                     }
                 }
             }

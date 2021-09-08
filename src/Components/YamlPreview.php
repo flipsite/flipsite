@@ -44,7 +44,11 @@ final class YamlPreview extends AbstractComponent
             $highlighted = implode("\n", $rows);
         }
 
-
+        $json = new Element('div', true);
+        $json->addStyle(['display'=>'hidden']);
+        $json->setAttribute('data-type', 'json');
+        $json->setContent(json_encode($raw));
+        $this->addChild($json);
 
 
         $pre->setContent($this->addClasses($highlighted, $data->getStyle()));

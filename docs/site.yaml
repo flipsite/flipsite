@@ -166,6 +166,32 @@ pages:
               bgColor: bg-white
               marginX: mx-5
       -
+        script.ready.add: docs-add-section.js
+        svg: zondicons/add-solid
+        paragraph:sm: 'Add section to:'
+        group:
+          button:link:
+            text: before
+            url: '#before'
+        style:
+          section:
+            paddingY: py-5
+            paddingX: px-5
+            container:
+              display: flex
+              alignItems: items-center
+              spaceX: space-x-2
+          svg:
+            fill: fill-current
+            textColor: text-green
+          group:
+            container:
+              fontFamily: font-mono
+              divide: divide-x
+            button:
+              marginX: px-2
+              cursor: hover:cursor-pointer
+      -
         grid:
           -
             group:

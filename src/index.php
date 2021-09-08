@@ -46,6 +46,7 @@ $container->add('enviroment', 'Flipsite\Enviroment', true);
 $container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment');
 AppFactory::setContainer($container);
 $app = AppFactory::create();
+$app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
 $cssMw         = new CssMiddleware($container->get('reader')->get('theme'));
@@ -79,47 +80,51 @@ $app->get('/robots.txt', function (Request $request, Response $response) {
 });
 
 $app->get('/api/pages', function (Request $request, Response $response) {
-    $yaml = Symfony\Component\Yaml\Yaml::parseFile('/Users/Henrik/Sites/flipsite-example/site.yaml');
-
-    $yaml = Symfony\Component\Yaml\Yaml::dump($yaml, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-
-    $matches = [];
-    preg_match_all("/\s*\\'{1}[a-zA-Z:]+\\'{1}\:/", $yaml, $matches);
-
-    foreach ($matches[0] as $match) {
-        $with = str_replace("'", '', $match);
-        $yaml = str_replace($match, $with, $yaml);
-    }
-    preg_match_all("/\:\s{1}\'[a-zA-Z]{1}.*\'/", $yaml, $matches);
-
-    foreach ($matches[0] as $match) {
-        if (strpos($match, "''") === false) {
-            $with = ltrim($match, ": '");
-            $with = rtrim($with, "'");
-            $yaml = str_replace($match, ': '.$with, $yaml);
-        }
-    }
-
-    print_r($yaml);
-
-
-
     $reader = $this->get('reader');
     $pages = array_keys($reader->get('pages'));
     $response->getBody()->write(json_encode($pages));
     return $response->withHeader('Content-Type', 'application/json');
 });
-$app->post('/api/pages/{page}/sections', function (Request $request, Response $response, array $args) {
-    // $reader = $this->get('reader');
-    // $pages = array_keys($reader->get('pages'));
-    // $response->getBody()->write(json_encode($pages));
-    // return $response->withHeader('Content-Type', 'application/json');
+
+
+$app->post('/api/sections/{page}', function (Request $request, Response $response, array $args) {
+    $page = str_replace('-', '/', $args['page']);
+    $body = $request->getParsedBody();
+
+    $enviroment = $this->get('enviroment');
+    $reader = $this->get('reader');
+    $pages = array_keys($reader->get('pages'));
+    $siteFilePath = $enviroment->getSiteDir().'/site.yaml';
+    $site = Symfony\Component\Yaml\Yaml::parseFile($siteFilePath);
+    if (in_array($page, ['before','after'])) {
+        if (!isset($site[$page])) {
+            $site[$page] = [$body];
+        } else {
+            $site[$page][] = $body;
+        }
+    } else {
+        if (!isset($site['pages'][$page])) {
+            $site['pages'][$page] = [$body];
+        } else {
+            $site['pages'][$page][] = $body;
+        }
+    }
+    file_put_contents($siteFilePath, Flipsite\Utils\YamlDumper::dump($site, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    return $response->withStatus(202);
 });
+
 $app->post('/api/theme/style/{style}', function (Request $request, Response $response, array $args) {
-    // $reader = $this->get('reader');
-    // $pages = array_keys($reader->get('pages'));
-    // $response->getBody()->write(json_encode($pages));
-    // return $response->withHeader('Content-Type', 'application/json');
+    $style = $args['style'];
+    $body = $request->getParsedBody();
+    $enviroment = $this->get('enviroment');
+    $reader = $this->get('reader');
+    $themeFilePath = $enviroment->getSiteDir().'/theme.yaml';
+    $theme = Symfony\Component\Yaml\Yaml::parseFile($themeFilePath);
+    if (!isset($theme['style'][$style])) {
+        $theme['style'][$style] = $body;
+        file_put_contents($themeFilePath, Flipsite\Utils\YamlDumper::dump($theme, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+    }
+    return $response->withStatus(200);
 });
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
