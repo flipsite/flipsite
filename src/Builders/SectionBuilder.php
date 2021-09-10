@@ -10,18 +10,28 @@ use Flipsite\Components\Event;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\StyleAppearanceHelper;
+use Flipsite\Sections\AbstractSectionFactory;
 
 class SectionBuilder
 {
     private Enviroment $enviroment;
     private ComponentBuilder $componentBuilder;
+    private array $factories = [];
     private ?array $theme;
+    private array $defaultSectionStyle = [];
+    private array $inheritedStyle = [];
 
     public function __construct(Enviroment $enviroment, ComponentBuilder $componentBuilder, ?array $theme = null)
     {
         $this->enviroment       = $enviroment;
         $this->componentBuilder = $componentBuilder;
         $this->theme            = $theme;
+        $this->defaultSectionStyle = $this->componentBuilder->getComponentStyle('section');
+    }
+
+    public function addFactory(AbstractSectionFactory $factory) : void
+    {
+        $this->factories[] = $factory;
     }
 
     public function getSection(array $data) : ?AbstractElement
@@ -52,15 +62,17 @@ class SectionBuilder
         $id = $data['id'] ?? null;
         unset($data['id']);
 
-        $style      = $this->getStyle($data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? []);
-        $appearance = isset($data['style:dark']) ? 'dark' : $this->theme['appearance'] ?? 'light';
-        if (isset($style['appearance'])) {
-            $appearance = $style['appearance'];
-            unset($style['appearance']);
-        }
-        unset($data['style'],$data['style:dark']);
+        $style = $data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? [];
+        $appearance = isset($data['style:light']) ? 'light' : null;
+        $appearance ??= isset($data['style:dark']) ? 'dark' : null;
+        $appearance ??= isset($data['style:auto']) ? 'auto' : null;
+        $appearance ??= $this->theme['appearance'];
+        $appearance ??= 'light';
+        unset($data['style'],$data['style:light'],$data['style:dark'],$data['style:auto']);
 
-        $style['section'] = StyleAppearanceHelper::apply($style['section'], $appearance);
+        $style = $this->getStyle($style);
+
+        $style['section'] = StyleAppearanceHelper::apply($style['section'] ?? [], $appearance);
         unset($style['section']['dark']);
 
         $wrapper = null;
@@ -127,9 +139,9 @@ class SectionBuilder
             while (count($style['inherit'])) {
                 $inherited      = array_shift($style['inherit']);
                 $tmp            = explode(':', $inherited);
-                $variants       = isset($tmp[1]) ? explode('+', $tmp[1]) : [];
-                $inherited      = $tmp[0];
-                $inheritedStyle = $this->theme['style'][$inherited] ?? [];
+                $inherited      = array_shift($tmp);
+                $variants       = $tmp;
+                $inheritedStyle = $this->getInheritedStyle($inherited);
                 $variantFound   = false;
                 foreach ($variants as $variant) {
                     if (isset($inheritedStyle['variants'][$variant])) {
@@ -140,14 +152,37 @@ class SectionBuilder
                 if (!$variantFound && isset($inheritedStyle['variants']['DEFAULT'])) {
                     $inheritedStyle = ArrayHelper::merge($inheritedStyle, $inheritedStyle['variants']['DEFAULT']);
                 }
-                unset($inheritedStyle['variants']);
                 $style = ArrayHelper::merge($inheritedStyle, $style);
             }
             unset($style['inherit']);
         }
 
-        $style['section'] = ArrayHelper::merge($this->theme['components']['section'] ?? [], $style['section'] ?? []);
+        $style['section'] = ArrayHelper::merge($this->defaultSectionStyle, $style['section'] ?? []);
+
+        if (isset($style['section']['variants'])) {
+            foreach ($variants as $variant) {
+                if (isset($style['section']['variants'][$variant])) {
+                    $style['section'] = ArrayHelper::merge($style['section'], $style['section']['variants'][$variant]);
+                }
+            }
+        }
 
         return $style;
+    }
+    public function getInheritedStyle(string $inherited) : array
+    {
+        if (isset($this->inheritedStyle[$inherited])) {
+            $this->inheritedStyle[$inherited];
+        }
+        $inheritStyle = [];
+        foreach ($this->factories as $factory) {
+            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($inherited));
+        }
+
+        if (isset($this->theme['sections'][$inherited])) {
+            $inheritStyle = ArrayHelper::merge($inheritStyle, $this->theme['sections'][$inherited]);
+        }
+
+        return $this->inheritedStyle[$inherited] = $inheritStyle;
     }
 }

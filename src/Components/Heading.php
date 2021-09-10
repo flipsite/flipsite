@@ -8,6 +8,7 @@ final class Heading extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
+    protected bool $oneline = true;
 
     public function with(ComponentData $data) : void
     {

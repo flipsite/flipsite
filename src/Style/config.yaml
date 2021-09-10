@@ -8,24 +8,24 @@ screens:
 colors:
   transparent: transparent
   current: currentColor
-  bluegray: '#64748B'
-  coolgray: '#6B7280'
-  gray: '#71717A'
-  truegray: '#737373'
-  warkgray: '#78716C'
+  bluegray: "#64748B"
+  coolgray: "#6B7280"
+  gray: "#71717A"
+  truegray: "#737373"
+  warkgray: "#78716C"
   black: "#000"
   darkgrey: "#121212"
   white: "#fff"
-  blue: '#3B82F6'
-  indigo: '#6366F1'
-  purple: '#8B5CF6'
-  pink: '#EC4899'
-  red: '#EF4444'
-  orange: '#fd7e14'
-  yellow: '#F59E0B'
-  green: '#10B981'
-  teal: '#20c997'
-  cyan: '#0dcaf0'
+  blue: "#3B82F6"
+  indigo: "#6366F1"
+  purple: "#8B5CF6"
+  pink: "#EC4899"
+  red: "#EF4444"
+  orange: "#fd7e14"
+  yellow: "#F59E0B"
+  green: "#10B981"
+  teal: "#20c997"
+  cyan: "#0dcaf0"
 spacing:
   none: none
   auto: auto
@@ -76,7 +76,7 @@ backgroundSize:
   cover: cover
   contain: contain
 blur:
-  '0': 0
+  "0": 0
   sm: 4px
   DEFAULT: 8px
   md: 12px
@@ -132,7 +132,7 @@ dropShadow:
     - 0 20px 13px rgba(0, 0, 0, 0.03)
     - 0 8px 5px rgba(0, 0, 0, 0.08)
   2xl: 0 25px 25px rgba(0, 0, 0, 0.15)
-  none: '0 0 #0000'
+  none: "0 0 #0000"
 flex:
   1: 1 1 0%
   auto: 1 1 auto

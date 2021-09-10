@@ -19,6 +19,7 @@ use Flipsite\Builders\MetaBuilder;
 use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\SectionBuilder;
 use Flipsite\Components\ComponentFactory;
+use Flipsite\Sections\SectionFactory;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\Robots;
 use Flipsite\Utils\Sitemap;
@@ -151,14 +152,18 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $componentBuilder = new ComponentBuilder($enviroment, $reader, $path);
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
-        $componentBuilder->addFactory(new $class($componentBuilder));
+        $componentBuilder->addFactory(new $class());
     }
-
     $sectionBuilder = new SectionBuilder(
         $enviroment,
         $componentBuilder,
         $reader->get('theme')
     );
+    $sectionBuilder->addFactory(new SectionFactory());
+    // TODO implement support for external section factories
+    // foreach ($reader->getSectionFactories() as $class) {
+    //     $sectionBuilder->addFactory(new $class());
+    // }
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
     $componentBuilder->addListener($metaBuilder);
@@ -181,7 +186,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Add body class
     $bodyStyle = StyleAppearanceHelper::apply(
-        $reader->get('theme.components.body') ?? [],
+        $componentBuilder->getComponentStyle('body'),
         $reader->get('theme.appearance') ?? 'light'
     );
     $document->getChild('body')->addStyle($bodyStyle);

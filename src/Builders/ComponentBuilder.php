@@ -83,7 +83,7 @@ class ComponentBuilder
         $flags          = explode(':', $type);
         $type           = array_shift($flags);
         if (!isset($style[$type]['inherit']) || $style[$type]['inherit']) {
-            $componentStyle = ArrayHelper::merge($this->componentStyle[$type] ?? [], $style[$type] ?? []);
+            $componentStyle = ArrayHelper::merge($this->getComponentStyle($type), $style[$type] ?? []);
         } else {
             $componentStyle = $style[$type] ?? [];
         }
@@ -109,6 +109,25 @@ class ComponentBuilder
         return $component;
     }
 
+    public function getComponentStyle(string $type) : array
+    {
+        $style = $this->componentStyle[$type] ?? [];
+        if (isset($style['inherit']) && !$style['inherit']) {
+            unset($style['inherit']);
+            return $style;
+        }
+        $inheritStyle = [];
+        foreach ($this->factories as $factory) {
+            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($type));
+        }
+        if (null !== $inheritStyle) {
+            $style = ArrayHelper::merge($inheritStyle, $style);
+        }
+        $style['inherit'] = false; // custom style is loaded
+        $this->componentStyle[$type] = $style;
+        unset($style['inherit']);
+        return $style;
+    }
     private function buildComponent(string $type) : ?AbstractComponent
     {
         //Check external factories

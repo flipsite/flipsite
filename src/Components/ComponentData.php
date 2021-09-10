@@ -42,10 +42,6 @@ final class ComponentData
             $flags = array_diff($flags, ['auto']);
         }
 
-        $style = StyleAppearanceHelper::apply($style, $this->appearance);
-        unset($style['dark']);
-
-
         if (isset($data['variant'])) {
             $variant = $data['variant'];
             if (isset($style['variants'][$variant])) {
@@ -72,6 +68,9 @@ final class ComponentData
             $this->data['style'] = $dataStyle;
         }
         unset($style['variants']);
+
+        $style = StyleAppearanceHelper::apply($style, $this->appearance);
+        unset($style['dark']);
 
         if (null === $this->tag && isset($style['tag'])) {
             $this->tag = $style['tag'];

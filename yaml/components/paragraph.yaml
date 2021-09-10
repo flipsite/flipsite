@@ -1,0 +1,9 @@
+textColor: text-black-o65
+textSize: text-3.5|4
+variants:
+  lg:
+    textSize: text-4.5|5.5
+  sm:
+    textSize: text-3.25
+dark:
+  textColor: text-white-o70

@@ -54,6 +54,9 @@ class CssMiddleware implements MiddlewareInterface
         }
 
         foreach ($fonts as $type => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
             $font = $options['family'];
             if (false !== mb_strpos($font, ' ')) {
                 $font = "'".$font."'";

@@ -1,30 +1,29 @@
-navigation:
-  item: nav
-  name: Navigation
-  data: $sections/navigation.yaml
-  count: 4
+# navigation:
+#   item: nav
+#   name: Navigation
+#   data: $sections/navigation.yaml
+#   count: 4
 heroes:
   item: hero
   name: Heroes
-  data: $sections/heroes.yaml
   count: 1
-content:
-  item: content
-  name: Content
-  data: $sections/content.yaml
-  count: 6
-pricing:
-  item: price
-  name: Pricing
-  data: $sections/pricing.yaml
-  count: 1
-footers:
-  item: footer
-  name: Footers
-  data: $sections/footers.yaml
-  count: 2
-banners:
-  item: banner
-  name: Banners
-  data: $sections/banners.yaml
-  count: 2
+# content:
+#   item: content
+#   name: Content
+#   data: $sections/content.yaml
+#   count: 6
+# pricing:
+#   item: price
+#   name: Pricing
+#   data: $sections/pricing.yaml
+#   count: 1
+# footers:
+#   item: footer
+#   name: Footers
+#   data: $sections/footers.yaml
+#   count: 2
+# banners:
+#   item: banner
+#   name: Banners
+#   data: $sections/banners.yaml
+#   count: 2

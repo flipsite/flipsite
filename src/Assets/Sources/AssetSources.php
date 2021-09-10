@@ -23,7 +23,7 @@ final class AssetSources
     {
         $assetDirs = [
             $this->siteDir.'/assets/',
-            __DIR__.'/../../../docs/assets/'
+            $this->vendorDir.'/flipsite/flipsite/assets/',
         ];
 
         foreach ($assetDirs as $assetDir) {

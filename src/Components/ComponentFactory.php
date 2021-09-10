@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Symfony\Component\Yaml\Yaml;
+
 class ComponentFactory extends AbstractComponentFactory
 {
     public function get(string $type) : ?AbstractComponent
@@ -42,5 +44,14 @@ class ComponentFactory extends AbstractComponentFactory
             'blockquote',
             'cite',
         ]);
+    }
+
+    public function getStyle(string $type) : array
+    {
+        $filePath = __DIR__.'/../../yaml/components/'.$type.'.yaml';
+        if (file_exists($filePath)) {
+            return Yaml::parseFile($filePath);
+        }
+        return [];
     }
 }

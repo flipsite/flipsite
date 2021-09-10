@@ -1,0 +1,19 @@
+section:
+  container:
+    display: grid
+    gridTemplateCols: 'md:grid-cols-2'
+    alignItems: items-center
+    gap: gap-6|15
+    maxWidth: max-w-screen-xl
+    marginX: mx-auto
+content:
+  type: group
+  container:
+    spaceY: space-y-3.5
+image:
+  width: w-full
+  options:
+    aspectRatio: 16by9
+    sizes:
+      - '(min-width:768px) 600px'
+      - 300px

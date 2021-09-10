@@ -1,0 +1,24 @@
+fontFamily: font-heading
+fontWeight: font-bold
+textColor: text-black-o95
+variants:
+  xs:
+    textSize: text-3.5|4
+    lineHeight: leading-tight
+  sm:
+    textSize: text-4|4.5
+    lineHeight: leading-tight
+  md:
+    textSize: text-4|6
+    lineHeight: leading-tight
+  lg:
+    textSize: text-6|12
+    lineHeight: leading-none
+  xl:
+    textSize: text-9|16
+    lineHeight: leading-none
+  xxl:
+    textSize: text-12|20
+    lineHeight: leading-none
+dark:
+  textColor: text-white-o95

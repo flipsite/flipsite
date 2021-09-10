@@ -28,8 +28,7 @@
         gapX: gap-x-6|15
         gapY: gap-y-10|30
     grid:
-      container:
-        spaceY: space-y-7
+      spaceY: space-y-7
       colsAll:
         container:
           spaceY: space-y-2
