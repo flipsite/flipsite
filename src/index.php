@@ -80,53 +80,54 @@ $app->get('/robots.txt', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'text/plain');
 });
 
-$app->get('/api/pages', function (Request $request, Response $response) {
-    $reader = $this->get('reader');
-    $pages = array_keys($reader->get('pages'));
-    $response->getBody()->write(json_encode($pages));
-    return $response->withHeader('Content-Type', 'application/json');
-});
+if ('localhost' === getenv('APP_ENV')) {
+    $app->get('/api/pages', function (Request $request, Response $response) {
+        $reader = $this->get('reader');
+        $pages = array_keys($reader->get('pages'));
+        $response->getBody()->write(json_encode($pages));
+        return $response->withHeader('Content-Type', 'application/json');
+    });
 
+    $app->post('/api/sections/{page}', function (Request $request, Response $response, array $args) {
+        $page = $args['page'];
+        $body = $request->getParsedBody();
 
-$app->post('/api/sections/{page}', function (Request $request, Response $response, array $args) {
-    $page = $args['page'];
-    $body = $request->getParsedBody();
-
-    $enviroment = $this->get('enviroment');
-    $reader = $this->get('reader');
-    $pages = array_keys($reader->get('pages'));
-    $siteFilePath = $enviroment->getSiteDir().'/site.yaml';
-    $site = Symfony\Component\Yaml\Yaml::parseFile($siteFilePath);
-    if (in_array($page, ['before','after'])) {
-        if (!isset($site[$page])) {
-            $site[$page] = [$body];
+        $enviroment = $this->get('enviroment');
+        $reader = $this->get('reader');
+        $pages = array_keys($reader->get('pages'));
+        $siteFilePath = $enviroment->getSiteDir().'/site.yaml';
+        $site = Symfony\Component\Yaml\Yaml::parseFile($siteFilePath);
+        if (in_array($page, ['before','after'])) {
+            if (!isset($site[$page])) {
+                $site[$page] = [$body];
+            } else {
+                $site[$page][] = $body;
+            }
         } else {
-            $site[$page][] = $body;
+            if (!isset($site['pages'][$page])) {
+                $site['pages'][$page] = [$body];
+            } else {
+                $site['pages'][$page][] = $body;
+            }
         }
-    } else {
-        if (!isset($site['pages'][$page])) {
-            $site['pages'][$page] = [$body];
-        } else {
-            $site['pages'][$page][] = $body;
-        }
-    }
-    file_put_contents($siteFilePath, Flipsite\Utils\YamlDumper::dump($site, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-    return $response->withStatus(202);
-});
+        file_put_contents($siteFilePath, Flipsite\Utils\YamlDumper::dump($site, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        return $response->withStatus(202);
+    });
 
-$app->post('/api/theme/style/{style}', function (Request $request, Response $response, array $args) {
-    $style = $args['style'];
-    $body = $request->getParsedBody();
-    $enviroment = $this->get('enviroment');
-    $reader = $this->get('reader');
-    $themeFilePath = $enviroment->getSiteDir().'/theme.yaml';
-    $theme = Symfony\Component\Yaml\Yaml::parseFile($themeFilePath);
-    if (!isset($theme['style'][$style])) {
-        $theme['style'][$style] = $body;
-        file_put_contents($themeFilePath, Flipsite\Utils\YamlDumper::dump($theme, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-    }
-    return $response->withStatus(200);
-});
+    $app->post('/api/theme/style/{style}', function (Request $request, Response $response, array $args) {
+        $style = $args['style'];
+        $body = $request->getParsedBody();
+        $enviroment = $this->get('enviroment');
+        $reader = $this->get('reader');
+        $themeFilePath = $enviroment->getSiteDir().'/theme.yaml';
+        $theme = Symfony\Component\Yaml\Yaml::parseFile($themeFilePath);
+        if (!isset($theme['style'][$style])) {
+            $theme['style'][$style] = $body;
+            file_put_contents($themeFilePath, Flipsite\Utils\YamlDumper::dump($theme, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
+        }
+        return $response->withStatus(200);
+    });
+}
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
     $reader = $this->get('reader');
