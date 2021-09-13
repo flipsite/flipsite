@@ -1,0 +1,7 @@
+container:
+  textColor: text-black-o95
+  fontWeight: font-bold
+  textSize: text-3.5|4
+textColor: hover:text-primary
+dark:
+  textColor: text-white-o95 hover:text-primary2

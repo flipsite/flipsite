@@ -128,6 +128,7 @@ class ComponentBuilder
         unset($style['inherit']);
         return $style;
     }
+
     private function buildComponent(string $type) : ?AbstractComponent
     {
         //Check external factories
@@ -141,10 +142,11 @@ class ComponentBuilder
                     if (null === $this->sectionBuilder) {
                         $this->sectionBuilder = new SectionBuilder(
                             $this->enviroment,
+                            $this->reader,
                             $this,
-                            $this->reader->get('theme')
                         );
                     }
+
                     $component->addSectionBuilder($this->sectionBuilder);
                 }
                 if (method_exists($component, 'addEnviroment')) {

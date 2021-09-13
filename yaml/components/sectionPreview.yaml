@@ -1,0 +1,7 @@
+container:
+  border: border
+  overflow: overflow-hidden
+link:
+  display: block
+  borderColor: hover:border-primary
+  cursor: hover:cursor-pointer

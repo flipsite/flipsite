@@ -1,158 +1,108 @@
 name: Flipsite Docs
 description: Flipsite Docs
 before:
-  # -
-  #   logo:a:
-  #     svg: flipsite.svg
-  #     sr: Flipsite
-  #     url: home
-  #   nav:
-  #     flipsite: Documentation
-  #     flipsite/sections: Sections
-  #     flipsite/components: Components
-  #     github:
-  #       url: https://github.com/flipsite/flipsite
-  #       text: Github
-  #   style:
-  #     type: header
-  #     section:
-  #       bgColor: bg-white
-  #       paddingY: py-5
-  #       paddingX: px-5
-  #       border: border-b
-  #       container:
-  #         display: flex
-  #         justifyContent: justify-between
-  #         alignItems: items-center
-  #     a:
-  #       display: flex
-  #       alignItems: items-center
-  #       spaceX: space-x-2
-  #       svg:
-  #         height: h-6
-  #         width: w-auto
-  #     nav:
-  #       container:
-  #         display: flex
-  #         textSize: text-3.5
-  #         textColor: text-black-o90
-  #         spaceX: space-x-5|10
-  #       textColor: hover:text-primary
+  -
+    logo:
+      svg: flipsite.svg
+      sr: Flipsite
+      url: flipsite
+    nav:
+      flipsite: Documentation
+      flipsite/sections: Sections
+      flipsite/components: Components
+      github:
+        url: https://github.com/flipsite/flipsite
+        text: Github
+    style: navbar0:wide
 pages:
-  # flipsite:
-  #   -
-  #     breadcrumb:
-  #       flipsite: Home
-  #     style: &breadcrumb
-  #       section:
-  #         paddingX: px-5
-  #         paddingY: py-2.5
-  #         border: border-0
-  #       breadcrumb:
-  #         container:
-  #           textSize: text-3
-  #           fontWeight: font-light
-  #         separator:
-  #           padding: px-2
-  #           textColor: text-black-o50
-  #         textColor: hover:text-primary
-  #         current:
-  #           textColor: text-black
-  #           fontWeight: font-normal
-  #         text.type: span
   flipsite/sections:
-    # -
-    #   breadcrumb:
-    #     flipsite: Home
-    #     flipsite/sections: Sections
-    #   style: *breadcrumb
+    -
+      breadcrumb:
+        flipsite: Home
+        flipsite/sections: Sections
+      style: &breadcrumb
+        section:
+          paddingX: px-5
+          paddingY: py-2.5
+          container:
+            maxWidth: null
     -
       grid:
-        -
+        colData: $sections.yaml
+        colTpl:
           sectionPreview:
-            url: flipsite/sections/content0
-            section: content0
+            url: flipsite/sections/{colData.key}
+            section: '{colData.poster}'
           group:
-            heading: Content
-            paragraph: 1 section
-      style: &sections
+            heading:xs: '{colData.name}'
+            paragraph:xs: '{colData.count} sections'
+      style: &setionGrid
+        section:
+          paddingX: px-5
+          paddingY: py-5
+          container:
+            maxWidth: null
         grid:
           container:
             display: grid
             gridTemplateCols: grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5
             gap: gap-5
-          colsAll:
+        grid.colsAll.group.container:
+          display: flex
+          justifyContent: justify-between
+          alignItems: items-center
+          marginY: mt-2.5
+  flipsite/sections/[category]:
+    data: $sections.yaml
+    sections:
+      -
+        breadcrumb:
+          flipsite: Home
+          flipsite/sections: Sections
+          flipsite/category:
+            url: flipsite/sections/[category]
+            text: '{data.[category].name}'
+        style: *breadcrumb
+      -
+        grid:
+          colData: '{data.[category].data}'
+          colTpl:
             sectionPreview:
-              container:
-                bgColor: bg-gray-30
-                borderColor: border-black-o5
-                border: border rounded-2
-                overflow: overflow-hidden
-                padding: px-7.5
-              link:
-                display: block
-                bgColor: bg-gray-30
-                borderColor: border-black-o5 hover:border-primary-o30
-                cursor: hover:cursor-pointer
-              section:
-                bgColor: bg-white
-                border: shadow overflow-hidden
+              url: 'flipsite/sections/[category]/{colData.key}'
+              section: '{colData.key}'
             group:
-              container:
-                display: flex
-                justifyContent: justify-between
-                alignItems: items-center
-                marginY: mt-2 px-2
-              heading:
-                textSize: text-3.5
-                textColor: text-black-o90
-              paragraph:
-                textSize: text-3
-                fontWeight: font-light
-  # flipsite/sections/[category]:
-  #   data: $sections.yaml
-  #   sections:
-  #     -
-  #       breadcrumb:
-  #         flipsite: Home
-  #         flipsite/sections: Sections
-  #         flipsite/category:
-  #           url: flipsite/sections/[category]
-  #           text: '{data.[category].name}'
-  #       style: *breadcrumb
-  #     -
-  #       grid:
-  #         colData: '{data.[category].data}'
-  #         colTpl:
-  #           sectionPreview:
-  #             url: 'flipsite/sections/[category]/{colData.key}'
-  #             section:
-  #               root: '{colData.site}'
-  #               style: '{colData.style}'
-  #       style: *sections
-  # flipsite/sections/[category]/[section]:
-  #   data: $sections.yaml
-  #   sections:
-  #     -
-  #       breadcrumb:
-  #         flipsite: Home
-  #         flipsite/sections: Sections
-  #         category:
-  #           url: flipsite/sections/[category]
-  #           text: '{data.[category].name}'
-  #         section:
-  #           url: flipsite/sections/[category]/[section]
-  #           text: '{data.[category].item}[section]'
-  #       style: *breadcrumb
-  #     -
-  #       root: '{data.[category].data.[section].site}'
-  #       style:
-  #         root: '{data.[category].data.[section].style}'
-  #         section:
-  #           wrapper:
-  #             boxShadow: shadow
-  #             bgColor: bg-white
-  #             marginX: mx-5
+              heading:xs: '{colData.key}'
+              paragraph:xs: '{colData.variants} variants'
+
+        style: *setionGrid
+  flipsite/sections/[category]/[section]:
+    data: $sections.yaml
+    sections:
+      -
+        breadcrumb:
+          flipsite: Home
+          flipsite/sections: Sections
+          category:
+            url: flipsite/sections/[category]
+            text: '{data.[category].name}'
+          section:
+            url: flipsite/sections/[category]/[section]
+            text: '[section]'
+        style: *breadcrumb
+      -
+        sectionPreview:
+          section: '[section]'
+        style:
+          section:
+            paddingX: px-5
+            paddingY: py-5
+            container:
+              maxWidth: null
+          sectionPreview:
+            container:
+              border: null
+              boxShadow: shadow
+              bgColor: bg-white
   #     -
   #       script.ready.add: docs-add-section.js
   #       svg: zondicons/add-solid

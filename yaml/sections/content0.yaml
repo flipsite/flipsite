@@ -3,17 +3,34 @@ section:
     display: grid
     gridTemplateCols: 'md:grid-cols-2'
     alignItems: items-center
-    gap: gap-6|15
-    maxWidth: max-w-screen-xl
-    marginX: mx-auto
+    gapX: gap-x-5|15
+    gapY: gap-y-10|30
 content:
   type: group
-  container:
-    spaceY: space-y-3.5
+  container.spaceY: space-y-5
 image:
+  container.selfAlign: self-stretch
   width: w-full
+  height: h-full
+  objectFit: object-cover
   options:
-    aspectRatio: 16by9
     sizes:
       - '(min-width:768px) 600px'
       - 300px
+variants:
+  tr:
+    image.container:
+      colStart: md:col-start-1
+      rowStart: md:row-start-1
+  bl:
+    content.container:
+      rowStart: row-start-2 md:row-start-1
+    image.container:
+      rowStart: row-start-1
+  br:
+    content.container:
+      rowStart: row-start-2 md:row-start-1
+      colStart: md:col-start-2
+    image.container:
+      rowStart: row-start-1
+      colStart: md:col-start-1

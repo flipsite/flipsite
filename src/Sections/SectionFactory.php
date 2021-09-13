@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace Flipsite\Sections;
 
-use Symfony\Component\Yaml\Yaml;
+use Flipsite\Utils\YamlExpander;
 
 class SectionFactory extends AbstractSectionFactory
 {
-    public function getStyle(string $type) : array
+    public function getStyle(string $section) : ?array
     {
-        $filePath = __DIR__.'/../../yaml/sections/'.$type.'.yaml';
+        $filePath = __DIR__.'/../../yaml/sections/'.$section.'.yaml';
         if (file_exists($filePath)) {
-            return Yaml::parseFile($filePath);
+            return YamlExpander::parseFile($filePath);
         }
-        return [];
+        return null;
+    }
+    public function getExample(string $section) : ?array
+    {
+        $filePath = __DIR__.'/../../yaml/examples/'.$section.'.yaml';
+        if (file_exists($filePath)) {
+            return YamlExpander::parseFile($filePath);
+        }
+        return null;
     }
 }

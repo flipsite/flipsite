@@ -1,0 +1,19 @@
+container:
+  textColor: text-black-o65
+  textSize: text-3
+separator:
+  padding: px-2.5
+  textColor: text-black-o50
+textColor: hover:text-primary
+current:
+  textColor: text-black-o95
+  fontWeight: font-bold
+text.type: span
+dark:
+  container:
+    textColor: text-white-o70
+  textColor: hover:text-primary2
+  separator:
+    textColor: text-white-o20
+  current:
+    textColor: text-white-o95

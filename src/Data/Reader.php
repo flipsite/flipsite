@@ -249,7 +249,6 @@ final class Reader
                 $expandedPages[$page] = $pageData;
             }
         }
-
         return $expandedPages;
     }
 
@@ -302,7 +301,7 @@ class DataMapper
         foreach ($tpl as $attr => &$value) {
             if (is_array($value)) {
                 $value = $this->search($value, $dot);
-            } elseif (false !== mb_strpos($value, '{data.')) {
+            } elseif (is_string($value) && false !== mb_strpos($value, '{data.')) {
                 $matches = [];
                 preg_match('/\{data\.(.*?)\}/', $value, $matches);
                 $replace = $dot->get($matches[1]);

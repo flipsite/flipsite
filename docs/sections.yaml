@@ -1,11 +1,20 @@
-# navigation:
-#   item: nav
-#   name: Navigation
-#   data: $sections/navigation.yaml
-#   count: 4
+navigation:
+  name: Navigation
+  poster: navbar0
+  data:
+    navbar0.variants: 1
+  count: 1
 heroes:
-  item: hero
   name: Heroes
+  poster: hero0
+  data:
+    hero0.variants: 1
+  count: 1
+content:
+  name: Content
+  poster: content0
+  data:
+    content0.variants: 4
   count: 1
 # content:
 #   item: content

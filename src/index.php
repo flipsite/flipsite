@@ -157,14 +157,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     }
     $sectionBuilder = new SectionBuilder(
         $enviroment,
+        $reader,
         $componentBuilder,
-        $reader->get('theme')
     );
-    $sectionBuilder->addFactory(new SectionFactory());
-    // TODO implement support for external section factories
-    // foreach ($reader->getSectionFactories() as $class) {
-    //     $sectionBuilder->addFactory(new $class());
-    // }
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
     $componentBuilder->addListener($metaBuilder);

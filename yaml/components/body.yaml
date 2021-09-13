@@ -1,5 +1,5 @@
 fontWeight: font-light
 textColor: text-black-o60
 dark:
-  bgColor: bg-gray-900
+  bgColor: bg-primary-950
   textColor: text-white-o70

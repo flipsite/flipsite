@@ -1,0 +1,13 @@
+type: a
+display: block
+textColor: text-primary hover:text-primary-550
+svg:
+  width: w-24
+  fill: fill-current
+dark:
+  textColor: text-primary2 hover:text-primary2-550
+variants:
+  1by1:
+    svg:
+      width: w-10
+      height: h-10

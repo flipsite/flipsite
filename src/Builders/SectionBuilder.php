@@ -11,25 +11,34 @@ use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\StyleAppearanceHelper;
 use Flipsite\Sections\AbstractSectionFactory;
+use Flipsite\Data\Reader;
+use Flipsite\Sections\SectionFactory;
 
 class SectionBuilder
 {
     private Enviroment $enviroment;
+    private Reader $reader;
     private ComponentBuilder $componentBuilder;
     private array $factories = [];
     private ?array $theme;
     private array $defaultSectionStyle = [];
     private array $inheritedStyle = [];
 
-    public function __construct(Enviroment $enviroment, ComponentBuilder $componentBuilder, ?array $theme = null)
+    public function __construct(Enviroment $enviroment, Reader $reader, ComponentBuilder $componentBuilder)
     {
         $this->enviroment       = $enviroment;
+        $this->reader           = $reader;
         $this->componentBuilder = $componentBuilder;
-        $this->theme            = $theme;
+        $this->theme            = $reader->get('theme');
         $this->defaultSectionStyle = $this->componentBuilder->getComponentStyle('section');
+        $this->addFactory(new SectionFactory());
+        // TODO implement support for external section factories
+        // foreach ($reader->getSectionFactories() as $class) {
+        //     $sectionBuilder->addFactory(new $class());
+        // }
     }
 
-    public function addFactory(AbstractSectionFactory $factory) : void
+    private function addFactory(AbstractSectionFactory $factory) : void
     {
         $this->factories[] = $factory;
     }
@@ -159,7 +168,7 @@ class SectionBuilder
 
         $style['section'] = ArrayHelper::merge($this->defaultSectionStyle, $style['section'] ?? []);
 
-        if (isset($style['section']['variants'])) {
+        if (isset($variants) && isset($style['section']['variants'])) {
             foreach ($variants as $variant) {
                 if (isset($style['section']['variants'][$variant])) {
                     $style['section'] = ArrayHelper::merge($style['section'], $style['section']['variants'][$variant]);
@@ -176,7 +185,7 @@ class SectionBuilder
         }
         $inheritStyle = [];
         foreach ($this->factories as $factory) {
-            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($inherited));
+            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($inherited) ?? []);
         }
 
         if (isset($this->theme['sections'][$inherited])) {
@@ -184,5 +193,16 @@ class SectionBuilder
         }
 
         return $this->inheritedStyle[$inherited] = $inheritStyle;
+    }
+
+    public function getExample(string $section) : array
+    {
+        foreach ($this->factories as $factory) {
+            $example = $factory->getExample($section);
+            if (is_array($example)) {
+                return $example;
+            }
+        }
+        return [];
     }
 }

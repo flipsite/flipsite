@@ -1,6 +1,6 @@
 type: div
-textColor: text-secondary
+textColor: text-primary
 fontWeight: font-bold
 textTransform: uppercase
 dark:
-  textColor: text-secondary2
+  textColor: text-primary2

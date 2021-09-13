@@ -5,5 +5,7 @@ variants:
     textSize: text-4.5|5.5
   sm:
     textSize: text-3.25
+  xs:
+    textSize: text-3
 dark:
   textColor: text-white-o70

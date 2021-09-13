@@ -18,8 +18,6 @@ ready(function(){
         maxHeight = boxHeight;
       }
     });
-    maxHeight+=window.innerWidth/100*5
-    if (maxHeight<160)maxHeight=160
     sections.forEach(function(el) {
       el.parentNode.parentNode.style.height = maxHeight+'px'
       var box = el.parentNode;

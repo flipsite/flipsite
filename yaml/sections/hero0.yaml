@@ -1,0 +1,29 @@
+section:
+  paddingY: py-25|50
+  position: relative
+  container:
+    display: flex
+    alignItems: items-center justify-center
+content:
+  type: group
+  container:
+    spaceY: space-y-5
+    textAlign: text-center
+    zIndex: z-20
+    maxWidth: max-w-screen-md
+background:
+  type: image
+  container:
+    position: absolute
+    inset: inset-0
+    width: w-full
+    height: h-full
+    zIndex: z-0
+  width: w-full
+  height: h-full
+  objectFit: object-cover
+  options:
+    aspectRatio: 2by1
+    sizes:
+      - '(min-width:768px) 600px'
+      - 300px

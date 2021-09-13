@@ -1,2 +1,10 @@
-paddingX: px-6|15
+paddingX: px-5|15
 paddingY: py-10|30
+container:
+  marginX: mx-auto
+  maxWidth: max-w-screen-xl
+variants:
+  wide:
+    paddingX: px-5
+    container:
+      maxWidth: null
