@@ -23,23 +23,33 @@ class SectionPreview extends AbstractComponent
         }
 
         $this->element = new Element('div');
-        $this->element->addStyle($data->getStyle('container'));
+        $this->element->addStyle($data->getStyle('preview'));
         if ($url) {
             $this->element->addStyle($data->getStyle('link'));
             $this->element->setAttribute('data-href', $url);
         }
 
+        $container = new Element('div');
+        $container->addStyle($data->getStyle('container'));
+        $this->element->addChild($container);
+
         $section = new Element('div');
         $sectionData = $this->sectionBuilder->getExample($data->get('section'));
         $sectionData['style'] = $this->sectionBuilder->getInheritedStyle($sectionData['style'] ?? '');
-        $sectionData['style']['section']['border'] = null;
-        $this->element->addChild($section);
+        $container->addChild($section);
 
         $resize = new Element('div');
         $resize->addChild($this->sectionBuilder->getSection($sectionData));
         $resize->setAttribute('data-contain', true);
 
         $section->addChild($resize);
+
+        $raw = $this->sectionBuilder->getExample($data->get('section'));
+        $json = new Element('div', true);
+        $json->addStyle(['display'=>'hidden']);
+        $json->setAttribute('data-type', 'json');
+        $json->setContent(json_encode($raw));
+        $this->element->addChild($json);
 
         $this->builder->dispatch(new Event('ready-script', 'section-preview', file_get_contents(__DIR__.'/section-preview.js')));
     }

@@ -17,7 +17,6 @@ ready(function(){
   function postData(page) {
     var json = document.querySelectorAll('div[data-type=json]');
     var section = json[0].innerHTML;
-    var style = json[1].innerHTML;
     fetch('/api/sections/'+page.replaceAll('/','-'), {
       headers: {
         'Accept': 'application/json',
@@ -28,20 +27,6 @@ ready(function(){
     })
     .then(function(res){ console.log(res) })
     .catch(function(res){ console.log(res) })
-
-    parsedStyle = JSON.parse(style);
-    for (var id in parsedStyle) {
-      fetch('/api/theme/style/'+id, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify(parsedStyle[id])
-      })
-      .then(function(res){ console.log(res) })
-      .catch(function(res){ console.log(res) })
-    }
   }
   const load = async () => {
     const response = await fetch('/api/pages');

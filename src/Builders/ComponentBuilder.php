@@ -18,20 +18,14 @@ use Flipsite\Utils\StyleAppearanceHelper;
 
 class ComponentBuilder
 {
-    private Enviroment $enviroment;
-    private Reader $reader;
-    private Path $path;
     private ImageHandler $imageHandler;
     private ?SectionBuilder $sectionBuilder = null;
     private array $listeners      = [];
     private array $factories      = [];
     private array $componentStyle = [];
 
-    public function __construct(Enviroment $enviroment, Reader $reader, Path $path)
+    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
     {
-        $this->enviroment   = $enviroment;
-        $this->reader       = $reader;
-        $this->path         = $path;
         $this->imageHandler = new ImageHandler(
             $enviroment->getImageSources(),
             $enviroment->getImgDir()

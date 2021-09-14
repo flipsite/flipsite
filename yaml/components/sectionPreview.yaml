@@ -1,6 +1,5 @@
 container:
-  border: border
-  overflow: overflow-hidden
+  shadow: shadow
 link:
   display: block
   borderColor: hover:border-primary

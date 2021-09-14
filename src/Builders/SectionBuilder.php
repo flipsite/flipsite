@@ -55,15 +55,20 @@ class SectionBuilder
                     $script = [$script];
                 }
                 foreach ($script as $id => $script) {
-                    $filename = $this->enviroment->getSiteDir().'/'.$script;
+                    if (strpos($script, 'vendor/') === 0) {
+                        $filename = $this->enviroment->getVendorDir().'/'.ltrim($script, '/vendor');
+                    } else {
+                        $filename = $this->enviroment->getSiteDir().'/'.$script;
+                    }
                     if (file_exists($filename)) {
                         $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
-                    } else {
-                        $filename = $this->enviroment->getVendorDir().'/flipsite/flipsite/docs/'.$script;
-                        if (file_exists($filename)) {
-                            $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
-                        }
                     }
+                    // } else {
+                    //     $filename = $this->enviroment->getVendorDir().'/flipsite/flipsite/docs/'.$script;
+                    //     if (file_exists($filename)) {
+                    //         $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
+                    //     }
+                    // }
                 }
             }
             unset($data['script']);

@@ -19,8 +19,8 @@ ready(function(){
       }
     });
     sections.forEach(function(el) {
-      el.parentNode.parentNode.style.height = maxHeight+'px'
-      var box = el.parentNode;
+      el.parentNode.parentNode.parentNode.style.height = maxHeight+'px'
+      var box = el.parentNode.parentNode;
       var offsetY = (maxHeight - box.offsetHeight)/2;
       box.style.transform = 'translateY('+offsetY+'px)';
     });

@@ -10,3 +10,8 @@ variants:
     paddingY: py-2.5|5
     dark:
       bgColor: bg-primary2 hover:bg-primary2-550
+  link:
+    textColor: text-primary hover:text-primary-550
+    textDecoration: hover:underline
+  sm:
+    textSize: text-3

@@ -23,7 +23,7 @@ pages:
       style: &breadcrumb
         section:
           paddingX: px-5
-          paddingY: py-2.5
+          paddingY: pt-2.5
           container:
             maxWidth: null
     -
@@ -39,7 +39,7 @@ pages:
       style: &setionGrid
         section:
           paddingX: px-5
-          paddingY: py-5
+          paddingY: pb-5 pt-2.5
           container:
             maxWidth: null
         grid:
@@ -89,13 +89,16 @@ pages:
             url: flipsite/sections/[category]/[section]
             text: '[section]'
         style: *breadcrumb
+        style.section.bgColor: bg-gray-25
       -
         sectionPreview:
           section: '[section]'
+          json: true
         style:
           section:
+            bgColor: bg-gray-25
             paddingX: px-5
-            paddingY: py-5
+            paddingY: pt-2.5
             container:
               maxWidth: null
           sectionPreview:
@@ -103,32 +106,34 @@ pages:
               border: null
               boxShadow: shadow
               bgColor: bg-white
-  #     -
-  #       script.ready.add: docs-add-section.js
-  #       svg: zondicons/add-solid
-  #       paragraph:sm: 'Add section to:'
-  #       group:
-  #         button:link:
-  #           text: before
-  #           url: '#before'
-  #       style:
-  #         section:
-  #           paddingY: py-5
-  #           paddingX: px-5
-  #           container:
-  #             display: flex
-  #             alignItems: items-center
-  #             spaceX: space-x-2
-  #         svg:
-  #           fill: fill-current
-  #           textColor: text-green
-  #         group:
-  #           container:
-  #             fontFamily: font-mono
-  #             divide: divide-x
-  #           button:
-  #             marginX: px-2
-  #             cursor: hover:cursor-pointer
+      -
+        script.ready.add: vendor/flipsite/flipsite/docs/docs-add-section.js
+        svg: zondicons/add-solid
+        paragraph:sm: 'Add section to:'
+        group:
+          button:link:sm:
+            text: before
+            url: '#before'
+        style:
+          section:
+            bgColor: bg-gray-25
+            paddingY: py-2.5
+            paddingX: px-5
+            border: border-b mb-100
+            container:
+              display: flex
+              alignItems: items-center
+              spaceX: space-x-2
+          svg:
+            fill: fill-current
+            textColor: text-green
+          group:
+            container:
+              fontFamily: font-mono
+              divide: divide-x
+            button:
+              marginX: px-2
+              cursor: hover:cursor-pointer
   #     -
   #       grid:
   #         -
