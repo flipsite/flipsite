@@ -48,6 +48,7 @@ class SectionPreview extends AbstractComponent
         $section->addChild($resize);
 
         $raw = $this->sectionBuilder->getExample($data->get('section'));
+        $raw['style'] = $data->get('section');
         $json = new Element('div', true);
         $json->addStyle(['display'=>'hidden']);
         $json->setAttribute('data-type', 'json');
