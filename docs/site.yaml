@@ -13,7 +13,9 @@ before:
       github:
         url: https://github.com/flipsite/flipsite
         text: Github
-    style: navbar0:wide
+    style:
+      inherit: navbar0:wide
+      section.border: border-b
 pages:
   flipsite/sections:
     -
@@ -22,6 +24,7 @@ pages:
         flipsite/sections: Sections
       style: &breadcrumb
         section:
+          border: null
           bgColor: bg-gray-25
           paddingX: px-5
           paddingY: py-3.75
@@ -73,9 +76,9 @@ pages:
             sectionPreview:
               url: 'flipsite/sections/[category]/{colData.key}'
               section: '{colData.key}'
-            group:
-              heading:xs: '{colData.key}'
-              paragraph:xs: 'Variants: {colData.variants}'
+            # group:
+            #   heading:xs: '{colData.key}'
+            #   paragraph:xs: 'Variants: {colData.variants}'
         style: *setionGrid
   flipsite/sections/[category]/[section]:
     data: $sections.yaml
@@ -97,6 +100,7 @@ pages:
           json: true
         style:
           section:
+            border: null
             bgColor: bg-gray-25
             paddingX: px-5
             paddingY: null
@@ -125,6 +129,7 @@ pages:
               display: flex
               alignItems: items-center
               spaceX: space-x-2
+              maxWidth: null
           svg:
             fill: fill-current
             textColor: text-green

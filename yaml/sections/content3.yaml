@@ -3,8 +3,8 @@ section:
     display: grid
     gridTemplateCols: lg:grid-cols-2
     gap: gap-6|15
-  maxWidth: max-w-screen-xl
-  marginX: mx-auto
+    maxWidth: max-w-screen-xl
+    marginX: mx-auto
 header:
   type: group
   container:

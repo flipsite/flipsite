@@ -1,5 +1,4 @@
 section:
-  bgColor: bg-red
   container:
     maxWidth: max-w-screen-md
     marginX: mx-auto

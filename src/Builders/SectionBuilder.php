@@ -63,12 +63,6 @@ class SectionBuilder
                     if (file_exists($filename)) {
                         $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
                     }
-                    // } else {
-                    //     $filename = $this->enviroment->getVendorDir().'/flipsite/flipsite/docs/'.$script;
-                    //     if (file_exists($filename)) {
-                    //         $this->componentBuilder->dispatch(new Event($type.'-script', $id, file_get_contents($filename)));
-                    //     }
-                    // }
                 }
             }
             unset($data['script']);
@@ -85,6 +79,9 @@ class SectionBuilder
         unset($data['style'],$data['style:light'],$data['style:dark'],$data['style:auto']);
 
         $style = $this->getStyle($style);
+        if (isset($style['appearance'])) {
+            $appearance = $style['appearance'];
+        }
 
         $style['section'] = StyleAppearanceHelper::apply($style['section'] ?? [], $appearance);
         unset($style['section']['dark']);
@@ -192,7 +189,6 @@ class SectionBuilder
         foreach ($this->factories as $factory) {
             $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($inherited) ?? []);
         }
-
         if (isset($this->theme['sections'][$inherited])) {
             $inheritStyle = ArrayHelper::merge($inheritStyle, $this->theme['sections'][$inherited]);
         }

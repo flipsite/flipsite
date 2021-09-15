@@ -6,6 +6,4 @@ section:
     justifyContent: justify-center md:justify-between
     spaceY: space-y-2.5 md:space-y-0
   border: border-b
-nav:
-  container:
-    spaceX: space-x-5|15
+nav.container.spaceX: space-x-5|15

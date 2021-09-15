@@ -1,16 +1,25 @@
 section:
+  bgColor: bg-primary-100
   paddingY: py-25|50
   position: relative
   container:
     display: flex
     alignItems: items-center justify-center
+    maxWidth: max-w-screen-sm
 content:
   type: group
   container:
     spaceY: space-y-5
     textAlign: text-center
-    zIndex: z-20
-    maxWidth: max-w-screen-md
+    zIndex: z-10
+    width: w-full
+  svg:
+    display: inline-block
+    width: w-full
+    fill: fill-current
+    textColor: text-black-o95
+    dark:
+      textColor: text-white-o95
 background:
   type: image
   container:
@@ -19,6 +28,7 @@ background:
     width: w-full
     height: h-full
     zIndex: z-0
+    opacity: opacity-25
   width: w-full
   height: h-full
   objectFit: object-cover

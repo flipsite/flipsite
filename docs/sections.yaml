@@ -19,7 +19,8 @@ content:
     content2.variants: 1
     content3.variants: 1
     content4.variants: 1
-  count: 4
+    content5.variants: 1
+  count: 5
 footers:
   name: Footers
   poster: footer2

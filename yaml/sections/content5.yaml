@@ -1,0 +1,20 @@
+section:
+  container:
+    maxWidth: max-w-screen-xs lg:max-w-screen-xl
+    marginX: mx-auto
+grid:
+  container:
+    display: grid
+    gapX: gap-x-5|15
+    gapY: gap-y-5|15
+    gridTemplateCols: lg:grid-cols-3
+  colsAll:
+    content:
+      type: group
+      container:
+        spaceY: space-y-3.5
+    image:
+      width: w-full
+      marginY: mb-3.5
+      options:
+        aspectRatio: 16by9
