@@ -42,26 +42,23 @@ final class ComponentData
             $flags = array_diff($flags, ['auto']);
         }
 
+        $possibleVariants = $flags;
         if (isset($data['variant'])) {
-            $variant = $data['variant'];
+            $possibleVariants = array_merge($possibleVariants, explode(':', $data['variant']));
+        }
+
+        $variantFound = false;
+        foreach ($possibleVariants as $variant) {
             if (isset($style['variants'][$variant])) {
                 $style        = ArrayHelper::merge($style, $style['variants'][$variant]);
                 $flags        = array_diff($flags, [$variant]);
                 $variantFound = true;
             }
-        } else {
-            $variantFound = false;
-            foreach ($flags as $variant) {
-                if (isset($style['variants'][$variant])) {
-                    $style        = ArrayHelper::merge($style, $style['variants'][$variant]);
-                    $flags        = array_diff($flags, [$variant]);
-                    $variantFound = true;
-                }
-            }
-            if (!$variantFound && isset($style['variants']['DEFAULT'])) {
-                $style = ArrayHelper::merge($style, $style['variants']['DEFAULT']);
-            }
         }
+        if (!$variantFound && isset($style['variants']['DEFAULT'])) {
+            $style = ArrayHelper::merge($style, $style['variants']['DEFAULT']);
+        }
+
         if (is_array($dataStyle)) {
             $style = ArrayHelper::merge($style, $dataStyle);
         } elseif (is_string($dataStyle)) {

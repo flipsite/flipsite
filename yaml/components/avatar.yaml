@@ -1,0 +1,12 @@
+type: image
+borderRadius: rounded-full
+display: inline-block
+options:
+  aspectRatio: 1by1
+variants:
+  xxl:
+    height: h-40
+    width: w-40
+    options:
+      sizes:
+        - 320px

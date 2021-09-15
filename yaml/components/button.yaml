@@ -26,7 +26,13 @@ variants:
   link:
     textColor: text-primary hover:text-primary-550
     textDecoration: hover:underline
+    dark:
+      textColor: text-primary2 hover:text-primary2-550
   sm:
     textSize: text-3
+    spaceX: space-x-1.5
+    icon:
+      width: w-3
 icon:
+  inherit: false
   fill: fill-current

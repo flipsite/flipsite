@@ -29,6 +29,12 @@ footers:
     footer1.variants: 1
     footer2.variants: 1
   count: 3
+team:
+  name: Team
+  poster: team0
+  data:
+    team0.variants: 2
+  count: 1
 # content:
 #   item: content
 #   name: Content

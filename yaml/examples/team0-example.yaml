@@ -1,0 +1,16 @@
+content:
+  heading:md: Joe Biden
+  paragraph:sm: |
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet aliquet magna, et dapibus nunc aliquam ac. Praesent ultricies at nulla non blandit. Pellentesque quis eros augue.
+  buttons:
+    -
+      variant: link:sm
+      url: '#'
+      icon: zondicons/phone
+      text: 050 1234567
+    -
+      variant: link:sm
+      url: '#'
+      icon: zondicons/envelope
+      text: info@flipsite.io
+avatar:xxl: placeholder.png
