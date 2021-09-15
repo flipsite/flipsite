@@ -18,7 +18,7 @@ class SectionFactory extends AbstractSectionFactory
     }
     public function getExample(string $section) : ?array
     {
-        $filePath = __DIR__.'/../../yaml/examples/'.$section.'.yaml';
+        $filePath = __DIR__.'/../../yaml/examples/'.$section.'-example.yaml';
         if (file_exists($filePath)) {
             return YamlExpander::parseFile($filePath);
         }

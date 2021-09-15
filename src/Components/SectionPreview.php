@@ -35,7 +35,8 @@ class SectionPreview extends AbstractComponent
 
         $section = new Element('div');
         $sectionData = $this->sectionBuilder->getExample($data->get('section'));
-        $sectionData['style'] = $this->sectionBuilder->getInheritedStyle($sectionData['style'] ?? '');
+        $sectionData['style'] = $this->sectionBuilder->getInheritedStyle($data->get('section') ?? '');
+        $sectionData['style']['section']['bgColor'] = 'bg-white'; // TODO body
         $container->addChild($section);
 
         $resize = new Element('div');

@@ -2,5 +2,6 @@ container:
   shadow: shadow
 link:
   display: block
-  borderColor: hover:border-primary
   cursor: hover:cursor-pointer
+  transform: transform hover:scale-102
+  transition: transition ease-in-out duration-150

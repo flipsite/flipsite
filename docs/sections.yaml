@@ -15,7 +15,18 @@ content:
   poster: content0
   data:
     content0.variants: 4
-  count: 1
+    content1.variants: 1
+    content2.variants: 1
+    content3.variants: 1
+  count: 4
+footers:
+  name: Footers
+  poster: footer2
+  data:
+    footer0.variants: 4
+    footer1.variants: 1
+    footer2.variants: 1
+  count: 3
 # content:
 #   item: content
 #   name: Content

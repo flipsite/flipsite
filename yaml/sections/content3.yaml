@@ -1,0 +1,45 @@
+section:
+  container:
+    display: grid
+    gridTemplateCols: lg:grid-cols-2
+    gap: gap-6|15
+  maxWidth: max-w-screen-xl
+  marginX: mx-auto
+header:
+  type: group
+  container:
+    colSpan: lg:col-span-2
+    marginX: mx-auto
+    maxWidth: max-w-screen-md
+    spaceY: space-y-5
+    textAlign: text-center
+images:
+  type: grid
+  colType: image
+  container:
+    display: grid
+    gridTemplateCols: grid-cols-2
+    gap: gap-2.5
+  colsAll:
+    width: w-full
+    objectFit: object-cover
+    options:
+      aspectRatio: 1by1
+      sizes:
+        - (min-width:768px) 600px
+        - 300px
+  cols.0:
+    options:
+      aspectRatio: 2by1
+      sizes:
+        - (min-width:768px) 900px
+        - 450px
+    container:
+      colSpan: col-span-2
+grid:
+  container:
+    selfAlign: self-center
+    spaceY: space-y-6|15
+  colsAll:
+    container:
+      spaceY: space-y-3.5

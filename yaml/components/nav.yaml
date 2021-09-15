@@ -5,3 +5,7 @@ container:
 textColor: hover:text-primary
 dark:
   textColor: text-white-o95 hover:text-primary2
+variants:
+  sitemap:
+    fontWeight: font-light
+    textSize: text-3.25|3.5

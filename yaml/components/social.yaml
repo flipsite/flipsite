@@ -1,0 +1,7 @@
+container:
+  display: inline-flex
+  spaceX: space-x-5
+icon:
+  fill: fill-current
+  inherit: false
+  textColor: text-primary hover:text-primary-550

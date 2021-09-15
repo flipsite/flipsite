@@ -1,9 +1,22 @@
 type: a
 display: inline-flex
+alignItems: items-center
+justifyContent: justify-center
 fontWeight: font-bold
+text:
+  type: span
+spaceX: space-x-2.5
 variants:
   primary:
     bgColor: bg-primary hover:bg-primary-550
+    textColor: text-white-o95
+    borderRadius: rounded
+    paddingX: px-5|15
+    paddingY: py-2.5|5
+    dark:
+      bgColor: bg-primary2 hover:bg-primary2-550
+  secondary:
+    bgColor: bg-secondary hover:bg-secondary-550
     textColor: text-white-o95
     borderRadius: rounded
     paddingX: px-5|15
@@ -15,3 +28,5 @@ variants:
     textDecoration: hover:underline
   sm:
     textSize: text-3
+icon:
+  fill: fill-current

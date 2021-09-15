@@ -4,4 +4,3 @@ content:
   paragraph:lg: |
     Build an entire website in YAML and understand it at a glance. Flipsite is a static/dynamic compiler for beautiful HTML & CSS & resources that are structured, fast, minimal and accessible.
 background: placeholder.png
-style: hero0

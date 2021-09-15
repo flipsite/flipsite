@@ -1,0 +1,7 @@
+section:
+  paddingY: py-5|15
+  container:
+    spaceY: space-y-3.5
+    textAlign: text-center
+    marginX: mx-auto
+nav.container.spaceX: space-x-5|15

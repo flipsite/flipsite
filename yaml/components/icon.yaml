@@ -1,0 +1,22 @@
+type: svg
+fill: fill-current
+textColor: text-primary
+container:
+  display: inline-block
+  bgColor: bg-primary-100
+  borderRadius: rounded-full
+variants:
+  md:
+    width: w-8
+    height: w-8
+    container:
+      width: w-15
+      height: w-15
+      padding: p-3.5
+  xl:
+    width: w-15
+    height: w-15
+    container:
+      width: w-25
+      height: w-25
+      padding: p-5

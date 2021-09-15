@@ -22,8 +22,9 @@ pages:
         flipsite/sections: Sections
       style: &breadcrumb
         section:
+          bgColor: bg-gray-25
           paddingX: px-5
-          paddingY: pt-2.5
+          paddingY: py-3.75
           container:
             maxWidth: null
     -
@@ -39,7 +40,9 @@ pages:
       style: &setionGrid
         section:
           paddingX: px-5
-          paddingY: pb-5 pt-2.5
+          paddingY: pb-5
+          bgColor: bg-gray-25
+          border: border-b
           container:
             maxWidth: null
         grid:
@@ -72,8 +75,7 @@ pages:
               section: '{colData.key}'
             group:
               heading:xs: '{colData.key}'
-              paragraph:xs: '{colData.variants} variants'
-
+              paragraph:xs: 'Variants: {colData.variants}'
         style: *setionGrid
   flipsite/sections/[category]/[section]:
     data: $sections.yaml
@@ -89,7 +91,6 @@ pages:
             url: flipsite/sections/[category]/[section]
             text: '[section]'
         style: *breadcrumb
-        style.section.bgColor: bg-gray-25
       -
         sectionPreview:
           section: '[section]'
@@ -98,7 +99,7 @@ pages:
           section:
             bgColor: bg-gray-25
             paddingX: px-5
-            paddingY: pt-2.5
+            paddingY: null
             container:
               maxWidth: null
           sectionPreview:
@@ -117,7 +118,7 @@ pages:
         style:
           section:
             bgColor: bg-gray-25
-            paddingY: py-2.5
+            paddingY: py-3.75
             paddingX: px-5
             border: border-b mb-100
             container:

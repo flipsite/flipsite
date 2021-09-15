@@ -1,0 +1,5 @@
+icon:xl: zondicons/bolt
+paragraph:md: Pages built with Flipsite are lightning fast, because they only include what's needed on the screen. No useless div elements, no useless CSS selectors, images of exactly the right size for the device & screen, automatically lazy loading external fonts, videos and other resources etc. And the DOM structure is so beautiful even yo mama and any accessibility tool can read it.
+button:link:
+  url: '#'
+  text: Learn More

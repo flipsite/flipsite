@@ -1,0 +1,31 @@
+section:
+  container:
+    marginX: mx-auto
+    maxWidth: max-w-screen-lg
+    spaceY: space-y-6|15
+    textAlign: text-center
+  paddingY: pt-10|30
+header:
+  type: group
+  container:
+    marginX: mx-auto
+    maxWidth: max-w-screen-sm
+    spaceY: space-y-7
+grid:
+  container:
+    display: grid
+    gridTemplateCols: grid-cols-2 sm:grid-cols-4
+    gap: gap-6|15
+  colsAll:
+    container:
+      spaceY: space-y-3.5
+image:
+  container:
+    display: block
+  borderRadius: rounded-t
+  options:
+    aspectRatio: 21by9
+    sizes:
+      - (min-width:768px) 600px
+      - 300px
+  width: w-full
