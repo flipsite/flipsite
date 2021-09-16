@@ -13,19 +13,46 @@ final class A extends AbstractComponent
 
     public function with(ComponentData $data) : void
     {
+        $componentData = $this->expand($data->get());
+
         $this->addStyle($data->getStyle());
         $external = false;
-        $onclick = $data->get('onclick', true);
-        if ($onclick) {
-            $this->setAttribute('onclick', $onclick);
+        if (isset($componentData['onclick'])) {
+            $this->setAttribute('onclick', $componentData['onclick']);
+            unset($componentData['onclick']);
         }
-        $this->setAttribute('href', $this->url($data->get('url'), $external));
+        $this->setAttribute('href', $this->url($componentData['url'], $external));
         if ($external) {
             $this->setAttribute('target', '_blank');
             $this->setAttribute('rel', 'noopener noreferrer');
         }
-        $data->unset('url');
-        $components = $this->builder->build($data->get(), $data->getStyle(), $data->getAppearance());
+        unset($componentData['url']);
+        $components = $this->builder->build($componentData, $data->getStyle(), $data->getAppearance());
         $this->addChildren($components);
+    }
+
+    private function expand(array $data) : array
+    {
+        $expanded = [];
+        foreach ($data as $key => $val) {
+            switch ($key) {
+                case 'tel':
+                    $expanded['url'] = 'tel:'.$val;
+                    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+                    try {
+                        $numberProto = $phoneUtil->parse($val, '');
+                    } catch (\libphonenumber\NumberParseException $e) {
+                    }
+                    $expanded['text'] = $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL);
+                    break;
+                case 'mailto':
+                    $expanded['url'] = 'mailto:'.$val;
+                    $expanded['text'] = $val;
+                    break;
+                default:
+                    $expanded[$key] = $val;
+            }
+        }
+        return $expanded;
     }
 }

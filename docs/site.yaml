@@ -7,7 +7,7 @@ before:
       sr: Flipsite
       url: flipsite
     nav:
-      flipsite: Documentation
+      flipsite|exact: Documentation
       flipsite/sections: Sections
       flipsite/components: Components
       github:

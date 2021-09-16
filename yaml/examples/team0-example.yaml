@@ -1,3 +1,4 @@
+avatar:xxl: placeholder.png
 content:
   heading:md: Joe Biden
   paragraph:sm: |
@@ -13,4 +14,3 @@ content:
       url: '#'
       icon: zondicons/envelope
       text: info@flipsite.io
-avatar:xxl: placeholder.png
