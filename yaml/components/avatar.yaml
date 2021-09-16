@@ -9,4 +9,4 @@ variants:
     width: w-40
     options:
       sizes:
-        - 320px
+        - 160px

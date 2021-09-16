@@ -22,6 +22,7 @@ content:
       textColor: text-white-o95
 background:
   type: image
+  loading: eager
   container:
     position: absolute
     inset: inset-0
@@ -33,7 +34,6 @@ background:
   height: h-full
   objectFit: object-cover
   options:
-    aspectRatio: 2by1
+    aspectRatio: 3by2
     sizes:
-      - '(min-width:768px) 600px'
       - 300px
