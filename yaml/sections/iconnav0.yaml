@@ -1,0 +1,29 @@
+section:
+  paddingY: null
+  paddingX: null
+  container:
+    overflow: overflow-x-auto
+    border: border-b
+nav:
+  container:
+    display: flex
+    fontWeight: font-bold
+    textSize: text-3
+    justfyContent: justify-start md:justify-around px-2.5
+  icon:
+    inherit: false
+    width: w-6
+    marginY: my-1
+    fill: fill-current
+  position: relative
+  paddingY: py-5
+  paddingX: px-10
+  display: flex flex-col items-center
+  whitespace: whitespace-nowrap
+  small:
+    position: absolute
+    textColor: text-primary
+    dark.textColor: text-primary2
+    width: w-full
+    bottom: bottom-2
+    textAlign: text-center

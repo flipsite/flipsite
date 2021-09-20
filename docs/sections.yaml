@@ -3,6 +3,7 @@ navigation:
   poster: navbar0
   data:
     navbar0.variants: 1
+    iconnav0.variants: 1
   count: 1
 heroes:
   name: Heroes
