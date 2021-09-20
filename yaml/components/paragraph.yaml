@@ -8,3 +8,10 @@ variants:
     textSize: text-3
 dark:
   textColor: text-white-o70
+  markdown:
+    strong:
+      textColor: text-white-o95
+markdown:
+  strong:
+    textColor: text-black-o95
+    fontWeight: font-bold
