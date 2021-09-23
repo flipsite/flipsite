@@ -74,8 +74,7 @@ class SectionBuilder
         $appearance = isset($data['style:light']) ? 'light' : null;
         $appearance ??= isset($data['style:dark']) ? 'dark' : null;
         $appearance ??= isset($data['style:auto']) ? 'auto' : null;
-        $appearance ??= $this->theme['appearance'];
-        $appearance ??= 'light';
+        $appearance ??= $this->theme['appearance'] ?? 'light';
         unset($data['style'],$data['style:light'],$data['style:dark'],$data['style:auto']);
 
         $style = $this->getStyle($style);
