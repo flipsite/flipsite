@@ -15,11 +15,11 @@ final class Picture extends AbstractComponent
         $basePath = $this->enviroment->getBasePath();
         $src      = $data->get('value');
         $options  = $this->getOptions($data->getStyle('options'));
+        $this->addStyle($data->getStyle('container'));
         if ($this->isSvg($src)) {
             $imageContext = $this->imageHandler->getContext($src, []);
         } else {
             $imageContext = $this->imageHandler->getContext($src, $options);
-            $this->addStyle($data->getStyle('container'));
             foreach ($imageContext->getSources() as $source) {
                 $sourceEl = new Source($source->type);
                 foreach ($source->srcset as $srcset) {
