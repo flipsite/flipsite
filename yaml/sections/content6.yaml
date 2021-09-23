@@ -16,7 +16,7 @@ grid:
     display: grid
     gapX: gap-x-5|15
     gapY: gap-y-5|15
-    gridTemplateCols: sm:grid-cols-2 lg:grid-cols-3
+    gridTemplateCols: sm:grid-cols-2
   colsAll:
     content:
       type: group

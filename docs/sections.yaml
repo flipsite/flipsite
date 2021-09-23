@@ -21,6 +21,7 @@ content:
     content3.variants: 1
     content4.variants: 1
     content5.variants: 1
+    content6.variants: 1
   count: 5
 footers:
   name: Footers
@@ -30,11 +31,23 @@ footers:
     footer1.variants: 1
     footer2.variants: 1
   count: 3
+contact:
+  name: Contact
+  poster: contact0
+  data:
+    contact0.variants: 2
+  count: 1
 team:
   name: Team
   poster: team0
   data:
     team0.variants: 2
+  count: 1
+logos:
+  name: Logos
+  poster: logos0
+  data:
+    logos0.variants: 1
   count: 1
 # content:
 #   item: content

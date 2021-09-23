@@ -36,4 +36,5 @@ background:
   options:
     aspectRatio: 3by2
     sizes:
+      - (min-width:768px) 600px
       - 300px

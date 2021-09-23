@@ -1,0 +1,14 @@
+grid:
+  colType: a
+  container:
+    display: grid
+    gridTemplateCols: md:grid-cols-3
+    gapX: gap-x-2.5
+  colsAll:
+    border: border
+    borderColor: hover:border-primary
+    display: flex flex-col justify-center items-center
+    spaceY: space-y-3.5
+    borderRadius: rounded
+    minHeight: min-h-40
+    paddingY: py-5

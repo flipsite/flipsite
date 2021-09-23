@@ -1,0 +1,34 @@
+section:
+  container:
+    spaceY: space-y-5|15
+header:
+  type: group
+  tag: header
+  container:
+    spaceY: space-y-3.5
+    textAlign: text-center
+    maxWidth: max-w-screen-md
+    marginX: mx-auto
+logos:
+  type: grid
+  colType: image
+  container:
+    display: grid
+    gridTemplateCols: grid-cols-2 md:grid-cols-4
+    gapX: gap-x-2.5
+    gapY: gap-y-2.5
+  colsAll:
+    container:
+      bgColor: bg-gray-20
+      display: flex
+      alignItems: items-center
+      justifyContent: justify-center
+      paddingX: px-15
+      paddingY: py-10
+      borderRadius: rounded
+      minHeight: min-h-40
+    objectFit: object-contain
+    width: w-full
+    options:
+      sizes:
+        - 300px
