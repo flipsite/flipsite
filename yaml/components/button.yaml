@@ -3,6 +3,7 @@ display: inline-flex
 alignItems: items-center
 justifyContent: justify-center
 fontWeight: font-bold
+minHeight: min-h-0vh
 text:
   type: span
 spaceX: space-x-2.5

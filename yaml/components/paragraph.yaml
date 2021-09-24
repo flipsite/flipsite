@@ -1,5 +1,5 @@
 textColor: text-black-o65
-minHeight: min-h-0vw
+minHeight: min-h-0vh
 variants:
   lg:
     textSize: text-4.5|5.5
