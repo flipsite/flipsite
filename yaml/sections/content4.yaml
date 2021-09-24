@@ -13,8 +13,7 @@ grid:
       gap: gap-5|15
       alignItems: items-center
     image:
-      container:
-        colSpan: md:col-span-2
+      colSpan: md:col-span-2
       width: w-full
       options:
         aspectRatio: 16by9
@@ -24,5 +23,5 @@ grid:
         spaceY: space-y-3.5
         colSpan: md:col-span-3
   colsOdd:
-    image.container:
+    image:
       gridPos: md:col-start-4 md:row-start-1

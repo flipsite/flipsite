@@ -46,6 +46,11 @@ abstract class AbstractElement
         return $this->children;
     }
 
+    public function getAttribute(string $attr)
+    {
+        return $this->attributes[$attr] ?? null;
+    }
+
     public function setAttribute(string $attr, $value, bool $append = false) : self
     {
         if ($append && isset($this->attributes[$attr])) {

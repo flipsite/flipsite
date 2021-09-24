@@ -22,13 +22,10 @@ content:
       textColor: text-white-o95
 background:
   type: image
-  container:
-    position: absolute
-    inset: inset-0
-    width: w-full
-    height: h-full
-    zIndex: z-0
-    opacity: opacity-25
+  position: absolute
+  inset: inset-0
+  zIndex: z-0
+  opacity: opacity-25
   width: w-full
   height: h-full
   objectFit: object-cover

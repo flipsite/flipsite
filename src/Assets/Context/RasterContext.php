@@ -59,7 +59,7 @@ final class RasterContext extends AbstractImageContext
         return $sources;
     }
 
-    private function getSrcset(string $extension) : array
+    public function getSrcset(string $extension) : array
     {
         if (null === $this->srcset) {
             return [new ImageSrcset($this->buildSrc($extension))];

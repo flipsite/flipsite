@@ -14,4 +14,12 @@ final class ImageSrcset
         $this->src     = $src;
         $this->variant = $variant;
     }
+
+    public function __toString() : string
+    {
+        if (isset($this->variant)) {
+            return $this->src.' '.$this->variant;
+        }
+        return $this->src;
+    }
 }

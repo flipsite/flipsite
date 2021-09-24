@@ -17,6 +17,5 @@ content:
     container:
       spaceX: space-x-5|15
 avatar:
-  container:
-    rowStart: row-start-1
-    flex: flex-none
+  rowStart: row-start-1
+  flex: flex-none

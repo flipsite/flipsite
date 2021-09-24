@@ -17,6 +17,7 @@ use Flipsite\Builders\FaviconBuilder;
 use Flipsite\Builders\FontBuilder;
 use Flipsite\Builders\MetaBuilder;
 use Flipsite\Builders\ScriptBuilder;
+use Flipsite\Builders\PreloadBuilder;
 use Flipsite\Builders\SectionBuilder;
 use Flipsite\Components\ComponentFactory;
 use Flipsite\Sections\SectionFactory;
@@ -113,20 +114,6 @@ if ('localhost' === getenv('APP_ENV')) {
         file_put_contents($siteFilePath, Flipsite\Utils\YamlDumper::dump($site, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
         return $response->withStatus(202);
     });
-
-    $app->post('/api/theme/style/{style}', function (Request $request, Response $response, array $args) {
-        $style = $args['style'];
-        $body = $request->getParsedBody();
-        $enviroment = $this->get('enviroment');
-        $reader = $this->get('reader');
-        $themeFilePath = $enviroment->getSiteDir().'/theme.yaml';
-        $theme = Symfony\Component\Yaml\Yaml::parseFile($themeFilePath);
-        if (!isset($theme['style'][$style])) {
-            $theme['style'][$style] = $body;
-            file_put_contents($themeFilePath, Flipsite\Utils\YamlDumper::dump($theme, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-        }
-        return $response->withStatus(200);
-    });
 }
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
@@ -170,6 +157,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $scriptBuilder = new ScriptBuilder();
     $componentBuilder->addListener($scriptBuilder);
 
+    $perloadBuilder = new PreloadBuilder();
+    $componentBuilder->addListener($perloadBuilder);
+
     $page = $path->getPage();
     $documentBuilder->addLayout($reader->getLayout($page));
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
@@ -193,6 +183,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Add Favicon
     $document = $faviconBuilder->getDocument($document);
+
+    // Add Preload builder
+    $document = $perloadBuilder->getDocument($document);
 
     // Add Webfonts
     $fonts = $reader->get('theme.fonts');

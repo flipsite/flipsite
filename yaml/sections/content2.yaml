@@ -20,8 +20,6 @@ grid:
     container:
       spaceY: space-y-3.5
 image:
-  container:
-    display: block
   borderRadius: rounded-t
   options:
     aspectRatio: 21by9

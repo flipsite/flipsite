@@ -9,7 +9,7 @@ content:
   type: group
   container.spaceY: space-y-5
 image:
-  container.selfAlign: self-stretch
+  selfAlign: self-stretch
   width: w-full
   height: h-full
   objectFit: object-cover

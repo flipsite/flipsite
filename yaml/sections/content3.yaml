@@ -34,8 +34,7 @@ images:
       sizes:
         - (min-width:768px) 900px
         - 450px
-    container:
-      colSpan: col-span-2
+    colSpan: col-span-2
 grid:
   container:
     selfAlign: self-center

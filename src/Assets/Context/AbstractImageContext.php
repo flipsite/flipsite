@@ -11,7 +11,6 @@ abstract class AbstractImageContext
     protected string $src;
     protected ?int $width                    = null;
     protected ?int $height                   = null;
-    protected ?array $sources                = null;
     protected ?AbstractImageOptions $options = null;
 
     public function __construct(string $src)
