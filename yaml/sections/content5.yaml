@@ -28,6 +28,6 @@ grid:
       options:
         aspectRatio: 16by9
         sizes:
-          - (min-width:768px) 600px
+          - (min-width:768px) 450px
           - 300px
       objectFit: object-cover
