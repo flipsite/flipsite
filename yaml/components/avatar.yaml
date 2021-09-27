@@ -8,5 +8,5 @@ variants:
     height: h-40
     width: w-40
     options:
-      sizes:
-        - 160px
+      srcset:
+        - '160'

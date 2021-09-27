@@ -29,8 +29,8 @@ class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
                     $img = $event->getData();
                     $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
-                    $link->setAttribute('href', $img->getAttribute('src'));
                     $link->setAttribute('as', 'image');
+                    $link->setAttribute('href', $img->getAttribute('src'));
                     $link->setAttribute('imagesrcset', $img->getAttribute('srcset'));
                     $link->setAttribute('imagesizes', $img->getAttribute('sizes'));
                     $this->links[] = $link;

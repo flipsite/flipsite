@@ -32,6 +32,12 @@ background:
   options:
     loading: eager
     aspectRatio: 3by2
+    srcset:
+      - 300
+      - 400
+      - 500
+      - 600
+      - 700
+      - 800
     sizes:
-      - (min-width:768px) 600px
-      - 300px
+      - 100vw

@@ -27,7 +27,15 @@ grid:
       marginY: mb-3.5
       options:
         aspectRatio: 16by9
+        srcset:
+          - 400
+          - 500
+          - 600
+          - 700
+          - 800
+          - 900
         sizes:
-          - (min-width:768px) 600px
-          - 300px
+          - xl:xl/2
+          - sm:50vw
+          - 100vw
       objectFit: object-cover

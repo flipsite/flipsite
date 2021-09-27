@@ -6,10 +6,18 @@ namespace Flipsite\Utils;
 
 final class CanIUse
 {
+    public static array $parserResults = [];
+    public static function getResult(string $userAgent) : \UAParser\Result\Client
+    {
+        if (!isset(self::$parserResults[$userAgent])) {
+            $parser = \UAParser\Parser::create();
+            self::$parserResults[$userAgent] = $parser->parse($userAgent);
+        }
+        return self::$parserResults[$userAgent];
+    }
     public static function cssMathFunctions(string $userAgent) : bool
     {
-        $parser = \UAParser\Parser::create();
-        $result = $parser->parse($userAgent);
+        $result = self::getResult($userAgent);
         $major = intval($result->ua->major);
         $minor = intval($result->ua->minor);
 
@@ -31,6 +39,40 @@ final class CanIUse
             return true;
         }
 
+        $supported = $supported[$result->ua->family];
+        if (is_bool($supported)) {
+            return $supported;
+        }
+        if (is_int($supported)) {
+            return $major >= $supported ;
+        }
+
+        if (is_array($supported)) {
+            return $major > $supported[0] || ($major === $supported[0] && $minor >= $supported[1]);
+        }
+
+        return false;
+    }
+
+    public static function webp(string $userAgent) : bool
+    {
+        $result = self::getResult($userAgent);
+        $major = intval($result->ua->major);
+        $minor = intval($result->ua->minor);
+
+        $supported = [
+            'IE' => false,
+            'Edge' => 18,
+            'Firefox' => 65,
+            'Chrome' => 32,
+            'Opera' => 19,
+            'Mobile Safari' => 14,
+        ];
+        print_r($result);
+        die();
+        if (!isset($supported[$result->ua->family])) {
+            return true;
+        }
         $supported = $supported[$result->ua->family];
         if (is_bool($supported)) {
             return $supported;

@@ -23,7 +23,15 @@ image:
   borderRadius: rounded-t
   options:
     aspectRatio: 21by9
+    srcset:
+      - 400
+      - 600
+      - 800
+      - 1000
+      - 1200
+      - 1400
+      - 2048
     sizes:
-      - (min-width:768px) 600px
-      - 300px
+      - lg:lg
+      - 100vw
   width: w-full

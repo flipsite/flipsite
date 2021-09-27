@@ -20,8 +20,8 @@ variants:
     bgColor: bg-secondary hover:bg-secondary-550
     textColor: text-white-o95
     borderRadius: rounded
-    paddingX: px-5|15
-    paddingY: py-2.5|5
+    paddingX: px-10|15
+    paddingY: py-3.5|5
     dark:
       bgColor: bg-primary2 hover:bg-primary2-550
   link:
