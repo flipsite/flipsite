@@ -24,13 +24,10 @@ image:
   options:
     aspectRatio: 21by9
     srcset:
-      - 400
-      - 600
-      - 800
-      - 1000
-      - 1200
-      - 1400
-      - 2048
+      - 320w
+      - 640w
+      - 960w
+      - 1280w
     sizes:
       - lg:lg
       - 100vw

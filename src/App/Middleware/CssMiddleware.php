@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\App\Middleware;
 
 use Flipsite\Style\Parsers\HtmlParser;
@@ -17,7 +16,7 @@ class CssMiddleware implements MiddlewareInterface
 {
     private ?array $theme;
 
-    public function __construct(?array $theme)
+    public function __construct(?array $theme, private \Flipsite\Utils\CanIUse $canIUse)
     {
         $this->theme = $theme;
         unset($this->theme['components'], $this->theme['style']);
@@ -69,7 +68,7 @@ class CssMiddleware implements MiddlewareInterface
 
         $tailwind = new Tailwind($config);
         $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\UnitCallback());
-        $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\ResponsiveSizeCallback($config['screens']));
+        $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\ResponsiveSizeCallback($config['screens'], $this->canIUse->cssMathFunctions()));
         $tailwind->addCallback('background-image', new \Flipsite\Style\Callbacks\BgGradientCallback());
 
         $css           = $tailwind->getCss($elements, $classes);

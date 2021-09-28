@@ -30,7 +30,7 @@ ready(function(){
   windowSizeChange();
   setTimeout(function(){
     windowSizeChange();
-  },1);
+  },100);
   document.querySelectorAll('[data-href]').forEach(function(el){
     el.onclick = function(){
       window.location = el.getAttribute('data-href')

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -30,7 +29,8 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $this->path         = $path;
         $this->imageHandler = new ImageHandler(
             $enviroment->getImageSources(),
-            $enviroment->getImgDir()
+            $enviroment->getImgDir(),
+            $enviroment->getImgBasePath(),
         );
     }
 
@@ -42,7 +42,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
         $title = $meta['title'] ?? $this->fallbackTitle;
         if (null !== $title) {
-            $title .= ' - '.$name;
+            $title .= ' - ' . $name;
         } else {
             $title = $name;
         }
@@ -69,10 +69,10 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $share = $meta['share'] ?? $this->reader->get('share');
         if ($share) {
             $image      = $this->imageHandler->getContext($share, ['width' => 1200, 'height' => 630]);
-            $elements[] = $this->og('og:image', $server.'/img/'.$image->getSrc());
+            $elements[] = $this->og('og:image', $server . $image->getSrc());
         }
 
-        $elements[] = $this->og('og:url', trim($server.$page, '/'));
+        $elements[] = $this->og('og:url', trim($server . $page, '/'));
         $elements[] = $this->og('og:site_name', $name);
         $elements[] = $this->og('og:type', 'website');
 

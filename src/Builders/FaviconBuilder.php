@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -22,7 +21,8 @@ class FaviconBuilder implements BuilderInterface
         $this->reader       = $reader;
         $this->imageHandler = new ImageHandler(
             $enviroment->getImageSources(),
-            $enviroment->getImgDir()
+            $enviroment->getImgDir(),
+            $enviroment->getImgBasePath(),
         );
     }
 
@@ -41,7 +41,7 @@ class FaviconBuilder implements BuilderInterface
             $image = $this->imageHandler->getContext($favicon['ico']);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
-            $el->setAttribute('href', '/img/'.$image->getSrc());
+            $el->setAttribute('href', $image->getSrc());
             $document->getChild('head')->addChild($el);
         }
 
@@ -49,7 +49,7 @@ class FaviconBuilder implements BuilderInterface
             $image = $this->imageHandler->getContext($favicon['svg']);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
-            $el->setAttribute('href', '/img/'.$image->getSrc());
+            $el->setAttribute('href', $image->getSrc());
             $el->setAttribute('type', 'image/svg+xml');
             $document->getChild('head')->addChild($el);
         }
@@ -58,7 +58,7 @@ class FaviconBuilder implements BuilderInterface
             $image = $this->imageHandler->getContext($favicon['apple']);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'apple-touch-icon');
-            $el->setAttribute('href', '/img/'.$image->getSrc());
+            $el->setAttribute('href', $image->getSrc());
             $document->getChild('head')->addChild($el);
         }
 

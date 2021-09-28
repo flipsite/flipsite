@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Assets\Sources\AssetSources;
@@ -65,10 +64,15 @@ final class Enviroment
         return $this->basePath;
     }
 
+    public function getImgBasePath() : string
+    {
+        return $this->basePath . '/img';
+    }
+
     public function getServer(bool $basePath = true) : string
     {
         if ($basePath) {
-            return trim($this->server.$this->basePath, '/');
+            return trim($this->server . $this->basePath, '/');
         }
         return $this->server;
     }
@@ -86,10 +90,5 @@ final class Enviroment
     public function isLive() : bool
     {
         return $this->live;
-    }
-
-    public function getGenerator() : ?string
-    {
-        return 'Flipsite v0.0.1-dev';
     }
 }

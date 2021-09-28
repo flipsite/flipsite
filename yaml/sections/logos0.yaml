@@ -29,6 +29,3 @@ logos:
       minHeight: min-h-40
     objectFit: object-contain
     width: w-full
-    options:
-      sizes:
-        - 300px

@@ -1,22 +1,17 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets\Context;
 
 use Flipsite\Assets\Options\AbstractImageOptions;
 
 abstract class AbstractImageContext
 {
-    protected string $src;
+    protected string $image;
+    protected string $imgBasePath;
     protected ?int $width                    = null;
     protected ?int $height                   = null;
     protected ?AbstractImageOptions $options = null;
-
-    public function __construct(string $src)
-    {
-        $this->src = $src;
-    }
 
     abstract public function getSrc() : string;
 
@@ -29,6 +24,4 @@ abstract class AbstractImageContext
     {
         return $this->height;
     }
-
-    abstract public function getSources() : ?array;
 }

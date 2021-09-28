@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -14,21 +13,22 @@ use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
-use Flipsite\Utils\StyleAppearanceHelper;
+use Flipsite\Utils\CanIUse;
 
 class ComponentBuilder
 {
     private ImageHandler $imageHandler;
     private ?SectionBuilder $sectionBuilder = null;
-    private array $listeners      = [];
-    private array $factories      = [];
-    private array $componentStyle = [];
+    private array $listeners                = [];
+    private array $factories                = [];
+    private array $componentStyle           = [];
 
-    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
+    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
         $this->imageHandler = new ImageHandler(
             $enviroment->getImageSources(),
-            $enviroment->getImgDir()
+            $enviroment->getImgDir(),
+            $enviroment->getImgBasePath(),
         );
         $this->componentStyle = $reader->get('theme.components') ?? [];
     }
@@ -85,7 +85,7 @@ class ComponentBuilder
         unset($componentStyle['type']);
 
         if (strpos($componentType, ':')) {
-            $flags          = explode(':', $componentType);
+            $flags                   = explode(':', $componentType);
             $componentType           = array_shift($flags);
         }
 
@@ -117,7 +117,7 @@ class ComponentBuilder
         if (null !== $inheritStyle) {
             $style = ArrayHelper::merge($inheritStyle, $style);
         }
-        $style['inherit'] = false; // custom style is loaded
+        $style['inherit']            = false; // custom style is loaded
         $this->componentStyle[$type] = $style;
         unset($style['inherit']);
         return $style;
@@ -157,6 +157,9 @@ class ComponentBuilder
                 }
                 if (method_exists($component, 'addSlugs')) {
                     $component->addSlugs($this->reader->getSlugs());
+                }
+                if (method_exists($component, 'addCanIUse')) {
+                    $component->addCanIUse($this->canIUse);
                 }
                 return $component;
             }

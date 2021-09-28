@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -53,7 +52,9 @@ abstract class AbstractElement
 
     public function setAttribute(string $attr, $value, bool $append = false) : self
     {
-        if ($append && isset($this->attributes[$attr])) {
+        if (null === $value) {
+            unset($this->attributes[$attr]);
+        } elseif ($append && isset($this->attributes[$attr])) {
             $this->attributes[$attr] .= ' '.$value;
         } else {
             $this->attributes[$attr] = $value;

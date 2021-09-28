@@ -1,19 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Callbacks;
-
-use Flipsite\Utils\CanIUse;
 
 class ResponsiveSizeCallback
 {
-    private bool $isSupported = false;
-
-    public function __construct(private array $screens)
+    public function __construct(private array $screens, private bool $isCssMathFunctionsSupported)
     {
-        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-        $this->isSupported = CanIUse::cssMathFunctions($userAgent);
     }
 
     public function __invoke(array $args)
@@ -30,23 +23,23 @@ class ResponsiveSizeCallback
         $minSizePx   = floatval($this->getPx($args[1]));
         $maxScreenPx = floatval($this->screens[$args[2]]);
         $maxSizePx   = floatval($this->getPx($args[3]));
-        $minSizeRem = $minSizePx / 16.0;
-        $maxSizeRem = $maxSizePx / 16.0;
+        $minSizeRem  = $minSizePx / 16.0;
+        $maxSizeRem  = $maxSizePx / 16.0;
 
-        if (!$this->isSupported) {
-            return ($minSizeRem + 0.5*($maxSizeRem-$minSizeRem)).'rem';
+        if (!$this->isCssMathFunctionsSupported) {
+            return ($minSizeRem + 0.5 * ($maxSizeRem - $minSizeRem)) . 'rem';
         }
 
         $slope       = ($maxSizePx - $minSizePx) / ($maxScreenPx / 100 - $minScreenPx / 100);
         $interceptPx = round($maxSizePx - $slope * $maxScreenPx / 100, 2);
 
         if (0.0 === $interceptPx) {
-            $between = $slope.'vw';
+            $between = $slope . 'vw';
         } else {
-            $between = round($interceptPx / 16.0, 2).'rem + '.$slope.'vw';
+            $between = round($interceptPx / 16.0, 2) . 'rem + ' . $slope . 'vw';
         }
 
-        return 'min(max('.$minSizeRem.'rem,'.$between.'),'.$maxSizeRem.'rem)';
+        return 'min(max(' . $minSizeRem . 'rem,' . $between . '),' . $maxSizeRem . 'rem)';
     }
 
     private function getPx($value) : float

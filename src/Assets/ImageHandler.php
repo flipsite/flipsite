@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets;
 
 use Exception;
@@ -13,7 +12,6 @@ use Flipsite\Assets\Context\SvgContext;
 use Flipsite\Assets\Editors\IcoEditor;
 use Flipsite\Assets\Editors\RasterEditor;
 use Flipsite\Assets\Editors\SvgEditor;
-use Flipsite\Assets\Options\RasterOptions;
 use Flipsite\Assets\Options\SvgOptions;
 use Flipsite\Assets\Sources\AssetSources;
 use Intervention\Image\ImageManager;
@@ -21,35 +19,26 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 final class ImageHandler
 {
-    private AssetSources $assetSources;
-    private string $cacheDir;
-    private bool $webp = true;
+    private bool $webpServer = true;
 
-    public function __construct(AssetSources $assetSources, string $cacheDir)
+    public function __construct(private AssetSources $assetSources, private string $cacheDir, private string $imgBasePath = '/img')
     {
-        $this->assetSources = $assetSources;
-        $this->cacheDir     = $cacheDir;
-        $this->webp         = (extension_loaded('gd') && function_exists('imagewebp')) || (function_exists('\Imagick::queryFormats') && \Imagick::queryFormats('WEBP'));
+        $this->webpServer   = (extension_loaded('gd') && function_exists('imagewebp')) || (function_exists('\Imagick::queryFormats') && \Imagick::queryFormats('WEBP'));
     }
 
-    public function __invoke(string $src, ?array $args = null) : AbstractImageContext
+    public function getContext(string $image, ?array $options = null) : AbstractImageContext
     {
-        return $this->getContext($src, $args);
-    }
-
-    public function getContext(string $src, ?array $args = null) : AbstractImageContext
-    {
-        if (0 === mb_strpos($src, 'http')) {
+        if (0 === mb_strpos($image, 'http')) {
             return new ExternalContext($src);
         }
-        $file = new ImageFile($src, $this->assetSources);
+        $file = new ImageFile($image, $this->assetSources);
         if ('svg' === $file->getExtension()) {
-            return new SvgContext($src, $file, new SvgOptions($args));
+            return new SvgContext($image, $this->imgBasePath, $file, new SvgOptions($options));
         }
         if ('ico' === $file->getExtension()) {
-            return new IcoContext($src, $file);
+            return new IcoContext($image, $this->imgBasePath, $file);
         }
-        return new RasterContext($src, $file, new RasterOptions($args), $args['srcset'] ?? null, $this->webp);
+        return new RasterContext($image, $this->imgBasePath, $file, $options);
     }
 
     public function getResponse(Response $response, string $path) : Response
@@ -82,12 +71,12 @@ final class ImageHandler
 
     private function inCache(string $path) : bool
     {
-        return file_exists($this->cacheDir.'/'.$path);
+        return file_exists($this->cacheDir . '/' . $path);
     }
 
     private function getCached(Response $response, string $path) : Response
     {
-        $filename = $this->cacheDir.'/'.$path;
+        $filename = $this->cacheDir . '/' . $path;
         $pathinfo = pathinfo($path);
         if ('svg' === $pathinfo['extension']) {
             $body = $response->getBody();

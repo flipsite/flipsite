@@ -31,13 +31,9 @@ background:
   objectFit: object-cover
   options:
     loading: eager
-    aspectRatio: 3by2
+    aspectRatio: 1by1
     srcset:
-      - 300
-      - 400
-      - 500
-      - 600
-      - 700
-      - 800
+      - 320w
+      - 640w
     sizes:
       - 100vw

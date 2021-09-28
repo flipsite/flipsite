@@ -42,9 +42,9 @@
       objectFit: object-cover
       options:
         aspectRatio: 16by9
-        sizes:
-          - (min-width:768px) 600px
-          - 300px
+        # sizes:
+        #   - (min-width:768px) 600px
+        #   - 300px
       width: w-full
       height: h-full
       container:

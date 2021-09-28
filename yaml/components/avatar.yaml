@@ -9,4 +9,6 @@ variants:
     width: w-40
     options:
       srcset:
-        - '160'
+        - 160w
+        - 320w
+        - 540w

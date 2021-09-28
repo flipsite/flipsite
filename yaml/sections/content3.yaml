@@ -25,15 +25,15 @@ images:
     objectFit: object-cover
     options:
       aspectRatio: 1by1
-      sizes:
-        - (min-width:768px) 600px
-        - 300px
+      srcset:
+        - 320w
+        - 640w
   cols.0:
     options:
       aspectRatio: 2by1
-      sizes:
-        - (min-width:768px) 900px
-        - 450px
+      srcset:
+        - 160w
+        - 320w
     colSpan: col-span-2
 grid:
   container:

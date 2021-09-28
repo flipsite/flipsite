@@ -14,9 +14,9 @@ image:
   height: h-full
   objectFit: object-cover
   options:
-    sizes:
-      - '(min-width:768px) 600px'
-      - 300px
+    # sizes:
+    #   - '(min-width:768px) 600px'
+    #   - 300px
 variants:
   tr:
     image.container:

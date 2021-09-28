@@ -20,7 +20,6 @@ use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\PreloadBuilder;
 use Flipsite\Builders\SectionBuilder;
 use Flipsite\Components\ComponentFactory;
-use Flipsite\Sections\SectionFactory;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\Robots;
 use Flipsite\Utils\Sitemap;
@@ -30,28 +29,28 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Flipsite\Utils\StyleAppearanceHelper;
 
-require_once getenv('VENDOR_DIR').'/autoload.php';
-require_once 'polyfills.php';
+require_once getenv('VENDOR_DIR') . '/autoload.php';
 
 if (!getenv('APP_BASEPATH')) {
     $basePath = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']);
     $protocol = 'on' === ($_SERVER['HTTPS'] ?? '') ? 'https' : 'http';
-    putenv('APP_BASEPATH='.$basePath);
-    putenv('APP_SERVER='.$protocol.'://'.$_SERVER['HTTP_HOST']);
+    putenv('APP_BASEPATH=' . $basePath);
+    putenv('APP_SERVER=' . $protocol . '://' . $_SERVER['HTTP_HOST']);
 } else {
     $protocol = 'on' === ($_SERVER['HTTPS'] ?? '') ? 'https' : 'http';
-    putenv('APP_SERVER='.$protocol.'://'.$_SERVER['HTTP_HOST']);
+    putenv('APP_SERVER=' . $protocol . '://' . $_SERVER['HTTP_HOST']);
 }
 
 $container = new Container();
 $container->add('enviroment', 'Flipsite\Enviroment', true);
+$container->add('caniuse', 'Flipsite\Utils\CanIUse', true);
 $container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment');
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
-$cssMw         = new CssMiddleware($container->get('reader')->get('theme'));
+$cssMw         = new CssMiddleware($container->get('reader')->get('theme'), $container->get('caniuse'));
 $diagnosticsMw = new DiagnosticsMiddleware();
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
 $offlineMw     = new OfflineMiddleware($container->get('enviroment'), $container->get('reader'));
@@ -61,7 +60,8 @@ $app->get('/img[/{file:.*}]', function (Request $request, Response $response, ar
     $enviroment = $this->get('enviroment');
     $handler = new ImageHandler(
         $enviroment->getImageSources(),
-        $enviroment->getImgDir()
+        $enviroment->getImgDir(),
+        $enviroment->getImgBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
@@ -96,9 +96,9 @@ if ('localhost' === getenv('APP_ENV')) {
         $enviroment = $this->get('enviroment');
         $reader = $this->get('reader');
         $pages = array_keys($reader->get('pages'));
-        $siteFilePath = $enviroment->getSiteDir().'/site.yaml';
+        $siteFilePath = $enviroment->getSiteDir() . '/site.yaml';
         $site = Symfony\Component\Yaml\Yaml::parseFile($siteFilePath);
-        if (in_array($page, ['before','after'])) {
+        if (in_array($page, ['before', 'after'])) {
             if (!isset($site[$page])) {
                 $site[$page] = [$body];
             } else {
@@ -132,12 +132,12 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $enviroment = $this->get('enviroment');
     if (null !== $redirect) {
         $response = $response->withStatus(302);
-        $redirect = trim($enviroment->getServer().'/'.$redirect, '/');
+        $redirect = trim($enviroment->getServer() . '/' . $redirect, '/');
         return $response->withHeader('Location', $redirect);
     }
 
     $documentBuilder = new DocumentBuilder($enviroment, $reader, $path);
-    $componentBuilder = new ComponentBuilder($enviroment, $reader, $path);
+    $componentBuilder = new ComponentBuilder($enviroment, $reader, $path, $this->get('caniuse'));
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());
@@ -176,7 +176,6 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $reader->get('theme.appearance') ?? 'light'
     );
     $document->getChild('body')->addStyle($bodyStyle);
-
 
     // Add Meta
     $document = $metaBuilder->getDocument($document);

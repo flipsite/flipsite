@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets\Context;
 
 use Flipsite\Assets\ImageFile;
@@ -9,66 +8,43 @@ use Flipsite\Assets\Options\RasterOptions;
 
 final class RasterContext extends AbstractImageContext
 {
-    private string $filename;
     private string $hash;
-    private string $extension;
-    private ?array $srcset;
     private bool $webp;
+    private ?array $srcset;
+    private string $extension;
 
-    public function __construct(string $src, ImageFile $file, RasterOptions $options, ?array $srcset = null, bool $webp = true)
+    public function __construct(string $image, string $imgBasePath, ImageFile $file, array $options)
     {
-        $this->src       = $src;
-        $this->hash      = $file->getHash();
-        $this->extension = $file->getExtension();
-        $this->filename  = $file->getFilename();
-        $this->options   = $options;
-        $this->srcset    = $srcset;
-        $this->webp      = $webp;
-
-        $this->width  = $options->getValue('width');
-        $this->height = $options->getValue('height');
-
-        if (!$this->width && !$this->height) {
-            $realSize     = getimagesize($this->filename);
-            $this->width  = $realSize[0];
-            $this->height = $realSize[1];
-        } elseif (!$this->width) {
-            $realSize    = getimagesize($this->filename);
-            $factor      = floatval($this->height / $realSize[1]);
-            $this->width = intval($factor * $realSize[0]);
-        } elseif (!$this->height) {
-            $realSize     = getimagesize($this->filename);
-            $factor       = floatval($this->width / $realSize[0]);
-            $this->height = intval($factor * $realSize[1]);
-        }
+        $this->image                  = $image;
+        $pathinfo                     = pathinfo($image);
+        $this->extension              = $pathinfo['extension'];
+        $this->imgBasePath            = $imgBasePath;
+        $this->hash                   = $file->getHash();
+        $this->srcset                 = $options['srcset'] ?? null;
+        $size                         = $this->getSize($options, $file->getFilename());
+        $options['width']             = $size['width'];
+        $options['height']            = $size['height'];
+        $this->width                  = $options['width'];
+        $this->height                 = $options['height'];
+        unset($options['aspectRatio'], $options['srcset']);
+        $this->options = new RasterOptions($options);
     }
 
     public function getSrc() : string
     {
-        return $this->buildSrc('webp' === $this->extension ? 'png' : $this->extension);
+        return $this->imgBasePath.'/'.$this->buildSrc();
     }
 
-    public function getSources() : ?array
-    {
-        $sources = [];
-        if ($this->webp) {
-            $sources[] = new ImageSource('image/webp', $this->getSrcset('webp'));
-        }
-        $extension = 'webp' === $this->extension ? 'png' : $this->extension;
-        $sources[] = new ImageSource('image/'.$extension, $this->getSrcset($extension));
-        return $sources;
-    }
-
-    public function getSrcset(string $extension) : array
+    public function getSrcset() : ?string
     {
         if (null === $this->srcset) {
-            return [new ImageSrcset($this->buildSrc($extension))];
+            return null;
         }
         $srcset = [];
         foreach ($this->srcset as $variant) {
             preg_match('/[0-9\.]+[w|x]/', $variant, $matches);
             if (0 === count($matches)) {
-                throw new \Exception('Invalid srcset variant ('.$variant.'). Should be multiplier (1x, 1.5x) or width (100w, 300w)');
+                throw new \Exception('Invalid srcset variant (' . $variant . '). Should be multiplier (1x, 1.5x) or width (100w, 300w)');
             }
             if (false !== mb_strpos($variant, 'x')) {
                 $this->options->changeScale(floatval(trim($variant, 'x')));
@@ -77,15 +53,38 @@ final class RasterContext extends AbstractImageContext
                 $scale = $width / floatval($this->options->getValue('width'));
                 $this->options->changeScale($scale);
             }
-            $srcset[] = new ImageSrcset($this->buildSrc($extension), $variant);
+            $srcset[] = new ImageSrcset($this->imgBasePath.'/'.$this->buildSrc(), $variant);
         }
         $this->options->changeScale();
-        return $srcset;
+        return implode(', ', $srcset);
     }
 
-    private function buildSrc(string $extension) : string
+    private function buildSrc() : string
     {
-        $replace = $this->options.'.'.$this->hash.'.'.$extension;
-        return str_replace('.'.$this->extension, $replace, $this->src);
+        $replace = $this->options.'.'.$this->hash. '.'.$this->extension;
+        return str_replace('.'.$this->extension, $replace, $this->image);
+    }
+
+    private function getSize(array $options, string $filename) : array
+    {
+        $width  = $options['width'] ?? null;
+        $height = $options['height'] ?? null;
+        // If no width, use smallest from srcset
+        if (!$width && isset($options['srcset'][0]) && strpos($options['srcset'][0], 'w')) {
+            $width = intval($options['srcset'][0]);
+        }
+        if (isset($options['aspectRatio'])) {
+            $tmp = explode('by', $options['aspectRatio']);
+            if (2 === count($tmp)) {
+                $factor = floatval($tmp[0] / $tmp[1]);
+                if ($width) {
+                    $height = intval($width / $factor);
+                } elseif ($height) {
+                    $width = intval($height / $factor);
+                }
+            }
+        }
+
+        return ['width' => $width, 'height' => $height];
     }
 }
