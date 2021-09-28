@@ -25,9 +25,9 @@ image:
     aspectRatio: 21by9
     srcset:
       - 320w
+      - 480w
       - 640w
-      - 960w
-      - 1280w
+      - 720w
     sizes:
       - lg:lg
       - 100vw

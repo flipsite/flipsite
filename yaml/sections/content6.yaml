@@ -29,6 +29,7 @@ grid:
         aspectRatio: 16by9
         srcset:
           - 320w
+          - 480w
           - 640w
         sizes:
           - xl:xl/2.2

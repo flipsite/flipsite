@@ -91,22 +91,22 @@ final class Image extends AbstractComponent
             }
             $options['sizes'] = implode(', ', $options['sizes']);
         }
-        if (isset($options['srcset'][0]) && strpos($options['srcset'][0], 'w')) {
-            $srcset = [];
-            foreach ($options['srcset'] as $ss) {
-                $ss       = intval($ss);
-                $srcset[] = $ss;
-                $srcset[] = $ss * 2;
-                if ($ss <= 480) {
-                    $srcset[] = $ss * 3;
-                }
-            }
-            $srcset = array_unique($srcset);
-            foreach ($srcset as &$ss) {
-                $ss .= 'w';
-            }
-            $options['srcset'] = $srcset;
-        }
+        // if (isset($options['srcset'][0]) && strpos($options['srcset'][0], 'w')) {
+        //     $srcset = [];
+        //     foreach ($options['srcset'] as $ss) {
+        //         $ss       = intval($ss);
+        //         $srcset[] = $ss;
+        //         $srcset[] = $ss * 2;
+        //         if ($ss <= 480) {
+        //             $srcset[] = $ss * 3;
+        //         }
+        //     }
+        //     $srcset = array_unique($srcset);
+        //     foreach ($srcset as &$ss) {
+        //         $ss .= 'w';
+        //     }
+        //     $options['srcset'] = $srcset;
+        // }
         return $options;
     }
 }

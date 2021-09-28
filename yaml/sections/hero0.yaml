@@ -34,6 +34,7 @@ background:
     aspectRatio: 1by1
     srcset:
       - 320w
+      - 480w
       - 640w
     sizes:
       - 100vw
