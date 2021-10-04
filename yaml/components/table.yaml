@@ -6,7 +6,6 @@ thAll:
   textAlign: text-left
   width: w-1/4
   textSize: text-3
-th.3.textAlign: text-right
 tdAll:
   textColor: text-black-o70
   textSize: text-2.6|3.5
@@ -14,4 +13,10 @@ tdAll:
   textOverflow: truncate
 trEven:
   bgColor: bg-black-o5
-td.3.textAlign: text-right
+dark:
+  thAll:
+    textColor: text-primary2
+  tdAll:
+    textColor: text-white-o70
+  trEven:
+    bgColor: bg-white-o5
