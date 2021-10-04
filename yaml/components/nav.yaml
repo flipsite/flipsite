@@ -23,6 +23,12 @@ variants:
     active:
       bgColor: bg-primary
       textColor: text-white-o95
+    dark:
+      active:
+        bgColor: bg-primary2
+        textColor: text-white-o95
+      textColor: text-white-o95 hover:text-primary2
+      bgColor: hover:bg-primary2-o10
   tabs:
     container:
       marginY: null
@@ -31,3 +37,7 @@ variants:
     borderColor: border-primary-o10 hover:border-primary
     active:
       borderColor: border-primary
+    dark:
+      active:
+        borderColor: border-primary2
+    textColor: text-white-o95
