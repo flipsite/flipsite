@@ -4,4 +4,6 @@ section:
     spaceY: space-y-3.5
     textAlign: text-center
     marginX: mx-auto
-nav.container.spaceX: space-x-5|15
+nav.container:
+  justifyContent: justify-center
+  spaceX: space-x-5|15

@@ -12,8 +12,12 @@ dark:
   textColor: text-white-o95 hover:text-primary2
 variants:
   sitemap:
+    container:
+      display: grid
+      spaceX: null
     fontWeight: font-light
     textSize: text-3.25|3.5
+    paddingX: null
   pills:
     container:
       marginY: my-4
