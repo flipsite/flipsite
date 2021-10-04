@@ -1,81 +1,58 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class ContactDetails extends AbstractComponent
+final class ContactDetails extends Grid
 {
     use Traits\BuilderTrait;
     use Traits\PathTrait;
 
-    protected string $tag = 'ul';
-
     public function with(ComponentData $data) : void
     {
-        $this->addStyle($data->getStyle('container'));
-        $style = $data->getStyle();
-        unset($style['container']);
-        foreach ($this->normalize($data->get()) as $item) {
-            $li = new Element('li');
-            $li->addStyle($data->getStyle('li'));
-            $components = $this->builder->build($item, $data->getStyle(), $data->getAppearance());
-            $li->addChildren($components);
-
-            // if (isset($item['url'])) {
-            //     unset($item['icon']);
-            //     $a = $this->builder->build('a', $item, ['a' => $style['link'] ?? []], $appearance);
-            //     $li->addChild($a);
-            // } else {
-            //     $span = new Element('span');
-            //     $span->setContent($item['text']);
-            //     $li->addChild($span);
-            // }
-            $this->addChild($li);
-        }
+        $data = $this->normalize($data, $data->get('icon', true) ?? 'icon', $data->get('text', true) ?? 'paragraph');
+        parent::with($data);
     }
 
-    protected function normalize($data) : array
+    protected function normalize(ComponentData $data, string $iconType, string $textType) : ComponentData
     {
-        $items = [];
-        foreach ($data as $attr => $val) {
+        $itemData = $data->get();
+        $items    = [];
+        foreach ($itemData as $attr => $val) {
             if (isset($items[$attr])) {
                 continue;
             }
             switch ($attr) {
                 case 'company':
                     $items[$attr] = [
-                        'icon' => 'zondicons/home',
-                        'text' => $val,
+                        $iconType      => 'zondicons/home',
+                        $textType      => $val,
                     ];
                     break;
                 case 'person':
                     $items[$attr] = [
-                        'icon' => 'zondicons/user',
-                        'text' => $val,
+                        $iconType      => 'zondicons/user',
+                        $textType      => $val,
                     ];
                     break;
                 case 'address':
                     $addressFormatter = new \Adamlc\AddressFormat\Format();
-                    $addressFormatter->setLocale($data['country']);
-                    $addressFormatter['STREET_ADDRESS'] = $data['address'] ?? '';
-                    $addressFormatter['LOCALITY']       = $data['city']    ?? '';
-                    $addressFormatter['POSTAL_CODE']    = $data['zip']     ?? '';
-                    $addressFormatter['ADMIN_AREA']     = $data['state']   ?? '';
-                    $addressFormatter['COUNTRY']        = $data['country'] ?? '';
+                    $addressFormatter->setLocale($itemData['country']);
+                    $addressFormatter['STREET_ADDRESS'] = $itemData['address'] ?? '';
+                    $addressFormatter['LOCALITY']       = $itemData['city'] ?? '';
+                    $addressFormatter['POSTAL_CODE']    = $itemData['zip'] ?? '';
+                    $addressFormatter['ADMIN_AREA']     = $itemData['state'] ?? '';
+                    $addressFormatter['COUNTRY']        = $itemData['country'] ?? '';
                     $address                            = $addressFormatter->formatAddress(false);
                     $items[$attr]                       = [
-                        'icon' => 'zondicons/location',
-                        'text' => str_replace("\n", ', ', $address),
+                        $iconType => 'zondicons/location',
+                        $textType => $this->md(str_replace("\n", ', ', $address), $itemData['maps']),
                     ];
-                    if (isset($data['maps'])) {
-                        $items[$attr]['url'] = $data['maps'];
-                    }
                     break;
                 case 'phone':
-                    $phones    = is_array($data['phone']) && !ArrayHelper::isAssociative($data['phone']) ? $data['phone'] : [$data['phone']];
+                    $phones    = is_array($itemData['phone']) && !ArrayHelper::isAssociative($itemData['phone']) ? $itemData['phone'] : [$itemData['phone']];
                     $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
                     foreach ($phones as $i => $phone) {
                         if (is_string($phone)) {
@@ -86,32 +63,30 @@ final class ContactDetails extends AbstractComponent
                         } catch (\libphonenumber\NumberParseException $e) {
                         }
                         $items['phone'.$i] = [
-                            'icon' => 'zondicons/phone',
-                            'text' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                            'url'  => 'tel:'.$phone['number'],
+                            $iconType => 'zondicons/phone',
+                            $textType => $this->md($phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL), 'tel:'.$phone['number']),
                         ];
                     }
                     break;
                 case 'email':
                     $items[$attr] = [
-                        'icon' => 'zondicons/envelope',
-                        'text' => $val,
-                        'url'  => 'mailto:'.$val,
+                        $iconType => 'zondicons/envelope',
+                        $textType => $this->md($val, 'mailto:'.$val)
                     ];
                     break;
             }
         }
         unset($items['country'],$items['zip'],$items['maps'],$items['city']);
-        foreach ($items as $key => $item) {
-            if (isset($item['url'])) {
-                $item['a'] = [
-                    'text' => $item['text'],
-                    'url' => $item['url'],
-                ];
-                unset($item['text'],$item['url']);
-                $items[$key] = $item;
-            }
+        $data->set(array_values($items));
+
+        return $data;
+    }
+
+    private function md(string $text, ?string $url = null) : string
+    {
+        if (null === $url) {
+            return $text;
         }
-        return $items;
+        return '['.$text.']('.$url.')';
     }
 }

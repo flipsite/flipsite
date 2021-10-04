@@ -18,14 +18,13 @@ logos:
     gapX: gap-x-2.5
     gapY: gap-y-2.5
   colsAll:
-    container:
-      bgColor: bg-gray-20
-      display: flex
-      alignItems: items-center
-      justifyContent: justify-center
-      paddingX: px-15
-      paddingY: py-10
-      borderRadius: rounded
-      minHeight: min-h-40
+    bgColor: bg-gray-o5
+    display: flex
+    alignItems: items-center
+    justifyContent: justify-center
+    paddingX: px-15
+    paddingY: py-10
+    borderRadius: rounded
+    minHeight: min-h-40
     objectFit: object-contain
     width: w-full

@@ -1,14 +1,14 @@
 section:
   container:
     display: grid
-    gridTemplateCols: lg:grid-cols-2
-    gap: gap-6|15
+    gridTemplateCols: md:grid-cols-2
+    gap: gap-5|15
     maxWidth: max-w-screen-xl
     marginX: mx-auto
 header:
   type: group
   container:
-    colSpan: lg:col-span-2
+    colSpan: md:col-span-2
     marginX: mx-auto
     maxWidth: max-w-screen-md
     spaceY: space-y-5
@@ -32,8 +32,8 @@ images:
     options:
       aspectRatio: 2by1
       srcset:
-        - 160w
         - 320w
+        - 640w
     colSpan: col-span-2
 grid:
   container:
@@ -41,4 +41,4 @@ grid:
     spaceY: space-y-6|15
   colsAll:
     container:
-      spaceY: space-y-3.5
+      spaceY: space-y-5

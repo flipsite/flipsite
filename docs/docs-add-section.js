@@ -17,7 +17,7 @@ ready(function(){
   function postData(page) {
     var json = document.querySelectorAll('div[data-type=json]');
     var section = json[0].innerHTML;
-    fetch('/api/sections/'+page.replaceAll('/','-'), {
+    fetch('/api/sections/'+page, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'

@@ -2,8 +2,10 @@ navigation:
   name: Navigation
   poster: navbar0
   data:
-    navbar0.variants: 1
+    navbar0.variants: 2
+    navbar1.variants: 2
     iconnav0.variants: 1
+    navbar2.variants: 1
   count: 1
 heroes:
   name: Heroes
@@ -23,49 +25,29 @@ content:
     content5.variants: 1
     content6.variants: 1
   count: 5
-# footers:
-#   name: Footers
-#   poster: footer2
-#   data:
-#     footer0.variants: 4
-#     footer1.variants: 1
-#     footer2.variants: 1
-#   count: 3
-# contact:
-#   name: Contact
-#   poster: contact0
-#   data:
-#     contact0.variants: 2
-#   count: 1
-# team:
-#   name: Team
-#   poster: team0
-#   data:
-#     team0.variants: 2
-#   count: 1
-# logos:
-#   name: Logos
-#   poster: logos0
-#   data:
-#     logos0.variants: 1
-#   count: 1
-# # content:
-# #   item: content
-# #   name: Content
-# #   data: $sections/content.yaml
-# #   count: 6
-# # pricing:
-# #   item: price
-# #   name: Pricing
-# #   data: $sections/pricing.yaml
-# #   count: 1
-# # footers:
-# #   item: footer
-# #   name: Footers
-# #   data: $sections/footers.yaml
-# #   count: 2
-# # banners:
-# #   item: banner
-# #   name: Banners
-# #   data: $sections/banners.yaml
-# #   count: 2
+footers:
+  name: Footers
+  poster: footer2
+  data:
+    footer0.variants: 4
+    footer1.variants: 1
+    footer2.variants: 1
+  count: 3
+contact:
+  name: Contact
+  poster: contact0
+  data:
+    contact0.variants: 2
+  count: 1
+team:
+  name: Team
+  poster: team0
+  data:
+    team0.variants: 2
+  count: 1
+logos:
+  name: Logos
+  poster: logos0
+  data:
+    logos0.variants: 1
+  count: 1

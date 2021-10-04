@@ -1,11 +1,33 @@
 container:
+  display: flex
   textColor: text-black-o95
   fontWeight: font-bold
   textSize: text-3.5|4
+  marginY: my-5
+  spaceX: space-x-5|10
 textColor: hover:text-primary
+paddingX: px-3.5
+display: block
 dark:
   textColor: text-white-o95 hover:text-primary2
 variants:
   sitemap:
     fontWeight: font-light
     textSize: text-3.25|3.5
+  pills:
+    container:
+      marginY: my-4
+    bgColor: hover:bg-primary-o10
+    borderRadius: rounded-full
+    paddingY: py-1
+    active:
+      bgColor: bg-primary
+      textColor: text-white-o95
+  tabs:
+    container:
+      marginY: null
+    paddingY: pt-5 pb-4
+    border: border-b-1
+    borderColor: border-primary-o10 hover:border-primary
+    active:
+      borderColor: border-primary

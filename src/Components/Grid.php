@@ -1,12 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class Grid extends AbstractComponent
+class Grid extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
@@ -25,8 +24,8 @@ final class Grid extends AbstractComponent
         $cols = $data->get();
         if (isset($cols['colData'])) {
             $colData = $this->addKey($cols['colData']);
-            $colTpl = $cols['colTpl'];
-            $cols = $this->mapData($colTpl, $colData);
+            $colTpl  = $cols['colTpl'];
+            $cols    = $this->mapData($colTpl, $colData);
         }
 
         foreach ($cols as $i => $colData) {
@@ -36,8 +35,8 @@ final class Grid extends AbstractComponent
                 $this->addChildren($components);
             } else {
                 $containerStyle = $colStyle['container'] ?? [];
-                $components = $this->builder->build($colData, $colStyle, $data->getAppearance());
-                $col        = new Element($containerStyle['tag'] ?? 'div');
+                $components     = $this->builder->build($colData, $colStyle, $data->getAppearance());
+                $col            = new Element($containerStyle['tag'] ?? 'div');
                 unset($containerStyle['tag']);
                 $col->addStyle($containerStyle);
                 $col->addChildren($components);
@@ -95,13 +94,14 @@ final class Grid extends AbstractComponent
     private function addKey(array $data) : array
     {
         $data_ = $data;
-        $data = [];
+        $data  = [];
         foreach ($data_ as $key => $value) {
             $value['key'] = $key;
-            $data[] = $value;
+            $data[]       = $value;
         }
         return $data;
     }
+
     private function addType(string $type, array $data) : array
     {
         $components = [];

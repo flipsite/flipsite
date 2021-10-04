@@ -55,7 +55,7 @@ pages:
             gap: gap-5
         grid.colsAll.group.container:
           display: flex
-          justifyContent: justify-between
+          justify: justify-between
           alignItems: items-center
           marginY: mt-2.5
   flipsite/sections/[category]:
@@ -124,7 +124,7 @@ pages:
             bgColor: bg-gray-25
             paddingY: py-3.75
             paddingX: px-5
-            border: border-b mb-100
+            border: border-b
             container:
               display: flex
               alignItems: items-center
@@ -140,6 +140,7 @@ pages:
             button:
               marginX: px-2
               cursor: hover:cursor-pointer
+
   #     -
   #       grid:
   #         -

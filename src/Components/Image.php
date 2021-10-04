@@ -29,6 +29,7 @@ final class Image extends AbstractComponent
         $this->addStyle($data->getStyle());
         if ($this->isSvg($src)) {
             $imageContext = $this->imageHandler->getContext($src, []);
+            $this->setAttribute('src', $imageContext->getSrc());
         } else {
             if ($this->canIUse->webp()) {
                 $src = str_replace('.jpg', '.webp', $src);

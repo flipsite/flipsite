@@ -1,0 +1,17 @@
+container:
+  width: w-full
+  marginY: mt-5
+thAll:
+  textColor: text-primary
+  textAlign: text-left
+  width: w-1/4
+  textSize: text-3
+th.3.textAlign: text-right
+tdAll:
+  textColor: text-black-o70
+  textSize: text-2.6|3.5
+  padding: p-1
+  textOverflow: truncate
+trEven:
+  bgColor: bg-black-o5
+td.3.textAlign: text-right

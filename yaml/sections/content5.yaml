@@ -27,4 +27,8 @@ grid:
       marginY: mb-3.5
       options:
         aspectRatio: 16by9
+        srcset:
+          - 320w
+          - 480w
+          - 640w
       objectFit: object-cover

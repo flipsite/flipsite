@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use League\Csv\Reader;
@@ -20,7 +19,7 @@ final class Table extends AbstractComponent
             $header = explode(',', $header);
         }
         $records = $data->get('rows') ?? [];
-        $import = $data->get('import') ?? null;
+        $import  = $data->get('import') ?? null;
         if ($import && mb_strpos($import, '.csv')) {
             $filename = $this->enviroment->getSiteDir().'/'.$import;
             if (file_exists($filename)) {
@@ -33,7 +32,7 @@ final class Table extends AbstractComponent
             }
         }
         if (null !== $header) {
-            $tr = new Element('tr');
+            $tr      = new Element('tr');
             $thStyle = $data->getStyle('th') ?? [];
             foreach ($header as $i => $col) {
                 $th = new Element('th', true);
@@ -44,7 +43,7 @@ final class Table extends AbstractComponent
             }
             $this->addChild($tr);
         }
-        $row = 0;
+        $row     = 0;
         $tdStyle = $data->getStyle('td') ?? [];
         foreach ($records as $record) {
             $tr = new Element('tr');

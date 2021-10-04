@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -25,8 +24,8 @@ final class ComponentData
         } elseif (is_string($data)) {
             $this->data = ['value' => $data];
         } elseif (ArrayHelper::isAssociative($data)) {
-            $this->id  = $data['id']    ?? null;
-            $this->tag = $data['tag']   ?? null;
+            $this->id  = $data['id'] ?? null;
+            $this->tag = $data['tag'] ?? null;
             $dataStyle = $data['style'] ?? false;
             unset($data['id'],$data['tag'],$data['style']);
             $this->data = $data;
@@ -36,10 +35,10 @@ final class ComponentData
 
         if (in_array('dark', $flags)) {
             $this->appearance  = 'dark';
-            $flags = array_diff($flags, ['dark']);
+            $flags             = array_diff($flags, ['dark']);
         } elseif (in_array('auto', $flags)) {
             $this->appearance  = 'auto';
-            $flags = array_diff($flags, ['auto']);
+            $flags             = array_diff($flags, ['auto']);
         }
 
         $possibleVariants = $flags;
@@ -87,6 +86,11 @@ final class ComponentData
             return $data;
         }
         return $this->data;
+    }
+
+    public function set(array $data)
+    {
+        return $this->data = $data;
     }
 
     public function unset(string $key)

@@ -89,7 +89,7 @@ if ('localhost' === getenv('APP_ENV')) {
         return $response->withHeader('Content-Type', 'application/json');
     });
 
-    $app->post('/api/sections/{page}', function (Request $request, Response $response, array $args) {
+    $app->post('/api/sections[/{page:.*}]', function (Request $request, Response $response, array $args) {
         $page = $args['page'];
         $body = $request->getParsedBody();
 

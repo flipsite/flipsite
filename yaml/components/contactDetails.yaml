@@ -1,0 +1,15 @@
+tag: ul
+container:
+  display: inline-grid
+  gapY: gap-y-2
+  textAlign: text-left
+colsAll:
+  container:
+    tag: li
+    display: flex
+    align-items: items-start
+    spaceX: space-x-3.5
+  icon:
+    height: h-6
+    flex: flex-none
+text: paragraph
