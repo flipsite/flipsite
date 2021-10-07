@@ -20,11 +20,9 @@ logos:
   colsAll:
     bgColor: bg-gray-o5
     display: flex
-    alignItems: items-center
-    justifyContent: justify-center
-    paddingX: px-15
-    paddingY: py-10
+    paddingX: px-5
+    paddingY: py-5
     borderRadius: rounded
-    minHeight: min-h-40
+    height: h-30|50
     objectFit: object-contain
     width: w-full

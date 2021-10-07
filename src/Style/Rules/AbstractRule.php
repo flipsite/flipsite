@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 use Flipsite\Style\CallbackInterface;
@@ -15,6 +14,8 @@ abstract class AbstractRule
     protected array $declarations = [];
 
     protected ?string $childCombinator = null;
+
+    protected ?string $pseudoElement = null;
 
     protected array $config;
     private CallbackInterface $callbacks;
@@ -41,6 +42,11 @@ abstract class AbstractRule
     public function getChildCombinator() : ?string
     {
         return $this->childCombinator;
+    }
+
+    public function getPseudoElement() : ?string
+    {
+        return $this->pseudoElement;
     }
 
     protected function getConfig(string $property, ?string $value = null)

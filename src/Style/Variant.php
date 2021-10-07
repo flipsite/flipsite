@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Style\Variants\AbstractType;
@@ -75,7 +74,8 @@ class Variant
         $escape = ['/', '.', '|'];
         foreach ($this->classes as $class) {
             $childCombinator = null;
-            $rules           = $this->tailwind->getRules($class, $childCombinator);
+            $pseudoElement   = null;
+            $rules           = $this->tailwind->getRules($class, $childCombinator, $pseudoElement);
             if (null === $rules) {
                 continue;
             }
@@ -90,6 +90,9 @@ class Variant
             }
             $css .= $cls;
             $css .= $pseudo;
+            if ($pseudoElement) {
+                $css .= $pseudoElement;
+            }
             if (null !== $childCombinator) {
                 $css .= '>'.$childCombinator;
             }

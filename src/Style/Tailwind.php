@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -81,7 +80,7 @@ final class Tailwind implements CallbackInterface
         return $css;
     }
 
-    public function getRules(string $className, ?string &$childCombinator) : ?string
+    public function getRules(string $className, ?string &$childCombinator, ?string &$pseudoElement) : ?string
     {
         if (isset($this->rules[$className])) {
             return $this->rules[$className];
@@ -91,6 +90,7 @@ final class Tailwind implements CallbackInterface
             return null;
         }
         $childCombinator = $class->getChildCombinator();
+        $pseudoElement   = $class->getPseudoElement();
         return $class->getDeclarations();
     }
 
@@ -197,7 +197,10 @@ final class Tailwind implements CallbackInterface
                 }
                 $variantId = implode('', $variantId);
                 $class     = 'Flipsite\Style\Variants\\'.$variantId.'Type';
-                $type      = new $class($variantId);
+                if (!class_exists($class)) {
+                    $class     = 'Flipsite\Style\Variants\\CustomStateType';
+                }
+                $type = new $class($variantId);
             }
             $variant->addType($type);
         }

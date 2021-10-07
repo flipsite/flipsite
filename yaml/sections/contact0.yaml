@@ -4,6 +4,7 @@ grid:
     display: grid
     gridTemplateCols: md:grid-cols-3
     gapX: gap-x-2.5
+    gapY: gap-y-2.5
   colsAll:
     border: border
     borderColor: hover:border-primary

@@ -116,6 +116,17 @@ if ('localhost' === getenv('APP_ENV')) {
     });
 }
 
+$app->post('/form/submit/{formId}', function (Request $request, Response $response, array $args) {
+    $enviroment = $this->get('enviroment');
+    $form = $this->get('reader')->get('forms.'.$args['formId']);
+    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'], $request->getParsedBody())) {
+        //print_r($request->getParsedBody());
+    }
+    $response = $response->withStatus(302);
+    $redirect = trim($enviroment->getServer().'/'.$form['done'], '/');
+    return $response->withHeader('Location', $redirect);
+});
+
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
     $reader = $this->get('reader');
 
