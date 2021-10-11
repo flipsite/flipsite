@@ -3,10 +3,10 @@ container:
   textColor: text-black-o95
   fontWeight: font-bold
   textSize: text-3.5|4
-  marginY: my-5
-  spaceX: space-x-5|10
+  whitespace: whitespace-nowrap
+  spaceX: space-x-5|15
+paddingY: py-5
 textColor: hover:text-primary
-paddingX: px-3.5
 display: block
 dark:
   textColor: text-white-o95 hover:text-primary2
@@ -20,10 +20,12 @@ variants:
     paddingX: null
   pills:
     container:
-      marginY: my-4
+      spaceX: space-x-1.5|7
     bgColor: hover:bg-primary-o10
     borderRadius: rounded-full
     paddingY: py-1
+    marginY: my-4
+    paddingX: px-3.5
     active:
       bgColor: bg-primary
       textColor: text-white-o95
@@ -44,4 +46,4 @@ variants:
     dark:
       active:
         borderColor: border-primary2
-    textColor: text-white-o95
+      textColor: text-white-o95
