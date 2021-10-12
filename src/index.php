@@ -130,19 +130,25 @@ $app->post('/form/submit/{formId}', function (Request $request, Response $respon
                     if ($val) {
                         $html .= '<b>'.strtoupper($attr).':</b><br>';
                         $html .= $val.'<br><br>';
-                        $body .= $attr.":\r\n";
+                        $body .= strtoupper($attr).":\r\n";
                         $body .= $val."\r\n\r\n";
                     }
                 }
                 $body .= '- flipsite';
-                $client = new Postmark\PostmarkClient($form['token']);
-                $sendResult = $client->sendEmail(
-                    'noreply@flipsite.io',
-                    $form['to'],
-                    $form['subject'],
-                    $html,
-                    $body
-                );
+                if ('localhost' === getenv('APP_ENV')) {
+                    error_log('SUBJECT: '.$form['subject']);
+                    error_log('BODY:');
+                    error_log($body);
+                } else {
+                    $client     = new Postmark\PostmarkClient($form['token']);
+                    $sendResult = $client->sendEmail(
+                        'noreply@flipsite.io',
+                        $form['to'],
+                        $form['subject'],
+                        $html,
+                        $body
+                    );
+                }
                 $res = 'success';
             } catch (Exception $generalException) {
                 error_log(print_r($generalException->getMessage(), true));
