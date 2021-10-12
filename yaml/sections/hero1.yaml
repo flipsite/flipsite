@@ -1,0 +1,6 @@
+section:
+  paddingY: py-25|50
+  container:
+    maxWidth: max-w-screen-sm
+    spaceY: space-y-7.5
+    textAlign: text-center

@@ -1,3 +1,6 @@
+section:
+  container:
+    spaceY: space-y-5|15
 grid:
   colType: a
   container:
@@ -7,9 +10,25 @@ grid:
     gapY: gap-y-2.5
   colsAll:
     border: border
-    borderColor: hover:border-primary
-    display: flex flex-col justify-center items-center
-    spaceY: space-y-3.5
+    borderColor: border-black-o10 hover:border-primary
+    display: flex flex-col justify-start items-center
+    spaceY: space-y-3
     borderRadius: rounded
     minHeight: min-h-40
     paddingY: py-5
+header:
+  tag: header
+  type: group
+  container:
+    marginX: mx-auto
+    maxWidth: max-w-screen-sm
+    spaceY: space-y-5
+    textAlign: text-center
+footer:
+  type: group
+  tag: footer
+  container:
+    marginX: mx-auto
+    maxWidth: max-w-screen-sm
+    spaceY: space-y-5
+    textAlign: text-center

@@ -2,7 +2,7 @@ section:
   container:
     marginX: mx-auto
     maxWidth: max-w-screen-lg
-    spaceY: space-y-6|15
+    spaceY: space-y-5|15
     textAlign: text-center
   paddingY: pt-10|30
 header:
@@ -10,7 +10,7 @@ header:
   container:
     marginX: mx-auto
     maxWidth: max-w-screen-sm
-    spaceY: space-y-7
+    spaceY: space-y-5
 grid:
   container:
     display: grid

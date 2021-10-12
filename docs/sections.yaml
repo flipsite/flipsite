@@ -12,6 +12,7 @@ heroes:
   poster: hero0
   data:
     hero0.variants: 1
+    hero1.variants: 1
   count: 1
 content:
   name: Content
@@ -24,6 +25,7 @@ content:
     content4.variants: 1
     content5.variants: 1
     content6.variants: 1
+    content7.variants: 1
   count: 5
 footers:
   name: Footers

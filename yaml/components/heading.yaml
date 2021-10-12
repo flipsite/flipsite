@@ -22,3 +22,7 @@ variants:
     lineHeight: leading-none
 dark:
   textColor: text-white-o95
+markdown:
+  em:
+    fontStyle:  not-italic
+    textColor: text-primary
