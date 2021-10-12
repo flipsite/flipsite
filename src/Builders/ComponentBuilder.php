@@ -14,6 +14,7 @@ use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\CanIUse;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ComponentBuilder
 {
@@ -23,7 +24,7 @@ class ComponentBuilder
     private array $factories                = [];
     private array $componentStyle           = [];
 
-    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
+    public function __construct(private Request $request, private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
         $this->imageHandler = new ImageHandler(
             $enviroment->getImageSources(),
@@ -160,6 +161,9 @@ class ComponentBuilder
                 }
                 if (method_exists($component, 'addCanIUse')) {
                     $component->addCanIUse($this->canIUse);
+                }
+                if (method_exists($component, 'addRequest')) {
+                    $component->addRequest($this->request);
                 }
                 return $component;
             }

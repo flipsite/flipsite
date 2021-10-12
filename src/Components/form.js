@@ -33,7 +33,10 @@ function submit(id) {
     var json = JSON.parse(form.getAttribute('data-validate').replaceAll("'",'"'));
     var ok = {};
     for (var name in json.data) {
-        ok[name] = validate(json.data[name], form.querySelector('[name='+name+']').value);
+        var control = form.querySelector('[name='+name+']');
+        if (null !== control) {
+            ok[name] = validate(json.data[name], control.value);
+        }
     }
     var required = {}
     for (var i in json.required) {

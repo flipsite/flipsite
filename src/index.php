@@ -119,11 +119,39 @@ if ('localhost' === getenv('APP_ENV')) {
 $app->post('/form/submit/{formId}', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
     $form = $this->get('reader')->get('forms.'.$args['formId']);
-    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'], $request->getParsedBody())) {
-        //print_r($request->getParsedBody());
+    $parsedBody = $request->getParsedBody();
+    $res = 'error';
+    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'] ?? [], $parsedBody)) {
+        if ('postmarkapp' === $form['type']) {
+            try {
+                $html = '';
+                $body = '';
+                foreach ($parsedBody as $attr => $val) {
+                    if ($val) {
+                        $html .= '<b>'.strtoupper($attr).':</b><br>';
+                        $html .= $val.'<br><br>';
+                        $body .= $attr.":\r\n";
+                        $body .= $val."\r\n\r\n";
+                    }
+                }
+                $body .= '- flipsite';
+                $client = new Postmark\PostmarkClient($form['token']);
+                $sendResult = $client->sendEmail(
+                    'noreply@flipsite.io',
+                    $form['to'],
+                    $form['subject'],
+                    $html,
+                    $body
+                );
+                $res = 'success';
+            } catch (Exception $generalException) {
+                error_log(print_r($generalException->getMessage(), true));
+                die();
+            }
+        }
     }
     $response = $response->withStatus(302);
-    $redirect = trim($enviroment->getServer().'/'.$form['done'], '/');
+    $redirect = trim($enviroment->getServer().'/'.$form['done'].'?res='.$res.'#'.$args['formId'], '/');
     return $response->withHeader('Location', $redirect);
 });
 
@@ -148,7 +176,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     }
 
     $documentBuilder = new DocumentBuilder($enviroment, $reader, $path);
-    $componentBuilder = new ComponentBuilder($enviroment, $reader, $path, $this->get('caniuse'));
+    $componentBuilder = new ComponentBuilder($request, $enviroment, $reader, $path, $this->get('caniuse'));
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());

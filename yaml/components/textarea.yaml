@@ -1,0 +1,7 @@
+animation: invalid:animate-shake invalid:bg-red-100 invalid:border-red
+width: w-full
+height: h-40
+padding: p-2.5
+border: border focus:ring-4 ring-primary-500 ring-opacity-20 focus:outline-none focus:border-primary
+borderRadius: rounded
+textColor: placeholder-black-o30
