@@ -1,5 +1,5 @@
 paddingX: px-5|15
-paddingY: py-10|30
+paddingY: py-5|15
 container:
   marginX: mx-auto
   maxWidth: max-w-screen-xl

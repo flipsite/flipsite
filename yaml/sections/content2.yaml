@@ -4,7 +4,7 @@ section:
     maxWidth: max-w-screen-lg
     spaceY: space-y-5|15
     textAlign: text-center
-  paddingY: pt-10|30
+  paddingY: pt-5|15
 header:
   type: group
   container:

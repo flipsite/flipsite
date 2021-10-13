@@ -15,9 +15,13 @@ variants:
     container:
       display: grid
       spaceX: null
+      marginY: mt-3.5
+      spaceY: space-y-2
     fontWeight: font-light
     textSize: text-3.25|3.5
     paddingX: null
+    paddingY: null
+    display: flex
   pills:
     container:
       spaceX: space-x-1.5|7

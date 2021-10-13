@@ -29,11 +29,12 @@ content:
   count: 5
 footers:
   name: Footers
-  poster: footer2
+  poster: sitemap0
   data:
     footer0.variants: 4
     footer1.variants: 1
-    footer2.variants: 1
+    sitemap0.variants: 1
+    sitemap1.variants: 1
   count: 3
 contact:
   name: Contact

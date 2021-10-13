@@ -6,7 +6,7 @@ variants:
     textSize: text-3.5|4
     lineHeight: leading-tight
   sm:
-    textSize: text-4|4.5
+    textSize: text-4
     lineHeight: leading-tight
   md:
     textSize: text-5|8

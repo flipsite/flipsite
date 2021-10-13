@@ -1,5 +1,5 @@
 section:
-  paddingY: py-5
+  paddingY: null
   container:
     display: flex flex-col md:flex-row
     alignItems: items-center

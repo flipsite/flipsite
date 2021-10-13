@@ -1,6 +1,4 @@
 section:
-  paddingY: null
-  marginY: mb-10|30
   container:
     display: grid
     gridTemplateCols: 'md:grid-cols-2'

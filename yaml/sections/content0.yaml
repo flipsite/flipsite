@@ -14,7 +14,7 @@ image:
   height: h-full
   objectFit: object-cover
   options:
-    aspectRatio: 1by1
+    aspectRatio: 16by9
     srcset:
       - 320w
       - 480w

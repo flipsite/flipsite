@@ -10,14 +10,14 @@ group:
     twitter: flipsiteio
 grid:
   -
-    heading:xs: Category One
+    heading:sm: Category One
     nav:sitemap:
       first: First Link
       second: Second Link
       third: Third Lik
       fourth: Fourth Link
   -
-    heading:xs: Category Two
+    heading:sm: Category Two
     nav:sitemap:
       first: First Link
       second: Second Link
@@ -25,7 +25,7 @@ grid:
       fourth: Fourth Link
       fifth: Fifth Link
   -
-    heading:xs: Category Three
+    heading:sm: Category Three
     nav:sitemap:
       first: First Link
       second: Second Link
