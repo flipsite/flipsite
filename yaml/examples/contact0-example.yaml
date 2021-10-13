@@ -1,16 +1,16 @@
 grid:
   -
     url: 'tel:+358501234567'
-    icon:xl: zondicons/phone
-    heading:sm: Call
+    icon:lg: zondicons/phone
+    heading:xs: Call
     paragraph:sm: 050 1234 567
   -
     url: 'mailto:info@flipsite.io'
-    icon:xl: zondicons/envelope
-    heading:sm: 'Send E-mail'
+    icon:lg: zondicons/envelope
+    heading:xs: 'Send E-mail'
     paragraph:sm: info@flipsite.io
   -
     url: 'https://goo.gl/maps/dEgMsEkobMMRswm38'
-    icon:xl: zondicons/location
-    heading:sm: Directions
+    icon:lg: zondicons/location
+    heading:xs: Directions
     paragraph:sm: Mariehamn, Åland Islands

@@ -1,0 +1,17 @@
+grid:
+  colType: a
+  container:
+    display: grid
+    gridTemplateCols: sm:grid-cols-2 lg:grid-cols-4
+    border: border-t
+    borderColor: border-black-o10
+  colsAll:
+    fontWeight: font-bold
+    textColor: text-primary hover:text-primary-600
+    paddingY: py-5
+    paddingX: px-2.5
+    icon:
+      marginX: mr-3
+      textColor: null
+    border: border-b
+    borderColor: border-black-o10

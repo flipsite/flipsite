@@ -5,9 +5,15 @@ display: inline-block
 variants:
   width: w-4
   height: w-4
+  sm:
+    width: w-6
+    height: w-6
   md:
     width: w-8
     height: w-8
+  lg:
+    width: w-10
+    height: w-10
   xl:
-    width: w-15
-    height: w-15
+    width: w-16
+    height: w-16

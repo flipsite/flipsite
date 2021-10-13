@@ -1,34 +1,29 @@
-section:
-  container:
-    spaceY: space-y-5|15
 grid:
   colType: a
   container:
     display: grid
-    gridTemplateCols: md:grid-cols-3
-    gapX: gap-x-2.5
-    gapY: gap-y-2.5
+    gridTemplateCols: sm:grid-cols-3
+    gapX: gap-x-5
+    gapY: gap-y-5
   colsAll:
-    border: border
-    borderColor: border-black-o10 hover:border-primary
+    boxShadow: shadow
     display: flex flex-col justify-start items-center
     spaceY: space-y-3
     borderRadius: rounded
-    minHeight: min-h-40
     paddingY: py-5
-header:
-  tag: header
-  type: group
-  container:
-    marginX: mx-auto
-    maxWidth: max-w-screen-sm
-    spaceY: space-y-5
-    textAlign: text-center
-footer:
-  type: group
-  tag: footer
-  container:
-    marginX: mx-auto
-    maxWidth: max-w-screen-sm
-    spaceY: space-y-5
-    textAlign: text-center
+# header:
+#   tag: header
+#   type: group
+#   container:
+#     marginX: mx-auto
+#     maxWidth: max-w-screen-sm
+#     spaceY: space-y-5
+#     textAlign: text-center
+# footer:
+#   type: group
+#   tag: footer
+#   container:
+#     marginX: mx-auto
+#     maxWidth: max-w-screen-sm
+#     spaceY: space-y-5
+#     textAlign: text-center
