@@ -4,6 +4,14 @@ display: inline-block
 options:
   aspectRatio: 1by1
 variants:
+  xs:
+    height: h-10
+    width: w-10
+    options:
+      srcset:
+        - 80w
+        - 160w
+        - 320w
   xxl:
     height: h-40
     width: w-40

@@ -1,10 +1,11 @@
 section:
+  paddingY: py-25|50
   container:
     display: grid
     gridTemplateCols: 'md:grid-cols-2'
     alignItems: items-center
     gapX: gap-x-5|15
-    gapY: gap-y-5|15
+    gapY: gap-y-10|30
 content:
   type: group
   container.spaceY: space-y-5
@@ -14,7 +15,7 @@ image:
   height: h-full
   objectFit: object-cover
   options:
-    aspectRatio: 16by9
+    aspectRatio: 1by1
     srcset:
       - 320w
       - 480w
