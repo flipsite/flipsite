@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class A extends AbstractComponent
@@ -21,7 +20,12 @@ final class A extends AbstractComponent
             $this->setAttribute('onclick', $componentData['onclick']);
             unset($componentData['onclick']);
         }
+        $href = $this->url($componentData['url'], $external);
         $this->setAttribute('href', $this->url($componentData['url'], $external));
+
+        if (strpos($href, 'javascript:toggle') === 0) {
+            $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.js')));
+        }
         if ($external) {
             $this->setAttribute('target', '_blank');
             $this->setAttribute('rel', 'noopener noreferrer');
@@ -38,7 +42,7 @@ final class A extends AbstractComponent
             switch ($key) {
                 case 'tel':
                     $expanded['url'] = 'tel:'.$val;
-                    $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+                    $phoneUtil       = \libphonenumber\PhoneNumberUtil::getInstance();
                     try {
                         $numberProto = $phoneUtil->parse($val, '');
                     } catch (\libphonenumber\NumberParseException $e) {
@@ -46,7 +50,7 @@ final class A extends AbstractComponent
                     $expanded['text'] = $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL);
                     break;
                 case 'mailto':
-                    $expanded['url'] = 'mailto:'.$val;
+                    $expanded['url']  = 'mailto:'.$val;
                     $expanded['text'] = $val;
                     break;
                 default:

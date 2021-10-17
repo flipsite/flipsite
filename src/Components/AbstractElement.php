@@ -15,12 +15,14 @@ abstract class AbstractElement
     protected array $attributes = [];
     protected array $style      = [];
     protected bool $render      = true;
+    private ?string $cache      = null;
 
     public function addStyle(?array $style) : self
     {
         if (null === $style) {
             return $this;
         }
+        $this->cache = null;
         $this->style = ArrayHelper::merge($this->style, $style);
         return $this;
     }
@@ -52,6 +54,7 @@ abstract class AbstractElement
 
     public function setAttribute(string $attr, $value, bool $append = false) : self
     {
+        $this->cache = null;
         if (null === $value) {
             unset($this->attributes[$attr]);
         } elseif ($append && isset($this->attributes[$attr])) {
@@ -72,12 +75,14 @@ abstract class AbstractElement
 
     public function setContent(string $content) : self
     {
+        $this->cache   = null;
         $this->content = $content;
         return $this;
     }
 
     public function appendContent(string $content) : self
     {
+        $this->cache = null;
         $this->content .= $content;
         return $this;
     }
@@ -87,7 +92,8 @@ abstract class AbstractElement
         if (null === $child) {
             return $this;
         }
-        $children = [];
+        $this->cache = null;
+        $children    = [];
         if (null !== $name) {
             $children[$name] = $child;
         } else {
@@ -99,6 +105,7 @@ abstract class AbstractElement
 
     public function addChild(?AbstractElement $child = null, ?string $name = null) : self
     {
+        $this->cache = null;
         if (null === $child) {
             return $this;
         }
@@ -122,6 +129,9 @@ abstract class AbstractElement
     {
         if (!$this->render) {
             return null;
+        }
+        if ($this->cache) {
+            return $this->cache;
         }
         $html = '';
         $i    = str_repeat(' ', $indentation * $level);
@@ -154,7 +164,7 @@ abstract class AbstractElement
         } else {
             $html .= '</'.$this->tag.'>'."\n";
         }
-        return $html;
+        return $this->cache = $html;
     }
 
     protected function renderAttributes() : string

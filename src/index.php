@@ -238,6 +238,13 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $document = $fontBuilder->getDocument($document);
     }
 
+    $bodyHtml = $document->getChild('body')->render();
+    if (strpos($bodyHtml, 'scroll:')) {
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/scroll.js')));
+    }
+    if (strpos($bodyHtml, 'enter:')) {
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/enter.js')));
+    }
     // Add Scripts
     $document = $scriptBuilder->getDocument($document);
 
