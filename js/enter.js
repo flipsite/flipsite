@@ -17,7 +17,7 @@ ready(() => {
     });
   }
   const observer = new IntersectionObserver(handleIntersection,{
-    threshold: 0.5,
+    threshold: 0.1,
   });
   var elements = document.querySelectorAll('[class*="enter:"]');
   elements.forEach((el)=>{

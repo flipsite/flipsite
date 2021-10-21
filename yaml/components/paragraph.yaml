@@ -17,8 +17,6 @@ markdown:
     textColor: text-black-o95
     fontWeight: font-bold
   a:
-    textColor: hover:text-primary
+    textColor: hover:text-primary text-blue-800-o70
     textDecoration: hover:underline
-    bg: bg-primary-o5
-    paddingX: px-1
 

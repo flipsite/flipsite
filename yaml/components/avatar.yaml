@@ -3,6 +3,12 @@ borderRadius: rounded-full
 display: inline-block
 options:
   aspectRatio: 1by1
+  srcset:
+    - 100w
+    - 200w
+    - 300w
+height: h-12|16
+width: w-12|16
 variants:
   xs:
     height: h-10
@@ -12,9 +18,9 @@ variants:
         - 80w
         - 160w
         - 320w
-  xxl:
-    height: h-40
-    width: w-40
+  xl:
+    height: h-30|40
+    width: w-30|40
     options:
       srcset:
         - 160w

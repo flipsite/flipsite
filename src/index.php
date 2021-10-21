@@ -238,7 +238,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $document = $fontBuilder->getDocument($document);
     }
 
-    $bodyHtml = $document->getChild('body')->render();
+    $bodyHtml = $document->getChild('body')->render(2, 1);
     if (strpos($bodyHtml, 'scroll:')) {
         $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/scroll.js')));
     }

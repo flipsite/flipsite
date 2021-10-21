@@ -4,8 +4,10 @@ navigation:
   data:
     navbar0.variants: 2
     navbar1.variants: 2
+    navbar3.variants: 1
     iconnav0.variants: 1
     navbar2.variants: 1
+    navbar4.variants: 1
   count: 1
 heroes:
   name: Heroes

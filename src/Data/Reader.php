@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Enviroment;
@@ -33,7 +32,7 @@ final class Reader
     public function __construct(Enviroment $enviroment)
     {
         $this->enviroment = $enviroment;
-        $siteDir = $this->enviroment->getSiteDir();
+        $siteDir          = $this->enviroment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
             $this->loadSite(YamlExpander::parseFile($siteDir.'/site.yaml'));
         } else {
@@ -43,7 +42,7 @@ final class Reader
 
     public function loadSite(array $yaml)
     {
-        $this->data = $yaml;
+        $this->data          = $yaml;
         $this->data['pages'] = $this->expandPages($this->data['pages']);
         $this->parseLanguages();
         $this->slugs = new Slugs(
@@ -111,7 +110,7 @@ final class Reader
         $sections = [];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';
-            if ('default' !== $type || $this->hideSection($section, $language)) {
+            if ('default' !== $type || $this->hideSection($section, $page, $language)) {
                 continue;
             }
             if (isset($section['repeat'])) {
@@ -176,7 +175,7 @@ final class Reader
         return $factories;
     }
 
-    private function hideSection(array $section, Language $language) : bool
+    private function hideSection(array $section, string $page, Language $language) : bool
     {
         if ($section['hidden'] ?? false) {
             return true;
@@ -186,6 +185,17 @@ final class Reader
             $languages = is_string($val) ? explode(',', $val) : $val;
             if (!in_array((string) $language, $languages)) {
                 return true;
+            }
+        }
+        if (isset($section['options']['hidden']['pages'])) {
+            $pages = $section['options']['hidden']['pages'];
+            foreach ($pages as $hidePage) {
+                if ($hidePage === $page) {
+                    return true;
+                }
+                if (str_ends_with($hidePage, '*') && str_starts_with($page, str_replace('*', '', $hidePage))) {
+                    return true;
+                }
             }
         }
         return false;
@@ -208,7 +218,7 @@ final class Reader
     private function parseLanguages() : void
     {
         $languages = $this->data['languages'] ?? null;
-        $language  = $this->data['language']  ?? null;
+        $language  = $this->data['language'] ?? null;
         if (null === $languages && null !== $language) {
             $languages = [$language];
         } elseif (is_string($languages)) {
@@ -279,7 +289,7 @@ final class Reader
         }
 
         $dataMapper                   = new DataMapper();
-        $repeated = [];
+        $repeated                     = [];
         foreach ($repeat as $data) {
             $repeated = array_merge($repeated, $dataMapper->apply($sections, $data));
         }

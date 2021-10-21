@@ -1,17 +1,26 @@
+section:
+  paddingX: null
+  paddingY: null
+  container:
+    empty: true
 grid:
   colType: a
   container:
     display: grid
     gridTemplateCols: sm:grid-cols-2 lg:grid-cols-4
-    border: border-t
-    borderColor: border-black-o10
   colsAll:
-    fontWeight: font-bold
-    textColor: text-primary hover:text-primary-600
-    paddingY: py-5
-    paddingX: px-2.5
-    icon:
-      marginX: mr-3
-      textColor: null
+    display: flex
+    alignItems: items-center
     border: border-b
-    borderColor: border-black-o10
+    borderColor: border-black-o7.5
+    paddingY: py-2.5|5
+    spaceX: space-x-3.5
+    text.type: span
+    #fontWeight: font-bold
+    #textColor: text-black-o95 hover:text-primary
+    #paddingY: py-5
+    #paddingX: px-2.5
+    #icon:
+      #marginX: mr-2.5
+    #border: border-b
+    #borderColor: border-black-o7.5

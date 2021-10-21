@@ -1,0 +1,22 @@
+id: navbar
+logo:
+  svg: flipsite.svg
+  sr: Flipsite
+  url: home
+menuToggle:
+  url: javascript:toggle('navbar','open')
+  menu: zondicons/menu
+  close: zondicons/close
+nav:
+  flipsite:
+    text: Home
+    icon: zondicons/cheveron-right
+  features:
+    text: Features
+    icon: zondicons/cheveron-right
+  about:
+    text: About
+    icon: zondicons/cheveron-right
+  contact:
+    text: Contact
+    icon: zondicons/cheveron-right

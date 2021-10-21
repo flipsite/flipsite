@@ -27,7 +27,7 @@ class Grid extends AbstractComponent
             $colTpl  = $cols['colTpl'];
             $cols    = $this->mapData($colTpl, $colData);
         }
-
+        $hasDataHref = false;
         foreach ($cols as $i => $colData) {
             $colStyle = $this->getColStyle($i, $data->getStyle());
             if ($type) {
@@ -35,60 +35,37 @@ class Grid extends AbstractComponent
                 $this->addChildren($components);
             } else {
                 $containerStyle = $colStyle['container'] ?? [];
+                $wrapper        = null;
+                if (isset($containerStyle['wrapper'])) {
+                    $wrapper = new Element('div');
+                    $wrapper->addStyle($containerStyle['wrapper']);
+                    unset($containerStyle['wrapper']);
+                }
+                $dataHref = $colData['url'] ?? null;
+                unset($colData['url']);
+                if ($dataHref) {
+                    $hasDataHref = true;
+                    $external    = false;
+                    $dataHref    = $this->url($dataHref, $external);
+                }
                 $components     = $this->builder->build($colData, $colStyle, $data->getAppearance());
                 $col            = new Element($containerStyle['tag'] ?? 'div');
                 unset($containerStyle['tag']);
                 $col->addStyle($containerStyle);
                 $col->addChildren($components);
-                $this->addChild($col);
+                if ($wrapper) {
+                    $wrapper->addChild($col);
+                    $wrapper->setAttribute('data-href', $dataHref);
+                    $this->addChild($wrapper);
+                } else {
+                    $col->setAttribute('data-href', $dataHref);
+                    $this->addChild($col);
+                }
             }
         }
-
-        //$type = implode(':', $data->getFlags()) ?? 'group';
-        // if ($type) {
-
-        // } else {
-        //     foreach ($data->getData() as $item) {
-        //     //$components[] = $this->builder->build($item, [], 'light');
-        //     //$this->addChildren($components);
-        // }
-        // }
-
-        // foreach ($data->getData() as $item) {
-        //     //$components[] = $this->builder->build($item, [], 'light');
-        //     //$this->addChildren($components);
-        //}
-
-        // unset($style['container']);
-        // if (isset($data['colTpl'])) {
-        //     $data = $this->mapData($data['colTpl'], $data['colData']);
-        // }
-        // if (isset($style['colType']) || count($flags)) {
-        //     $data = $this->addType($style['colType'] ?? $flags[0], $data);
-        // }
-
-        // foreach ($data as $i => $col) {
-        //     $colStyle = $this->getColStyle($i, $style);
-        //     print_r($colStyle);
-        //     $components = [];
-        //     foreach ($col as $componentType => $componentData) {
-        //         $componentStyle = $colStyle[$componentType] ?? [];
-        //         if (mb_strpos($componentType, ':')) {
-        //             $tmp            = explode(':', $componentType);
-        //             $componentStyle = ArrayHelper::merge($colStyle[$tmp[0]] ?? [], $componentStyle);
-        //         }
-        //         $components[] = $this->builder->build($componentType, $componentData, $componentStyle, $appearance);
-        //     }
-        //     if (isset($colStyle['container'])) {
-        //         $col = new Element($colStyle['container']['type'] ?? 'div');
-        //         unset($colStyle['container']['type']);
-        //         $col->addStyle($colStyle['container']);
-        //         $col->addChildren($components);
-        //         $this->addChild($col);
-        //     } else {
-        //         $this->addChildren($components);
-        //     }
-        // }
+        if ($hasDataHref) {
+            $this->builder->dispatch(new Event('ready-script', 'data-href', file_get_contents(__DIR__.'/../../js/ready.data-href.js')));
+        }
     }
 
     private function addKey(array $data) : array

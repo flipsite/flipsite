@@ -1,0 +1,34 @@
+section:
+  textAlign: text-center
+  width: w-full
+  height: h-14
+  paddingY: null
+  display: flex items-center justify-center
+  container:
+    empty: true
+back:
+  type: a
+  display: flex items-center justify-center
+  height: h-14
+  width: w-14
+  position: absolute top-0 left-0
+  icon:
+    width: w-6
+    height: h-6
+    textColor: null
+  textColor: text-black-o95 hover:text-primary
+  dark:
+    textColor: text-white-o95 hover:text-primary2
+close:
+  type: a
+  display: flex items-center justify-center
+  height: h-14
+  width: w-14
+  position: absolute top-0 right-0
+  icon:
+    width: w-6
+    height: h-6
+    textColor: null
+  textColor: text-black-o95 hover:text-primary
+  dark:
+    textColor: text-white-o95 hover:text-primary2

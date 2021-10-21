@@ -27,6 +27,11 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function getTag() : string
+    {
+        return $this->tag;
+    }
+
     public function childCount() : int
     {
         return count($this->children);

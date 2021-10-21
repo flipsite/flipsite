@@ -1,0 +1,1 @@
+ready(()=>{document.querySelectorAll('[data-href]').forEach((el)=>{el.onclick = function(){window.location.href = el.getAttribute('data-href');}});});
