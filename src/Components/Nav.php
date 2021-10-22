@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -16,10 +15,26 @@ final class Nav extends AbstractComponent
     public function with(ComponentData $data) : void
     {
         $items = $this->normalize($data->get());
-        $items = $this->addIsActive($items, $this->path->getPage());
+        $flags = $data->getFlags();
+        if (in_array('onpage', $flags)) {
+            $items[0]['isActive'] = true;
+            foreach ($items as &$item) {
+                $item['url'] = '#'.$item['url'];
+                $this->setAttribute('data-nav', true);
+                $activeStyle = ArrayHelper::merge($data->getStyle(), $data->getStyle('active'));
+                $activeStyle = array_filter($activeStyle, function ($item) {
+                    return is_string($item);
+                });
+                sort($activeStyle);
+                $this->setAttribute('data-active', implode(' ', $activeStyle));
+                $this->builder->dispatch(new Event('ready-script', 'nav', file_get_contents(__DIR__.'/../../js/nav.js')));
+            }
+        } else {
+            $items = $this->addIsActive($items, $this->path->getPage());
+        }
         $this->addStyle($data->getStyle('container'));
         foreach ($items as &$item) {
-            if ($item['isActive']) {
+            if ($item['isActive'] ?? false) {
                 $item['style'] = $data->getStyle('active');
             }
             unset($item['isActive']);
@@ -68,7 +83,7 @@ final class Nav extends AbstractComponent
             // If URL is an array, it's a localized external URL that cannot be active
             if (isset($item['url']) && is_string($item['url'])) {
                 $item['isActive'] = $item['isActive'] ?? false;
-                $item['exact']    = $item['exact']    ?? false;
+                $item['exact']    = $item['exact'] ?? false;
                 if ($item['exact'] && $item['url'] === $active) {
                     $item['isActive'] = true;
                 } elseif (!$item['exact']) {

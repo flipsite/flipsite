@@ -140,78 +140,36 @@ pages:
             button:
               marginX: px-2
               cursor: hover:cursor-pointer
+      -
+        nav:pills:onpage:
+          content: Content
+          style: Style
+        style: navbar1
+      -
+        id: content
+        sectionYaml.section: '[section]'
+        style: &code
+          section:
+            paddingY: null
+            paddingX: null
+            container:
+              empty: tr
+          sectionYaml:
+            container:
+              bgColor: bg-dark-400
+              display: block
+              paddingY: py-3.75
+              paddingX: px-5
+              textSize: text-3
+            attr.textColor: text-primary-300
+            string.textColor: text-white
+            number.textColor: text-blue-200
+            literal.textColor: text-blue-200
+            bullet.textColor: text-white
 
-  #     -
-  #       grid:
-  #         -
-  #           group:
-  #             paragraph: Add as page section in `site.yaml`
-  #             # button:link:
-  #             #   text: Copy
-  #             #   url: '#'
-  #             #   onclick: copyYaml(this)
-  #           yamlPreview:
-  #             root: '{data.[category].data.[section].site}'
-  #             style: '{data.[category].item}[section]'
-  #         -
-  #           group:
-  #             paragraph: Add to `style` in `theme.yaml`
-  #             # button:link:
-  #             #   text: Copy
-  #             #   url: '#'
-  #             #   onclick: copyYaml(this)
-  #           yamlPreview:
-  #             root: '{data.[category].data.[section].style}'
-  #             options:
-  #               wrap: '{data.[category].item}[section]'
-  #       style:
-  #         section:
-  #           paddingX: px-5
-  #           paddingY: pt-5
-  #         grid:
-  #           container:
-  #             display: grid
-  #             gap: gap-10
-  #             gridTemplateCols: grid-cols-1
-  #           colsAll:
-  #             container.spaceY: space-y-2
-  #             group:
-  #               container:
-  #                 display: flex justify-between align-center text-3.5
-  #               paragraph:
-  #                 textSize: text-3.5
-  #                 fontWeight: font-light
-  #                 markdown:
-  #                   code:
-  #                     bgColor: bg-primary-o20
-  #                     textColor: text-primary-600
-  #                     padding: px-1 py-0.5
-  #                     marginX: mx-0.5
-  #                     borderRadius: rounded
-  #             yamlPreview:
-  #               container:
-  #                 display: block
-  #                 bgColor: bg-black-o80
-  #                 borderRadius: rounded
-  #                 textSize: text-3.5
-  #                 padding: p-3.5
-  #                 overflow: overflow-hidden
-  #               attr.textColor: text-primary-300
-  #               string.textColor: text-white
-  #               number.textColor: text-blue-200
-  #               literal.textColor: text-blue-200
-  #               bullet.textColor: text-white
 
-  # flipsite/components:
-  #   -
-  #     breadcrumb:
-  #       flipsite: Home
-  #       flipsite/components: Components
-  #     style: *breadcrumb
-  # flipsite/components/heading:
-  #   -
-  #     breadcrumb:
-  #       flipsite: Home
-  #       flipsite/components: Components
-  #       flipsite/components/heading: Heading
-  #     style: *breadcrumb
+      -
+        id: style
+        sectionYaml.style: '[section]'
+        style.section.display: hidden
+        style: *code

@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Sections;
 
 use Flipsite\Utils\YamlExpander;
+use Symfony\Component\Yaml\Yaml;
 
 class SectionFactory extends AbstractSectionFactory
 {
@@ -16,11 +16,12 @@ class SectionFactory extends AbstractSectionFactory
         }
         return null;
     }
-    public function getExample(string $section) : ?array
+
+    public function getExample(string $section, bool $expand = true) : ?array
     {
         $filePath = __DIR__.'/../../yaml/examples/'.$section.'-example.yaml';
         if (file_exists($filePath)) {
-            return YamlExpander::parseFile($filePath);
+            return $expand ? YamlExpander::parseFile($filePath) : Yaml::parseFile($filePath);
         }
         return null;
     }

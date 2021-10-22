@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\AbstractElement;
@@ -22,14 +21,14 @@ class SectionBuilder
     private array $factories = [];
     private ?array $theme;
     private array $defaultSectionStyle = [];
-    private array $inheritedStyle = [];
+    private array $inheritedStyle      = [];
 
     public function __construct(Enviroment $enviroment, Reader $reader, ComponentBuilder $componentBuilder)
     {
-        $this->enviroment       = $enviroment;
-        $this->reader           = $reader;
-        $this->componentBuilder = $componentBuilder;
-        $this->theme            = $reader->get('theme');
+        $this->enviroment          = $enviroment;
+        $this->reader              = $reader;
+        $this->componentBuilder    = $componentBuilder;
+        $this->theme               = $reader->get('theme');
         $this->defaultSectionStyle = $this->componentBuilder->getComponentStyle('section');
         $this->addFactory(new SectionFactory());
         // TODO implement support for external section factories
@@ -70,7 +69,7 @@ class SectionBuilder
         $id = $data['id'] ?? null;
         unset($data['id']);
 
-        $style = $data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? [];
+        $style      = $data['style'] ?? $data['style:light'] ?? $data['style:dark'] ?? $data['style:auto'] ?? [];
         $appearance = isset($data['style:light']) ? 'light' : null;
         $appearance ??= isset($data['style:dark']) ? 'dark' : null;
         $appearance ??= isset($data['style:auto']) ? 'auto' : null;
@@ -179,6 +178,7 @@ class SectionBuilder
 
         return $style;
     }
+
     public function getInheritedStyle(string $inherited) : array
     {
         if (isset($this->inheritedStyle[$inherited])) {
@@ -199,6 +199,17 @@ class SectionBuilder
     {
         foreach ($this->factories as $factory) {
             $example = $factory->getExample($section);
+            if (is_array($example)) {
+                return $example;
+            }
+        }
+        return [];
+    }
+
+    public function getExampleStyle(string $section) : array
+    {
+        foreach ($this->factories as $factory) {
+            $example = $factory->getStyle($section, false);
             if (is_array($example)) {
                 return $example;
             }
