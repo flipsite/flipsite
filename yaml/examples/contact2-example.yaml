@@ -1,0 +1,21 @@
+grid:
+  -
+    url: '#'
+    avatar: placeholder.png
+    name:
+      heading:sm: Joe Biden
+      small: President
+    call:
+      url: tel:+358501234567
+      icon: zondicons/phone
+    icon: zondicons/cheveron-right
+  -
+    url: '#'
+    avatar: placeholder.png
+    name:
+      heading:sm: Donald Trump
+      small: Senior Citizen
+    call:
+      url: https://wa.me/358501234567
+      icon: simple-icons/whatsapp
+    icon: zondicons/cheveron-right

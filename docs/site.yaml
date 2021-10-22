@@ -156,7 +156,7 @@ pages:
               empty: tr
           sectionYaml:
             container:
-              bgColor: bg-dark-400
+              bgColor: bg-gray-800
               display: block
               paddingY: py-3.75
               paddingX: px-5

@@ -1,9 +1,16 @@
 section:
   paddingY: null
-  paddingX: px-0
+  position: fixed z-1000 w-full
+  bgColor: bg-transparent scroll:bg-black backdrop-filter scroll:backdrop-blur-2 shadow
   container:
-    display: flex flex-col md:flex-row
-    alignItems: items-center
-    justifyContent: justify-center
-    spaceY: space-y-2.5 md:space-y-0
-  border: border-b
+    display: md:flex
+    justifyContent: justify-center scroll:justify-between items-center
+    minHeight: min-h-14
+nav:
+  container:
+    display: hidden open:block md:flex
+logo:
+  display: hidden scroll:block
+menuToggle:
+  display: block md:hidden
+  position: absolute right-0 top-0

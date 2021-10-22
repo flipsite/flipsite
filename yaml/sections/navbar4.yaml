@@ -1,6 +1,5 @@
 section:
   textAlign: text-center
-  width: w-full
   height: h-14
   paddingY: null
   display: flex items-center justify-center
@@ -32,3 +31,9 @@ close:
   textColor: text-black-o95 hover:text-primary
   dark:
     textColor: text-white-o95 hover:text-primary2
+variants:
+  top:
+    section:
+      position: fixed
+      width: w-full
+      zIndex: z-100

@@ -44,6 +44,7 @@ contact:
   data:
     contact0.variants: 2
     contact1.variants: 2
+    contact2.variants: 2
   count: 1
 team:
   name: Team
