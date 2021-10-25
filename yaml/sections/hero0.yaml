@@ -1,5 +1,5 @@
 section:
-  bgColor: bg-light
+  bgColor: bg-white-o85
   paddingY: py-25|50
   position: relative
   container:
@@ -7,7 +7,7 @@ section:
     alignItems: items-center justify-center
     maxWidth: max-w-screen-sm
   dark:
-    bgColor: bg-dark
+    bgColor: bg-black-o85
 content:
   type: group
   container:
@@ -22,21 +22,21 @@ content:
     textColor: text-black-o95
     dark:
       textColor: text-white-o95
-# background:
-#   type: image
-#   position: absolute
-#   inset: inset-0
-#   zIndex: z-0
-#   opacity: opacity-25
-#   width: w-full
-#   height: h-full
-#   objectFit: object-cover
-#   options:
-#     loading: eager
-#     aspectRatio: 1by1
-#     srcset:
-#       - 320w
-#       - 480w
-#       - 640w
-#     sizes:
-#       - 100vw
+background:
+  type: image
+  position: absolute
+  inset: inset-0
+  zIndex: z-0
+  opacity: opacity-25
+  width: w-full
+  height: h-full
+  objectFit: object-cover
+  options:
+    loading: eager
+    aspectRatio: 1by1
+    srcset:
+      - 320w
+      - 480w
+      - 640w
+    sizes:
+      - 100vw

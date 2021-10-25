@@ -1,11 +1,14 @@
 type: a
-display: block
-textColor: text-primary hover:text-primary-550
+display: flex
+alignItems: items-center
+textColor: text-black-o95 hover:text-primary
+height: h-14
 svg:
-  width: w-24
+  height: h-8
+  width: w-auto
   fill: fill-current
 dark:
-  textColor: text-primary2 hover:text-primary2-550
+  textColor: text-white-o95 hover:text-primary2
 variants:
   1by1:
     svg:

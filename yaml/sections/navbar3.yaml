@@ -1,16 +1,35 @@
 section:
   paddingY: null
-  position: fixed z-1000 w-full
-  bgColor: bg-transparent scroll:bg-black backdrop-filter scroll:backdrop-blur-2 shadow
+  paddingX: px-4 md:px-5|15
+  bgColor: bg-transparent open:bg-white-o90 scroll:bg-white-o90
+  bosShadow: scroll:shadow open:shadow
   container:
     display: md:flex
     justifyContent: justify-center scroll:justify-between items-center
-    minHeight: min-h-14
+  transition: transition-all duration-200 ease-in-out
+  dark:
+    bgColor: bg-transparent open:bg-black-o90 scroll:bg-black-o90
 nav:
   container:
+    paddingY: pb-4 md:py-0
+    paddingX: px-0 md:px-5|15
     display: hidden open:block md:flex
+    spaceX: space-x-0 md:space-x-5|15
+    width: w-full md:w-auto
+  display: flex md:block
+  justifyContent: justify-between
+  height: h-14
+  lineHeight: leading-14
+  text:
+    type: span
 logo:
-  display: hidden scroll:block
+  display: hidden scroll:flex open:flex open:md:hidden
 menuToggle:
   display: block md:hidden
   position: absolute right-0 top-0
+variants:
+  top:
+    section:
+      position: fixed top-0
+      width: w-full
+      zIndex: z-1000

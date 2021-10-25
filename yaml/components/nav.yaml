@@ -5,9 +5,9 @@ container:
   textSize: text-3.5|4
   whitespace: whitespace-nowrap
   spaceX: space-x-5|15
-paddingY: py-5
+  minHeight: min-h-14
+  alignItems: items-center
 textColor: hover:text-primary
-display: block
 dark:
   textColor: text-white-o95 hover:text-primary2
 variants:

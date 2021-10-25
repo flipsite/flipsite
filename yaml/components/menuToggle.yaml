@@ -3,14 +3,16 @@ textColor: text-dark-o95 hover:text-primary
 height: h-14
 width: w-14
 position: relative
+display: block
 menu:
   position: absolute
   type: svg
   width: w-6
   height: h-6
   top: top-1/2
-  right: right-0
+  right: right-1/2
   marginY: -mt-3
+  marginX: -mr-3
   fill: fill-current
   opacity: opacity-100 open:opacity-0 !open:opacity-100
   transition: transition-all duration-200 ease-in-out
@@ -23,9 +25,10 @@ close:
   type: svg
   width: w-6
   height: h-6
-  marginY: -mt-3
   top: top-1/2
-  right: right-0
+  right: right-1/2
+  marginY: -mt-3
+  marginX: -mr-3
   fill: fill-current
   opacity: opacity-0 open:opacity-100 !open:opacity-0
   transition: transition-all duration-200 ease-in-out

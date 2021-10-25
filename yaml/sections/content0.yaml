@@ -11,7 +11,7 @@ content:
 image:
   selfAlign: self-stretch
   width: w-full
-  height: h-full
+  height: h-auto
   objectFit: object-cover
   options:
     aspectRatio: 16by9
