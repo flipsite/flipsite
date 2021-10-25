@@ -10,7 +10,7 @@ final class Label extends AbstractComponent
 
     public function with(ComponentData $data) : void
     {
-        $for = $data->get('for', true) ?? $data->getFlags()[0];
+        $for = $data->get('for', true) ?? $data->getFlags()[0] ?? null;
         $this->addStyle($data->getStyle());
         if (null !== $for) {
             $this->setAttribute('for', $for);
