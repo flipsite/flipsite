@@ -1,0 +1,22 @@
+logos:
+  type: grid
+  colType: a
+  container:
+    display: grid
+    gridTemplateCols: grid-cols-2 md:grid-cols-4
+    gapX: gap-x-2.5
+    gapY: gap-y-2.5
+    textAlign: text-center
+  colsAll:
+    bgColor: bg-gray-o5
+    paddingX: px-5
+    paddingY: py-5
+    textSize: text-3
+    textColor: hover:text-primary
+    borderRadius: hover:shadow
+    image:
+      borderRadius: null
+      display: block
+      height: h-30|50
+      objectFit: object-contain
+      width: w-full
