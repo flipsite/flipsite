@@ -1,10 +1,12 @@
+type: group
 paddingX: px-5|15
 paddingY: py-5|15
-container:
-  marginX: mx-auto
-  maxWidth: max-w-screen-xl
-variants:
-  wide:
-    paddingX: px-5
-    container:
-      maxWidth: null
+marginX: mx-auto
+maxWidth: max-w-screen-xl
+wrapper:
+  bgColor: bg-red
+# variants:
+#   wide:
+#     paddingX: px-5
+#     container:
+#       maxWidth: null

@@ -9,7 +9,7 @@ abstract class AbstractElement
 {
     protected bool $empty       = false;
     protected bool $oneline     = false;
-    protected string $tag       = 'div';
+    protected string $tag       = '';
     protected array $children   = [];
     protected string $content   = '';
     protected array $attributes = [];

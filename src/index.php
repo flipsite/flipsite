@@ -187,11 +187,11 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());
     }
-    $sectionBuilder = new SectionBuilder(
-        $enviroment,
-        $reader,
-        $componentBuilder,
-    );
+    // $sectionBuilder = new SectionBuilder(
+    //     $enviroment,
+    //     $reader,
+    //     $componentBuilder,
+    // );
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
     $componentBuilder->addListener($metaBuilder);
@@ -207,7 +207,8 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     $page = $path->getPage();
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
-        $section = $componentBuilder->build('group', $sectionData);
+        $inheritedStyle = ['bgColor' => 'bg-blue'];
+        $section = $componentBuilder->build('section', $sectionData, $inheritedStyle);
         $documentBuilder->addSection($section);
     }
     $document = $documentBuilder->getDocument();

@@ -39,18 +39,32 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(string $type, $data) : ?AbstractComponent
+    public function build(string $type, $data, array $inheritedStyle = []) : ?AbstractComponent
     {
-        if (is_array($data) && (isset($data['style']) || isset($data['extend']))) {
-            $style = [
-                'bgColor'       => 'bg-red',
-                'heading'       => [
-                    'textSize' => 'text-20'
-                ]];
+        $flags = explode(':', $type);
+        $type  = array_shift($flags);
+
+        $style = $this->getComponentStyle($type, $flags);
+
+        //print_r($componentStyle);
+        //$globalStyle = $this->getGlobalStyle($type);
+
+        // print_r($style);
+        // echo '<br>';
+        // print_r($data['style']);
+
+        // if (is_array($data) && (isset($data['style']) || isset($data['extend']))) {
+        //     $style = [
+        //         'bgColor'       => 'bg-red',
+        //         'heading'       => [
+        //             'textSize' => 'text-20'
+        //         ]];
+        // }
+        if (is_array($data)) {
+            unset($data['style']);
+            $type = $style['type'] ?? $type;
         }
-        //unset($data['style']);
-        $flags      = explode(':', $type);
-        $type       = array_shift($flags);
+
         // Check external factories
         foreach ($this->factories as $factory) {
             $component = $factory->get($type);
@@ -99,59 +113,67 @@ class ComponentBuilder
         }
     }
 
-    private function getComponent(string $type, $data, array $style, string $appearance) : ?AbstractComponent
-    {
-        // Figure out component type
-        $flags          = explode(':', $type);
-        $type           = array_shift($flags);
-        if (!isset($style[$type]['inherit']) || $style[$type]['inherit']) {
-            $componentStyle = ArrayHelper::merge($this->getComponentStyle($type), $style[$type] ?? []);
-        } else {
-            $componentStyle = $style[$type] ?? [];
-        }
-        $componentType  = $componentStyle['type'] ?? $type;
-        unset($componentStyle['type']);
+    // private function getComponent(string $type, $data, array $style, string $appearance) : ?AbstractComponent
+    // {
+    //     // Figure out component type
+    //     $flags          = explode(':', $type);
+    //     $type           = array_shift($flags);
+    //     if (!isset($style[$type]['inherit']) || $style[$type]['inherit']) {
+    //         $componentStyle = ArrayHelper::merge($this->getComponentStyle($type), $style[$type] ?? []);
+    //     } else {
+    //         $componentStyle = $style[$type] ?? [];
+    //     }
+    //     $componentType  = $componentStyle['type'] ?? $type;
+    //     unset($componentStyle['type']);
 
-        if (strpos($componentType, ':')) {
-            $flags                   = explode(':', $componentType);
-            $componentType           = array_shift($flags);
-        }
+    //     if (strpos($componentType, ':')) {
+    //         $flags                   = explode(':', $componentType);
+    //         $componentType           = array_shift($flags);
+    //     }
 
-        // Get component from factory
-        $component = $this->buildComponent($componentType);
-        if (null === $component) {
-            return null;
-        }
-        $componentData = new ComponentData($flags, $data, $componentStyle, $appearance);
-        $id            = $componentData->getId();
-        if ($id) {
-            $component->setAttribute('id', $id);
-        }
-        $component->with($componentData);
-        return $component;
-    }
+    //     // Get component from factory
+    //     $component = $this->buildComponent($componentType);
+    //     if (null === $component) {
+    //         return null;
+    //     }
+    //     $componentData = new ComponentData($flags, $data, $componentStyle, $appearance);
+    //     $id            = $componentData->getId();
+    //     if ($id) {
+    //         $component->setAttribute('id', $id);
+    //     }
+    //     $component->with($componentData);
+    //     return $component;
+    // }
 
     public function expandStyle(array|string $style) : array
     {
     }
 
-    public function getComponentStyle(string $type) : array
+    public function getComponentStyle(string $type, array $flags) : array
     {
-        $style = $this->componentStyle[$type] ?? [];
-        if (isset($style['inherit']) && !$style['inherit']) {
-            unset($style['inherit']);
-            return $style;
-        }
-        $inheritStyle = [];
+        // Figure out default style from component factories and merge if variants defined in flags
+        $style = [];
         foreach ($this->factories as $factory) {
-            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($type));
+            $style = ArrayHelper::merge($style, $factory->getStyle($type));
         }
-        if (null !== $inheritStyle) {
-            $style = ArrayHelper::merge($inheritStyle, $style);
-        }
-        $style['inherit']            = false; // custom style is loaded
-        $this->componentStyle[$type] = $style;
-        unset($style['inherit']);
+
+        // TODO MMerge variants
+
+        // if (isset($style['inherit']) && !$style['inherit']) {
+        //     unset($style['inherit']);
+        //     return $style;
+        // }
+        // $inheritStyle = [];
+        // foreach ($this->factories as $factory) {
+        //     $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($type));
+        // }
+        // if (null !== $inheritStyle) {
+        //     $style = ArrayHelper::merge($inheritStyle, $style);
+        // }
+        // $style['inherit']            = false; // custom style is loaded
+        // $this->componentStyle[$type] = $style;
+        // unset($style['inherit']);
+        // return $style;
         return $style;
     }
 

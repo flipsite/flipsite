@@ -10,7 +10,7 @@ final class Heading extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
-    public function with($data, $style) : void
+    public function with(array $data, array $style) : void
     {
     }
 
