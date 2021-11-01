@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\AbstractElement;
@@ -29,9 +28,7 @@ abstract class AbstractDocumentBuilder
 
     abstract public function getDocument();
 
-    abstract public function addLayout(?array $layoutData = null) : void;
-
-    abstract public function addSection(AbstractElement $section, string $area = 'default');
+    abstract public function addSection(?AbstractElement $section);
 
     private function reset(Language $language) : void
     {

@@ -206,21 +206,18 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $componentBuilder->addListener($perloadBuilder);
 
     $page = $path->getPage();
-    $documentBuilder->addLayout($reader->getLayout($page));
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
-        $area = $sectionData['area'] ?? 'default';
-        unset($sectionData['area']);
-        $section = $sectionBuilder->getSection($sectionData);
-        $documentBuilder->addSection($section, $area);
+        $section = $componentBuilder->build('group', $sectionData);
+        $documentBuilder->addSection($section);
     }
     $document = $documentBuilder->getDocument();
 
-    // Add body class
-    $bodyStyle = StyleAppearanceHelper::apply(
-        $componentBuilder->getComponentStyle('body'),
-        $reader->get('theme.appearance') ?? 'light'
-    );
-    $document->getChild('body')->addStyle($bodyStyle);
+    // // Add body class
+    // $bodyStyle = StyleAppearanceHelper::apply(
+    //     $componentBuilder->getComponentStyle('body'),
+    //     $reader->get('theme.appearance') ?? 'light'
+    // );
+    // $document->getChild('body')->addStyle($bodyStyle);
 
     // Add Meta
     $document = $metaBuilder->getDocument($document);

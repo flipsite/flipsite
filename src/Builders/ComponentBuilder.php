@@ -39,25 +39,52 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(array $data, array $style, string $appearance) : array
+    public function build(string $type, $data) : ?AbstractComponent
     {
-        $components = [];
-        foreach ($data as $type => $componentData) {
-            if (null === $componentData) {
-                continue;
-            }
-            if (isset($componentData['if'])) {
-                if ($this->handleIf(is_array($componentData['if']) ? $componentData['if'] : ['isset' => $componentData['if']])) {
-                    return null;
-                }
-                unset($componentData['if']);
-            }
-            $component = $this->getComponent($type, $componentData, $style, $appearance);
+        if (is_array($data) && (isset($data['style']) || isset($data['extend']))) {
+            $style = [
+                'bgColor'       => 'bg-red',
+                'heading'       => [
+                    'textSize' => 'text-20'
+                ]];
+        }
+        //unset($data['style']);
+        $flags      = explode(':', $type);
+        $type       = array_shift($flags);
+        // Check external factories
+        foreach ($this->factories as $factory) {
+            $component = $factory->get($type);
             if (null !== $component) {
-                $components[] = $component;
+                if (method_exists($component, 'addBuilder')) {
+                    $component->addBuilder($this);
+                }
+                if (method_exists($component, 'addEnviroment')) {
+                    $component->addEnviroment($this->enviroment);
+                }
+                if (method_exists($component, 'addImageHandler')) {
+                    $component->addImageHandler($this->imageHandler);
+                }
+                if (method_exists($component, 'addPath')) {
+                    $component->addPath($this->path);
+                }
+                if (method_exists($component, 'addReader')) {
+                    $component->addReader($this->reader);
+                }
+                if (method_exists($component, 'addSlugs')) {
+                    $component->addSlugs($this->reader->getSlugs());
+                }
+                if (method_exists($component, 'addCanIUse')) {
+                    $component->addCanIUse($this->canIUse);
+                }
+                if (method_exists($component, 'addRequest')) {
+                    $component->addRequest($this->request);
+                }
+
+                $component->with($data, $style ?? []);
+                return $component;
             }
         }
-        return $components;
+        return null;
     }
 
     public function addListener(ComponentListenerInterface $listener) : void
@@ -104,6 +131,10 @@ class ComponentBuilder
         return $component;
     }
 
+    public function expandStyle(array|string $style) : array
+    {
+    }
+
     public function getComponentStyle(string $type) : array
     {
         $style = $this->componentStyle[$type] ?? [];
@@ -124,26 +155,16 @@ class ComponentBuilder
         return $style;
     }
 
-    private function buildComponent(string $type) : ?AbstractComponent
+    private function buildComponent(string $type, ) : ?AbstractComponent
     {
         //Check external factories
         foreach ($this->factories as $factory) {
-            $component = $factory->get($type);
+            $component = $factory->get($type, );
             if (null !== $component) {
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);
                 }
-                if (method_exists($component, 'addSectionBuilder')) {
-                    if (null === $this->sectionBuilder) {
-                        $this->sectionBuilder = new SectionBuilder(
-                            $this->enviroment,
-                            $this->reader,
-                            $this,
-                        );
-                    }
 
-                    $component->addSectionBuilder($this->sectionBuilder);
-                }
                 if (method_exists($component, 'addEnviroment')) {
                     $component->addEnviroment($this->enviroment);
                 }
