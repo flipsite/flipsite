@@ -5,7 +5,7 @@ section:
 grid:
   container:
     display: grid
-    spaceY: space-y-10|30
+    gapY: gap-y-10|30
   colsAll:
     container:
       display: grid
@@ -17,6 +17,9 @@ grid:
       width: w-full
       options:
         aspectRatio: 16by9
+        srcset:
+          - 320w
+          - 480w
     content:
       type: group
       container:

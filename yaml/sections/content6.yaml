@@ -15,7 +15,7 @@ grid:
   container:
     display: grid
     gapX: gap-x-5|15
-    gapY: gap-y-5|15
+    gapY: gap-y-10|30
     gridTemplateCols: sm:grid-cols-2
   colsAll:
     content:
