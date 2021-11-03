@@ -3,25 +3,22 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-final class A extends AbstractComponent
+final class A extends AbstractGroup
 {
-    use Traits\BuilderTrait;
     use Traits\UrlTrait;
 
     protected string $tag = 'a';
 
-    public function with(ComponentData $data) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $componentData = $this->expand($data->get());
-
-        $this->addStyle($data->getStyle());
+        $urlData  = $this->expand($data);
         $external = false;
-        if (isset($componentData['onclick'])) {
-            $this->setAttribute('onclick', $componentData['onclick']);
-            unset($componentData['onclick']);
+        if (isset($urlData['onclick'])) {
+            $this->setAttribute('onclick', $urlData['onclick']);
+            unset($urlData['onclick']);
         }
-        $href = $this->url($componentData['url'], $external);
-        $this->setAttribute('href', $this->url($componentData['url'], $external));
+        $href = $this->url($urlData['url'], $external);
+        $this->setAttribute('href', $this->url($urlData['url'], $external));
 
         if (strpos($href, 'javascript:toggle') === 0) {
             $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.js')));
@@ -30,9 +27,8 @@ final class A extends AbstractComponent
             $this->setAttribute('target', '_blank');
             $this->setAttribute('rel', 'noopener noreferrer');
         }
-        unset($componentData['url']);
-        $components = $this->builder->build($componentData, $data->getStyle(), $data->getAppearance());
-        $this->addChildren($components);
+        unset($data['url'],$data['tel'],$data['mailto']);
+        parent::build($data, $style, $appearance);
     }
 
     private function expand(array $data) : array

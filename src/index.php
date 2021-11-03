@@ -208,7 +208,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $page = $path->getPage();
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
         $inheritedStyle = ['bgColor' => 'bg-blue'];
-        $section = $componentBuilder->build('section', $sectionData, $inheritedStyle);
+        $section = $componentBuilder->build('section', $sectionData, [], $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
     }
     $document = $documentBuilder->getDocument();

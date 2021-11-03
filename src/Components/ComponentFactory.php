@@ -46,11 +46,20 @@ class ComponentFactory extends AbstractComponentFactory
         ]);
     }
 
-    public function getStyle(string $type) : array
+    public function getStyle(string $component) : array
     {
-        $filePath = __DIR__.'/../../yaml/components/'.$type.'.yaml';
+        $filePath = __DIR__.'/../../yaml/components/'.$component.'.yaml';
         if (file_exists($filePath)) {
-            return Yaml::parseFile($filePath);
+            return Yaml::parseFile($filePath) ?? [];
+        }
+        return [];
+    }
+
+    public function getLayout(string $layout) : array
+    {
+        $filePath = __DIR__.'/../../yaml/layouts/'.$layout.'.yaml';
+        if (file_exists($filePath)) {
+            return Yaml::parseFile($filePath) ?? [];
         }
         return [];
     }

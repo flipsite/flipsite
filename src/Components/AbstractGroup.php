@@ -3,17 +3,20 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
+    use Traits\ImageHandlerTrait;
+    use Traits\CanIUseTrait;
 
     protected string $tag = 'div';
 
-    public function with(array $data, array $style) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
         $wrapperStyle = $style['wrapper'] ?? false;
-        unset($style['wrapper']);
         if ($wrapperStyle) {
             $this->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
@@ -26,9 +29,16 @@ abstract class AbstractGroup extends AbstractComponent
             $this->addStyle($style);
         }
         $children = [];
-
         foreach ($data as $type => $componentData) {
-            $children[] = $this->builder->build('heading', 'Test');
+            $componentStyle = $style[$type] ?? [];
+            if (strpos($type, ':')) {
+                $tmp      = explode(':', $type);
+                $baseType = array_shift($tmp);
+                if (isset($style[$baseType])) {
+                    $componentStyle = ArrayHelper::merge($style[$baseType], $componentStyle);
+                }
+            }
+            $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
         }
         if ($wrapperStyle) {
             $content->addChildren($children);
@@ -36,30 +46,4 @@ abstract class AbstractGroup extends AbstractComponent
             $this->addChildren($children);
         }
     }
-
-    // private function setStyle(array $style) : array
-    // {
-    //     $this->addStyle($style['container'] ?? null);
-    //     $this->addStyle($style['wrapper'] ?? null);
-    // }
-
-    // protected string $tag = 'div';
-
-    // public function __construct(array $data)
-    // {
-    //     // $style = $data['style'];
-    //     // print_r($style);
-    //     // unset($data['style']);
-    //     // $this->tag = 'section';
-    //     // foreach ($data as $componentType => $componentData) {
-    //     //     //echo $componentType;
-    //     // }
-    // }
-
-    // public function with(ComponentData $data) : void
-    // {
-    //     $this->addStyle($data->getStyle('container'));
-    //     $components = $this->builder->build($data->get(), $data->getStyle(), $data->getAppearance());
-    //     $this->addChildren($components);
-    // }
 }

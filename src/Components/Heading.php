@@ -10,8 +10,33 @@ final class Heading extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
-    public function with(array $data, array $style) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
+        foreach ($data['flags'] as $flag) {
+            if (in_array($flag, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) {
+                $this->tag = $flag;
+            }
+        }
+        $markdown  = $this->getMarkdownLine($data['markdown'], $style['markdown'] ?? null);
+        $this->addStyle($style);
+        if ('h1' === $this->tag) {
+            $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
+        }
+        if (isset($data['name'])) {
+            $a = new Element('a');
+            $a->setContent($markdown);
+            $a->setAttribute('name', $data['name']);
+            $this->addChild($a);
+        } else {
+            $this->setContent($markdown);
+        }
+    }
+
+    public function normalize(string|int|bool $data) : array
+    {
+        if (is_string($data)) {
+            return ['markdown' => $data];
+        }
     }
 
     //     $this->tag = $data->getTag() ?? 'h2';

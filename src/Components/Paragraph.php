@@ -8,14 +8,17 @@ final class Paragraph extends AbstractComponent
     use Traits\MarkdownTrait;
     protected string $tag = 'p';
 
-    public function with($data, $style) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
+        $markdown  = $this->getMarkdownLine($data['markdown'], $style['markdown']);
+        $this->setContent($markdown);
+        $this->addStyle($style);
     }
 
-    // public function with(ComponentData $data) : void
-    // {
-    //     $markdown  = $this->getMarkdownLine($data->get('text') ?? $data->get('value'), $data->getStyle('markdown'));
-    //     $this->setContent($markdown);
-    //     $this->addStyle($data->getStyle());
-    // }
+    public function normalize(string|int|bool $data) : array
+    {
+        if (is_string($data)) {
+            return ['markdown' => $data];
+        }
+    }
 }

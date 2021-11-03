@@ -35,7 +35,7 @@ final class RasterContext extends AbstractImageContext
         return $this->imgBasePath.'/'.$this->buildSrc();
     }
 
-    public function getSrcset() : ?string
+    public function getSrcset(?string $type = null) : ?string
     {
         if (null === $this->srcset) {
             return null;
@@ -53,7 +53,7 @@ final class RasterContext extends AbstractImageContext
                 $scale = $width / floatval($this->options->getValue('width'));
                 $this->options->changeScale($scale);
             }
-            $srcset[] = new ImageSrcset($this->imgBasePath.'/'.$this->buildSrc(), $variant);
+            $srcset[] = new ImageSrcset($this->imgBasePath.'/'.$this->buildSrc(), $variant, $type);
         }
         $this->options->changeScale();
         return implode(', ', $srcset);
