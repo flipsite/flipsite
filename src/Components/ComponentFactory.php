@@ -37,7 +37,7 @@ class ComponentFactory extends AbstractComponentFactory
     private function isTag(string $tag) : bool
     {
         return in_array($tag, [
-            'p',
+            'label',
             'span',
             'div',
             'small',

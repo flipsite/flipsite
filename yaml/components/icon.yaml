@@ -2,18 +2,24 @@ type: svg
 fill: fill-current
 textColor: text-primary
 display: inline-block
+width: w-4
+height: h-4
 variants:
-  width: w-4
-  height: w-4
   sm:
-    width: w-6
-    height: w-6
-  md:
+    width: w-3
+    height: w-3
+  lg:
     width: w-8
     height: w-8
-  lg:
-    width: w-10
-    height: w-10
   xl:
     width: w-16
     height: w-16
+  xxl:
+    width: w-30
+    height: w-30
+  darkest:
+    textColor: text-darkest
+  lightest:
+    textColor: text-lightest
+  secondary:
+    textColor: text-secondary

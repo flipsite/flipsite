@@ -13,11 +13,12 @@ final class Image extends AbstractComponent
     protected bool $empty  = true;
     protected bool $online = true;
 
-    public function normalize(string|int|bool $data) : array
+    public function normalize(string|int|bool|array $data) : array
     {
-        if (is_string($data)) {
+        if (!is_array($data)) {
             return ['src' => $data];
         }
+        return $data;
     }
 
     public function build(array $data, array $style, string $appearance) : void

@@ -32,7 +32,7 @@ final class Heading extends AbstractComponent
         }
     }
 
-    public function normalize(string|int|bool $data) : array
+    public function normalize(string|int|bool|array $data) : array
     {
         if (is_string($data)) {
             return ['markdown' => $data];

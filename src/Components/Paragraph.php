@@ -15,7 +15,7 @@ final class Paragraph extends AbstractComponent
         $this->addStyle($style);
     }
 
-    public function normalize(string|int|bool $data) : array
+    public function normalize(string|int|bool|array $data) : array
     {
         if (is_string($data)) {
             return ['markdown' => $data];

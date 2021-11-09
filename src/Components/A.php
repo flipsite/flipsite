@@ -31,6 +31,14 @@ final class A extends AbstractGroup
         parent::build($data, $style, $appearance);
     }
 
+    public function normalize(string|int|bool|array $data) : array
+    {
+        if (!is_array($data)) {
+            return ['text' => $data, 'url' => '#'];
+        }
+        return $data;
+    }
+
     private function expand(array $data) : array
     {
         $expanded = [];

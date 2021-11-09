@@ -207,18 +207,17 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     $page = $path->getPage();
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
-        $inheritedStyle = ['bgColor' => 'bg-blue'];
         $section = $componentBuilder->build('section', $sectionData, [], $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
     }
     $document = $documentBuilder->getDocument();
 
-    // // Add body class
-    // $bodyStyle = StyleAppearanceHelper::apply(
-    //     $componentBuilder->getComponentStyle('body'),
-    //     $reader->get('theme.appearance') ?? 'light'
-    // );
-    // $document->getChild('body')->addStyle($bodyStyle);
+    // Add body class TODO fix
+    $bodyStyle = StyleAppearanceHelper::apply(
+        \Flipsite\Utils\ArrayHelper::merge($componentBuilder->getStyle('body'), $reader->get('theme.components.body') ?? []),
+        $reader->get('theme.appearance') ?? 'light'
+    );
+    $document->getChild('body')->addStyle($bodyStyle);
 
     // Add Meta
     $document = $metaBuilder->getDocument($document);

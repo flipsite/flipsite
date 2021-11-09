@@ -1,14 +1,13 @@
 type: a
 display: flex
 alignItems: items-center
-textColor: text-black-o95 hover:text-primary
-height: h-14
+textColor: text-darkest hover:text-primary
 svg:
-  height: h-8
+  height: h-10
   width: w-auto
   fill: fill-current
 dark:
-  textColor: text-white-o95 hover:text-primary2
+  textColor: text-lightest hover:text-primary2
 variants:
   1by1:
     svg:

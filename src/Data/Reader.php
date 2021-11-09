@@ -102,11 +102,10 @@ final class Reader
 
     public function getSections(string $page, Language $language) : array
     {
-        $all = array_merge(
-            $this->data['before'] ?? [],
-            $this->data['pages'][$page] ?? [],
-            $this->data['after'] ?? []
-        );
+        $all = $this->data['pages'][$page] ?? [];
+        if (ArrayHelper::isAssociative($all)) {
+            $all = [$all];
+        }
         $sections = [];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';

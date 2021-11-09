@@ -2,10 +2,12 @@ type: group
 marginX: mx-auto
 maxWidth: max-w-screen-xl
 # border: border
-# wrapper:
-#   bgColor: bg-gray-50
-#   paddingX: px-5|15
-#   paddingY: py-5|15
+wrapper:
+  paddingX: px-5|15
+  paddingY: py-5|15
+dark:
+  wrapper:
+    bgColor: bg-gray-900
 # background:
 #   bgPosition: bg-center
 #   bgSize: bg-cover

@@ -9,9 +9,9 @@ abstract class AbstractComponent extends AbstractElement
 {
     abstract public function build(array $data, array $style, string $appearance) : void;
 
-    public function normalize(string|int|bool $data) : array
+    public function normalize(string|int|bool|array $data) : array
     {
-        return ['value' => $data];
+        return is_array($data) ? $data : ['value' => $data];
     }
 
     public function setBackground(string|array $background, array $style = []) : void
@@ -19,8 +19,10 @@ abstract class AbstractComponent extends AbstractElement
         if (is_string($background)) {
             $background = ['src' => $background];
         }
-        $src = $background['src'];
-
+        if (isset($background['style'])) {
+            $style = ArrayHelper::merge($style, $background['style']);
+        }
+        $src     = $background['src'];
         $options = $style['options'] ?? [];
 
         if (isset($background['style'])) {

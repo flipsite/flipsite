@@ -1,13 +1,7 @@
-wrapper:
-  paddingX: px-5|15
-  paddingY: py-5|15
-marginX: mx-auto
-dark:
-  wrapper:
-    bgColor: bg-gray-800
-display: grid grid-cols-2
-gridTemplateCols: grid-cols-2
+display: grid md:grid-cols-2
+gapX: gap-5|15
 alignItems: items-center
+
 # section:
 #   bgColor: bg-white-o85
 #   paddingY: py-25|50

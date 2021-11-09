@@ -59,7 +59,7 @@ class ComponentBuilder
             $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $appearance);
         }
 
-        if (is_array($data)) {
+        if (is_array($style)) {
             $type = $style['type'] ?? $type;
             unset($style['type']);
         }
@@ -92,9 +92,7 @@ class ComponentBuilder
                 if (method_exists($component, 'addRequest')) {
                     $component->addRequest($this->request);
                 }
-                if (!is_array($data)) {
-                    $data = $component->normalize($data);
-                }
+                $data          = $component->normalize($data);
                 $data['flags'] = $flags;
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
@@ -124,13 +122,13 @@ class ComponentBuilder
         }
     }
 
-    private function getStyle(string $type, array $flags) : array
+    public function getStyle(string $type, array $flags = []) : array
     {
         $style = [];
         foreach ($this->factories as $factory) {
             $style = ArrayHelper::merge($style, $factory->getStyle($type));
         }
-
+        $style = ArrayHelper::merge($style, $this->geThemeComponentStyle($type, $flags));
         foreach ($flags as $flag) {
             if (isset($style['variants'][$flag])) {
                 $style = ArrayHelper::merge($style, $style['variants'][$flag]);
@@ -203,5 +201,17 @@ class ComponentBuilder
             return true;
         }
         return false;
+    }
+
+    private function geThemeComponentStyle(string $type, array $flags = []) : array
+    {
+        $style = $this->theme['components'][$type] ?? [];
+        if (count($flags)) {
+            $type = $type.':'.implode(':', $flags);
+            if (isset($this->theme['components'][$type])) {
+                $style = ArrayHelper::merge($style, $this->theme['components'][$type]);
+            }
+        }
+        return $style;
     }
 }
