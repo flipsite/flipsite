@@ -5,49 +5,28 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class Nav extends AbstractComponent
+final class Nav extends AbstractGroup
 {
     use Traits\BuilderTrait;
     use Traits\PathTrait;
 
     protected string $tag = 'nav';
 
-    public function with(ComponentData $data) : void
+    public function normalize(string|int|bool|array $data) : array
     {
-        $items = $this->normalize($data->get());
-        $flags = $data->getFlags();
-        if (in_array('onpage', $flags)) {
-            $items[0]['isActive'] = true;
-            foreach ($items as &$item) {
-                $item['url'] = '#'.$item['url'];
-                $this->setAttribute('data-nav', true);
-                $activeStyle = ArrayHelper::merge($data->getStyle(), $data->getStyle('active'));
-                $activeStyle = array_filter($activeStyle, function ($item) {
-                    return is_string($item);
-                });
-                sort($activeStyle);
-                $this->setAttribute('data-active', implode(' ', $activeStyle));
-                $this->builder->dispatch(new Event('ready-script', 'nav', file_get_contents(__DIR__.'/../../js/nav.js')));
-            }
-        } else {
-            $items = $this->addIsActive($items, $this->path->getPage());
+        if (!is_array($data)) {
+            throw new Exception('Nav data not array');
         }
-        $this->addStyle($data->getStyle('container'));
-        foreach ($items as &$item) {
-            if ($item['isActive'] ?? false) {
-                $item['style'] = $data->getStyle('active');
-            }
-            unset($item['isActive']);
-            $components = $this->builder->build(['a' => $item], ['a' => $data->getStyle()], $data->getAppearance());
-            $this->addChildren($components);
-        }
-    }
 
-    protected function normalize($data) : array
-    {
-        if (ArrayHelper::isAssociative($data)) {
+        if (ArrayHelper::isAssociative($data) && !isset($data['items'])) {
+            $style = $data['style'] ?? [];
+            unset($data['style']);
+            $data = ['items' => $data, 'style'=>$style];
+        }
+
+        if (ArrayHelper::isAssociative($data['items'])) {
             $items = [];
-            foreach ($data as $url => $value) {
+            foreach ($data['items'] as $url => $value) {
                 $args = explode('|', $url);
                 $url  = array_shift($args);
                 if (is_string($value)) {
@@ -69,30 +48,65 @@ final class Nav extends AbstractComponent
                 foreach ($args as $attr) {
                     $item[$attr] = true;
                 }
-                $items[] = $item;
+                $items[]       = $item;
+                $data['items'] = $items;
             }
-        } else {
-            return $data;
         }
-        return $items;
+
+        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
+
+        return $data;
     }
 
-    private function addIsActive(array $items, string $active) : array
+    public function build(array $data, array $style, string $appearance) : void
     {
+        $items = $data['items'] ?? [];
+        unset($data['items']);
+        foreach ($items as $i => $item) {
+            $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
+            if ($item['active'] && isset($style['active'])) {
+                unset($item['active']);
+                if (!isset($item['style'])) {
+                    $item['style'] = [];
+                }
+                $item['style'] = ArrayHelper::merge($item['style'], $style['active']);
+            }
+            $data['a:'.$i] = $item;
+        }
+        unset($style['items'], $style['active']);
+
+        parent::build($data, $style, $appearance);
+    }
+
+    private function addActive(array $items, string $active) : array
+    {
+        $activeParts = explode('/', $active);
         foreach ($items as &$item) {
             // If URL is an array, it's a localized external URL that cannot be active
             if (isset($item['url']) && is_string($item['url'])) {
                 $url              = explode('#', $item['url'])[0];
-                $item['isActive'] = $item['isActive'] ?? false;
+                $item['active']   = $item['active'] ?? false;
                 $item['exact']    = $item['exact'] ?? false;
                 if ($item['exact'] && $url === $active) {
-                    $item['isActive'] = true;
+                    $item['active'] = true;
                 } elseif (!$item['exact']) {
-                    $item['isActive'] = $url === mb_substr($active, 0, mb_strlen($url));
+                    $urlParts       = explode('/', $url);
+                    $item['active'] = $this->compare($urlParts, $activeParts);
                 }
             }
             unset($item['exact']);
         }
         return $items;
+    }
+
+    private function compare(array $url, array $active): bool
+    {
+        $same = 0;
+        foreach ($active as $i => $a) {
+            if ($a === ($url[$i] ?? '')) {
+                $same++;
+            }
+        }
+        return $same >= count($active);
     }
 }

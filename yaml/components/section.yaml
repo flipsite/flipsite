@@ -1,19 +1,21 @@
 type: group
-marginX: mx-auto
-maxWidth: max-w-screen-xl
-# border: border
-wrapper:
-  paddingX: px-5|15
-  paddingY: py-5|15
-dark:
-  wrapper:
-    bgColor: bg-gray-900
-# background:
-#   bgPosition: bg-center
-#   bgSize: bg-cover
-#   options:
-#     aspectRatio: 1by1
-#     width: 480
-#     srcset:
-#       - 1x
-#       - 2x
+# marginX: mx-auto
+# maxWidth: max-w-screen-xl
+paddingX: px-5|15
+paddingY: py-5|15
+# # border: border
+# # wrapper:
+# #   paddingX: px-5|15
+# #   paddingY: py-5|15
+# bgColor: bg-light
+# dark:
+#   bgColor: bg-dark
+# # background:
+# #   bgPosition: bg-center
+# #   bgSize: bg-cover
+# #   options:
+# #     aspectRatio: 1by1
+# #     width: 480
+# #     srcset:
+# #       - 1x
+# #       - 2x

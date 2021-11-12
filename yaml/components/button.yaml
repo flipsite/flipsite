@@ -10,6 +10,7 @@ spaceX: space-x-2.5
 borderRadius: rounded-full
 paddingX: px-10|15
 height: h-14
+whitespace: whitespace-nowrap
 variants:
   primary:
     bgColor: bg-primary hover:bg-primary-550
