@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules\Traits;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -34,10 +33,15 @@ trait ColorTrait
         if (0 === count($args)) {
             return null;
         }
-        $colors = $this->getConfig('colors', array_shift($args));
+        $colors = $this->getConfig('colors', $args[0]);
         if (null === $colors) {
-            return null;
+            if (substr($args[0], 0, 2) === '[#') {
+                $colors = substr($args[0], 1, 7);
+            } else {
+                return null;
+            }
         }
+        array_shift($args);
         if (is_string($colors)) {
             $colors = [500 => $colors];
         }
