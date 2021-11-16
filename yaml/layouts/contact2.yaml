@@ -3,7 +3,7 @@ section:
   paddingY: null
   container:
     empty: true
-  marginY: mb-5|15
+  #marginY: mb-5|15
   bgColor: bg-white
 grid:
   container:
