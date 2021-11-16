@@ -6,10 +6,15 @@ namespace Flipsite\Components;
 final class Tag extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    protected string $tag = 'div';
+
+    public function __construct(string $tag = 'div')
+    {
+        $this->tag = $tag;
+    }
 
     public function build(array $data, array $style, string $appearance) : void
     {
+        $this->tag = $data['tag'] ?? $this->tag;
         $this->setContent($data['value']);
         $this->addStyle($style);
     }
@@ -19,5 +24,6 @@ final class Tag extends AbstractComponent
         if (is_string($data)) {
             return ['value' => $data];
         }
+        return $data;
     }
 }

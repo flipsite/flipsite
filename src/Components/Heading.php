@@ -37,6 +37,7 @@ final class Heading extends AbstractComponent
         if (is_string($data)) {
             return ['markdown' => $data];
         }
+        return $data;
     }
 
     //     $this->tag = $data->getTag() ?? 'h2';

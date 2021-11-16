@@ -53,6 +53,17 @@ class ComponentBuilder
             $style      = ArrayHelper::merge($style, $data['style']);
             unset($data['style']);
         }
+
+        // If still has variants
+        if (isset($style['variants'])) {
+            foreach ($flags as $flag) {
+                if (isset($style['variants'][$flag])) {
+                    $style = ArrayHelper::merge($style, $style['variants'][$flag]);
+                }
+            }
+            unset($style['variants']);
+        }
+
         $appearance = $style['appearance'] ?? $appearance;
         unset($style['appearance']);
         if (isset($style['dark'])) {

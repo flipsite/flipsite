@@ -10,12 +10,14 @@ paddingY: py-5|15
 # bgColor: bg-light
 # dark:
 #   bgColor: bg-dark
-# # background:
-# #   bgPosition: bg-center
-# #   bgSize: bg-cover
-# #   options:
-# #     aspectRatio: 1by1
-# #     width: 480
-# #     srcset:
-# #       - 1x
-# #       - 2x
+background:
+  bgPosition: bg-center
+  bgSize: bg-cover
+  bgRepeat: bg-no-repeat
+  options:
+    aspectRatio: 3by1
+    width: 480
+    srcset:
+      - 1x
+      - 1.5x
+      - 2x

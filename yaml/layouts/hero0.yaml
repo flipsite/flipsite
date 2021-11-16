@@ -1,6 +1,4 @@
-display: grid md:grid-cols-2
-gapX: gap-5|15
-alignItems: items-center
+display: grid md:grid-cols-2 gap-5|15 items-center
 
 # section:
 #   bgColor: bg-white-o85

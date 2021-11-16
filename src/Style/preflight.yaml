@@ -126,6 +126,8 @@
   overflow: visible
 - for: select
   text-transform: none
+- for: address
+  font-style: normal
 # abbr[title] {
 #   border-bottom: none; /* 1 */
 #   text-decoration: underline; /* 2 */

@@ -5,9 +5,8 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class Nav extends AbstractGroup
+class Nav extends AbstractGroup
 {
-    use Traits\BuilderTrait;
     use Traits\PathTrait;
 
     protected string $tag = 'nav';
@@ -15,7 +14,10 @@ final class Nav extends AbstractGroup
     public function normalize(string|int|bool|array $data) : array
     {
         if (!is_array($data)) {
-            throw new Exception('Nav data not array');
+            throw new \Exception('Nav data not array');
+        }
+        if (!ArrayHelper::isAssociative($data)) {
+            $data = ['items' => $data];
         }
 
         if (ArrayHelper::isAssociative($data) && !isset($data['items'])) {
@@ -102,11 +104,11 @@ final class Nav extends AbstractGroup
     private function compare(array $url, array $active): bool
     {
         $same = 0;
-        foreach ($active as $i => $a) {
-            if ($a === ($url[$i] ?? '')) {
+        foreach ($url as $i => $a) {
+            if ($a === ($active[$i] ?? '')) {
                 $same++;
             }
         }
-        return $same >= count($active);
+        return $same >= count($url);
     }
 }
