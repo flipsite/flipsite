@@ -38,12 +38,27 @@ final class Table extends AbstractComponent
                 }
             }
         }
+        if (isset($data['header']) && is_string($data['header'])) {
+            $data['header'] = explode(',', $data['header']);
+        }
         return $data;
     }
 
     public function build(array $data, array $style, string $appearance) : void
     {
         $this->addStyle($style);
+        if (null !== $data['header']) {
+            $tr      = new Element('tr');
+            foreach ($data['header'] as $i => $col) {
+                $th = new Element('th', true);
+                $th->addStyle($style['thAll'] ?? null);
+                $th->addStyle($style['th'][$i] ?? null);
+                $th->setContent($col);
+                $tr->addChild($th);
+            }
+            $this->addChild($tr);
+        }
+
         foreach ($data['rows'] as $i => $row) {
             $tr = new Element('tr');
             $tr->addStyle($style['trAll'] ?? null);
