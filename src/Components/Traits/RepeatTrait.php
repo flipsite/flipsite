@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait RepeatTrait
@@ -20,7 +19,7 @@ trait RepeatTrait
     {
         foreach ($tpl as $attr => &$value) {
             if (is_array($value)) {
-                $value = $this->applyTpl($value, $data);
+                $value = $this->attachDataToTpl($value, $data);
             } elseif (false !== mb_strpos((string)$value, '{')) {
                 $matches = [];
                 preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
