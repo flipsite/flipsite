@@ -8,6 +8,7 @@ use Flipsite\Utils\ArrayHelper;
 class Nav extends AbstractGroup
 {
     use Traits\PathTrait;
+    use Traits\RepeatTrait;
 
     protected string $tag = 'nav';
 
@@ -18,6 +19,12 @@ class Nav extends AbstractGroup
         }
         if (!ArrayHelper::isAssociative($data)) {
             $data = ['items' => $data];
+        }
+
+        if (is_array($data) && isset($data['repeat'],$data['item'])) {
+            // TODO maybe import file content here
+            $data['items'] = $this->expandRepeat($data['repeat'], $data['item']);
+            unset($data['repeat'], $data['item']);
         }
 
         if (ArrayHelper::isAssociative($data) && !isset($data['items'])) {

@@ -255,7 +255,7 @@ final class Reader
                 // TODO add support for localized slugs
                 foreach ($permutations as $permutation) {
                     $expandedPage = $page;
-                    $sections     = $pageData['sections'];
+                    $sections     = $pageData['content'];
                     foreach ($params as $i => $param) {
                         $expandedPage = str_replace($param, (string)$permutation[$i], $expandedPage);
                         $sections     = ArrayHelper::strReplace($param, (string)$permutation[$i], $sections);
