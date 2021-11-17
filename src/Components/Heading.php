@@ -17,7 +17,7 @@ final class Heading extends AbstractComponent
                 $this->tag = $flag;
             }
         }
-        $markdown  = $this->getMarkdownLine($data['markdown'], $style['markdown'] ?? null);
+        $markdown  = $this->getMarkdownLine((string)$data['markdown'], $style['markdown'] ?? null);
         $this->addStyle($style);
         if ('h1' === $this->tag) {
             $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
@@ -34,8 +34,8 @@ final class Heading extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (is_string($data)) {
-            return ['markdown' => $data];
+        if (!is_array($data)) {
+            return ['markdown' => (string)$data];
         }
         return $data;
     }
