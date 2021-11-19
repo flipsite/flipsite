@@ -9,19 +9,23 @@ class Nav extends AbstractGroup
 {
     use Traits\PathTrait;
     use Traits\RepeatTrait;
+    use Traits\SlugsTrait;
 
     protected string $tag = 'nav';
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (!is_array($data)) {
-            throw new \Exception('Nav data not array');
-        }
-        if (!ArrayHelper::isAssociative($data)) {
+        if (is_array($data) && !ArrayHelper::isAssociative($data)) {
             $data = ['items' => $data];
         }
+        if (is_string($data)) {
+            $data = ['items' => $data];
+        }
+        if (isset($data['items']) && is_string($data['items'])) {
+            $data['items'] = $this->getFromSlugs($data['items']);
+        }
 
-        if (is_array($data) && isset($data['repeat'],$data['item'])) {
+        if (isset($data['repeat'],$data['item'])) {
             // TODO maybe import file content here
             $data['items'] = $this->expandRepeat($data['repeat'], $data['item']);
             unset($data['repeat'], $data['item']);
@@ -117,5 +121,36 @@ class Nav extends AbstractGroup
             }
         }
         return $same >= count($url);
+    }
+
+    private function getFromSlugs(string $page) : ?array
+    {
+        $pages      = [];
+        $all        = $this->slugs->getPages();
+        $firstExact = false;
+        if ('pages' === $page) {
+            $pages = array_filter($all, function ($value) {
+                return mb_strpos($value, '/') === false;
+            });
+        } else {
+            $firstExact = true;
+            $pages      = array_filter($all, function ($value) use ($page) {
+                return str_starts_with($value, $page);
+            });
+        }
+        $items = [];
+        foreach ($pages as $page) {
+            $tmp             = explode('/', $page);
+            $item            = [
+                'url'  => $page,
+                'text' => array_pop($tmp)
+            ];
+            if ($firstExact) {
+                $item['exact'] = true;
+                $firstExact    = false;
+            }
+            $items[] = $item;
+        }
+        return $items;
     }
 }

@@ -136,9 +136,9 @@ class ComponentBuilder
     public function getStyle(string $type, array $flags = []) : array
     {
         $style = [];
-        foreach ($this->factories as $factory) {
-            $style = ArrayHelper::merge($style, $factory->getStyle($type));
-        }
+        // foreach ($this->factories as $factory) {
+        //     $style = ArrayHelper::merge($style, $factory->getStyle($type));
+        // }
         $style = ArrayHelper::merge($style, $this->geThemeComponentStyle($type, $flags));
         foreach ($flags as $flag) {
             if (isset($style['variants'][$flag])) {
