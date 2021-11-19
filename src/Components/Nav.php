@@ -134,8 +134,9 @@ class Nav extends AbstractGroup
             });
         } else {
             $firstExact = true;
-            $pages      = array_filter($all, function ($value) use ($page) {
-                return str_starts_with($value, $page);
+            $level      = substr_count($page, '/');
+            $pages      = array_filter($all, function ($value) use ($page, $level) {
+                return str_starts_with($value, $page) && substr_count($value, '/') <= $level + 1;
             });
         }
         $items = [];
