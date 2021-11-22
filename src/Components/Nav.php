@@ -69,6 +69,12 @@ class Nav extends AbstractGroup
 
         $data['items'] = $this->addActive($data['items'], $this->path->getPage());
 
+        if (isset($data['options'])) {
+            $offset        = $data['options']['offset'] ?? 0;
+            $length        = $data['options']['length'] ?? 999999;
+            $data['items'] = array_slice($data['items'], $offset, $length);
+        }
+
         return $data;
     }
 
