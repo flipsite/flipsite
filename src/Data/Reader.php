@@ -29,6 +29,8 @@ final class Reader
 
     private Slugs $slugs;
 
+    private ?array $pageNames = null;
+
     public function __construct(Enviroment $enviroment)
     {
         $this->enviroment = $enviroment;
@@ -100,6 +102,47 @@ final class Reader
         return $this->slugs;
     }
 
+    public function getPageName(string $page, Language $language) : string
+    {
+        if ('home' === $page) {
+            switch ((string)$language) {
+                case 'sv': return 'Hem';
+                case 'fi': return 'Koti';
+                default: return 'Home';
+            }
+        }
+
+        $slug = $this->slugs->getSlug($page, $language);
+        if (null === $slug) {
+            echo $page;
+            die();
+        }
+        $slug = explode('/', $slug);
+        $last = array_pop($slug);
+        if ($last === '') {
+            $last = 'home';
+        }
+
+        if (is_null($this->pageNames)) {
+            $this->pageNames = [];
+            foreach ($this->data['pages'] as $p => $data) {
+                if (ArrayHelper::isAssociative($data)) {
+                    $data = [$data];
+                }
+                foreach ($data as $section) {
+                    if (isset($section['_name'])) {
+                        $this->pageNames[$last] = $section['_name'];
+                    }
+                }
+            }
+        }
+
+        if (isset($this->pageNames[$last])) {
+            return $this->pageNames[$last];
+        }
+        return ucfirst(str_replace('-', ' ', $last));
+    }
+
     public function getSections(string $page, Language $language) : array
     {
         $before = $this->data['before'] ?? [];
@@ -133,18 +176,55 @@ final class Reader
     public function getMeta(string $page, Language $language) : ?array
     {
         $meta = [
+            'title'       => [$this->get('name')],
             'description' => $this->get('description', $language),
             'keywords'    => $this->get('keywords', $language),
             'author'      => $this->get('author', $language),
         ];
-        $all = $this->data['pages'][$page] ?? [];
-        foreach ($all as $section) {
-            $type = $section['type'] ?? 'default';
-            if ('meta' === $type) {
-                $pageMeta = $this->localize($section, $language);
-                $meta     = ArrayHelper::merge($meta, $pageMeta);
+
+        if ($language != $this->languages[0]) {
+            $meta['title'][0] .= ' ('.strtoupper((string)$language).')';
+        }
+
+        $data = $this->data['pages'][$page];
+        if (ArrayHelper::isAssociative($data)) {
+            $data = [$data];
+        }
+
+        $p     = explode('/', $page);
+        $title = [];
+        while (count($p) > 0) {
+            $title[]  = $this->getPageName(implode('/', $p), $language);
+            array_pop($p);
+        }
+        $meta['title'] =array_merge($title, $meta['title']);
+
+        foreach ($data as $section) {
+            if (isset($section['_meta'])) {
+                $pageMeta = $this->localize($section['_meta'], $language);
+                if (isset($pageMeta['title'])) {
+                    array_pop($meta['title']);
+                    $meta['title'][] = $pageMeta['title'];
+                    unset($pageMeta['title']);
+                }
+                $meta = ArrayHelper::merge($meta, $pageMeta);
             }
         }
+
+        $meta['title'] = implode(' - ', $meta['title']);
+
+        // $all = $this->data['pages'][$page] ?? [];
+        // foreach ($all as $section) {
+        //     if (isset($section['_meta'])) {
+        //         if ('meta' === $type) {
+        //             $pageMeta = $this->localize($section, $language);
+        //             $meta     = ArrayHelper::merge($meta, $pageMeta);
+        //         }
+        //     }
+        // }
+        // if (!isset($meta['title'])) {
+        //     echo 'Hej';
+        // }
         return $meta;
     }
 

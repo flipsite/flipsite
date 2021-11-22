@@ -19,9 +19,9 @@ final class Heading extends AbstractComponent
         }
         $markdown  = $this->getMarkdownLine((string)$data['text'], $style['text'] ?? null);
         $this->addStyle($style);
-        if ('h1' === $this->tag) {
-            $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
-        }
+        // if ('h1' === $this->tag) {
+        //     $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
+        // }
         if (isset($data['name'])) {
             $a = new Element('a');
             $a->setContent($markdown);

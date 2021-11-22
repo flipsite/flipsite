@@ -9,6 +9,7 @@ final class Breadcrumb extends AbstractGroup
 {
     use Traits\BuilderTrait;
     use Traits\PathTrait;
+    use Traits\ReaderTrait;
 
     protected string $tag = 'nav';
 
@@ -26,7 +27,7 @@ final class Breadcrumb extends AbstractGroup
             if ('home' === $page) {
                 $data['items'] = [$data['home'] ?? [
                     'url'  => 'home',
-                    'text' => 'Hem',
+                    'text' => $this->reader->getPageName('home', $this->path->getLanguage())
                 ]];
                 unset($data['home']);
             } else {
@@ -34,16 +35,15 @@ final class Breadcrumb extends AbstractGroup
                 $path            = explode('/', $page);
                 while (count($path) > 0) {
                     $page            = implode('/', $path);
-                    $tmp             = explode('/', $page);
                     $data['items'][] = [
                         'url'  => $page,
-                        'text' => array_pop($tmp)
+                        'text' => $this->reader->getPageName($page, $this->path->getLanguage())
                     ];
                     array_pop($path);
                 }
                 $data['items'][] = $data['home'] ?? [
                     'url'  => 'home',
-                    'text' => 'Hem'
+                    'text' => $this->reader->getPageName('home', $this->path->getLanguage())
                 ];
                 unset($data['home']);
                 $data['items'] = array_reverse($data['items']);

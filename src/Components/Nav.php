@@ -10,6 +10,7 @@ class Nav extends AbstractGroup
     use Traits\PathTrait;
     use Traits\RepeatTrait;
     use Traits\SlugsTrait;
+    use Traits\ReaderTrait;
 
     protected string $tag = 'nav';
 
@@ -141,10 +142,9 @@ class Nav extends AbstractGroup
         }
         $items = [];
         foreach ($pages as $page) {
-            $tmp             = explode('/', $page);
             $item            = [
                 'url'  => $page,
-                'text' => array_pop($tmp)
+                'text' => $this->reader->getPageName($page, $this->path->getLanguage())
             ];
             if ($firstExact) {
                 $item['exact'] = true;

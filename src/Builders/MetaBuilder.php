@@ -20,8 +20,6 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
     private Path $path;
     private ImageHandler $imageHandler;
 
-    private ?string $fallbackTitle = null;
-
     public function __construct(Enviroment $enviroment, Reader $reader, Path $path)
     {
         $this->enviroment   = $enviroment;
@@ -39,13 +37,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $language = $this->path->getLanguage();
         $name     = $this->reader->get('name', $language);
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
-
-        $title = $meta['title'] ?? $this->fallbackTitle;
-        if (null !== $title) {
-            $title .= ' - ' . $name;
-        } else {
-            $title = $name;
-        }
+        $title    = $meta['title'] ?? $name;
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
@@ -91,11 +83,6 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
     public function handleComponentEvent(Event $event) : void
     {
-        switch ($event->getType()) {
-            case 'h1':
-                $this->fallbackTitle = $event->getData();
-                break;
-        }
     }
 
     private function meta(string $name, ?string $content) : ?AbstractElement
