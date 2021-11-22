@@ -117,10 +117,9 @@ final class Reader
             echo $page;
             die();
         }
-        $slug = explode('/', $slug);
-        $last = array_pop($slug);
-        if ($last === '') {
-            $last = 'home';
+
+        if ($slug === '') {
+            $slug = 'home';
         }
 
         if (is_null($this->pageNames)) {
@@ -131,15 +130,19 @@ final class Reader
                 }
                 foreach ($data as $section) {
                     if (isset($section['_name'])) {
-                        $this->pageNames[$last] = $section['_name'];
+                        $this->pageNames[$p] = $section['_name'];
                     }
                 }
             }
         }
 
-        if (isset($this->pageNames[$last])) {
-            return $this->pageNames[$last];
+        if (isset($this->pageNames[$slug])) {
+            return $this->pageNames[$slug];
         }
+
+        $slug = explode('/', $slug);
+        $last = array_pop($slug);
+
         return ucfirst(str_replace('-', ' ', $last));
     }
 
@@ -401,12 +404,14 @@ class DataMapper
                 $value = $this->search($value, $dot);
             } elseif (is_string($value) && false !== mb_strpos($value, '{data.')) {
                 $matches = [];
-                preg_match('/\{data\.(.*?)\}/', $value, $matches);
-                $replace = $dot->get($matches[1]);
-                if (is_array($replace)) {
-                    $value = $replace;
-                } else {
-                    $value = str_replace($matches[0], $dot->get($matches[1]) ?? '', $value);
+                preg_match_all('/\{data\.(.*?)\}/', $value, $matches);
+                foreach ($matches[1] as $i => $replace) {
+                    $replace = $dot->get($replace);
+                    if (is_array($replace)) {
+                        $value = $replace;
+                    } else {
+                        $value = str_replace($matches[0][$i], $replace ?? '', $value);
+                    }
                 }
             }
         }
