@@ -43,14 +43,21 @@ class ComponentBuilder
         $flags = explode(':', $type);
         $type  = array_shift($flags);
         $style = $this->getStyle($type, $flags);
-        if (is_array($data) && isset($data['layout'])) {
-            $layout = $this->getLayout($data['layout']);
-            unset($data['layout']);
-            $style = ArrayHelper::merge($style, $layout);
-        }
         $style = ArrayHelper::merge($style, $parentStyle);
+
         if (is_array($data) && isset($data['style'])) {
-            $style      = ArrayHelper::merge($style, $data['style']);
+            // If string, => inherit
+            if (is_string($data['style'])) {
+                $data['style'] = ['inherit' => $data['style']];
+            }
+            // Resolve inheritance
+            if (isset($data['style']['inherit'])) {
+                $inheritFlags = explode(':', $data['style']['inherit']);
+                unset($data['style']['inherit']);
+                $inheritType   = array_shift($inheritFlags);
+                $data['style'] = ArrayHelper::merge($this->getStyle($inheritType, $inheritFlags), $data['style']);
+            }
+            $style = ArrayHelper::merge($style, $data['style']);
             unset($data['style']);
         }
 
@@ -135,11 +142,7 @@ class ComponentBuilder
 
     public function getStyle(string $type, array $flags = []) : array
     {
-        $style = [];
-        // foreach ($this->factories as $factory) {
-        //     $style = ArrayHelper::merge($style, $factory->getStyle($type));
-        // }
-        $style = ArrayHelper::merge($style, $this->geThemeComponentStyle($type, $flags));
+        $style = $this->getComponentStyle($type, $flags);
         foreach ($flags as $flag) {
             if (isset($style['variants'][$flag])) {
                 $style = ArrayHelper::merge($style, $style['variants'][$flag]);
@@ -154,9 +157,6 @@ class ComponentBuilder
         $variants = explode(':', $layout);
         $layout   = array_shift($variants);
         $style    = [];
-        foreach ($this->factories as $factory) {
-            $style = ArrayHelper::merge($style, $factory->getLayout($layout));
-        }
         if (isset($this->theme['layouts'][$layout])) {
             $style = ArrayHelper::merge($style, $this->theme['layouts'][$layout]);
         }
@@ -178,7 +178,6 @@ class ComponentBuilder
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);
                 }
-
                 if (method_exists($component, 'addEnviroment')) {
                     $component->addEnviroment($this->enviroment);
                 }
@@ -214,7 +213,7 @@ class ComponentBuilder
         return false;
     }
 
-    private function geThemeComponentStyle(string $type, array $flags = []) : array
+    private function getComponentStyle(string $type, array $flags = []) : array
     {
         $style = $this->theme['components'][$type] ?? [];
         if (count($flags)) {
