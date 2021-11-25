@@ -27,10 +27,10 @@ class Grid extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (is_array($data) && isset($data['repeat'],$data['col'])) {
+        if (is_array($data) && isset($data['data'],$data['col'])) {
             // TODO maybe import file content here
-            $data['cols'] = $this->expandRepeat($data['repeat'], $data['col']);
-            unset($data['repeat'], $data['col']);
+            $data['cols'] = $this->expandRepeat($data['data'], $data['col']);
+            unset($data['data'], $data['col']);
         }
         if (!is_array($data)) {
             throw new \Exception('Invalid component data');

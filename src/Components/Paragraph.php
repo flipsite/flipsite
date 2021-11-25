@@ -10,7 +10,7 @@ final class Paragraph extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $markdown  = $this->getMarkdownLine($data['markdown'], $style['markdown']);
+        $markdown  = $this->getMarkdownLine($data['markdown'] ?? [], $style['markdown'] ?? []);
         $this->setContent($markdown);
         $this->addStyle($style);
     }

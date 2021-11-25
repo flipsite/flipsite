@@ -164,7 +164,7 @@ final class Reader
         $sections = [];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';
-            if ('default' !== $type || $this->hideSection($section, $page, $language)) {
+            if ($this->hideSection($section, $page, $language)) {
                 continue;
             }
             if (isset($section['repeat'])) {
@@ -280,6 +280,9 @@ final class Reader
         }
         if (isset($section['options']['hidden']['pages'])) {
             $pages = $section['options']['hidden']['pages'];
+            if (is_string($pages)) {
+                $pages = explode(',', $pages);
+            }
             foreach ($pages as $hidePage) {
                 if ($hidePage === $page) {
                     return true;
