@@ -69,7 +69,7 @@ final class Table extends AbstractComponent
             }
             $tr->addStyle($style['tr'][$i++] ?? []);
             foreach ($row as $j => $col) {
-                $td = new Element('td', true);
+                $td = new Element($j === 0 ? 'th' : 'td', true);
                 $td->addStyle($style['tdAll'] ?? []);
                 $td->addStyle($style['td'][$j++] ?? []);
                 $td->setContent($col);
