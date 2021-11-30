@@ -7,7 +7,13 @@ final class Input extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected bool $oneline = true;
+    protected bool $empty   = true;
     protected string $tag   = 'input';
+
+    // public function normalize(string|int|bool|array $data) : array
+    // {
+    //     return $data;
+    // }
 
     public function build(array $data, array $style, string $appearance) : void
     {

@@ -17,8 +17,12 @@ class Grid extends AbstractComponent
         $this->addStyle($style);
         $children = [];
         foreach ($data['cols'] as $i => $colData) {
-            $type = $colData['type'] ?? 'group';
-            unset($colData['type']);
+            if (is_array($colData)) {
+                $type = $colData['type'] ?? $style['colType'] ?? 'group';
+                unset($colData['type']);
+            } else {
+                $type = $style['colType'] ?? 'group';
+            }
             $colStyle   = $this->getColStyle($i, $style);
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }

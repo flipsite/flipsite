@@ -16,6 +16,10 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
+        if (isset($style['cols'])) {
+            $colStyle = $style['cols'];
+            unset($style['cols']);
+        }
         $wrapperStyle = $style['wrapper'] ?? false;
         if ($wrapperStyle) {
             $this->tag = $wrapperStyle['tag'] ?? 'div';
@@ -33,8 +37,14 @@ abstract class AbstractGroup extends AbstractComponent
             $this->addStyle($style);
         }
         $children = [];
+        $i        = 0;
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
+            if (isset($colStyle[$i])) {
+                unset($colStyle[$i]['type']);
+                $componentStyle = ArrayHelper::merge($componentStyle, $colStyle[$i]);
+            }
+
             if (strpos($type, ':')) {
                 $tmp      = explode(':', $type);
                 $baseType = array_shift($tmp);
@@ -43,6 +53,7 @@ abstract class AbstractGroup extends AbstractComponent
                 }
             }
             $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
+            $i++;
         }
         if ($wrapperStyle) {
             $content->addChildren($children);

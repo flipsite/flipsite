@@ -15,20 +15,22 @@ final class Highchart extends AbstractComponent
         <script src="https://code.highcharts.com/modules/accessibility.js"></script>';
         $test .= "<script>Highcharts.chart('aaa', {
             data: {
-              table: 'elpriser'
+              table: 'elpriser',
+            //   parsed: function (columns) {
+            //     for (var row in columns) {
+            //         for (var col in columns[row]) {
+            //             var val = columns[row][col];
+            //             if (null !== val && val.indexOf('€') !== -1) {
+            //                 columns[row][col] = parseFloat(val.replace(',','.'))
+            //             }
+            //         }
+            //     }
+            //     console.log(columns)
+
             },
             chart: {
               type: 'column'
-            },
-            title: {
-              text: 'Data extracted from a HTML table in the page'
-            },
-            yAxis: {
-              allowDecimals: false,
-              title: {
-                text: 'Units'
-              }
-            },
+            }
           });</script>";
         $this->setContent($test);
     }

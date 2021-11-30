@@ -14,6 +14,10 @@ final class Tag extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
+        if (!$data['value'] && !$this->empty) {
+            $this->render = false;
+            return;
+        }
         $this->tag = $data['tag'] ?? $this->tag;
         $this->setContent($data['value']);
         $this->addStyle($style);

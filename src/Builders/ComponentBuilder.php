@@ -118,8 +118,10 @@ class ComponentBuilder
                     }
                     unset($data['_attr']);
                 }
+                unset($data['_meta'],$data['_name']);
                 if (isset($data['background'])) {
                     $component->setBackground($data['background'], $style['background'] ?? []);
+                    unset($data['background']);
                 }
                 $component->build($data, $style ?? [], $appearance);
                 return $component;

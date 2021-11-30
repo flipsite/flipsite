@@ -59,8 +59,11 @@ final class Breadcrumb extends AbstractGroup
         $items = $data['items'] ?? [];
         unset($data['items']);
 
-        $separatorType = $data['separator']['type'] ?? 'span';
-        $separatorData = $data['separator'] ?? ['value' => '/'];
+        $separator = ['text' => '/'];
+        if (isset($data['separator'])) {
+            $separator = $data['separator'];
+            unset($data['separator']);
+        }
 
         foreach ($items as $i => $item) {
             $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
@@ -73,10 +76,10 @@ final class Breadcrumb extends AbstractGroup
             }
             $data['a:'.$i] = $item;
             if ($i !== count($items) - 1) {
-                $data[$separatorType.':'.$i] = $separatorData;
+                $data['separator:'.$i] = $separator;
             }
         }
-        unset($style['items'], $style['active'], $data['separator']);
+        unset($style['items'], $style['active']);
 
         parent::build($data, $style, $appearance);
     }

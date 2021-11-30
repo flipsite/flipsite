@@ -82,8 +82,14 @@ class Nav extends AbstractGroup
     {
         $items = $data['items'] ?? [];
         unset($data['items']);
+        $last = count($items) - 1;
         foreach ($items as $i => $item) {
             $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
+            if ($i === 0 && isset($style['first'])) {
+                $item['style'] = ArrayHelper::merge($item['style'], $style['first']);
+            } elseif ($i === $last && isset($style['last'])) {
+                $item['style'] = ArrayHelper::merge($item['style'], $style['last']);
+            }
             if ($item['active'] && isset($style['active'])) {
                 unset($item['active']);
                 if (!isset($item['style'])) {
@@ -93,7 +99,7 @@ class Nav extends AbstractGroup
             }
             $data['a:'.$i] = $item;
         }
-        unset($style['items'], $style['active']);
+        unset($style['items'], $style['active'], $style['first'], $style['last']);
 
         parent::build($data, $style, $appearance);
     }

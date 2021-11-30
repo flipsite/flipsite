@@ -53,7 +53,6 @@ final class Table extends AbstractComponent
                 $th = new Element('th', true);
                 $th->addStyle($style['thAll'] ?? null);
                 $th->addStyle($style['th'][$i] ?? null);
-                $th->setContent($col);
                 $tr->addChild($th);
             }
             $this->addChild($tr);
@@ -69,13 +68,41 @@ final class Table extends AbstractComponent
             }
             $tr->addStyle($style['tr'][$i++] ?? []);
             foreach ($row as $j => $col) {
-                $td = new Element($j === 0 ? 'th' : 'td', true);
+                $tag = $style['td'][$j]['tag'] ?? 'td';
+                $td  = new Element($tag, true);
                 $td->addStyle($style['tdAll'] ?? []);
-                $td->addStyle($style['td'][$j++] ?? []);
-                $td->setContent($col);
+                $td->addStyle($style['td'][$j] ?? []);
+                if (isset($data['format'])) {
+                    $td->setContent($this->format($data['format'], $col, $j));
+                } else {
+                    $td->setContent($col);
+                }
                 $tr->addChild($td);
             }
             $this->addChild($tr);
+        }
+    }
+
+    private function format(array $format, string $content, int $index) : string
+    {
+        if (!$content) {
+            return $content;
+        }
+        $f = $format['tdAll'] ?? 'none';
+        if (isset($format['td'][$index])) {
+            $f = $format['td'][$index];
+        }
+        $parts = explode('|', $f);
+        switch ($parts[0]) {
+            case 'currency':
+                $value  = number_format(floatVal($content), 2, ',', '');
+                $format = $parts[1] ?? false;
+                if (isset($parts[1])) {
+                    return  sprintf($parts[1], $value);
+                }
+                // no break
+            case 'none':
+            default: return $content;
         }
     }
 }

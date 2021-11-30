@@ -7,9 +7,14 @@ final class PlainText extends AbstractComponent
 {
     protected string $plainText;
 
+    public function normalize(string|int|bool|array $data) : array
+    {
+        return ['value' => (string)$data];
+    }
+
     public function build(array $data, array $style, string $appearance) : void
     {
-        $this->plainText = $data['value'] ?? '';
+        $this->plainText = $data['value'];
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
