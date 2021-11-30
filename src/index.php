@@ -169,16 +169,20 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $args['path'] ?? '',
         $reader->getDefaultLanguage(),
         $reader->getLanguages(),
-        $reader->getSlugs()
+        $reader->getSlugs(),
+        $reader->getRedirects()
     );
 
     // Check if the requested path needs to redirect
     $redirect = $path->getRedirect();
     $enviroment = $this->get('enviroment');
     if (null !== $redirect) {
-        $response = $response->withStatus(302);
-        $redirect = trim($enviroment->getServer() . '/' . $redirect, '/');
-        return $response->withHeader('Location', $redirect);
+        // Check if internal url
+        $parsedUrl = parse_url($redirect);
+        if (!isset($parsedUrl['scheme'])) {
+            $redirect = trim($enviroment->getServer() . '/' . $redirect, '/');
+        }
+        return $response->withStatus(302)->withHeader('Location', $redirect);
     }
 
     $documentBuilder = new DocumentBuilder($enviroment, $reader, $path);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Flipsite\Data\Slugs;
@@ -19,7 +18,7 @@ final class Path
     /**
      * @param array<Language> $languages
      * */
-    public function __construct(string $path, Language $default, array $languages, Slugs $slugs)
+    public function __construct(string $path, Language $default, array $languages, Slugs $slugs, array $redirects = null)
     {
         $this->languages = $languages;
         $parts           = explode('/', $path);
@@ -39,7 +38,11 @@ final class Path
         }
         $this->language = $pathLanguage ?? $slugs->getLanguage($pathWithoutLanguage) ?? $default;
         if (!$this->page) {
-            $this->page = '404';
+            if (is_array($redirects) && isset($redirects[$pathWithoutLanguage])) {
+                $this->redirect = $redirects[$pathWithoutLanguage];
+            } else {
+                $this->page = '404';
+            }
             return;
         }
         $slug = $slugs->getSlug($this->page, $this->language);
