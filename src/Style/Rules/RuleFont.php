@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 final class RuleFont extends AbstractRule
@@ -24,12 +23,8 @@ final class RuleFont extends AbstractRule
             return;
         }
 
-        $arg0   = $args[0];
-        $config = $this->getConfig('fontWeight');
-
-        if (1 === count($args) && isset($config[$arg0])) {
-            $this->setDeclaration('font-weight', $config[$arg0]);
-            return;
+        if (is_numeric($args[0])) {
+            $this->setDeclaration('font-weight', intval($args[0]));
         }
     }
 }
