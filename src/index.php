@@ -211,7 +211,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     $page = $path->getPage();
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
-        $section = $componentBuilder->build('section', $sectionData, [], $reader->get('theme.appearance') ?? 'light');
+        $section = $componentBuilder->build('section', $sectionData, ['type'=>'group'], $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
     }
     $document = $documentBuilder->getDocument();
