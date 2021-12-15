@@ -27,8 +27,7 @@ final class A extends AbstractGroup
             $this->setAttribute('target', '_blank');
             $this->setAttribute('rel', 'noopener noreferrer');
         }
-        unset($data['url'],$data['tel'],$data['mailto']);
-        parent::build($data, $style, $appearance);
+        parent::build($urlData, $style, $appearance);
     }
 
     public function normalize(string|int|bool|array $data) : array
@@ -51,11 +50,26 @@ final class A extends AbstractGroup
                         $numberProto = $phoneUtil->parse($val, '');
                     } catch (\libphonenumber\NumberParseException $e) {
                     }
-                    $expanded['text'] = $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL);
+                    $format = \libphonenumber\PhoneNumberFormat::NATIONAL;
+                    if (in_array('international', $data['flags'])) {
+                        $format = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
+                    } elseif (in_array('e164', $data['flags'])) {
+                        $format = \libphonenumber\PhoneNumberFormat::E164;
+                    }
+                    $number = $phoneUtil->format($numberProto, $format);
+                    if (isset($data['text'])) {
+                        $expanded['text'] = sprintf($data['text'], $number);
+                    } else {
+                        $expanded['text'] = $number;
+                    }
                     break;
                 case 'mailto':
                     $expanded['url']  = 'mailto:'.$val;
-                    $expanded['text'] = $val;
+                    if (isset($data['text'])) {
+                        $expanded['text'] = sprintf($data['text'], $val);
+                    } else {
+                        $expanded['text'] = $val;
+                    }
                     break;
                 default:
                     $expanded[$key] = $val;

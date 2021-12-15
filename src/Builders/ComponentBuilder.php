@@ -45,6 +45,12 @@ class ComponentBuilder
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
 
+        if (isset($data['options'],$data['options']['isset'])) {
+            if (!$data['options']['isset']) {
+                return null;
+            }
+        };
+
         if (is_array($data) && isset($data['style'])) {
             // If string, => inherit
             if (is_string($data['style'])) {
@@ -118,6 +124,7 @@ class ComponentBuilder
                     }
                     unset($data['_attr']);
                 }
+
                 unset($data['_meta'],$data['_name']);
                 if (isset($data['background'])) {
                     $component->setBackground($data['background'], $style['background'] ?? []);
