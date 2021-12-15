@@ -1,13 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\SocialHelper;
 
-final class Social extends AbstractComponent
+final class Social extends AbstractGroup
 {
     use Traits\BuilderTrait;
     use Traits\ReaderTrait;
@@ -15,31 +14,21 @@ final class Social extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function with(ComponentData $data) : void
+    public function normalize(string|int|bool|array $data) : array
     {
-        $items = $this->normalize($data->get());
-        $this->addStyle($data->getStyle('container'));
-        foreach ($items as $item) {
-            $style      = ArrayHelper::merge($data->getStyle(), $data->getStyle($item['type']));
-            $components = $this->builder->build(['a' => $item['data']], ['a' => $style], $data->getAppearance());
-            $this->addChildren($components);
-        }
-    }
-
-    protected function normalize($items) : array
-    {
-        if (ArrayHelper::isAssociative($items)) {
+        if (ArrayHelper::isAssociative($data)) {
             $name     = $this->reader->get('name');
             $language = $this->path->getLanguage();
-            $obj      = $items;
             $items    = [];
-            foreach ($obj as $type => $handle) {
-                $items[] = [
-                    'type' => $type,
-                    'data' => SocialHelper::getData($type, (string)$handle, $name, $language),
-                ];
+            $i        = 0;
+            foreach ($data as $type => $handle) {
+                $item = SocialHelper::getData($type, (string)$handle, $name, $language);
+                unset($item['color'], $item['name']);
+
+                $items['a:'.$i++] = $item;
             }
+            $data = $items;
         }
-        return $items;
+        return $data;
     }
 }
