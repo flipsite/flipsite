@@ -53,6 +53,7 @@ final class Table extends AbstractComponent
                 $th = new Element('th', true);
                 $th->addStyle($style['thAll'] ?? null);
                 $th->addStyle($style['th'][$i] ?? null);
+                $th->setContent($col);
                 $tr->addChild($th);
             }
             $this->addChild($tr);
