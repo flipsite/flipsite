@@ -53,7 +53,13 @@ trait ColorTrait
         }
 
         if (isset($colors[$shade])) {
-            $color = ColorFactory::fromString($colors[$shade]);
+            try {
+                $color = ColorFactory::fromString($colors[$shade]);
+            } catch (\Exception $e) {
+                // Check if reference to other color
+                $args = explode('-', $colors[$shade]);
+                return $this->getColor($args);
+            }
         } else {
             $color = ColorFactory::fromString($colors[500]);
             $color = $this->getShade($color, intval($shade));

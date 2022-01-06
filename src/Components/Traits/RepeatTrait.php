@@ -9,6 +9,9 @@ trait RepeatTrait
     {
         $expanded = [];
         foreach ($data as $key => $item) {
+            if (is_string($item)) {
+                $item = ['self' => $item];
+            }
             $item['key'] = $key;
             $expanded[]  = $this->attachDataToTpl($tpl, new \Adbar\Dot($item));
         }
@@ -25,9 +28,10 @@ trait RepeatTrait
                 preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
                 foreach ($matches[1] as $match) {
                     $replaceWith = $data->get($match);
+
                     if (is_array($replaceWith)) {
                         $value = $replaceWith;
-                    } else {
+                    } elseif ($replaceWith) {
                         $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
                     }
                 }

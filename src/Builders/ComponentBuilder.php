@@ -8,6 +8,7 @@ use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
+use Flipsite\Components\Traits\RepeatTrait;
 use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
@@ -17,6 +18,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ComponentBuilder
 {
+    use RepeatTrait;
+
     private ImageHandler $imageHandler;
     private ?SectionBuilder $sectionBuilder = null;
     private array $listeners                = [];
@@ -86,6 +89,14 @@ class ComponentBuilder
         if (is_array($style)) {
             $type = $style['type'] ?? $type;
             unset($style['type']);
+        }
+
+        if (isset($style['tpl'])) {
+            if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
+                $data = ['value' => $data];
+            }
+            $data = $this->attachDataToTpl($style['tpl'], new \Adbar\Dot($data));
+            unset($style['tpl']);
         }
 
         // Check external factories
