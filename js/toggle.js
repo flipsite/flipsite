@@ -25,3 +25,6 @@ function toggle(id,prefix) {
       });
     });
 }
+document.body.addEventListener("dummy", function(e) {
+  // something that does nothing
+});
