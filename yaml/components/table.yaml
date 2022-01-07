@@ -1,22 +1,22 @@
-container:
-  width: w-full
-  marginY: mt-5
-thAll:
-  textColor: text-primary
-  textAlign: text-left
-  width: w-1/4
-  textSize: text-3
-tdAll:
-  textColor: text-black-o70
-  textSize: text-2.6|3.5
-  padding: p-1
-  textOverflow: truncate
-trEven:
-  bgColor: bg-black-o5
-dark:
-  thAll:
-    textColor: text-primary2
-  tdAll:
-    textColor: text-white-o70
-  trEven:
-    bgColor: bg-white-o5
+# container:
+#   width: w-full
+#   marginY: mt-5
+# thAll:
+#   textColor: text-primary
+#   textAlign: text-left
+#   width: w-1/4
+#   textSize: text-3
+# tdAll:
+#   textColor: text-black-o70
+#   textSize: text-2.6|3.5
+#   padding: p-1
+#   textOverflow: truncate
+# trEven:
+#   bgColor: bg-black-o5
+# dark:
+#   thAll:
+#     textColor: text-primary2
+#   tdAll:
+#     textColor: text-white-o70
+#   trEven:
+#     bgColor: bg-white-o5

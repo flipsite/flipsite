@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Symfony\Component\Yaml\Yaml;
@@ -38,7 +37,7 @@ class ComponentFactory extends AbstractComponentFactory
     private function isTag(string $tag) : bool
     {
         return in_array($tag, [
-            'p',
+            'label',
             'span',
             'div',
             'small',
@@ -47,12 +46,21 @@ class ComponentFactory extends AbstractComponentFactory
         ]);
     }
 
-    public function getStyle(string $type) : array
-    {
-        $filePath = __DIR__.'/../../yaml/components/'.$type.'.yaml';
-        if (file_exists($filePath)) {
-            return Yaml::parseFile($filePath);
-        }
-        return [];
-    }
+    // public function getStyle(string $component) : array
+    // {
+    //     $filePath = __DIR__.'/../../yaml/components/'.$component.'.yaml';
+    //     if (file_exists($filePath)) {
+    //         return Yaml::parseFile($filePath) ?? [];
+    //     }
+    //     return [];
+    // }
+
+    // public function getLayout(string $layout) : array
+    // {
+    //     $filePath = __DIR__.'/../../yaml/layouts/'.$layout.'.yaml';
+    //     if (file_exists($filePath)) {
+    //         return Yaml::parseFile($filePath) ?? [];
+    //     }
+    //     return [];
+    // }
 }

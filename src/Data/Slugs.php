@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -43,6 +42,11 @@ final class Slugs
                 }
             }
         }
+    }
+
+    public function getPages() : array
+    {
+        return $this->pages;
     }
 
     public function getAll() : array

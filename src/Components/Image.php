@@ -13,10 +13,18 @@ final class Image extends AbstractComponent
     protected bool $empty  = true;
     protected bool $online = true;
 
-    public function with(ComponentData $data) : void
+    public function normalize(string|int|bool|array $data) : array
     {
-        $src               = $data->get('value');
-        $options           = $this->normalizeOptions($data->getStyle('options'));
+        if (!is_array($data)) {
+            return ['src' => $data];
+        }
+        return $data;
+    }
+
+    public function build(array $data, array $style, string $appearance) : void
+    {
+        $src               = $data['src'];
+        $options           = $this->normalizeOptions($style['options'] ?? []);
         $sizes             = $options['sizes'] ?? null;
         unset($options['sizes']);
         $isEager           = false; // To later preload all eager loading images
@@ -25,8 +33,8 @@ final class Image extends AbstractComponent
             $isEager = ($options['loading'] ?? '') === 'eager';
             unset($options['loading']);
         }
-        $this->setAttribute('alt', (string)$data->get('alt'));
-        $this->addStyle($data->getStyle());
+        $this->setAttribute('alt', (string)($data['alt'] ?? ''));
+        $this->addStyle($style);
         if ($this->isSvg($src)) {
             $imageContext = $this->imageHandler->getContext($src, []);
             $this->setAttribute('src', $imageContext->getSrc());
@@ -92,22 +100,6 @@ final class Image extends AbstractComponent
             }
             $options['sizes'] = implode(', ', $options['sizes']);
         }
-        // if (isset($options['srcset'][0]) && strpos($options['srcset'][0], 'w')) {
-        //     $srcset = [];
-        //     foreach ($options['srcset'] as $ss) {
-        //         $ss       = intval($ss);
-        //         $srcset[] = $ss;
-        //         $srcset[] = $ss * 2;
-        //         if ($ss <= 480) {
-        //             $srcset[] = $ss * 3;
-        //         }
-        //     }
-        //     $srcset = array_unique($srcset);
-        //     foreach ($srcset as &$ss) {
-        //         $ss .= 'w';
-        //     }
-        //     $options['srcset'] = $srcset;
-        // }
         return $options;
     }
 }

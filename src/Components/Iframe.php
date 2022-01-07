@@ -1,22 +1,25 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Iframe extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected bool $oneline = true;
-    protected string $tag  = 'iframe';
+    protected string $tag   = 'iframe';
 
-    public function with(ComponentData $data) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $this->addStyle($data->getStyle());
-        $this->setAttributes($data->get());
+        $this->addStyle($style);
+
+        unset($data['flags']);
+        foreach ($data as $key => $val) {
+            $this->setAttribute($key, $val);
+        }
     }
 
-    public function normalize($data) : array
+    public function normalize(string|int|bool|array $data) : array
     {
         if (!isset($data['title'])) {
             throw new \Exception('iframe title missing');

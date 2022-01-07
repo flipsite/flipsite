@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait UrlTrait
@@ -9,6 +8,7 @@ trait UrlTrait
     use SlugsTrait;
     use PathTrait;
     use EnviromentTrait;
+    use ReaderTrait;
 
     private function url(string $url, bool &$external) : string
     {
@@ -16,6 +16,11 @@ trait UrlTrait
         // Just return if empty
         if ('#' === $url) {
             return '#';
+        }
+
+        $redirects = $this->reader->getRedirects();
+        if (isset($redirects[$url])) {
+            $url = $redirects[$url];
         }
 
         $parsed = parse_url($url);

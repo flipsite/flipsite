@@ -7,23 +7,28 @@ final class Input extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected bool $oneline = true;
+    protected bool $empty   = true;
     protected string $tag   = 'input';
 
-    public function with(ComponentData $data) : void
+    // public function normalize(string|int|bool|array $data) : array
+    // {
+    //     return $data;
+    // }
+
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $flags = $data->getFlags();
-        $type  = array_shift($flags);
+        $this->addStyle($style);
+        $type = array_shift($data['flags']);
         if ($this->isType($type)) {
             $this->setAttribute('type', $type);
-            $name = $data->get('name', true) ?? $flags[0];
+            $name = $data['name'] ?? $data['flags'][0];
         } else {
             $this->setAttribute('type', 'text');
-            $name = $data->get('name', true) ?? $type;
+            $name = $data['name'] ?? $type;
         }
         $this->setAttribute('name', $name);
         $this->setAttribute('id', $name);
-        $this->addStyle($data->getStyle());
-        $this->setAttributes($data->get());
+        $this->addStyle($style);
     }
 
     private function isType(string $type) : bool

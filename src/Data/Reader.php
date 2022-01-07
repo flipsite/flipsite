@@ -29,6 +29,8 @@ final class Reader
 
     private Slugs $slugs;
 
+    private ?array $pageNames = null;
+
     public function __construct(Enviroment $enviroment)
     {
         $this->enviroment = $enviroment;
@@ -100,17 +102,74 @@ final class Reader
         return $this->slugs;
     }
 
+    public function getRedirects() : ?array
+    {
+        return $this->data['redirects'] ?? [];
+    }
+
+    public function getPageName(string $page, Language $language) : string
+    {
+        if ('home' === $page) {
+            switch ((string)$language) {
+                case 'sv': return 'Hem';
+                case 'fi': return 'Koti';
+                default: return 'Home';
+            }
+        }
+
+        $slug = $this->slugs->getSlug($page, $language);
+        if (null === $slug) {
+            echo $page;
+            die();
+        }
+
+        if ($slug === '') {
+            $slug = 'home';
+        }
+
+        if (is_null($this->pageNames)) {
+            $this->pageNames = [];
+            foreach ($this->data['pages'] as $p => $data) {
+                if (ArrayHelper::isAssociative($data)) {
+                    $data = [$data];
+                }
+                foreach ($data as $section) {
+                    if (isset($section['_name'])) {
+                        $this->pageNames[$p] = $section['_name'];
+                    }
+                }
+            }
+        }
+
+        if (isset($this->pageNames[$slug])) {
+            return $this->pageNames[$slug];
+        }
+
+        $slug = explode('/', $slug);
+        $last = array_pop($slug);
+
+        return ucfirst(str_replace('-', ' ', $last));
+    }
+
     public function getSections(string $page, Language $language) : array
     {
-        $all = array_merge(
-            $this->data['before'] ?? [],
-            $this->data['pages'][$page] ?? [],
-            $this->data['after'] ?? []
-        );
+        $before = $this->data['before'] ?? [];
+        if (ArrayHelper::isAssociative($before)) {
+            $before = [$before];
+        }
+        $after = $this->data['after'] ?? [];
+        if (ArrayHelper::isAssociative($after)) {
+            $after = [$after];
+        }
+        $all = $this->data['pages'][$page] ?? [];
+        if (ArrayHelper::isAssociative($all)) {
+            $all = [$all];
+        }
+        $all      = array_merge($before, $all, $after);
         $sections = [];
         foreach ($all as $section) {
             $type = $section['type'] ?? 'default';
-            if ('default' !== $type || $this->hideSection($section, $page, $language)) {
+            if ($this->hideSection($section, $page, $language)) {
                 continue;
             }
             if (isset($section['repeat'])) {
@@ -125,18 +184,55 @@ final class Reader
     public function getMeta(string $page, Language $language) : ?array
     {
         $meta = [
+            'title'       => [$this->get('name')],
             'description' => $this->get('description', $language),
             'keywords'    => $this->get('keywords', $language),
             'author'      => $this->get('author', $language),
         ];
-        $all = $this->data['pages'][$page] ?? [];
-        foreach ($all as $section) {
-            $type = $section['type'] ?? 'default';
-            if ('meta' === $type) {
-                $pageMeta = $this->localize($section, $language);
-                $meta     = ArrayHelper::merge($meta, $pageMeta);
+
+        if ($language != $this->languages[0]) {
+            $meta['title'][0] .= ' ('.strtoupper((string)$language).')';
+        }
+
+        $data = $this->data['pages'][$page];
+        if (ArrayHelper::isAssociative($data)) {
+            $data = [$data];
+        }
+
+        $p     = explode('/', $page);
+        $title = [];
+        while (count($p) > 0) {
+            $title[]  = $this->getPageName(implode('/', $p), $language);
+            array_pop($p);
+        }
+        $meta['title'] =array_merge($title, $meta['title']);
+
+        foreach ($data as $section) {
+            if (isset($section['_meta'])) {
+                $pageMeta = $this->localize($section['_meta'], $language);
+                if (isset($pageMeta['title'])) {
+                    array_pop($meta['title']);
+                    $meta['title'][] = $pageMeta['title'];
+                    unset($pageMeta['title']);
+                }
+                $meta = ArrayHelper::merge($meta, $pageMeta);
             }
         }
+
+        $meta['title'] = implode(' - ', $meta['title']);
+
+        // $all = $this->data['pages'][$page] ?? [];
+        // foreach ($all as $section) {
+        //     if (isset($section['_meta'])) {
+        //         if ('meta' === $type) {
+        //             $pageMeta = $this->localize($section, $language);
+        //             $meta     = ArrayHelper::merge($meta, $pageMeta);
+        //         }
+        //     }
+        // }
+        // if (!isset($meta['title'])) {
+        //     echo 'Hej';
+        // }
         return $meta;
     }
 
@@ -189,6 +285,9 @@ final class Reader
         }
         if (isset($section['options']['hidden']['pages'])) {
             $pages = $section['options']['hidden']['pages'];
+            if (is_string($pages)) {
+                $pages = explode(',', $pages);
+            }
             foreach ($pages as $hidePage) {
                 if ($hidePage === $page) {
                     return true;
@@ -247,7 +346,7 @@ final class Reader
                 // TODO add support for localized slugs
                 foreach ($permutations as $permutation) {
                     $expandedPage = $page;
-                    $sections     = $pageData['sections'];
+                    $sections     = $pageData['content'];
                     foreach ($params as $i => $param) {
                         $expandedPage = str_replace($param, (string)$permutation[$i], $expandedPage);
                         $sections     = ArrayHelper::strReplace($param, (string)$permutation[$i], $sections);
@@ -313,12 +412,14 @@ class DataMapper
                 $value = $this->search($value, $dot);
             } elseif (is_string($value) && false !== mb_strpos($value, '{data.')) {
                 $matches = [];
-                preg_match('/\{data\.(.*?)\}/', $value, $matches);
-                $replace = $dot->get($matches[1]);
-                if (is_array($replace)) {
-                    $value = $replace;
-                } else {
-                    $value = str_replace($matches[0], $dot->get($matches[1]) ?? '', $value);
+                preg_match_all('/\{data\.(.*?)\}/', $value, $matches);
+                foreach ($matches[1] as $i => $replace) {
+                    $replace = $dot->get($replace);
+                    if (is_array($replace)) {
+                        $value = $replace;
+                    } else {
+                        $value = str_replace($matches[0][$i], $replace ?? '', $value);
+                    }
                 }
             }
         }

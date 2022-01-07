@@ -1,10 +1,23 @@
+type: group
+# marginX: mx-auto
+# maxWidth: max-w-screen-xl
 paddingX: px-5|15
 paddingY: py-5|15
-container:
-  marginX: mx-auto
-  maxWidth: max-w-screen-xl
-variants:
-  wide:
-    paddingX: px-5
-    container:
-      maxWidth: null
+# # border: border
+# # wrapper:
+# #   paddingX: px-5|15
+# #   paddingY: py-5|15
+# bgColor: bg-light
+# dark:
+#   bgColor: bg-dark
+background:
+  bgPosition: bg-center
+  bgSize: bg-cover
+  bgRepeat: bg-no-repeat
+  options:
+    aspectRatio: 3by1
+    width: 480
+    srcset:
+      - 1x
+      - 1.5x
+      - 2x

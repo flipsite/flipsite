@@ -7,33 +7,63 @@ minHeight: min-h-0vh
 text:
   type: span
 spaceX: space-x-2.5
+borderRadius: rounded-full
+paddingX: px-10|15
+height: h-14
+whitespace: whitespace-nowrap
 variants:
   primary:
     bgColor: bg-primary hover:bg-primary-550
     textColor: text-white-o95
-    borderRadius: rounded
-    paddingX: px-10|15
-    paddingY: py-3.5|5
     dark:
       bgColor: bg-primary2 hover:bg-primary2-550
   secondary:
     bgColor: bg-secondary hover:bg-secondary-550
     textColor: text-white-o95
-    borderRadius: rounded
-    paddingX: px-10|15
-    paddingY: py-3.5|5
     dark:
-      bgColor: bg-primary2 hover:bg-primary2-550
-  link:
-    textColor: text-primary hover:text-primary-550
-    textDecoration: hover:underline
-    dark:
-      textColor: text-primary2 hover:text-primary2-550
+      bgColor: bg-secondary2 hover:bg-secondary2-550
+  outline:
+    bgColor: hover:bg-primary-o10
+    textColor: text-primary
+    border: border-2px border-primary
+    boxModel: box-border
+  darkest:
+    bgColor: bg-darkest
+    textColor: text-lightest
+  lightest:
+    bgColor: bg-lightest
+    textColor: text-darkest
+  lg:
+    paddingX: px-15|25
+    height: h-16
+    textSize: text-4.5|5.5
   sm:
-    textSize: text-3
-    spaceX: space-x-1.5
-    icon:
-      width: w-3
+    paddingX: px-7.5|10
+    height: h-10
+    textSize: text-3.5
+  link:
+    paddingX: null
+    height: null
+    borderRadius: null
+    textColor: text-primary
+    textDecoration: hover:underline
+#   secondary:
+#     bgColor: bg-secondary hover:bg-secondary-550
+#     textColor: text-white-o95
+#     borderRadius: rounded
+#     paddingX: px-10|15
+#     paddingY: py-3.5|5
+#     dark:
+#       bgColor: bg-primary2 hover:bg-primary2-550
+#   link:
+#     textColor: text-primary hover:text-primary-550
+#     textDecoration: hover:underline
+#     dark:
+#       textColor: text-primary2 hover:text-primary2-550
+#   sm:
+#     textSize: text-3
+#     spaceX: space-x-1.5
+#     icon:
+#       width: w-3
 icon:
-  inherit: false
-  fill: fill-current
+  textColor: null

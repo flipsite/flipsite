@@ -3,7 +3,7 @@ textColor: text-black-o95 hover:text-primary
 dark:
   textColor: text-white-o95 hover:text-primary2
 height: h-14
-width: w-14
+width: w-6
 position: relative
 display: block
 menu:

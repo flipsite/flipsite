@@ -8,13 +8,11 @@ final class Textarea extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'textarea';
 
-    public function with(ComponentData $data) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $flags = $data->getFlags();
-        $name  = $data->get('name', true) ?? array_shift($flags);
+        $name  = $data['name'] ?? array_shift($data['flags']);
         $this->setAttribute('name', $name);
         $this->setAttribute('id', $name);
-        $this->addStyle($data->getStyle());
-        $this->setAttributes($data->get());
+        $this->addStyle($style);
     }
 }

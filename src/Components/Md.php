@@ -15,24 +15,23 @@ final class Md extends AbstractComponent
 
     private ?Element $container = null;
 
-    public function with(ComponentData $data) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $value = $data->get('value');
-        if (mb_strpos($value, '.md')) {
-            $filename = $this->enviroment->getSiteDir().'/'.$value;
+        if (mb_strpos($data['value'], '.md')) {
+            $filename = $this->enviroment->getSiteDir().'/'.$data['value'];
             if (file_exists($filename)) {
                 $markdown = file_get_contents($filename);
             }
         } else {
-            $markdown = $value;
+            $markdown = $data['value'];
         }
-        $containerStyle = $data->getStyle('container');
-        $style          = $data->getStyle();
+
+        $containerStyle = $style['container'] ?? null;
         unset($style['container']);
-        $style          = $this->extendStyle($style, $data->getAppearance());
+        $style          = $this->extendStyle($style, $appearance);
 
         $this->content  = $this->getMarkdown($markdown ?? '', $style ?? null);
-        $containerStyle = $data->getStyle('container');
+
         if ($containerStyle) {
             $this->container = new Element($containerStyle['type'] ?? 'div');
             unset($containerStyle['type']);
@@ -64,19 +63,19 @@ final class Md extends AbstractComponent
     private function extendStyle(array $style, string $appearance) : array
     {
         foreach ($style as $tag => &$def) {
-            if (isset($def['inherit'])) {
-                $tmp                         = explode(':', $def['inherit']);
-                $inheritedComponentStyle     = $this->builder->getComponentStyle($tmp[0]);
-                $variant                     = $tmp[1] ?? null;
-                if ($variant) {
-                    $variant = $inheritedComponentStyle['variants'][$variant];
-                    unset($style['variants']);
-                    $inheritedComponentStyle = ArrayHelper::merge($inheritedComponentStyle, $variant);
-                }
-                $inheritedComponentStyle = StyleAppearanceHelper::apply($inheritedComponentStyle, $appearance);
-                unset($inheritedComponentStyle['dark'], $inheritedComponentStyle['markdown'], $inheritedComponentStyle['variants'], $inheritedComponentStyle['inherit']);
-                $def = ArrayHelper::merge($inheritedComponentStyle, $def);
-            }
+            // if (isset($def['inherit'])) {
+            //     $tmp                         = explode(':', $def['inherit']);
+            //     $inheritedComponentStyle     = $this->builder->getComponentStyle($tmp[0]);
+            //     $variant                     = $tmp[1] ?? null;
+            //     if ($variant) {
+            //         $variant = $inheritedComponentStyle['variants'][$variant];
+            //         unset($style['variants']);
+            //         $inheritedComponentStyle = ArrayHelper::merge($inheritedComponentStyle, $variant);
+            //     }
+            //     $inheritedComponentStyle = StyleAppearanceHelper::apply($inheritedComponentStyle, $appearance);
+            //     unset($inheritedComponentStyle['dark'], $inheritedComponentStyle['markdown'], $inheritedComponentStyle['variants'], $inheritedComponentStyle['inherit']);
+            //     $def = ArrayHelper::merge($inheritedComponentStyle, $def);
+            // }
         }
         return $style;
     }

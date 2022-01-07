@@ -1,0 +1,44 @@
+display: grid md:grid-cols-2 gap-5|15 items-center
+
+# section:
+#   bgColor: bg-white-o85
+#   paddingY: py-25|50
+#   position: relative
+#   container:
+#     display: flex
+#     alignItems: items-center justify-center
+#     maxWidth: max-w-screen-sm
+#   dark:
+#     bgColor: bg-black-o85
+# content:
+#   type: group
+#   container:
+#     spaceY: space-y-5
+#     textAlign: text-center
+#     zIndex: z-10
+#     width: w-full
+#   svg:
+#     display: inline-block
+#     width: w-full
+#     fill: fill-current
+#     textColor: text-black-o95
+#     dark:
+#       textColor: text-white-o95
+# background:
+#   type: image
+#   position: absolute
+#   inset: inset-0
+#   zIndex: z-0
+#   opacity: opacity-25
+#   width: w-full
+#   height: h-full
+#   objectFit: object-cover
+#   options:
+#     loading: eager
+#     aspectRatio: 1by1
+#     srcset:
+#       - 320w
+#       - 480w
+#       - 640w
+#     sizes:
+#       - 100vw

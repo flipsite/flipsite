@@ -6,9 +6,9 @@ namespace Flipsite\Builders;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
-use Flipsite\Components\ComponentData;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
+use Flipsite\Components\Traits\RepeatTrait;
 use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
@@ -18,11 +18,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ComponentBuilder
 {
+    use RepeatTrait;
+
     private ImageHandler $imageHandler;
     private ?SectionBuilder $sectionBuilder = null;
     private array $listeners                = [];
     private array $factories                = [];
-    private array $componentStyle           = [];
+    private array $theme                    = [];
 
     public function __construct(private Request $request, private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
@@ -31,7 +33,7 @@ class ComponentBuilder
             $enviroment->getImgDir(),
             $enviroment->getImgBasePath(),
         );
-        $this->componentStyle = $reader->get('theme.components') ?? [];
+        $this->theme = $reader->get('theme') ?? [];
     }
 
     public function addFactory(AbstractComponentFactory $factory) : void
@@ -39,25 +41,111 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(array $data, array $style, string $appearance) : array
+    public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance) : ?AbstractComponent
     {
-        $components = [];
-        foreach ($data as $type => $componentData) {
-            if (null === $componentData) {
-                continue;
+        $flags = explode(':', $type);
+        $type  = array_shift($flags);
+        $style = $this->getStyle($type, $flags);
+        $style = ArrayHelper::merge($style, $parentStyle);
+
+        if (isset($data['options'],$data['options']['isset'])) {
+            if (!$data['options']['isset']) {
+                return null;
             }
-            if (isset($componentData['if'])) {
-                if ($this->handleIf(is_array($componentData['if']) ? $componentData['if'] : ['isset' => $componentData['if']])) {
-                    return null;
+        };
+
+        if (is_array($data) && isset($data['style'])) {
+            // If string, => inherit
+            if (is_string($data['style'])) {
+                $data['style'] = ['inherit' => $data['style']];
+            }
+            // Resolve inheritance
+            if (isset($data['style']['inherit'])) {
+                $inheritFlags = explode(':', $data['style']['inherit']);
+                unset($data['style']['inherit']);
+                $inheritType   = array_shift($inheritFlags);
+                $data['style'] = ArrayHelper::merge($this->getStyle($inheritType, $inheritFlags), $data['style']);
+            }
+            $style = ArrayHelper::merge($style, $data['style']);
+            unset($data['style']);
+        }
+
+        // If still has variants
+        if (isset($style['variants'])) {
+            foreach ($flags as $flag) {
+                if (isset($style['variants'][$flag])) {
+                    $style = ArrayHelper::merge($style, $style['variants'][$flag]);
                 }
-                unset($componentData['if']);
             }
-            $component = $this->getComponent($type, $componentData, $style, $appearance);
+            unset($style['variants']);
+        }
+
+        $appearance = $style['appearance'] ?? $appearance;
+        unset($style['appearance']);
+        if (isset($style['dark'])) {
+            $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $appearance);
+        }
+
+        if (is_array($style)) {
+            $type = $style['type'] ?? $type;
+            unset($style['type']);
+        }
+
+        if (isset($style['tpl'])) {
+            if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
+                $data = ['value' => $data];
+            }
+            $data = $this->attachDataToTpl($style['tpl'], new \Adbar\Dot($data));
+            unset($style['tpl']);
+        }
+
+        // Check external factories
+        foreach ($this->factories as $factory) {
+            $component = $factory->get($type);
             if (null !== $component) {
-                $components[] = $component;
+                if (method_exists($component, 'addBuilder')) {
+                    $component->addBuilder($this);
+                }
+                if (method_exists($component, 'addEnviroment')) {
+                    $component->addEnviroment($this->enviroment);
+                }
+                if (method_exists($component, 'addImageHandler')) {
+                    $component->addImageHandler($this->imageHandler);
+                }
+                if (method_exists($component, 'addPath')) {
+                    $component->addPath($this->path);
+                }
+                if (method_exists($component, 'addReader')) {
+                    $component->addReader($this->reader);
+                }
+                if (method_exists($component, 'addSlugs')) {
+                    $component->addSlugs($this->reader->getSlugs());
+                }
+                if (method_exists($component, 'addCanIUse')) {
+                    $component->addCanIUse($this->canIUse);
+                }
+                if (method_exists($component, 'addRequest')) {
+                    $component->addRequest($this->request);
+                }
+                $data          = $component->normalize($data);
+                $data['flags'] = $flags;
+                if (isset($data['_attr'])) {
+                    foreach ($data['_attr'] as $attr => $value) {
+                        $component->setAttribute($attr, $value);
+                    }
+                    unset($data['_attr']);
+                }
+
+                unset($data['_meta'],$data['_name']);
+                if (isset($data['background'])) {
+                    $component->setBackground($data['background'], $style['background'] ?? []);
+                    unset($data['background']);
+                }
+                $component->build($data, $style ?? [], $appearance);
+                return $component;
             }
         }
-        return $components;
+        return null;
     }
 
     public function addListener(ComponentListenerInterface $listener) : void
@@ -72,77 +160,43 @@ class ComponentBuilder
         }
     }
 
-    private function getComponent(string $type, $data, array $style, string $appearance) : ?AbstractComponent
+    public function getStyle(string $type, array $flags = []) : array
     {
-        // Figure out component type
-        $flags          = explode(':', $type);
-        $type           = array_shift($flags);
-        if (!isset($style[$type]['inherit']) || $style[$type]['inherit']) {
-            $componentStyle = ArrayHelper::merge($this->getComponentStyle($type), $style[$type] ?? []);
-        } else {
-            $componentStyle = $style[$type] ?? [];
+        $style = $this->getComponentStyle($type, $flags);
+        foreach ($flags as $flag) {
+            if (isset($style['variants'][$flag])) {
+                $style = ArrayHelper::merge($style, $style['variants'][$flag]);
+            }
         }
-        $componentType  = $componentStyle['type'] ?? $type;
-        unset($componentStyle['type']);
-
-        if (strpos($componentType, ':')) {
-            $flags                   = explode(':', $componentType);
-            $componentType           = array_shift($flags);
-        }
-
-        // Get component from factory
-        $component = $this->buildComponent($componentType);
-        if (null === $component) {
-            return null;
-        }
-        $componentData = new ComponentData($flags, $data, $componentStyle, $appearance);
-        $id            = $componentData->getId();
-        if ($id) {
-            $component->setAttribute('id', $id);
-        }
-        $component->with($componentData);
-        return $component;
-    }
-
-    public function getComponentStyle(string $type) : array
-    {
-        $style = $this->componentStyle[$type] ?? [];
-        if (isset($style['inherit']) && !$style['inherit']) {
-            unset($style['inherit']);
-            return $style;
-        }
-        $inheritStyle = [];
-        foreach ($this->factories as $factory) {
-            $inheritStyle = ArrayHelper::merge($inheritStyle, $factory->getStyle($type));
-        }
-        if (null !== $inheritStyle) {
-            $style = ArrayHelper::merge($inheritStyle, $style);
-        }
-        $style['inherit']            = false; // custom style is loaded
-        $this->componentStyle[$type] = $style;
-        unset($style['inherit']);
+        unset($style['variants']);
         return $style;
     }
 
-    private function buildComponent(string $type) : ?AbstractComponent
+    private function getLayout(string $layout) : array
+    {
+        $variants = explode(':', $layout);
+        $layout   = array_shift($variants);
+        $style    = [];
+        if (isset($this->theme['layouts'][$layout])) {
+            $style = ArrayHelper::merge($style, $this->theme['layouts'][$layout]);
+        }
+        foreach ($variants as $variant) {
+            if (isset($style['variants'][$variant])) {
+                $style = ArrayHelper::merge($style, $style['variants'][$variant]);
+                unset($style['variants'][$variant]);
+            }
+        }
+        return $style;
+    }
+
+    private function buildComponent(string $type, ) : ?AbstractComponent
     {
         //Check external factories
         foreach ($this->factories as $factory) {
-            $component = $factory->get($type);
+            $component = $factory->get($type, );
             if (null !== $component) {
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);
-                }
-                if (method_exists($component, 'addSectionBuilder')) {
-                    if (null === $this->sectionBuilder) {
-                        $this->sectionBuilder = new SectionBuilder(
-                            $this->enviroment,
-                            $this->reader,
-                            $this,
-                        );
-                    }
-
-                    $component->addSectionBuilder($this->sectionBuilder);
                 }
                 if (method_exists($component, 'addEnviroment')) {
                     $component->addEnviroment($this->enviroment);
@@ -177,5 +231,17 @@ class ComponentBuilder
             return true;
         }
         return false;
+    }
+
+    private function getComponentStyle(string $type, array $flags = []) : array
+    {
+        $style = $this->theme['components'][$type] ?? [];
+        if (count($flags)) {
+            $type = $type.':'.implode(':', $flags);
+            if (isset($this->theme['components'][$type])) {
+                $style = ArrayHelper::merge($style, $this->theme['components'][$type]);
+            }
+        }
+        return $style;
     }
 }

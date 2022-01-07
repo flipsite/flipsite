@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets\Editors;
 
 use Flipsite\Assets\Options\RasterOptions;
@@ -45,6 +44,10 @@ final class RasterEditor extends AbstractImageEditor
         $blur = $options->getValue('blur');
         if ($blur) {
             $image->blur($blur);
+        }
+        $opacity = $options->getValue('opacity');
+        if ($opacity) {
+            $image->opacity($opacity);
         }
         if ($options->getValue('blackWhite')) {
             $image->greyscale();

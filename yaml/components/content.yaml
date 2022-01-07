@@ -1,0 +1,15 @@
+type: group
+variants:
+  center:
+    textAlign: text-center
+  right:
+    textAlign: text-right
+  tight:
+    spaceY: space-y-2
+  normal:
+    spaceY: space-y-3.5
+  relaxed:
+    spaceY: space-y-5
+  loose:
+    spaceY: space-y-7
+    

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Paragraph extends AbstractComponent
@@ -9,10 +8,17 @@ final class Paragraph extends AbstractComponent
     use Traits\MarkdownTrait;
     protected string $tag = 'p';
 
-    public function with(ComponentData $data) : void
+    public function build(array $data, array $style, string $appearance) : void
     {
-        $markdown  = $this->getMarkdownLine($data->get('text') ?? $data->get('value'), $data->getStyle('markdown'));
+        $markdown  = $this->getMarkdownLine($data['markdown'] ?? [], $style['markdown'] ?? []);
         $this->setContent($markdown);
-        $this->addStyle($data->getStyle());
+        $this->addStyle($style);
+    }
+
+    public function normalize(string|int|bool|array $data) : array
+    {
+        if (is_string($data)) {
+            return ['markdown' => $data];
+        }
     }
 }
