@@ -3,7 +3,7 @@ var toggleElements = {};
 function toggle(id,prefix) {
     var target = document.getElementById(id);
     if (!target.getAttribute('data-toggle')) {
-      toggleElements[id+'-'+prefix] = target.parentNode.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]');
+      toggleElements[id+'-'+prefix] = target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]');
       toggleElements[id+'-'+prefix].forEach((el) => {
         var classes = el.getAttribute('class').split(' ');
         var toggleClasses = [];
