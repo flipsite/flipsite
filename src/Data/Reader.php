@@ -130,6 +130,9 @@ final class Reader
         if (is_null($this->pageNames)) {
             $this->pageNames = [];
             foreach ($this->data['pages'] as $p => $data) {
+                if (null === $data) {
+                    continue;
+                }
                 if (ArrayHelper::isAssociative($data)) {
                     $data = [$data];
                 }

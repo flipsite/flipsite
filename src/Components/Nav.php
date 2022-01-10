@@ -145,6 +145,8 @@ class Nav extends AbstractGroup
             $pages = array_filter($all, function ($value) {
                 return mb_strpos($value, '/') === false;
             });
+        } elseif (strpos($page, ',') !== false) {
+            $pages = explode(',', str_replace(' ', '', $page));
         } else {
             $firstExact = true;
             $level      = substr_count($page, '/');
