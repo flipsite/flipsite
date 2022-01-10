@@ -28,10 +28,9 @@ trait RepeatTrait
                 preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
                 foreach ($matches[1] as $match) {
                     $replaceWith = $data->get($match);
-
                     if (is_array($replaceWith)) {
                         $value = $replaceWith;
-                    } elseif ($replaceWith) {
+                    } elseif ($replaceWith !== null) {
                         $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
                     }
                 }
