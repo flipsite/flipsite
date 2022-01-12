@@ -198,6 +198,10 @@ final class Reader
         }
 
         $data = $this->data['pages'][$page];
+        if (null === $data) {
+            $meta['title'] = implode(' - ', $meta['title']);
+            return $meta;
+        }
         if (ArrayHelper::isAssociative($data)) {
             $data = [$data];
         }
@@ -341,7 +345,7 @@ final class Reader
         }
         $expandedPages = [];
         foreach ($pages as $page => $pageData) {
-            if (false !== mb_strpos($page, '[')) {
+            if (false !== mb_strpos((string)$page, '[')) {
                 $matches = [];
                 preg_match_all('/\[([^\[\]]*)\]/', $page, $matches);
                 $params       = $matches[0];

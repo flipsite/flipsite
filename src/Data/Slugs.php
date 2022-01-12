@@ -65,7 +65,7 @@ final class Slugs
 
     public function getSlug(string $page, Language $language) : ?string
     {
-        return $this->slugs[$page][(string) $language] ?? null;
+        return (string)$this->slugs[$page][(string) $language] ?? null;
     }
 
     public function getPage(string $slug) : ?string
@@ -84,7 +84,7 @@ final class Slugs
     {
         foreach ($this->slugs as $page => $slugs) {
             foreach ($slugs as $langauge => $localizedSlug) {
-                similar_text($localizedSlug, $slug, $percent);
+                similar_text((string)$localizedSlug, (string)$slug, $percent);
                 if ($percent >= $neededSimilarity) {
                     return $page;
                 }

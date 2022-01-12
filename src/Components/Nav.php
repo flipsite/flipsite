@@ -67,6 +67,10 @@ class Nav extends AbstractGroup
             }
         }
 
+        if ($data['options']['exact'] ?? false) {
+            $data['items'][0]['exact'] = true;
+        }
+
         $data['items'] = $this->addActive($data['items'], $this->path->getPage());
 
         if (isset($data['options'])) {
@@ -90,7 +94,7 @@ class Nav extends AbstractGroup
             } elseif ($i === $last && isset($style['last'])) {
                 $item['style'] = ArrayHelper::merge($item['style'], $style['last']);
             }
-            if ($item['active'] && isset($style['active'])) {
+            if (isset($item['active']) && $item['active'] && isset($style['active'])) {
                 unset($item['active']);
                 if (!isset($item['style'])) {
                     $item['style'] = [];
@@ -141,24 +145,34 @@ class Nav extends AbstractGroup
         $pages      = [];
         $all        = $this->slugs->getPages();
         $firstExact = false;
-        if ('pages' === $page) {
+        if ('pages' === $page || 'level-0' === $page) {
             $pages = array_filter($all, function ($value) {
-                return mb_strpos($value, '/') === false;
+                return mb_strpos((string)$value, '/') === false;
             });
+        } elseif (str_starts_with($page, 'level-')) {
+            $level           = intval(str_replace('level-', '', $page));
+            $parts           = explode('/', $this->path->getPage());
+            $startsWith      = implode('/', array_splice($parts, 0, $level));
+            foreach ($all as $page) {
+                $count = substr_count((string)$page, '/');
+                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level) {
+                    $pages[] = $page;
+                }
+            }
         } elseif (strpos($page, ',') !== false) {
             $pages = explode(',', str_replace(' ', '', $page));
         } else {
             $firstExact = true;
-            $level      = substr_count($page, '/');
+            $level      = substr_count((string)$page, '/');
             $pages      = array_filter($all, function ($value) use ($page, $level) {
-                return str_starts_with($value, $page) && substr_count($value, '/') <= $level + 1;
+                return str_starts_with((string)$value, (string)$page) && substr_count($value, '/') <= $level + 1;
             });
         }
         $items = [];
         foreach ($pages as $page) {
             $item            = [
                 'url'  => $page,
-                'text' => $this->reader->getPageName($page, $this->path->getLanguage())
+                'text' => $this->reader->getPageName((string)$page, $this->path->getLanguage())
             ];
             if ($firstExact) {
                 $item['exact'] = true;

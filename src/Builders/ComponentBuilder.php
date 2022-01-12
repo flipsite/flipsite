@@ -45,6 +45,11 @@ class ComponentBuilder
     {
         $flags = explode(':', $type);
         $type  = array_shift($flags);
+
+        if (in_array('var', $flags) && is_string($data)) {
+            $data = $this->addVars($data);
+        }
+
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
 
@@ -243,5 +248,16 @@ class ComponentBuilder
             }
         }
         return $style;
+    }
+
+    private function addVars(string $value) : string
+    {
+        if (strpos($value, '%date.year%') !== false) {
+            $value = str_replace('%date.year%', date('Y'), $value);
+        }
+        if (strpos($value, '%page.name%') !== false) {
+            $value = str_replace('%page.name%', date('Y'), $this->reader->getPageName($this->path->getPage(), $this->path->getLanguage()));
+        }
+        return $value;
     }
 }

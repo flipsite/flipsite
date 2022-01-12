@@ -17,8 +17,8 @@ final class A extends AbstractGroup
             $this->setAttribute('onclick', $urlData['onclick']);
             unset($urlData['onclick']);
         }
-        $href = $this->url($urlData['url'], $external);
-        $this->setAttribute('href', $this->url($urlData['url'], $external));
+        $href = $this->url((string)$urlData['url'], $external);
+        $this->setAttribute('href', $href);
 
         if (strpos($href, 'javascript:toggle') === 0) {
             $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.js')));
