@@ -1,6 +1,11 @@
 
 var toggleElements = {};
-function toggle(id,prefix) {
+function toggle(id,prefix,self) {
+    e = window.event;
+    e.preventDefault();
+    if (self.hasAttribute('aria-expanded')) {
+      self.setAttribute('aria-expanded','false' == self.getAttribute('aria-expanded') ? 'true' : 'false');
+    }
     var target = document.getElementById(id);
     if (!target.getAttribute('data-toggle')) {
       toggleElements[id+'-'+prefix] = target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]');
