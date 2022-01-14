@@ -43,6 +43,11 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance) : ?AbstractComponent
     {
+        if (isset($data['_merge'])) {
+            $merge = $data['_merge'];
+            unset($data['_merge']);
+            $data = ArrayHelper::merge($data, $merge);
+        }
         $flags = explode(':', $type);
         $type  = array_shift($flags);
 
