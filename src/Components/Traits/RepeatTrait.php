@@ -38,4 +38,14 @@ trait RepeatTrait
         }
         return $tpl;
     }
+
+    protected function addTplDefaultData(array $data, array $default) : array
+    {
+        foreach ($default as $attr => $val) {
+            if (!isset($data[$attr])) {
+                $data[$attr] = $val;
+            }
+        }
+        return $data;
+    }
 }

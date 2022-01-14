@@ -100,6 +100,7 @@ class ComponentBuilder
             if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
                 $data = ['value' => $data];
             }
+            $data = $this->addTplDefaultData($data, $style['tplDefault'] ?? []);
             $data = $this->attachDataToTpl($style['tpl'], new \Adbar\Dot($data));
             unset($style['tpl']);
         }
