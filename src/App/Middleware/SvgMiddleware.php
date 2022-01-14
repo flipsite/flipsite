@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\App\Middleware;
 
 use Flipsite\Enviroment;
@@ -24,14 +23,16 @@ class SvgMiddleware implements MiddlewareInterface
     {
         $response = $handler->handle($request);
         $html     = (string) $response->getBody();
-        preg_match_all('/<svg src="(.*?)"(.|\n)*?<\/svg>/', $html, $matches);
+        $html     = str_replace("<svg></svg>\n", '<dummysvg></dummysvg>', $html);
+        preg_match_all('/<svg(.|\n)*?src="(.*?)" xmlns(.|\n)*?<\/svg>/', $html, $matches);
+
         if (0 === count($matches[0] ?? [])) {
-            $html = str_replace("    <svg></svg>\n", '', $html);
+            $html = str_replace("    <dummysvg></dummysvg>\n", '', $html);
         } else {
             $defs = '';
             $id   = 0;
             $svgs = [];
-            foreach ($matches[1] as $i => $src) {
+            foreach ($matches[2] as $i => $src) {
                 if (!isset($svgs[$src])) {
                     $file = $this->enviroment->getImageSources()->getFilename($src);
                     if (null !== $file) {
@@ -47,7 +48,7 @@ class SvgMiddleware implements MiddlewareInterface
                         $def .= "</g>\n";
                         $def = preg_replace('!\s+!', ' ', $def);
                         $def = str_replace("\n", ' ', $def);
-                        $defs.= '        '.$def."\n";
+                        $defs .= '        '.$def."\n";
                     }
                 }
                 $with = $matches[0][$i];
@@ -57,11 +58,11 @@ class SvgMiddleware implements MiddlewareInterface
                 $html = str_replace($matches[0][$i], $with, $html);
             }
             $svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: none;">';
-            $svg.= "\n      <defs>\n";
+            $svg .= "\n      <defs>\n";
             $defs = str_replace('></path>', '/>', $defs);
-            $svg.=           $defs;
+            $svg .= $defs;
             $svg .= "      </defs>\n    </svg>";
-            $html = str_replace('<svg></svg>', $svg, $html);
+            $html = str_replace('<dummysvg></dummysvg>', $svg, $html);
         }
         $streamFactory = new StreamFactory();
         $stream        = $streamFactory->createStream($html);
