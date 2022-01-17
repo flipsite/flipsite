@@ -1,4 +1,6 @@
 function submit(id) {
+    e = window.event;
+    e.preventDefault();
     var validate = function(data, value) {
         var format = data.split('|');
         if ('string'===format[0]) {
@@ -30,6 +32,7 @@ function submit(id) {
         }))
     }
     var form = undefined === id ? document.querySelector('form') : document.getElementById(id);
+
     var json = JSON.parse(form.getAttribute('data-validate').replaceAll("'",'"'));
     var ok = {};
     for (var name in json.data) {

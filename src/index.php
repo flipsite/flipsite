@@ -121,7 +121,7 @@ $app->post('/form/submit/{formId}', function (Request $request, Response $respon
     $form = $this->get('reader')->get('forms.'.$args['formId']);
     $parsedBody = $request->getParsedBody();
     $res = 'error';
-    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'] ?? [], $parsedBody)) {
+    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'] ?? [], $form['dummy'] ?? [], $parsedBody)) {
         if ('postmarkapp' === $form['type']) {
             try {
                 $html = '';

@@ -17,20 +17,14 @@ final class Form extends AbstractGroup
         $query = $this->request->getQueryParams();
         $page  = $this->path->getPage();
 
-        // if (isset($query['res']) && 'success' === $query['res']) {
-        //     $componentData                   = ['success' => $data->get('success', true)];
-        //     $componentData['success']['url'] = $page.'#'.$this->attributes['id'];
-        //     $components                      = $this->builder->build($componentData, $data->getStyle(), $data->getAppearance());
-        //     $this->addChildren($components);
-        //     return;
-        // }
-        // if (isset($query['res']) && 'error' === $query['res']) {
-        //     $componentData                 = ['error' => $data->get('error', true)];
-        //     $componentData['error']['url'] = $page.'#'.$this->attributes['id'];
-        //     $components                    = $this->builder->build($componentData, $data->getStyle(), $data->getAppearance());
-        //     $this->addChildren($components);
-        //     return;
-        // }
+        if (isset($query['res']) && 'success' === $query['res']) {
+            parent::build($data['success'] ?? [], $style['success'] ?? [], $appearance);
+            return;
+        }
+        if (isset($query['res']) && 'error' === $query['res']) {
+            parent::build($data['error'] ?? [], $style['error'] ?? [], $appearance);
+            return;
+        }
         unset($data['success'], $data['error']);
         $formData = $this->reader->get('forms.'.$data['id']);
         $this->setAttribute('id', $data['id']);
