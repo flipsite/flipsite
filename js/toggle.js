@@ -8,7 +8,7 @@ function toggle(id,prefix,self) {
     }
     var target = document.getElementById(id);
     if (!target.getAttribute('data-toggle')) {
-      toggleElements[id+'-'+prefix] = [target]
+      toggleElements[id+'-'+prefix] = [target];
       target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]').forEach((node)=>{
         toggleElements[id+'-'+prefix].push(node);
       });
@@ -29,7 +29,9 @@ function toggle(id,prefix,self) {
     }
     toggleElements[id+'-'+prefix].forEach((el) => {
       el.getAttribute('data-toggle-'+prefix).split(' ').forEach((cls)=>{
-        el.classList.toggle(cls)
+        if (cls) {
+          el.classList.toggle(cls)
+        }
       });
     });
 }
