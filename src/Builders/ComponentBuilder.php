@@ -105,8 +105,13 @@ class ComponentBuilder
             if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
                 $data = ['value' => $data];
             }
-            $data = $this->addTplDefaultData($data, $style['tplDefault'] ?? []);
-            $data = $this->attachDataToTpl($style['tpl'], new \Adbar\Dot($data));
+            if (isset($style['tplDefault'])) {
+                $default = $this->reader->localize($data, $this->path->getLanguage());
+                $data    = $this->addTplDefaultData($data, $default);
+                unset($style['tplDefault']);
+            }
+            $tpl   = $this->reader->localize($style['tpl'], $this->path->getLanguage());
+            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data));
             unset($style['tpl']);
         }
 
