@@ -161,6 +161,29 @@ $app->post('/form/submit/{formId}', function (Request $request, Response $respon
     return $response->withHeader('Location', $redirect);
 });
 
+$app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
+    $enviroment = $this->get('enviroment');
+    $filepath = $enviroment->getSiteDir().'/files/'.$args['file'];
+    if (!file_exists($filepath)) {
+        $response = $response->withStatus(302);
+        $redirect = trim($enviroment->getServer());
+        return $response->withHeader('Location', $redirect);
+    }
+
+    $pathinfo = pathinfo($filepath);
+    $extension = $pathinfo['extension'];
+    $fileName = $pathinfo['basename'];
+
+    $response = $response->withHeader('Content-Type', 'application/'.$extension);
+    $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $fileName));
+
+    $body = $response->getBody();
+    $body->rewind();
+    $body->write(file_get_contents($filepath));
+
+    return $response;
+});
+
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
     $reader = $this->get('reader');
 
