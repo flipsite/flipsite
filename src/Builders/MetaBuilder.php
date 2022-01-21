@@ -37,6 +37,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $language = $this->path->getLanguage();
         $name     = $this->reader->get('name', $language);
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
+
         $title    = $meta['title'] ?? $name;
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);

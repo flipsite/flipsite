@@ -45,10 +45,10 @@ final class Reader
     public function loadSite(array $yaml)
     {
         $this->data          = $yaml;
-        $this->data['pages'] = $this->expandPages($this->data['pages']);
+        $this->expandPagesAndSlugs();
         $this->parseLanguages();
         $this->slugs = new Slugs(
-            array_keys($this->data['pages'] ?? []),
+            array_keys($this->data['pages']),
             $this->data['slugs'] ?? null,
             $this->getDefaultLanguage(),
             $this->getLanguages()
@@ -107,7 +107,7 @@ final class Reader
         return $this->data['redirects'] ?? [];
     }
 
-    public function getPageName(string $page, Language $language) : string
+    public function getPageName(string $page, Language $language) : ?string
     {
         if ('home' === $page) {
             switch ((string)$language) {
@@ -116,12 +116,7 @@ final class Reader
                 default: return 'Home';
             }
         }
-
         $slug = $this->slugs->getSlug($page, $language);
-        if (null === $slug) {
-            echo $page;
-            die();
-        }
 
         if ($slug === '') {
             $slug = 'home';
@@ -138,17 +133,30 @@ final class Reader
                 }
                 foreach ($data as $section) {
                     if (isset($section['_name'])) {
-                        $this->pageNames[$p] = $section['_name'];
+                        $name                = is_array($section['_name']) ? $this->localize($section['_name'], $language) : $section['_name'];
+                        $this->pageNames[$p] = $name;
                     }
                 }
             }
         }
 
-        if (isset($this->pageNames[$slug])) {
-            return $this->pageNames[$slug];
+        if (isset($this->pageNames[$page])) {
+            return $this->pageNames[$page];
         }
 
         $slug = explode('/', $slug);
+
+        // If loc, test unlocalized version
+        $lang = $slug[0];
+        if (in_array($lang, $this->languageCodes)) {
+            $tmp = $slug;
+            array_shift($tmp);
+            $tmp = implode('/', $tmp);
+            if (isset($this->pageNames[$tmp])) {
+                return $this->pageNames[$tmp];
+            }
+        }
+
         $last = array_pop($slug);
 
         return ucfirst(str_replace('-', ' ', $last));
@@ -197,11 +205,8 @@ final class Reader
             $meta['title'][0] .= ' ('.strtoupper((string)$language).')';
         }
 
-        $data = $this->data['pages'][$page];
-        if (null === $data) {
-            $meta['title'] = implode(' - ', $meta['title']);
-            return $meta;
-        }
+        $data = $this->data['pages'][$page] ?? [];
+
         if (ArrayHelper::isAssociative($data)) {
             $data = [$data];
         }
@@ -209,10 +214,16 @@ final class Reader
         $p     = explode('/', $page);
         $title = [];
         while (count($p) > 0) {
-            $title[]  = $this->getPageName(implode('/', $p), $language);
+            $page  = implode('/', $p);
+            $pages = array_keys($this->data['pages']);
+            if (in_array($page, $pages)) {
+                $name    = $this->getPageName($page, $language);
+                $title[] = $name;
+            }
             array_pop($p);
         }
-        $meta['title'] =array_merge($title, $meta['title']);
+
+        $meta['title'] = array_merge($title, $meta['title']);
 
         foreach ($data as $section) {
             if (isset($section['_meta'])) {
@@ -338,18 +349,20 @@ final class Reader
         }
     }
 
-    private function expandPages(?array $pages) : array
+    private function expandPagesAndSlugs() : void
     {
-        if (null === $pages) {
-            return [];
-        }
+        $pages         = $this->data['pages'] ?? [];
+        $slugs         = $this->data['slugs'] ?? [];
         $expandedPages = [];
+        $expandedSlugs = [];
         foreach ($pages as $page => $pageData) {
             if (false !== mb_strpos((string)$page, '[')) {
                 $matches = [];
                 preg_match_all('/\[([^\[\]]*)\]/', $page, $matches);
+
                 $params       = $matches[0];
                 $permutations = $this->getPermutations(0, count($params), $pageData['data']);
+
                 // TODO add support for localized slugs
                 foreach ($permutations as $permutation) {
                     $expandedPage = $page;
@@ -360,12 +373,35 @@ final class Reader
                     }
                     $dataMapper                   = new DataMapper();
                     $expandedPages[$expandedPage] = $dataMapper->apply($sections, $pageData['data']);
+                    if ($slugs[$page]) {
+                        $expandedSlugs = $this->extendSlug($expandedSlugs, $page, $slugs[$page], $params, $permutation);
+                    }
                 }
             } else {
                 $expandedPages[$page] = $pageData;
+                if (isset($slugs[$page])) {
+                    $expandedSlugs[$page] = $slugs[$page];
+                }
             }
         }
-        return $expandedPages;
+        $this->data['pages'] = $expandedPages;
+        $this->data['slugs'] = $expandedSlugs;
+    }
+
+    private function extendSlug(array $extendedSlugs, string $page, string|array $slugs, array $params, array $permutation) : array
+    {
+        foreach ($params as $i => $param) {
+            $page = str_replace($param, (string)$permutation[$i], $page);
+            if (is_string($slugs)) {
+                $slugs = str_replace($param, (string)$permutation[$i], $slugs);
+            } else {
+                foreach ($slugs as &$slug) {
+                    $slug = str_replace($param, (string)$permutation[$i], $slug);
+                }
+            }
+        }
+        $extendedSlugs[$page] = $slugs;
+        return $extendedSlugs;
     }
 
     private function getPermutations(int $level, int $max, array $data, array $parents = []) : array

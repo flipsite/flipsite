@@ -264,10 +264,13 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     $bodyHtml = $document->getChild('body')->render(2, 1);
     if (strpos($bodyHtml, 'scroll:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/scroll.js')));
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.js')));
     }
+    // if (strpos($bodyHtml, 'stuck:')) {
+    //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.js')));
+    // }
     if (strpos($bodyHtml, 'enter:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/enter.js')));
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.js')));
     }
     // Add Scripts
     $document = $scriptBuilder->getDocument($document);

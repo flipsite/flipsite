@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Flipsite\Data\Slugs;
@@ -31,8 +30,11 @@ final class Sitemap
     {
         $xml = '';
         foreach ($this->slugs->getAll() as $loc => $alternate) {
+            if (404 === $loc) {
+                continue;
+            }
             $xml .= "  <url>\n";
-            $xml .= '    <loc>'.$this->getUrl($loc)."</loc>\n";
+            $xml .= '    <loc>'.$this->getUrl((string)$loc)."</loc>\n";
             $xml .= $this->getAlternate($alternate);
             $xml .= "  </url>\n";
         }
@@ -55,6 +57,9 @@ final class Sitemap
         }
         $xml = '';
         foreach ($alternate as $language => $url) {
+            if (404 === $url) {
+                continue;
+            }
             $xml .= '    <xhtml:link rel="alternate" hreflang="'.$language.'" ';
             $xml .= 'href="'.$this->getUrl($url).'"/>'."\n";
         }

@@ -65,6 +65,9 @@ final class Slugs
 
     public function getSlug(string $page, Language $language) : ?string
     {
+        if (!isset($this->slugs[$page])) {
+            return null;
+        }
         return (string)$this->slugs[$page][(string) $language] ?? null;
     }
 
