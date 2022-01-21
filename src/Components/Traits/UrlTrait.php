@@ -19,7 +19,8 @@ trait UrlTrait
         }
 
         if (str_starts_with($url, 'files/') && file_exists($this->enviroment->getSiteDir().'/'.$url)) {
-            return '/'.$url;
+            $basePath = $this->enviroment->getBasePath();
+            return $basePath.'/'.$url;
         }
         $redirects = $this->reader->getRedirects();
         if (isset($redirects[$url])) {
