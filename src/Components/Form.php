@@ -29,7 +29,7 @@ final class Form extends AbstractGroup
         $formData = $this->reader->get('forms.'.$data['id']);
         $this->setAttribute('id', $data['id']);
 
-        $this->setAttribute('action', 'form/submit/'.$data['id']);
+        $this->setAttribute('action', $data['action'] ?? 'form/submit/'.$data['id']);
         $this->setAttribute('method', $formData->method ?? 'post');
         if (isset($formData['data'])) {
             $this->setAttribute('data-validate', str_replace('"', "'", json_encode(['data'=>$formData['data'], 'required'=>$formData['required'] ?? []])));

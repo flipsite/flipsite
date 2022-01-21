@@ -36,7 +36,8 @@ final class Input extends AbstractComponent
         return in_array($type, [
             'text',
             'email',
-            'tel'
+            'tel',
+            'password'
         ]);
     }
 }
