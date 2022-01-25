@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -26,13 +25,23 @@ class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
         switch ($event->getType()) {
             case 'preload':
                 if ($event->getId() === 'image') {
-                    $img = $event->getData();
+                    $img  = $event->getData();
                     $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
                     $link->setAttribute('as', 'image');
                     $link->setAttribute('href', $img->getAttribute('src'));
                     $link->setAttribute('imagesrcset', $img->getAttribute('srcset'));
                     $link->setAttribute('imagesizes', $img->getAttribute('sizes'));
+                    $this->links[] = $link;
+                }
+                if ($event->getId() === 'background') {
+                    $imageContext  = $event->getData();
+                    $link          = new Element('link', true, true);
+                    $link->setAttribute('rel', 'preload');
+                    $link->setAttribute('as', 'image');
+                    $link->setAttribute('href', $imageContext->getSrc());
+                    $link->setAttribute('imagesrcset', $imageContext->getSrcset('srcset'));
+                    //$link->setAttribute('imagesizes', $imageContext->getAttribute('sizes'));
                     $this->links[] = $link;
                 }
                 break;

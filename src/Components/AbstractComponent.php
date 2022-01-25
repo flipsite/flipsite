@@ -39,11 +39,11 @@ abstract class AbstractComponent extends AbstractElement
                 $src = str_replace('.png', '.webp', $src);
             }
             $imageContext = $this->imageHandler->getContext($src, $options);
-            $this->setAttribute('style', 'background-image:url('.$imageContext->getSrc().');background-image:-webkit-image-set('.$imageContext->getSrcset('url').')');
+            $this->setAttribute('style', 'background-image: -webkit-image-set('.$imageContext->getSrcset('url').')');
         }
-        // if ($isEager) {
-        //     $this->builder->dispatch(new Event('preload', 'image', $this));
-        // }
+        if (($style['options']['loading'] ?? '') === 'eager') {
+            $this->builder->dispatch(new Event('preload', 'background', $imageContext));
+        }
 
         unset($style['options']);
         $this->addStyle($style);
