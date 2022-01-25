@@ -266,8 +266,12 @@ class ComponentBuilder
         if (strpos($value, '%date.year%') !== false) {
             $value = str_replace('%date.year%', date('Y'), $value);
         }
-        if (strpos($value, '%page.name%') !== false) {
-            $value = str_replace('%page.name%', date('Y'), $this->reader->getPageName($this->path->getPage(), $this->path->getLanguage()));
+        $matches = [];
+        preg_match_all('/\%page.(.*).name\%/', $value, $matches);
+
+        foreach ($matches[1] as $page) {
+            $page  = $page === 'current' ? $this->path->getPage() : $page;
+            $value = str_replace('%page.'.$page.'.name%', date('Y'), $this->reader->getPageName($page, $this->path->getLanguage()));
         }
         return $value;
     }
