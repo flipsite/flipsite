@@ -1,0 +1,28 @@
+directions:
+  en: Directions
+  sv: Hitta hit
+  fi: Ajoohjeet
+email:
+  en: E-mail
+  sv: E-post
+  fi: Sähköposti
+forgot_password:
+  en: Forgot password?
+  sv: Glömt lösenord?
+  fi: Unohtuiko salasana?
+password:
+  en: Password
+  sv: Lösenord
+  fi: Salasana
+phone:
+  en: Phone
+  sv: Telefon
+  fi: Puhelin
+signin:
+  en: Sign in
+  sv: Logga in
+  fi: Kirjaudu sisään
+your_password:
+  en: Your password
+  sv: Ditt lösenord
+  fi: Sinun salasanasi

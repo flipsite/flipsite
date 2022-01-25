@@ -25,6 +25,7 @@ class ComponentBuilder
     private array $listeners                = [];
     private array $factories                = [];
     private array $theme                    = [];
+    private array $localization             = [];
 
     public function __construct(private Request $request, private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
@@ -53,6 +54,10 @@ class ComponentBuilder
 
         if (in_array('var', $flags) && is_string($data)) {
             $data = $this->addVars($data);
+        }
+
+        if (in_array('loc', $flags) && is_string($data)) {
+            $data = $this->addLoc($data);
         }
 
         $style = $this->getStyle($type, $flags);
@@ -147,6 +152,10 @@ class ComponentBuilder
                 $data['flags'] = $flags;
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
+                        if (str_ends_with($attr, ':loc')) {
+                            $value = $this->addLoc($value);
+                            $attr  = rtrim($attr, ':loc');
+                        }
                         $component->setAttribute($attr, $value);
                     }
                     unset($data['_attr']);
@@ -274,5 +283,20 @@ class ComponentBuilder
             $value = str_replace('%page.'.$page.'.name%', date('Y'), $this->reader->getPageName($page, $this->path->getLanguage()));
         }
         return $value;
+    }
+
+    private function addLoc(string $value) : string
+    {
+        if (count($this->localization) === 0) {
+            $flipsite = \Symfony\Component\Yaml\Yaml::parseFile($this->enviroment->getVendorDir().'/flipsite/flipsite/localization/flipsite.yaml');
+            foreach ($flipsite as $key => $loc) {
+                if (!isset($this->localization[$key])) {
+                    $this->localization[$key] = $loc;
+                }
+            }
+        }
+
+        $language = (string)$this->path->getLanguage();
+        return $this->localization[$value][$language] ?? $language.':'.$value;
     }
 }
