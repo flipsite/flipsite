@@ -10,8 +10,7 @@ final class CanIUse
     public function __construct()
     {
         $parser       = \UAParser\Parser::create();
-        //$this->result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
-        $this->result = $parser->parse('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15');
+        $this->result = $parser->parse($_SERVER['HTTP_USER_AGENT']);
     }
 
     public function cssMathFunctions() : bool
