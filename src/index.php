@@ -116,10 +116,10 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
     ];
     $manifest['icons'][] = $icon;
     $manifest['start_url'] = '/';
-    $manifest['background_color'] = $toHex($reader->get('theme.colors.dark'));
+    $manifest['background_color'] = $toHex($reader->get('pwa.bgColor') ?? $reader->get('theme.colors.dark') ?? '#ffffff');
     $manifest['display'] = 'minimal-ui';
     $manifest['scope'] = '/';
-    $manifest['theme_color'] = $toHex($reader->get('theme.colors.primary'));
+    $manifest['theme_color'] = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
 
     // $enviroment = $this->get('enviroment');
     // $reader = $this->get('reader');

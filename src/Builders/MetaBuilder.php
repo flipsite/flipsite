@@ -74,7 +74,8 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $elements[] = $this->meta('twitter:image:alt', $title);
 
         // Theme color
-        $elements[] = $this->meta('theme-color', $this->reader->get('theme.colors.primary'));
+        $themeColor = $this->reader->get('pwa.themeColor') ?? $this->reader->get('theme.colors.primary');
+        $elements[] = $this->meta('theme-color', $themeColor);
 
         foreach ($elements as $el) {
             if (null !== $el) {
