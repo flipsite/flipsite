@@ -35,7 +35,7 @@ final class Form extends AbstractGroup
             $this->setAttribute('data-validate', str_replace('"', "'", json_encode(['data'=>$formData['data'], 'required'=>$formData['required'] ?? []])));
         }
         unset($data['id']);
-        $this->builder->dispatch(new Event('global-script', 'form', file_get_contents(__DIR__.'/form.js')));
+        $this->builder->dispatch(new Event('global-script', 'form', file_get_contents(__DIR__.'/../../js/form.min.js')));
 
         parent::build($data, $style, $appearance);
     }

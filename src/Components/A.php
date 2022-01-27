@@ -16,7 +16,7 @@ final class A extends AbstractGroup
         if (isset($urlData['onclick'])) {
             $this->setAttribute('onclick', $urlData['onclick']);
             if (strpos($urlData['onclick'], 'javascript:toggle') === 0) {
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.js')));
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
             }
             unset($urlData['onclick']);
         }
