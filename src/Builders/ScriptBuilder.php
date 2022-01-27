@@ -28,7 +28,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         }
 
         if ($this->sw) {
-            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}});');
+            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js");}});');
         }
 
         if (count($this->ready)) {
