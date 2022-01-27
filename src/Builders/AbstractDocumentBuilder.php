@@ -41,6 +41,11 @@ abstract class AbstractDocumentBuilder
         $charset->setAttribute('charset', 'utf-8');
         $head->addChild($charset);
 
+        $httpEquiv = new Element('meta', true, true);
+        $httpEquiv->setAttribute('http-equiv', 'X-UA-Compatible');
+        $httpEquiv->setAttribute('content', 'IE=edge');
+        $head->addChild($httpEquiv);
+
         $viewport = new Element('meta', true, true);
         $viewport->setAttribute('name', 'viewport');
         $viewport->setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover');
