@@ -55,7 +55,7 @@ class FaviconBuilder implements BuilderInterface
         }
 
         if (isset($favicon['apple'])) {
-            $image = $this->imageHandler->getContext($favicon['apple']);
+            $image = $this->imageHandler->getContext($favicon['apple'], ['width' => 192, 'height' => 192]);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'apple-touch-icon');
             $el->setAttribute('href', $image->getSrc());
