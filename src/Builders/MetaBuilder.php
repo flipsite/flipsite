@@ -73,6 +73,9 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $elements[] = $this->meta('twitter:card', 'summary_large_image');
         $elements[] = $this->meta('twitter:image:alt', $title);
 
+        // Theme color
+        $elements[] = $this->meta('theme-color', $this->reader->get('theme.colors.primary'));
+
         foreach ($elements as $el) {
             if (null !== $el) {
                 $document->getChild('head')->addChild($el);
