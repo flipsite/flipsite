@@ -13,7 +13,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
     private array $global = [];
     private array $ready  = [];
 
-    public function __construct(private bool $sw = false)
+    public function __construct(private string $basePath, private bool $sw = false)
     {
     }
 
@@ -28,7 +28,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         }
 
         if ($this->sw) {
-            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("/sw.js");}});');
+            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("'.$this->basePath.'/sw.js");}});');
         }
 
         if (count($this->ready)) {

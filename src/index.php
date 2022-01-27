@@ -238,7 +238,10 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $faviconBuilder = new FaviconBuilder($enviroment, $reader);
     $componentBuilder->addListener($metaBuilder);
 
-    $scriptBuilder = new ScriptBuilder((bool)$reader->get('offline'));
+    $scriptBuilder = new ScriptBuilder(
+        $enviroment->getBasePath(),
+        (bool)$reader->get('offline')
+    );
     $componentBuilder->addListener($scriptBuilder);
 
     $perloadBuilder = new PreloadBuilder();
