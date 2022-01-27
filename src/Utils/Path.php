@@ -20,6 +20,11 @@ final class Path
      * */
     public function __construct(string $path, Language $default, array $languages, Slugs $slugs, array $redirects = null)
     {
+        if ('offline.html' === $path) {
+            $this->language = $default;
+            $this->page     = 'offline';
+            return;
+        }
         $this->languages = $languages;
         $parts           = explode('/', $path);
         $pathLanguage    = $this->parsePathLanguage(array_shift($parts));

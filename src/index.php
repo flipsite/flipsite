@@ -74,6 +74,14 @@ $app->get('/sitemap.xml', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'application/xml');
 });
 
+$app->get('/sw.js', function (Request $request, Response $response) {
+    $enviroment = $this->get('enviroment');
+
+    $js = file_get_contents(__DIR__.'/../js/sw.js');
+    $response->getBody()->write((string) $js);
+    return $response->withHeader('Content-type', 'text/javascript');
+});
+
 $app->get('/robots.txt', function (Request $request, Response $response) {
     $enviroment = $this->get('enviroment');
     $robots = new Robots($enviroment->isLive(), $enviroment->getServer());
@@ -81,40 +89,44 @@ $app->get('/robots.txt', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'text/plain');
 });
 
-if ('localhost' === getenv('APP_ENV')) {
-    $app->get('/api/pages', function (Request $request, Response $response) {
-        $reader = $this->get('reader');
-        $pages = array_keys($reader->get('pages'));
-        $response->getBody()->write(json_encode($pages));
-        return $response->withHeader('Content-Type', 'application/json');
-    });
+$app->get('/manifest.json', function (Request $request, Response $response) {
+    $enviroment = $this->get('enviroment');
+    $imageHandler = new ImageHandler(
+        $enviroment->getImageSources(),
+        $enviroment->getImgDir(),
+        $enviroment->getImgBasePath(),
+    );
 
-    $app->post('/api/sections[/{page:.*}]', function (Request $request, Response $response, array $args) {
-        $page = $args['page'];
-        $body = $request->getParsedBody();
+    $toHex = function (string $color) : string {
+        $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
+        return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
+    };
+    $reader = $this->get('reader');
+    $manifest = [];
+    $manifest['short_name'] = $reader->get('name');
+    $manifest['name'] = $reader->get('name');
+    $manifest['icons'] = [];
 
-        $enviroment = $this->get('enviroment');
-        $reader = $this->get('reader');
-        $pages = array_keys($reader->get('pages'));
-        $siteFilePath = $enviroment->getSiteDir() . '/site.yaml';
-        $site = Symfony\Component\Yaml\Yaml::parseFile($siteFilePath);
-        if (in_array($page, ['before', 'after'])) {
-            if (!isset($site[$page])) {
-                $site[$page] = [$body];
-            } else {
-                $site[$page][] = $body;
-            }
-        } else {
-            if (!isset($site['pages'][$page])) {
-                $site['pages'][$page] = [$body];
-            } else {
-                $site['pages'][$page][] = $body;
-            }
-        }
-        file_put_contents($siteFilePath, Flipsite\Utils\YamlDumper::dump($site, 8, 2, Symfony\Component\Yaml\Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-        return $response->withStatus(202);
-    });
-}
+    $icons = $reader->get('favicon');
+    $image = $imageHandler->getContext($icons[512], ['width' => 512, 'height' => 512]);
+    $icon = [
+        'src'  => $image->getSrc(),
+        'type' => 'image/png',
+        'sizes'=> '512x512'
+    ];
+    $manifest['icons'][] = $icon;
+    $manifest['start_url'] = '/';
+    $manifest['background_color'] = $toHex($reader->get('theme.colors.dark'));
+    $manifest['display'] = 'minimal-ui';
+    $manifest['scope'] = '/';
+    $manifest['theme_color'] = $toHex($reader->get('theme.colors.primary'));
+
+    // $enviroment = $this->get('enviroment');
+    // $reader = $this->get('reader');
+    // $sitemap = new Sitemap($enviroment->getServer(), $reader->getSlugs());
+    $response->getBody()->write(json_encode($manifest));
+    return $response->withHeader('Content-type', 'application/json');
+});
 
 $app->post('/form/submit/{formId}', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
@@ -226,13 +238,14 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $faviconBuilder = new FaviconBuilder($enviroment, $reader);
     $componentBuilder->addListener($metaBuilder);
 
-    $scriptBuilder = new ScriptBuilder();
+    $scriptBuilder = new ScriptBuilder((bool)$reader->get('offline'));
     $componentBuilder->addListener($scriptBuilder);
 
     $perloadBuilder = new PreloadBuilder();
     $componentBuilder->addListener($perloadBuilder);
 
     $page = $path->getPage();
+
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
         $section = $componentBuilder->build('section', $sectionData, ['type'=>'group'], $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
@@ -246,31 +259,42 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     );
     $document->getChild('body')->addStyle($bodyStyle);
 
-    // Add Meta
-    $document = $metaBuilder->getDocument($document);
+    if ('offline' !== $page) {
+        // Add Meta
+        $document = $metaBuilder->getDocument($document);
 
-    // Add Favicon
-    $document = $faviconBuilder->getDocument($document);
+        // Add Favicon
+        $document = $faviconBuilder->getDocument($document);
 
-    // Add Preload builder
-    $document = $perloadBuilder->getDocument($document);
+        // Add Preload builder
+        $document = $perloadBuilder->getDocument($document);
 
-    // Add Webfonts
-    $fonts = $reader->get('theme.fonts');
-    if (null !== $fonts) {
-        $fontBuilder = new FontBuilder($fonts);
-        $document = $fontBuilder->getDocument($document);
+        // Add Webfonts
+        $fonts = $reader->get('theme.fonts');
+        if (null !== $fonts) {
+            $fontBuilder = new FontBuilder($fonts);
+            $document    = $fontBuilder->getDocument($document);
+        }
+
+        if ($reader->get('offline')) {
+            $manifestLink = new \Flipsite\Components\Element('link', true, true);
+            $manifestLink->setAttribute('rel', 'manifest');
+            $manifestLink->setAttribute('href', '/manifest.json');
+            $document->getChild('head')->addChild($manifestLink);
+        }
+    } else {
+        $document->getChild('head')->getChild('title')->setContent('OFFLINE');
     }
 
     $bodyHtml = $document->getChild('body')->render(2, 1);
     if (strpos($bodyHtml, 'scroll:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.js')));
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
     }
     // if (strpos($bodyHtml, 'stuck:')) {
     //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.js')));
     // }
     if (strpos($bodyHtml, 'enter:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.js')));
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
     }
     // Add Scripts
     $document = $scriptBuilder->getDocument($document);

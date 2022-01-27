@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\ComponentListenerInterface;
@@ -14,6 +13,10 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
     private array $global = [];
     private array $ready  = [];
 
+    public function __construct(private bool $sw = false)
+    {
+    }
+
     public function getDocument(Document $document) : Document
     {
         if (0 === count($this->global) && 0 === count($this->ready)) {
@@ -23,6 +26,11 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         foreach ($this->global as $code) {
             $script->addCode($code);
         }
+
+        if ($this->sw) {
+            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}});');
+        }
+
         if (count($this->ready)) {
             $script->addCode("function ready(fn){if(document.readyState!='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}");
         }

@@ -164,6 +164,9 @@ final class Reader
 
     public function getSections(string $page, Language $language) : array
     {
+        if ('offline' === $page) {
+            return $this->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
+        }
         $before = $this->data['before'] ?? [];
         if (ArrayHelper::isAssociative($before)) {
             $before = [$before];
