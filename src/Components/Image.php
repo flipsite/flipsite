@@ -37,6 +37,12 @@ final class Image extends AbstractComponent
         $this->addStyle($style);
         if ($this->isSvg($src)) {
             $imageContext = $this->imageHandler->getContext($src, []);
+            if ($imageContext->getWidth()) {
+                $this->setAttribute('width', $imageContext->getWidth());
+            }
+            if ($imageContext->getHeight()) {
+                $this->setAttribute('height', $imageContext->getHeight());
+            }
             $this->setAttribute('src', $imageContext->getSrc());
         } else {
             if ($this->canIUse->webp()) {
