@@ -71,6 +71,11 @@ final class Slugs
         return (string)$this->slugs[$page][(string) $language] ?? null;
     }
 
+    public function isPage(string $page) : bool
+    {
+        return in_array($page, $this->pages);
+    }
+
     public function getPage(string $slug) : ?string
     {
         foreach ($this->slugs as $page => $slugs) {

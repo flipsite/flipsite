@@ -35,10 +35,12 @@ final class Breadcrumb extends AbstractGroup
                 $path            = explode('/', $page);
                 while (count($path) > 0) {
                     $page            = implode('/', $path);
-                    $data['items'][] = [
-                        'url'  => $page,
-                        'text' => $this->reader->getPageName($page, $this->path->getLanguage())
-                    ];
+                    if ($this->reader->getSlugs()->isPage($page)) {
+                        $data['items'][] = [
+                            'url'  => $page,
+                            'text' => $this->reader->getPageName($page, $this->path->getLanguage())
+                        ];
+                    }
                     array_pop($path);
                 }
                 $data['items'][] = $data['home'] ?? [

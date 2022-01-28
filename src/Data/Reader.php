@@ -352,7 +352,7 @@ final class Reader
                     }
                     $dataMapper                   = new DataMapper();
                     $expandedPages[$expandedPage] = $dataMapper->apply($sections, $pageData['data']);
-                    if ($slugs[$page]) {
+                    if (isset($slugs[$page])) {
                         $expandedSlugs = $this->extendSlug($expandedSlugs, $page, $slugs[$page], $params, $permutation);
                     }
                 }
