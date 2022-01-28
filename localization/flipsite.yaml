@@ -18,6 +18,10 @@ phone:
   en: Phone
   sv: Telefon
   fi: Puhelin
+select_language:
+  en: Select language
+  sv: Välj språk
+  fi: Valitse kieli
 signin:
   en: Sign in
   sv: Logga in
