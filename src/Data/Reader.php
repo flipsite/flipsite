@@ -31,6 +31,8 @@ final class Reader
 
     private ?array $pageNames = null;
 
+    private string $hash = '';
+
     public function __construct(Enviroment $enviroment)
     {
         $this->enviroment = $enviroment;
@@ -53,6 +55,12 @@ final class Reader
             $this->getDefaultLanguage(),
             $this->getLanguages()
         );
+        $this->hash = md5(json_encode($this->data));
+    }
+
+    public function getHash(int $length = 6) : string
+    {
+        return substr($this->hash, 0, $length);
     }
 
     public function isOnline() : bool

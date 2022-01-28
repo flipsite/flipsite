@@ -74,13 +74,15 @@ $app->get('/sitemap.xml', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'application/xml');
 });
 
-$app->get('/sw.js', function (Request $request, Response $response) {
+$app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
     $enviroment = $this->get('enviroment');
-
     $js = file_get_contents(__DIR__.'/../js/sw.js');
+    if (preg_match('/[abcdef0-9]{6}/', $args['version'])) {
+        $js = str_replace('const OFFLINE_VERSION=1', 'const OFFLINE_VERSION="'.$args['version'].'"', $js);
+    }
     $response->getBody()->write((string) $js);
     return $response->withHeader('Content-type', 'text/javascript');
-});
+})->add($expiresMw);
 
 $app->get('/robots.txt', function (Request $request, Response $response) {
     $enviroment = $this->get('enviroment');
@@ -239,6 +241,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $componentBuilder->addListener($metaBuilder);
 
     $scriptBuilder = new ScriptBuilder(
+        $reader->getHash(),
         $enviroment->getBasePath(),
         (bool)$reader->get('offline')
     );
