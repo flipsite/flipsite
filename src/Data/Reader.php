@@ -29,7 +29,7 @@ final class Reader
 
     private Slugs $slugs;
 
-    private ?array $pageNames = null;
+    private ?PageNameResolver $pageNameResolver = null;
 
     private string $hash = '';
 
@@ -115,59 +115,12 @@ final class Reader
         return $this->data['redirects'] ?? [];
     }
 
-    public function getPageName(string $page, Language $language) : ?string
+    public function getPageName(string $page, Language $language) : string
     {
-        if ('home' === $page) {
-            switch ((string)$language) {
-                case 'sv': return 'Hem';
-                case 'fi': return 'Koti';
-                default: return 'Home';
-            }
+        if (is_null($this->pageNameResolver)) {
+            $this->pageNameResolver = new PageNameResolver($this->data['pages'], $this->getSlugs());
         }
-        $slug = $this->slugs->getSlug($page, $language);
-
-        if ($slug === '') {
-            $slug = 'home';
-        }
-
-        if (is_null($this->pageNames)) {
-            $this->pageNames = [];
-            foreach ($this->data['pages'] as $p => $data) {
-                if (null === $data) {
-                    continue;
-                }
-                if (ArrayHelper::isAssociative($data)) {
-                    $data = [$data];
-                }
-                foreach ($data as $section) {
-                    if (isset($section['_name'])) {
-                        $name                = is_array($section['_name']) ? $this->localize($section['_name'], $language) : $section['_name'];
-                        $this->pageNames[$p] = $name;
-                    }
-                }
-            }
-        }
-
-        if (isset($this->pageNames[$page])) {
-            return $this->pageNames[$page];
-        }
-
-        $slug = explode('/', $slug);
-
-        // If loc, test unlocalized version
-        $lang = $slug[0];
-        if (in_array($lang, $this->languageCodes)) {
-            $tmp = $slug;
-            array_shift($tmp);
-            $tmp = implode('/', $tmp);
-            if (isset($this->pageNames[$tmp])) {
-                return $this->pageNames[$tmp];
-            }
-        }
-
-        $last = array_pop($slug);
-
-        return ucfirst(str_replace('-', ' ', $last));
+        return $this->pageNameResolver->getName($page, $language);
     }
 
     public function getSections(string $page, Language $language) : array
@@ -311,6 +264,21 @@ final class Reader
             if (!in_array((string) $language, $languages)) {
                 return true;
             }
+        }
+        if (isset($section['options']['visible']['pages'])) {
+            $pages = $section['options']['visible']['pages'];
+            if (is_string($pages)) {
+                $pages = explode(',', $pages);
+            }
+            foreach ($pages as $visiblePage) {
+                if ($visiblePage === $page) {
+                    return false;
+                }
+                if (str_ends_with($visiblePage, '*') && str_starts_with($page, str_replace('*', '', $visiblePage))) {
+                    return false;
+                }
+            }
+            return true;
         }
         if (isset($section['options']['hidden']['pages'])) {
             $pages = $section['options']['hidden']['pages'];
