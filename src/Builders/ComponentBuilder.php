@@ -111,7 +111,7 @@ class ComponentBuilder
                 $data = ['value' => $data];
             }
             if (isset($style['tplDefault'])) {
-                $default = $this->reader->localize($data, $this->path->getLanguage());
+                $default = $this->reader->localize($style['tplDefault'], $this->path->getLanguage());
                 $data    = $this->addTplDefaultData($data, $default);
                 unset($style['tplDefault']);
             }
