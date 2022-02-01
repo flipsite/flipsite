@@ -286,7 +286,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
             $manifestLink = new \Flipsite\Components\Element('link', true, true);
             $manifestLink->setAttribute('rel', 'manifest');
             $baseUrl = $enviroment->getBasePath();
-            $manifestLink->setAttribute('href', $baseUrl.'manifest.json');
+            $manifestLink->setAttribute('href', $baseUrl.'/manifest.json');
             $document->getChild('head')->addChild($manifestLink);
         }
     } else {
