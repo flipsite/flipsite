@@ -160,7 +160,10 @@ class ComponentBuilder
                     }
                     unset($data['_attr']);
                 }
-
+                if (isset($style['tag'])) {
+                    $component->setTag($style['tag']);
+                    unset($style['tag']);
+                }
                 unset($data['_meta'],$data['_name']);
                 if (isset($data['background'])) {
                     $component->setBackground($data['background'], $style['background'] ?? []);

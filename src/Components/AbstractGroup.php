@@ -30,10 +30,6 @@ abstract class AbstractGroup extends AbstractComponent
             unset($style['tag']);
             $this->addChild($content);
         } else {
-            if (isset($style['tag'])) {
-                $this->tag = $style['tag'];
-                unset($style['tag']);
-            }
             $this->addStyle($style);
         }
         $children = [];

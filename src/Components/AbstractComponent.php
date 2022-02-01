@@ -14,6 +14,11 @@ abstract class AbstractComponent extends AbstractElement
         return is_array($data) ? $data : ['value' => $data];
     }
 
+    public function setTag(string $tag) : void
+    {
+        $this->tag = $tag;
+    }
+
     public function setBackground(string|array $background, array $style = []) : void
     {
         if (is_string($background)) {
