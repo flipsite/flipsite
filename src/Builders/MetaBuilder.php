@@ -62,7 +62,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $share = $meta['share'] ?? $this->reader->get('share');
         if ($share) {
             $image      = $this->imageHandler->getContext($share, ['width' => 1200, 'height' => 630]);
-            $elements[] = $this->og('og:image', $server . $image->getSrc());
+            $elements[] = $this->og('og:image', $this->enviroment->getServer(false) . $image->getSrc());
         }
 
         $elements[] = $this->og('og:url', trim($server . $page, '/'));
