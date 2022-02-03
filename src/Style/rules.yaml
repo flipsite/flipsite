@@ -71,9 +71,9 @@ content-end: align-content:flex-end
 content-between: align-content:space-between
 content-around: align-content:space-around
 content-evenly: align-content:space-evenly
-content-visibility-visible: visible
-content-visibility-hidden: hidden
-content-visibility-auto: auto
+content-visibility-visible: content-visibility:visible
+content-visibility-hidden: content-visibility:hidden
+content-visibility-auto: content-visibility:auto
 cursor-auto: cursor:auto
 cursor-default: cursor:default
 cursor-help: cursor:help
