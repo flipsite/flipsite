@@ -71,6 +71,11 @@ class Nav extends AbstractGroup
             $data['items'][0]['exact'] = true;
         }
 
+        if ($data['options']['remember'] ?? false) {
+            $this->setAttribute('data-remember', true);
+            $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__.'/../../js/ready.remember.min.js')));
+        }
+
         $data['items'] = $this->addActive($data['items'], $this->path->getPage());
 
         if (isset($data['options'])) {
