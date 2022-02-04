@@ -253,17 +253,20 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $page = $path->getPage();
 
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
-        $section = $componentBuilder->build('section', $sectionData, ['type'=>'group'], $reader->get('theme.appearance') ?? 'light');
+        $parentStyle = $sectionData['parentStyle'] ?? ['type' => 'group'];
+        unset($sectionData['parentStyle']);
+        $section = $componentBuilder->build('section', $sectionData, $parentStyle, $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
     }
-    $document = $documentBuilder->getDocument();
 
     // Add body class TODO fix
     $bodyStyle = StyleAppearanceHelper::apply(
         \Flipsite\Utils\ArrayHelper::merge($componentBuilder->getStyle('body'), $reader->get('theme.components.body') ?? []),
         $reader->get('theme.appearance') ?? 'light'
     );
-    $document->getChild('body')->addStyle($bodyStyle);
+    $documentBuilder->addBodyStyle($bodyStyle);
+
+    $document = $documentBuilder->getDocument();
 
     if ('offline' !== $page) {
         // Add Meta

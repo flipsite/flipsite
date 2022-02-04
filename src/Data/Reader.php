@@ -153,6 +153,18 @@ final class Reader
                 $sections[] = $section;
             }
         }
+        foreach ($sections as &$section) {
+            $parentStyle = null;
+            foreach ($section as $type => $value) {
+                if ($parentStyle) {
+                    continue;
+                }
+                $parentStyle = $this->get('theme.components.'.$type.'.section');
+            }
+            if (null !== $parentStyle) {
+                $section['parentStyle'] = $parentStyle;
+            }
+        }
         return $this->localize($sections ?? [], $language) ?? [];
     }
 

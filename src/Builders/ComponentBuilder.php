@@ -103,7 +103,7 @@ class ComponentBuilder
 
         if (is_array($style)) {
             $type = $style['type'] ?? $type;
-            unset($style['type']);
+            unset($style['type'],$style['section']);
         }
 
         if (isset($style['tpl'])) {
