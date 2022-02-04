@@ -84,6 +84,7 @@ class Nav extends AbstractGroup
             $data['items'] = array_slice($data['items'], $offset, $length);
         }
 
+
         return $data;
     }
 
@@ -107,6 +108,9 @@ class Nav extends AbstractGroup
                 $item['style'] = ArrayHelper::merge($item['style'], $style['active']);
             }
             $data['a:'.$i] = $item;
+        }
+        if (isset($style['empty'])) {
+            $data['empty'] = '&nbsp;';
         }
         unset($style['items'], $style['active'], $style['first'], $style['last']);
 
