@@ -1,5 +1,4 @@
 ready(() => {
-
   function handleIntersection(entries) {
     entries.map((entry) => {
       if (entry.isIntersecting) {
@@ -23,8 +22,4 @@ ready(() => {
   elements.forEach((el)=>{
     observer.observe(el);
   });
-
-
-
-
 });
