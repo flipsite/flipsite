@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 abstract class AbstractRuleSpacing extends AbstractRule
@@ -11,6 +10,8 @@ abstract class AbstractRuleSpacing extends AbstractRule
      */
     protected array $properties = [];
 
+    protected ?array $safeAreaInset = null;
+
     /**
      * @param array<string> $args
      */
@@ -18,8 +19,15 @@ abstract class AbstractRuleSpacing extends AbstractRule
     {
         $value = $this->getConfig('spacing', $args[0]);
         $value ??= $this->checkCallbacks('size', $args);
-        foreach ($this->properties as $property) {
-            $this->setDeclaration($property, $value);
+
+        $safe = $this->safeAreaInset && in_array('safe', $args);
+        foreach ($this->properties as $i => $property) {
+            if ($safe) {
+                $safeValue = 'calc('.$value.' + env('.$this->safeAreaInset[$i].'))';
+                $this->setDeclaration($property, $safeValue);
+            } else {
+                $this->setDeclaration($property, $value);
+            }
         }
     }
 }
