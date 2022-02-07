@@ -10,6 +10,6 @@ final class MdLine extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $this->content = $this->getMarkdownLine($data['value'], $style ?? null);
+        $this->content = $this->getMarkdownLine($data['value'], $style ?? null, $appearance);
     }
 }

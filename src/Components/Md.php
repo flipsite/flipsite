@@ -28,9 +28,9 @@ final class Md extends AbstractComponent
 
         $containerStyle = $style['container'] ?? null;
         unset($style['container']);
-        $style          = $this->extendStyle($style, $appearance);
+        //$style          = $this->extendStyle($style, $appearance);
 
-        $this->content  = $this->getMarkdown($markdown ?? '', $style ?? null);
+        $this->content  = $this->getMarkdown($markdown ?? '', $style ?? null, $appearance);
 
         if ($containerStyle) {
             $this->container = new Element($containerStyle['type'] ?? 'div');
@@ -47,7 +47,7 @@ final class Md extends AbstractComponent
         }
         $html = $this->content;
         $html = str_replace("\n", ' ', $html);
-        $tags = explode('-#-#-#-', str_replace('> <', '>-#-#-#-<', $html));
+        // $tags = explode('-#-#-#-', str_replace('> <', '>-#-#-#-<', $html));
         // $html = '';
         // foreach ($tags as $tag) {
         //     $html .= $i.wordwrap($tag, 80, "\n".$i)."\n";

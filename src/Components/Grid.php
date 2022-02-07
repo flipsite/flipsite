@@ -23,7 +23,7 @@ class Grid extends AbstractComponent
             } else {
                 $type = $style['colType'] ?? 'group';
             }
-            $colStyle   = $this->getColStyle($i, $style);
+            $colStyle   = $this->getColStyle($i, count($data['cols']), $style);
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }
         $this->addChildren($children);
@@ -45,7 +45,7 @@ class Grid extends AbstractComponent
         return $data;
     }
 
-    private function getColStyle(int $index, array $style) : array
+    private function getColStyle(int $index, int $count, array $style) : array
     {
         $colStyle = $style['colsAll'] ?? [];
         if ($index % 2 === 0 && isset($style['colsEven'])) {
@@ -55,6 +55,12 @@ class Grid extends AbstractComponent
         }
         if (isset($style['cols'][$index])) {
             $colStyle = ArrayHelper::merge($colStyle, $style['cols'][$index]);
+        }
+        if ($index === 0 && isset($style['cols']['first'])) {
+            $colStyle = ArrayHelper::merge($colStyle, $style['cols']['first']);
+        }
+        if ($index === $count - 1 && isset($style['cols']['last'])) {
+            $colStyle = ArrayHelper::merge($colStyle, $style['cols']['last']);
         }
         return $colStyle;
     }
