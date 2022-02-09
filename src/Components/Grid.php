@@ -16,6 +16,11 @@ class Grid extends AbstractComponent
     {
         $this->addStyle($style);
         $children = [];
+        if (isset($style['colsNth'])) {
+            $nth = $this->getNth($style['colsNth'], count($data['cols']));
+            unset($style['colsNth']);
+            $style['cols'] = ArrayHelper::merge($style['cols'] ?? [], $nth);
+        }
         foreach ($data['cols'] as $i => $colData) {
             if (is_array($colData)) {
                 $type = $colData['type'] ?? $style['colType'] ?? 'group';
@@ -56,12 +61,28 @@ class Grid extends AbstractComponent
         if (isset($style['cols'][$index])) {
             $colStyle = ArrayHelper::merge($colStyle, $style['cols'][$index]);
         }
-        if ($index === 0 && isset($style['cols']['first'])) {
-            $colStyle = ArrayHelper::merge($colStyle, $style['cols']['first']);
-        }
+
         if ($index === $count - 1 && isset($style['cols']['last'])) {
             $colStyle = ArrayHelper::merge($colStyle, $style['cols']['last']);
         }
         return $colStyle;
+    }
+
+    private function getNth(array $nth, int $count) : array
+    {
+        $parser    = new \MathParser\StdMathParser();
+        $evaluator = new \MathParser\Interpreting\Evaluator();
+        $colsStyle = [];
+        foreach ($nth as $exp => $style) {
+            $ast   = $parser->parse($exp);
+            $index = 0;
+            $i     = 0;
+            while ($index < $count) {
+                $evaluator->setVariables(['n' => $i++]);
+                $index             = intval($ast->accept($evaluator));
+                $colsStyle[$index] = $style;
+            }
+        }
+        return $colsStyle;
     }
 }
