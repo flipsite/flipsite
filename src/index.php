@@ -300,9 +300,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     if (strpos($bodyHtml, 'scroll:')) {
         $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
     }
-    // if (strpos($bodyHtml, 'stuck:')) {
-    //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.js')));
-    // }
+    if (strpos($bodyHtml, 'stuck:')) {
+        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.min.js')));
+    }
     if (strpos($bodyHtml, 'enter:')) {
         $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
     }
