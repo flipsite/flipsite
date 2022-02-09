@@ -30,7 +30,8 @@ trait MarkdownTrait
             $html = $this->addBullets($html, $style['bullet'], $appearance);
         }
         $html = $this->addMarkdownStyle($html, $style);
-        return $this->addUrlsToMarkdown($html);
+        $html = $this->addUrlsToMarkdown($html);
+        return $html;
     }
 
     private function addMarkdownStyle(string $html, array $style = []) : string
@@ -48,7 +49,21 @@ trait MarkdownTrait
                 if (is_array($classes)) {
                     $classes = implode(' ', $classes);
                 }
-                $html = str_replace('<'.$tag, '<'.$tag.' class="'.$classes.'"', $html);
+                $matches = [];
+                preg_match_all('/<'.$tag.'[\>\s]{1}/', $html, $matches);
+                $tags = array_unique($matches[0]);
+                foreach ($tags as $t) {
+                    $hasAttr = str_ends_with($t, ' ');
+                    $t       = str_replace('<', '', $t);
+                    $t       = str_replace('>', '', $t);
+                    $t       = trim($t);
+
+                    if ($hasAttr) {
+                        $html = str_replace('<'.$t.' ', '<'.$t.' class="'.$classes.'" ', $html);
+                    } else {
+                        $html = str_replace('<'.$t.'>', '<'.$t.' class="'.$classes.'">', $html);
+                    }
+                }
             }
         }
         return $html;
@@ -65,7 +80,11 @@ trait MarkdownTrait
         foreach ($hrefs as $href) {
             $external = false;
             $newHref  = $this->url($href, $external);
-            $html     = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
+            if ($external) {
+                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'" target="_blank" rel="noopener noreferrer"', $html);
+            } else {
+                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
+            }
         }
         return $html;
     }
