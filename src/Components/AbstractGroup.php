@@ -11,17 +11,22 @@ abstract class AbstractGroup extends AbstractComponent
     use Traits\UrlTrait;
     use Traits\ImageHandlerTrait;
     use Traits\CanIUseTrait;
+    use Traits\NthTrait;
 
     protected string $tag = 'div';
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        if (isset($style['cols'])) {
-            $colStyle = $style['cols'];
-            unset($style['cols']);
+        if (isset($data['_index'])) {
+            $nthStyle   = $this->getNth($data['_index'], $data['_total'], $style);
+            $style      = ArrayHelper::merge($style, $nthStyle);
         }
+
         $wrapperStyle = $style['wrapper'] ?? false;
-        if ($wrapperStyle) {
+        if (false !== $wrapperStyle) {
+            if (is_bool($wrapperStyle)) {
+                $wrapperStyle = [];
+            }
             $this->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
             $this->addStyle($wrapperStyle);
@@ -51,7 +56,7 @@ abstract class AbstractGroup extends AbstractComponent
             $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
             $i++;
         }
-        if ($wrapperStyle) {
+        if (false !== $wrapperStyle) {
             $content->addChildren($children);
         } else {
             $this->addChildren($children);

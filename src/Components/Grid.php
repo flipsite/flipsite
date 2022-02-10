@@ -9,6 +9,7 @@ class Grid extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\RepeatTrait;
+    use Traits\NthTrait;
 
     protected string $tag = 'div';
 
@@ -16,11 +17,6 @@ class Grid extends AbstractComponent
     {
         $this->addStyle($style);
         $children = [];
-        if (isset($style['colsNth'])) {
-            $nth = $this->getNth($style['colsNth'], count($data['cols']));
-            unset($style['colsNth']);
-            $style['cols'] = ArrayHelper::merge($style['cols'] ?? [], $nth);
-        }
         foreach ($data['cols'] as $i => $colData) {
             if (is_array($colData)) {
                 $type = $colData['type'] ?? $style['colType'] ?? 'group';
@@ -28,7 +24,7 @@ class Grid extends AbstractComponent
             } else {
                 $type = $style['colType'] ?? 'group';
             }
-            $colStyle   = $this->getColStyle($i, count($data['cols']), $style);
+            $colStyle   = $this->getNth($i, count($data['cols']), $style['cols'] ?? []);
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }
         $this->addChildren($children);
@@ -48,41 +44,5 @@ class Grid extends AbstractComponent
             $data = ['cols' => $data];
         }
         return $data;
-    }
-
-    private function getColStyle(int $index, int $count, array $style) : array
-    {
-        $colStyle = $style['colsAll'] ?? [];
-        if ($index % 2 === 0 && isset($style['colsEven'])) {
-            $colStyle = ArrayHelper::merge($colStyle, $style['colsEven']);
-        } elseif ($index % 2 === 1 && isset($style['colsOdd'])) {
-            $colStyle = ArrayHelper::merge($colStyle, $style['colsOdd']);
-        }
-        if (isset($style['cols'][$index])) {
-            $colStyle = ArrayHelper::merge($colStyle, $style['cols'][$index]);
-        }
-
-        if ($index === $count - 1 && isset($style['cols']['last'])) {
-            $colStyle = ArrayHelper::merge($colStyle, $style['cols']['last']);
-        }
-        return $colStyle;
-    }
-
-    private function getNth(array $nth, int $count) : array
-    {
-        $parser    = new \MathParser\StdMathParser();
-        $evaluator = new \MathParser\Interpreting\Evaluator();
-        $colsStyle = [];
-        foreach ($nth as $exp => $style) {
-            $ast   = $parser->parse($exp);
-            $index = 0;
-            $i     = 0;
-            while ($index < $count) {
-                $evaluator->setVariables(['n' => $i++]);
-                $index             = intval($ast->accept($evaluator));
-                $colsStyle[$index] = $style;
-            }
-        }
-        return $colsStyle;
     }
 }

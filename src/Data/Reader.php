@@ -153,7 +153,10 @@ final class Reader
                 $sections[] = $section;
             }
         }
-        foreach ($sections as &$section) {
+        foreach ($sections as $i => &$section) {
+            $section['_index'] = $i;
+            $section['_total'] = count($sections);
+
             $parentStyle = null;
             foreach ($section as $type => $value) {
                 if ($parentStyle) {
