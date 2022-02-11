@@ -9,6 +9,7 @@ final class Table extends AbstractComponent
 {
     use Traits\MarkdownTrait;
     use Traits\EnviromentTrait;
+    use Traits\NthTrait;
     protected string $tag = 'table';
 
     public function normalize(string|int|bool|array $data) : array
@@ -47,36 +48,30 @@ final class Table extends AbstractComponent
     public function build(array $data, array $style, string $appearance) : void
     {
         $this->addStyle($style);
-        if (null !== $data['header']) {
+        if ($data['header'] ?? false) {
             $tr      = new Element('tr');
             foreach ($data['header'] as $i => $col) {
                 $th = new Element('th', true);
-                $th->addStyle($style['thAll'] ?? null);
-                $th->addStyle($style['th'][$i] ?? null);
+                $th->addStyle($this->getNth($i, count($data['header']), $style['th'] ?? [], 'th'));
                 $th->setContent($col);
                 $tr->addChild($th);
             }
             $this->addChild($tr);
         }
 
+        $totalRows = count($data['rows']);
         foreach ($data['rows'] as $i => $row) {
             $tr = new Element('tr');
-            $tr->addStyle($style['trAll'] ?? null);
-            if (0 === $i % 2) {
-                $tr->addStyle($style['trEven'] ?? null);
-            } else {
-                $tr->addStyle($style['trOdd'] ?? null);
-            }
-            $tr->addStyle($style['tr'][$i++] ?? []);
+            $tr->addStyle($this->getNth($i, $totalRows, $style['tr'] ?? [], 'tr'));
             foreach ($row as $j => $col) {
                 $tag = $style['td'][$j]['tag'] ?? 'td';
                 $td  = new Element($tag, true);
-                $td->addStyle($style['tdAll'] ?? []);
-                $td->addStyle($style['td'][$j] ?? []);
+                $td->addStyle($this->getNth($j, $totalRows, $style['td'] ?? [], 'td'));
+
                 if (isset($data['format'])) {
                     $td->setContent($this->format($data['format'], $col, $j));
                 } else {
-                    $td->setContent($col);
+                    $td->setContent((string)$col);
                 }
                 $tr->addChild($td);
             }
@@ -107,75 +102,3 @@ final class Table extends AbstractComponent
         }
     }
 }
-            // $tdStyle = $data->getStyle('td') ?? [];
-            // foreach ($records as $record) {
-            //     $tr = new Element('tr');
-            //     $tr->addStyle($data->getStyle('trAll'));
-            //     if (0 === $row % 2) {
-            //         $tr->addStyle($data->getStyle('trEven'));
-            //     } else {
-            //         $tr->addStyle($data->getStyle('trOdd'));
-            //     }
-            //     ++$row;
-            //     $i = 0;
-            //     foreach ($record as $col) {
-            //         $td = new Element('td', true);
-            //         $td->addStyle($data->getStyle('tdAll'));
-            //         $td->addStyle($tdStyle[$i++] ?? []);
-            //         $td->setContent($col);
-            //         $tr->addChild($td);
-            //     }
-            //     $this->addChild($tr);
-            // }
-
-        // $this->addStyle($data->getStyle('container'));
-        // $header = $data->get('header') ?? null;
-        // if (is_string($header)) {
-        //     $header = explode(',', $header);
-        // }
-        // $records = $data->get('rows') ?? [];
-        // $import  = $data->get('import') ?? null;
-        // if ($import && mb_strpos($import, '.csv')) {
-        //     $filename = $this->enviroment->getSiteDir().'/'.$import;
-        //     if (file_exists($filename)) {
-        //         $csv = Reader::createFromPath($filename, 'r');
-        //         if (null === $header) {
-        //             $csv->setHeaderOffset(0);
-        //             $header = $csv->getHeader();
-        //         }
-        //         $records = $csv->getRecords();
-        //     }
-        // }
-        // if (null !== $header) {
-        //     $tr      = new Element('tr');
-        //     $thStyle = $data->getStyle('th') ?? [];
-        //     foreach ($header as $i => $col) {
-        //         $th = new Element('th', true);
-        //         $th->addStyle($data->getStyle('thAll') ?? []);
-        //         $th->addStyle($thStyle[$i] ?? null);
-        //         $th->setContent($col);
-        //         $tr->addChild($th);
-        //     }
-        //     $this->addChild($tr);
-        // }
-        // $row     = 0;
-        // $tdStyle = $data->getStyle('td') ?? [];
-        // foreach ($records as $record) {
-        //     $tr = new Element('tr');
-        //     $tr->addStyle($data->getStyle('trAll'));
-        //     if (0 === $row % 2) {
-        //         $tr->addStyle($data->getStyle('trEven'));
-        //     } else {
-        //         $tr->addStyle($data->getStyle('trOdd'));
-        //     }
-        //     ++$row;
-        //     $i = 0;
-        //     foreach ($record as $col) {
-        //         $td = new Element('td', true);
-        //         $td->addStyle($data->getStyle('tdAll'));
-        //         $td->addStyle($tdStyle[$i++] ?? []);
-        //         $td->setContent($col);
-        //         $tr->addChild($td);
-        //     }
-        //     $this->addChild($tr);
-        // }

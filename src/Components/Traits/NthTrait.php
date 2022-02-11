@@ -7,9 +7,9 @@ use Flipsite\Utils\ArrayHelper;
 
 trait NthTrait
 {
-    private ?array $nth = null;
+    private array $nth = [];
 
-    private function getNth(int $index, int $total, array $style) : array
+    private function getNth(int $index, int $total, array $style, string $id = 'nth') : array
     {
         $nth = $style['all'] ?? [];
         unset($style['all']);
@@ -30,22 +30,22 @@ trait NthTrait
         }
 
         if (isset($style['nth'])) {
-            if (null === $this->nth) {
-                $this->nth    = [];
-                $parser       = new \MathParser\StdMathParser();
-                $evaluator    = new \MathParser\Interpreting\Evaluator();
+            if (!isset($this->nth[$id])) {
+                $this->nth[$id]    = [];
+                $parser            = new \MathParser\StdMathParser();
+                $evaluator         = new \MathParser\Interpreting\Evaluator();
                 foreach ($style['nth'] as $exp => $nthStyle) {
                     $ast   = $parser->parse($exp);
                     $i     = 0;
                     $n     = 0;
                     while ($i < $total) {
                         $evaluator->setVariables(['n' => $n++]);
-                        $i             = intval($ast->accept($evaluator));
-                        $this->nth[$i] = $nthStyle;
+                        $i                  = intval($ast->accept($evaluator));
+                        $this->nth[$id][$i] = $nthStyle;
                     }
                 }
             }
-            $nth = ArrayHelper::merge($nth, $this->nth[$index] ?? []);
+            $nth = ArrayHelper::merge($nth, $this->nth[$id][$index] ?? []);
         }
         return $nth;
     }
