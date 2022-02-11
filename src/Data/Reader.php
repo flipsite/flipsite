@@ -166,6 +166,9 @@ final class Reader
             }
             if (null !== $parentStyle) {
                 $section['parentStyle'] = $parentStyle;
+                if (!isset($section['parentStyle']['type'])) {
+                    $section['parentStyle']['type'] = 'group';
+                }
             }
         }
         return $this->localize($sections ?? [], $language) ?? [];
