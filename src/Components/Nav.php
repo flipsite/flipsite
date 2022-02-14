@@ -76,14 +76,22 @@ class Nav extends AbstractGroup
             $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__.'/../../js/ready.remember.min.js')));
         }
 
-        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
-
         if (isset($data['options'])) {
             $offset        = $data['options']['offset'] ?? 0;
             $length        = $data['options']['length'] ?? 999999;
             $data['items'] = array_slice($data['items'], $offset, $length);
         }
 
+        if (isset($data['prepend'])) {
+            $data['items'] = array_merge($data['prepend'], $data['items']);
+            unset($data['prepend']);
+        }
+        if (isset($data['append'])) {
+            $data['items'] = array_merge($data['items'], $data['append']);
+            unset($data['append']);
+        }
+
+        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
 
         return $data;
     }
