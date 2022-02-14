@@ -5,9 +5,6 @@ namespace Flipsite\Components;
 
 final class Group extends AbstractGroup
 {
-    use Traits\BuilderTrait;
-    use Traits\UrlTrait;
-
     // private function setStyle(array $style) : array
     // {
     //     $this->addStyle($style['container'] ?? null);

@@ -39,12 +39,13 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $children = [];
         $i        = 0;
+        $total    = count($data);
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
-            if (isset($colStyle[$i])) {
-                unset($colStyle[$i]['type']);
-                $componentStyle = ArrayHelper::merge($componentStyle, $colStyle[$i]);
-            }
+
+            $colStyle = $this->getNth($i, $total, $style['cols'] ?? []);
+            unset($colStyle['type']);
+            $componentStyle = ArrayHelper::merge($componentStyle, $colStyle);
 
             if (strpos($type, ':')) {
                 $tmp      = explode(':', $type);
