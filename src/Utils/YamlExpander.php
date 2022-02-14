@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -9,6 +8,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlExpander
 {
+    public static array $cache = [];
+
     /**
      * Parses a YAML file into a PHP value.
      *
@@ -39,13 +40,32 @@ class YamlExpander
         foreach ($data as $attr => &$val) {
             if (is_array($val)) {
                 $val = self::parseIncludes($val, $rootDir);
-            } elseif (is_string($val) && str_starts_with($val, '$') && file_exists($rootDir.'/'.ltrim($val, '$'))) {
-                $val      = ltrim($val, '$');
-                $pathinfo = pathinfo($rootDir.'/'.$val);
-                $val      = Yaml::parseFile($rootDir.'/'.$val);
-                $dir      = $pathinfo['dirname'];
-                $val      = self::parseIncludes($val, $dir);
-                $val      = self::parseRef($val, $val);
+            } elseif (is_string($val) && str_starts_with($val, '$')) {
+                $filepath = $rootDir.'/'.ltrim($val, '$');
+                if (is_dir($filepath)) {
+                    $name = ltrim($val, '$');
+                    if (isset(self::$cache[$name])) {
+                        $val = self::$cache[$name];
+                    } else {
+                        $list = [];
+                        $i    = 0;
+                        foreach (scandir($filepath) as $file) {
+                            $parsed = YamlFront::parseFile($filepath.'/'.$file);
+                            if ($parsed) {
+                                $item                         = $parsed;
+                                $list[$parsed['key'] ?? $i++] = $parsed;
+                            }
+                        }
+                        self::$cache[$name] = $list;
+                        $val                = self::$cache[$name];
+                    }
+                } elseif (file_exists($filepath)) {
+                    $pathinfo = pathinfo($filepath);
+                    $val      = Yaml::parseFile($filepath);
+                    $dir      = $pathinfo['dirname'];
+                    $val      = self::parseIncludes($val, $dir);
+                    $val      = self::parseRef($val, $val);
+                }
             }
         }
         return $data;
