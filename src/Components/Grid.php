@@ -19,13 +19,18 @@ class Grid extends AbstractComponent
         $children  = [];
         $totalCols = count($data['cols']);
         foreach ($data['cols'] as $i => $colData) {
+            $colStyle = $this->getNth($i, $totalCols, $style['cols'] ?? []);
             if (is_array($colData)) {
-                $type = $colData['type'] ?? $style['colType'] ?? 'group';
+                $type = $colData['type'] ?? 'group';
                 unset($colData['type']);
             } else {
-                $type = $style['colType'] ?? 'group';
+                $type = 'group';
             }
-            $colStyle   = $this->getNth($i, $totalCols, $style['cols'] ?? []);
+            if (isset($colStyle['type'])) {
+                $type = $colStyle['type'];
+                unset($colStyle['type']);
+            }
+            $type       = $colStyle['type'] ?? $type;
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }
         $this->addChildren($children);
