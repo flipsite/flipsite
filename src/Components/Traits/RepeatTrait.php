@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components\Traits;
 
+use Flipsite\Utils\ArrayHelper;
+
 trait RepeatTrait
 {
     protected function expandRepeat(array $data, array $tpl) : array
@@ -20,8 +22,13 @@ trait RepeatTrait
 
     protected function attachDataToTpl(array $tpl, \Adbar\Dot $data)
     {
+        $unset  = [];
+        $subTpl = null;
+        $unset  = [];
         foreach ($tpl as $attr => &$value) {
-            if (is_array($value)) {
+            if ($attr === 'tpl') {
+                $subTpl = $value;
+            } elseif (is_array($value)) {
                 $value = $this->attachDataToTpl($value, $data);
             } elseif (false !== mb_strpos((string)$value, '{')) {
                 $matches = [];
@@ -32,9 +39,18 @@ trait RepeatTrait
                         $value = $replaceWith;
                     } elseif ($replaceWith !== null) {
                         $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
+                    } else {
+                        $unset[] = $attr;
                     }
                 }
             }
+        }
+        if ($subTpl) {
+            unset($tpl['tpl']);
+            $tpl =  ArrayHelper::merge($tpl, $subTpl);
+        }
+        foreach ($unset as $u) {
+            unset($tpl[$u]);
         }
         return $tpl;
     }
