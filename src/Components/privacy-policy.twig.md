@@ -19,6 +19,7 @@ In order for us to provide you the best possible experience on our websites, we 
 - **Usage data** — when you visit our site, we will store: the website from which you visited us from, the parts of our site you visit, the date and duration of your visit, your IP address, information from the device (device type, operating system, screen resolution, language, country you are located in, and web browser type) you used during your visit, and more. We process this usage data for statistical purposes, to improve our site and to recognize and stop any misuse.
 - **Cookies** — we may use cookies (small data files transferred onto computers or devices by sites) for record-keeping purposes and to enhance functionality on our site. You may deactivate or restrict the transmission of cookies by changing the settings of your web browser. Cookies that are already stored may be deleted at any time.
 {% if accountCreation %}
+
 - **Create an account** — when you sign up for and open an account or sign up for content or offers, we may ask you to provide us with information such as your name, email address and details about your organization. As otherwise detailed in this Privacy Policy, we will solely process this information to provide you with the service you signed up for.
 {% endif %}
 
