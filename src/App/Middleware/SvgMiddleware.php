@@ -23,7 +23,7 @@ class SvgMiddleware implements MiddlewareInterface
     {
         $response = $handler->handle($request);
         $html     = (string) $response->getBody();
-        $html     = str_replace("<svg></svg>\n", '<dummysvg></dummysvg>', $html);
+        $html     = str_replace("<svg></svg>\n", "<dummysvg></dummysvg>\n", $html);
         preg_match_all('/<svg(.|\n)*?src="(.*?)" xmlns(.|\n)*?<\/svg>/', $html, $matches);
 
         if (0 === count($matches[0] ?? [])) {
@@ -62,7 +62,7 @@ class SvgMiddleware implements MiddlewareInterface
             $defs = str_replace('></path>', '/>', $defs);
             $svg .= $defs;
             $svg .= "      </defs>\n    </svg>";
-            $html = str_replace('<dummysvg></dummysvg>', $svg."\n", $html);
+            $html = str_replace("<dummysvg></dummysvg>\n", $svg."\n", $html);
         }
         $streamFactory = new StreamFactory();
         $stream        = $streamFactory->createStream($html);
