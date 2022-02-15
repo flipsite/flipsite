@@ -16,7 +16,8 @@ class Grid extends AbstractComponent
     public function build(array $data, array $style, string $appearance) : void
     {
         $this->addStyle($style);
-        $children = [];
+        $children  = [];
+        $totalCols = count($data['cols']);
         foreach ($data['cols'] as $i => $colData) {
             if (is_array($colData)) {
                 $type = $colData['type'] ?? $style['colType'] ?? 'group';
@@ -24,7 +25,7 @@ class Grid extends AbstractComponent
             } else {
                 $type = $style['colType'] ?? 'group';
             }
-            $colStyle   = $this->getNth($i, count($data['cols']), $style['cols'] ?? []);
+            $colStyle   = $this->getNth($i, $totalCols, $style['cols'] ?? []);
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }
         $this->addChildren($children);
@@ -34,7 +35,7 @@ class Grid extends AbstractComponent
     {
         if (is_array($data) && isset($data['data'],$data['col'])) {
             // TODO maybe import file content here
-            $data['cols'] = $this->expandRepeat($data['data'], $data['col']);
+            $data['cols'] = $this->expandRepeat($this->getCols($data['data'], $data['options'] ?? null), $data['col']);
             unset($data['data'], $data['col']);
         }
         if (!is_array($data)) {
@@ -44,5 +45,15 @@ class Grid extends AbstractComponent
             $data = ['cols' => $data];
         }
         return $data;
+    }
+
+    private function getCols(array $cols, ?array $options) : array
+    {
+        if (null === $options) {
+            return $cols;
+        }
+        $offset  = $options['offset'] ?? 0;
+        $length  = $options['length'] ?? 99999;
+        return array_splice($cols, $offset, $length);
     }
 }
