@@ -157,14 +157,24 @@ final class Reader
             $section['_index'] = $i;
             $section['_total'] = count($sections);
 
-            $parentStyle = null;
+            $parentStyle = [];
             foreach ($section as $type => $value) {
                 if ($parentStyle) {
                     continue;
                 }
-                $parentStyle = $this->get('theme.components.'.$type.'.section');
+                $tmp    = explode(':', $type);
+                $styles = [];
+                while (count($tmp)) {
+                    $t           = implode(':', $tmp);
+                    $parentStyle = $this->get('theme.components.'.$t.'.section');
+                    if (is_array($parentStyle)) {
+                        $styles[$t] = $parentStyle;
+                    }
+                    array_pop($tmp);
+                }
+                $parentStyle = ArrayHelper::merge(...array_reverse($styles));
             }
-            if (null !== $parentStyle) {
+            if (count($parentStyle)) {
                 $section['parentStyle'] = $parentStyle;
                 if (!isset($section['parentStyle']['type'])) {
                     $section['parentStyle']['type'] = 'group';
