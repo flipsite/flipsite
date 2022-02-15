@@ -21,7 +21,6 @@ class ComponentBuilder
     use RepeatTrait;
 
     private ImageHandler $imageHandler;
-    private ?SectionBuilder $sectionBuilder = null;
     private array $listeners                = [];
     private array $factories                = [];
     private array $theme                    = [];
@@ -48,6 +47,10 @@ class ComponentBuilder
             $merge = $data['_merge'];
             unset($data['_merge']);
             $data = ArrayHelper::merge($data, $merge);
+        }
+
+        if (isset($data['_script'])) {
+            $this->handleScripts($data['_script']);
         }
         $flags = explode(':', $type);
         $type  = array_shift($flags);
@@ -301,5 +304,21 @@ class ComponentBuilder
 
         $language = (string)$this->path->getLanguage();
         return $this->localization[$value][$language] ?? $language.':'.$value;
+    }
+
+    private function handleScripts(array $scripts)
+    {
+        foreach ($scripts['global'] ?? [] as $id => $script) {
+            $filepath = $this->enviroment->getSiteDir().'/'.$script;
+            if (file_exists($filepath)) {
+                $this->dispatch(new Event('global-script', $id, file_get_contents($filepath)));
+            }
+        }
+        foreach ($scripts['ready'] ?? [] as $id => $script) {
+            $filepath = $this->enviroment->getSiteDir().'/'.$script;
+            if (file_exists($filepath)) {
+                $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
+            }
+        }
     }
 }
