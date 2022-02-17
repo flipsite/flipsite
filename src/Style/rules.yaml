@@ -215,6 +215,8 @@ resize: resize:both
 row-auto: grid-row:auto
 row-end-auto: grid-row-end:auto
 row-start-auto: grid-row-start:auto
+scroll-auto: scroll-behavior:auto
+scroll-smooth: scroll-behavior:smooth
 select-all: user-select:all
 select-auto: user-select:auto
 select-none: user-select:none
@@ -226,6 +228,18 @@ self-start: align-self:flex-start
 self-stretch: align-self:stretch
 sepia-0: --tw-sepia:sepia(0)
 sepia: --tw-sepia:sepia(1)
+snap-start: scroll-snap-align:start
+snap-end: scroll-snap-align:end
+snap-center: scroll-snap-align:center
+snap-align-none: scroll-snap-align:none
+snap-normal: scroll-snap-stop:normal
+snap-always: scroll-snap-stop:always
+snap-none: scroll-snap-type:none
+snap-x: scroll-snap-type:x var(--tw-scroll-snap-strictness)
+snap-y: scroll-snap-type:y var(--tw-scroll-snap-strictness)
+snap-both: scroll-snap-type:both var(--tw-scroll-snap-strictness)
+snap-mandatory: --tw-scroll-snap-strictness:mandatory
+snap-proximity: --tw-scroll-snap-strictness:proximity
 sr-only: position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0
 static: position:static
 sticky: position:sticky
@@ -246,7 +260,17 @@ text-center: text-align:center
 text-justify: text-align:justify
 text-left: text-align:left
 text-right: text-align:right
-transform-none: none;
+touch-auto: touch-action:auto
+touch-none: touch-action:none
+touch-pan-x: touch-action:pan-x
+touch-pan-left: touch-action:pan-left
+touch-pan-right: touch-action:pan-right
+touch-pan-y: touch-action:pan-y
+touch-pan-up: touch-action:pan-up
+touch-pan-down: touch-action:pan-down
+touch-pinch-zoom: touch-action:pinch-zoom
+touch-manipulation: touch-action:manipulation
+transform-none: none
 transform: --tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;transform:translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 transform-gpu: --tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;transform:translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
 transition-all: transition-property:all
@@ -260,6 +284,10 @@ truncate: overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 underline: text-decoration:underline
 uppercase: text-transform:uppercase
 visible: visibility:visible
+will-change-auto: will-change:auto
+will-change-scroll: will-change:scroll-position
+will-change-contents: will-change:contents
+will-change-transform: will-change:transform
 whitespace-nowrap: white-space:nowrap
 whitespace-normal: white-space:normal
 whitespace-pre-line: white-space:pre-line
