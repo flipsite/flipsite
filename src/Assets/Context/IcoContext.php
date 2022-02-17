@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Flipsite\Assets\Context;
 
-use Flipsite\Assets\ImageFile;
+use Flipsite\Assets\AssetFile;
 
 final class IcoContext extends AbstractImageContext
 {
     private string $hash;
 
-    public function __construct(string $src, ImageFile $file)
+    public function __construct(string $src, AssetFile $file)
     {
         $this->src  = $src;
         $this->hash = $file->getHash();

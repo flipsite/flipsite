@@ -26,7 +26,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $this->reader       = $reader;
         $this->path         = $path;
         $this->imageHandler = new ImageHandler(
-            $enviroment->getImageSources(),
+            $enviroment->getAssetSources(),
             $enviroment->getImgDir(),
             $enviroment->getImgBasePath(),
         );

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Assets\Context;
 
-use Flipsite\Assets\ImageFile;
+use Flipsite\Assets\AssetFile;
 use Flipsite\Assets\Options\SvgOptions;
 use Flipsite\Utils\SvgData;
 
@@ -11,7 +11,7 @@ final class SvgContext extends AbstractImageContext
 {
     private string $hash;
 
-    public function __construct(string $image, string $imgBasePath, ImageFile $file, SvgOptions $options)
+    public function __construct(string $image, string $imgBasePath, AssetFile $file, SvgOptions $options)
     {
         $this->image       = $image;
         $this->imgBasePath = $imgBasePath;

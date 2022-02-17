@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Flipsite\Assets\Editors;
 
-use Flipsite\Assets\ImageFile;
+use Flipsite\Assets\AssetFile;
 use Symfony\Component\Filesystem\Filesystem;
 
 abstract class AbstractImageEditor
 {
     protected string $cacheDir;
-    protected ImageFile $file;
+    protected AssetFile $file;
     protected string $path;
     protected Filesystem $fileSystem;
 
-    public function __construct(string $cacheDir, ImageFile $file, string $path)
+    public function __construct(string $cacheDir, AssetFile $file, string $path)
     {
         $this->file       = $file;
         $this->path       = $path;

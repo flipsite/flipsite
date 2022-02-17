@@ -31,7 +31,7 @@ final class ImageHandler
         if (0 === mb_strpos($image, 'http')) {
             return new ExternalContext($src);
         }
-        $file = new ImageFile($image, $this->assetSources);
+        $file = new AssetFile($image, $this->assetSources);
         if ('svg' === $file->getExtension()) {
             return new SvgContext($image, $this->imgBasePath, $file, new SvgOptions($options));
         }
@@ -47,7 +47,7 @@ final class ImageHandler
             return $this->getCached($response, $path);
         }
         try {
-            $file = ImageFile::fromRequest($path, $this->assetSources);
+            $file = AssetFile::fromRequest($path, $this->assetSources);
         } catch (Exception $e) {
             return $this->notFound();
         }

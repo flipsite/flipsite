@@ -34,7 +34,7 @@ class SvgMiddleware implements MiddlewareInterface
             $svgs = [];
             foreach ($matches[2] as $i => $src) {
                 if (!isset($svgs[$src])) {
-                    $file = $this->enviroment->getImageSources()->getFilename($src);
+                    $file = $this->enviroment->getAssetSources()->getFilename($src);
                     if (null !== $file) {
                         $svgData    = new SvgData($file);
                         $svgs[$src] = [

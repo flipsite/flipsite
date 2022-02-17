@@ -20,7 +20,7 @@ class FaviconBuilder implements BuilderInterface
         $this->enviroment   = $enviroment;
         $this->reader       = $reader;
         $this->imageHandler = new ImageHandler(
-            $enviroment->getImageSources(),
+            $enviroment->getAssetSources(),
             $enviroment->getImgDir(),
             $enviroment->getImgBasePath(),
         );

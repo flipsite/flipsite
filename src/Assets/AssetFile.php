@@ -6,7 +6,7 @@ namespace Flipsite\Assets;
 
 use Flipsite\Assets\Sources\AssetSources;
 
-final class ImageFile
+final class AssetFile
 {
     private const START = '@';
 

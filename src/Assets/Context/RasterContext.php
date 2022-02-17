@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Assets\Context;
 
-use Flipsite\Assets\ImageFile;
+use Flipsite\Assets\AssetFile;
 use Flipsite\Assets\Options\RasterOptions;
 
 final class RasterContext extends AbstractImageContext
@@ -13,7 +13,7 @@ final class RasterContext extends AbstractImageContext
     private ?array $srcset;
     private string $extension;
 
-    public function __construct(string $image, string $imgBasePath, ImageFile $file, array $options)
+    public function __construct(string $image, string $imgBasePath, AssetFile $file, array $options)
     {
         $this->image                  = $image;
         $pathinfo                     = pathinfo($image);
