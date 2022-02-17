@@ -10,6 +10,7 @@ use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
 use Flipsite\App\Middleware\FlipsiteMiddleware;
 use Flipsite\Assets\ImageHandler;
+use Flipsite\Assets\VideoHandler;
 use Flipsite\Builders\AnalyticsBuilder;
 use Flipsite\Builders\ComponentBuilder;
 use Flipsite\Builders\DocumentBuilder;
@@ -59,9 +60,19 @@ $svgMw         = new SvgMiddleware($container->get('enviroment'));
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
     $handler = new ImageHandler(
-        $enviroment->getImageSources(),
+        $enviroment->getAssetSources(),
         $enviroment->getImgDir(),
         $enviroment->getImgBasePath(),
+    );
+    return $handler->getResponse($response, $args['file']);
+})->add($expiresMw);
+
+$app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
+    $enviroment = $this->get('enviroment');
+    $handler = new VideoHandler(
+        $enviroment->getSiteDir().'/assets',
+        $enviroment->getVideoDir(),
+        $enviroment->getVideoBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
@@ -94,7 +105,7 @@ $app->get('/robots.txt', function (Request $request, Response $response) {
 $app->get('/manifest.json', function (Request $request, Response $response) {
     $enviroment = $this->get('enviroment');
     $imageHandler = new ImageHandler(
-        $enviroment->getImageSources(),
+        $enviroment->getAssetSources(),
         $enviroment->getImgDir(),
         $enviroment->getImgBasePath(),
     );

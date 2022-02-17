@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
+use Flipsite\Assets\VideoHandler;
 use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
@@ -21,6 +22,7 @@ class ComponentBuilder
     use RepeatTrait;
 
     private ImageHandler $imageHandler;
+    private VideoHandler $videoHandler;
     private array $listeners                = [];
     private array $factories                = [];
     private array $theme                    = [];
@@ -29,9 +31,14 @@ class ComponentBuilder
     public function __construct(private Request $request, private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
         $this->imageHandler = new ImageHandler(
-            $enviroment->getImageSources(),
+            $enviroment->getAssetSources(),
             $enviroment->getImgDir(),
             $enviroment->getImgBasePath(),
+        );
+        $this->videoHandler = new VideoHandler(
+            $enviroment->getSiteDir().'/assets',
+            $enviroment->getVideoDir(),
+            $enviroment->getVideoBasePath(),
         );
         $this->theme = $reader->get('theme') ?? [];
     }
@@ -135,6 +142,9 @@ class ComponentBuilder
                 }
                 if (method_exists($component, 'addImageHandler')) {
                     $component->addImageHandler($this->imageHandler);
+                }
+                if (method_exists($component, 'addVideoHandler')) {
+                    $component->addVideoHandler($this->videoHandler);
                 }
                 if (method_exists($component, 'addPath')) {
                     $component->addPath($this->path);

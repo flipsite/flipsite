@@ -12,6 +12,7 @@ final class AssetSources
      * @var array<AbstractAssetSource>
      */
     private array $sources = [];
+    private array $videoFormats = ['ogg','webm','mp4'];
 
     public function __construct(string $vendorDir, string $siteDir)
     {
@@ -40,6 +41,7 @@ final class AssetSources
                 }
             }
         }
+
 
         $parts = explode('/', $src);
         $type  = $parts[0];

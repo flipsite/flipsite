@@ -15,6 +15,7 @@ final class Enviroment
     private string $basePath;
     private string $server;
     private ?AssetSources $imageSources = null;
+    private ?AssetSources $videoSources = null;
 
     public function __construct()
     {
@@ -24,6 +25,12 @@ final class Enviroment
             throw new EnviromentException('IMG_DIR not set');
         }
         $this->imgDir = getenv('IMG_DIR');
+
+        if (false === getenv('VIDEO_DIR')) {
+            throw new EnviromentException('VIDEO_DIR not set');
+        }
+        $this->videoDir = getenv('VIDEO_DIR');
+
 
         if (false === getenv('SITE_DIR')) {
             throw new EnviromentException('SITE_DIR not set');
@@ -43,7 +50,7 @@ final class Enviroment
         $this->server = trim(getenv('APP_SERVER'), '/');
     }
 
-    public function getImageSources() : AssetSources
+    public function getAssetSources() : AssetSources
     {
         if (null === $this->imageSources) {
             $this->imageSources = new AssetSources(
@@ -69,6 +76,11 @@ final class Enviroment
         return $this->basePath . '/img';
     }
 
+    public function getVideoBasePath() : string
+    {
+        return $this->basePath . '/videos';
+    }
+
     public function getServer(bool $basePath = true) : string
     {
         if ($basePath) {
@@ -80,6 +92,11 @@ final class Enviroment
     public function getImgDir() : string
     {
         return $this->imgDir;
+    }
+
+    public function getVideoDir() : string
+    {
+        return $this->videoDir;
     }
 
     public function getSiteDir() : string

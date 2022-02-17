@@ -1,6 +1,8 @@
 /cache
 img/*
 !img/.keep
+videos/*
+!videos/.keep
 /vendor
 /.DS_Store
 /.phpunit.result.cache
