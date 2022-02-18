@@ -3,27 +3,28 @@
 declare(strict_types=1);
 namespace Flipsite\Assets;
 
-use Exception;
-use Flipsite\Assets\Sources\AssetSources;
 use Psr\Http\Message\ResponseInterface as Response;
 
 final class VideoHandler
 {
-    private array $extensions = ['ogg','webm','mp4'];
+    private array $extensions = ['ogg', 'webm', 'mp4'];
+
     public function __construct(private string $assetDir, private string $cacheDir, private string $videoBasePath = '/videos')
     {
     }
-    public function getSources(string $video) : array {
-        $sources = [];
-        $pathinfo = pathinfo($video);
+
+    public function getSources(string $video) : array
+    {
+        $sources                       = [];
+        $pathinfo                      = pathinfo($video);
         $files[$pathinfo['extension']] = $pathinfo['filename'];
-        $dir = $this->assetDir.'/'.$pathinfo['dirname'];
+        $dir                           = $this->assetDir.'/'.$pathinfo['dirname'];
         if (is_dir($dir)) {
             foreach (scandir($dir) as $file) {
                 if (str_starts_with($file, $pathinfo['filename'])) {
                     $tmp = pathinfo($file);
                     $ext = $tmp['extension'];
-                    if ($ext !== $pathinfo['extension']) {
+                    if ($ext !== $pathinfo['extension'] && in_array($ext, $this->extensions)) {
                         $files[$ext] = $tmp['filename'];
                     }
                 }
@@ -31,13 +32,13 @@ final class VideoHandler
         }
         $vidDir = $this->videoBasePath;
         if ('.' !== $pathinfo['dirname']) {
-            $vidDir.='/'.$pathinfo['dirname'];
+            $vidDir .= '/'.$pathinfo['dirname'];
         }
 
         foreach ($files as $ext => $name) {
-            $filepath = $dir.'/'.$name.'.'.$ext;
-            $hash = substr(md5($filepath),0,6);
-            $src =
+            $filepath               = $dir.'/'.$name.'.'.$ext;
+            $hash                   = substr(md5($filepath), 0, 6);
+            $src                    =
             $sources['video/'.$ext] = $vidDir.'/'.$name.'.'.$hash.'.'.$ext;
         }
         return $sources;
@@ -52,7 +53,7 @@ final class VideoHandler
         if (1 === count($parts)) {
             $parts = explode('.', $parts[0]);
         }
-        $filename = implode('.',$parts);
+        $filename = implode('.', $parts);
         if (file_exists($this->assetDir.'/'.$filename)) {
             $filesystem = new \Symfony\Component\Filesystem\Filesystem($this->cacheDir, 0777);
             $filesystem->copy($this->assetDir.'/'.$filename, $this->cacheDir.'/'.$path);
@@ -69,7 +70,7 @@ final class VideoHandler
     {
         $filename = $this->cacheDir . '/' . $path;
         $pathinfo = pathinfo($filename);
-        $body = $response->getBody();
+        $body     = $response->getBody();
         $body->rewind();
         $body->write(file_get_contents($filename));
         return $response->withHeader('Content-type', 'video/'.$pathinfo['extension']);
