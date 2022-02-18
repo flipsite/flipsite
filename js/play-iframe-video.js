@@ -1,4 +1,4 @@
-function youtube(el) {
+function playIframeVideo(el) {
   var icon = el.querySelector('svg');
   if (icon) icon.remove();
   var poster = el.querySelector('img');
