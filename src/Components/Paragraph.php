@@ -20,5 +20,6 @@ final class Paragraph extends AbstractComponent
         if (is_string($data)) {
             return ['markdown' => $data];
         }
+        return $data;
     }
 }
