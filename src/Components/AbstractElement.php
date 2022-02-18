@@ -187,6 +187,9 @@ abstract class AbstractElement
                     $html .= ' '.$attr;
                 }
             } else {
+                if (is_array($value)) {
+                    $value = htmlentities(json_encode($value), ENT_QUOTES, 'UTF-8');
+                }
                 $html .= ' '.$attr.'="'.$value.'"';
             }
         }
