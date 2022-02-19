@@ -26,6 +26,9 @@ trait MarkdownTrait
         $parsedown = new \Parsedown();
         $text      = trim($text);
         $html      = $parsedown->text($text);
+        $html = str_replace('<li>', '  <li>', $html);
+
+
         if (isset($style['bullet'])) {
             $html = $this->addBullets($html, $style['bullet'], $appearance);
         }
@@ -95,7 +98,8 @@ trait MarkdownTrait
         unset($style['icon']);
         $bullet                = $this->builder->build('svg', $icon, $style, $appearance);
         $bullet                = str_replace("\n", '', $bullet->render());
-        $html                  = str_replace('<li>', '<li>'.$bullet, $html);
+        $html                  = str_replace('<li>', "<li>\n    ".$bullet."\n    ", $html);
+        $html                  = str_replace("</li>\n", "\n  </li>\n", $html);
         return $html;
     }
 }

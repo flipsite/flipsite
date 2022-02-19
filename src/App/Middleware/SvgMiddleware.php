@@ -12,11 +12,8 @@ use Slim\Psr7\Factory\StreamFactory;
 
 class SvgMiddleware implements MiddlewareInterface
 {
-    private Enviroment $enviroment;
-
-    public function __construct(Enviroment $enviroment)
+    public function __construct(private Enviroment $enviroment)
     {
-        $this->enviroment = $enviroment;
     }
 
     public function process(Request $request, $handler) : Response
@@ -24,7 +21,9 @@ class SvgMiddleware implements MiddlewareInterface
         $response = $handler->handle($request);
         $html     = (string) $response->getBody();
         $html     = str_replace("<svg></svg>\n", "<dummysvg></dummysvg>\n", $html);
-        preg_match_all('/<svg(.|\n)*?src="(.*?)" xmlns(.|\n)*?<\/svg>/', $html, $matches);
+        $oneline = str_replace("\n", "", $html);
+        $oneline  = preg_replace('/\s\s+/', ' ', $oneline);
+        preg_match_all('/<svg(.|\n)*?src="(.*?)" xmlns(.|\n)*?<\/svg>/', $oneline, $matches);
 
         if (0 === count($matches[0] ?? [])) {
             $html = str_replace("    <dummysvg></dummysvg>\n", '', $html);
