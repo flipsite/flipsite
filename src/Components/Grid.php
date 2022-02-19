@@ -40,7 +40,19 @@ class Grid extends AbstractComponent
     {
         if (is_array($data) && isset($data['data'],$data['col'])) {
             // TODO maybe import file content here
-            $data['cols'] = $this->expandRepeat($this->getCols($data['data'], $data['options'] ?? null), $data['col']);
+            $cols = $this->getCols($data['data'],$data['options'] ?? null);
+            if (isset($data['options']['sort'])) {
+                $tmp = explode(' ',$data['options']['sort']);
+                $sortField = $tmp[0];
+                usort($cols, function($a,$b) use($sortField) {
+                    return $a[$sortField] <=> $b[$sortField];
+                });
+                if ('desc' === ($tmp[1] ?? 'asc')) {
+                    $cols = array_reverse($cols);
+                }
+            }
+
+            $data['cols'] = $this->expandRepeat($cols, $data['col']);
             unset($data['data'], $data['col']);
         }
         if (!is_array($data)) {
