@@ -12,10 +12,12 @@ final class Iframe extends AbstractComponent
     public function build(array $data, array $style, string $appearance) : void
     {
         $this->addStyle($style);
-
         unset($data['flags']);
         foreach ($data as $key => $val) {
             $this->setAttribute($key, $val);
+        }
+        if (isset($data['src'])) {
+            $this->setAttribute('src',$data['src']);
         }
     }
 
