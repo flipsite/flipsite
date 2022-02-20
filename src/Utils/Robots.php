@@ -27,6 +27,8 @@ final class Robots
             $rows = [
                 'User-agent: *',
                 'Disallow: /',
+                '# No sitemap if not live',
+                '# Sitemap: '.$this->baseUrl.'/sitemap.xml',
             ];
         }
         return implode("\n", $rows);
