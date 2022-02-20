@@ -38,28 +38,37 @@ class Grid extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (is_array($data) && isset($data['data'],$data['col'])) {
-            // TODO maybe import file content here
-            $cols = $this->getCols($data['data'],$data['options'] ?? null);
-            if (isset($data['options']['sort'])) {
-                $tmp = explode(' ',$data['options']['sort']);
-                $sortField = $tmp[0];
-                usort($cols, function($a,$b) use($sortField) {
-                    return $a[$sortField] <=> $b[$sortField];
-                });
-                if ('desc' === ($tmp[1] ?? 'asc')) {
-                    $cols = array_reverse($cols);
-                }
-            }
-
-            $data['cols'] = $this->expandRepeat($cols, $data['col']);
-            unset($data['data'], $data['col']);
-        }
-        if (!is_array($data)) {
-            throw new \Exception('Invalid component data');
-        }
         if (!ArrayHelper::isAssociative($data)) {
             $data = ['cols' => $data];
+        }
+        if (isset($data['data'])) {
+            $data['cols'] = $data['data'];
+            unset($data['data']);
+        }
+        if ($data['options']['shuffle'] ?? false) {
+            shuffle($data['cols']);
+        }
+        if ($data['options']['reverse'] ?? false) {
+            $data['cols'] = array_reverse($data['cols']);
+        }
+        if (isset($data['options']['offset'])||isset($data['options']['length'])){
+            $offset  = $data['options']['offset'] ?? 0;
+            $length  = $data['options']['length'] ?? 99999;
+            $data['cols'] = array_splice($data['cols'], $offset, $length);
+        }
+        if (isset($data['options']['sort'])) {
+            $tmp = explode(' ',$data['options']['sort']);
+            $sortField = $tmp[0];
+            uasort($data['cols'], function($a,$b) use($sortField) {
+                return $a[$sortField] <=> $b[$sortField];
+            });
+            if ('desc' === ($tmp[1] ?? 'asc')) {
+                $data['cols'] = array_reverse($data['cols']);
+            }
+        }
+        if (isset($data['col'])) {
+            $data['cols'] = $this->expandRepeat($data['cols'], $data['col']);
+            unset($data['col']);
         }
         return $data;
     }
