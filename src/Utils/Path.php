@@ -33,7 +33,15 @@ final class Path
         } else {
             $pathWithoutLanguage = $path;
         }
+
+        if ('404' === $pathWithoutLanguage) {
+            $this->language = $pathLanguage ?? $default;
+            $this->page = '404';
+            return;
+        }
+
         $this->page = $slugs->getPage($pathWithoutLanguage);
+
         $similar    = false;
         if (null === $this->page) {
             $this->page = $slugs->getSimilarPage($pathWithoutLanguage, 70.0);

@@ -30,7 +30,7 @@ final class Sitemap
     {
         $xml = '';
         foreach ($this->slugs->getAll() as $loc => $alternate) {
-            if (404 === $loc) {
+            if (str_ends_with((string)$loc,'404')) {
                 continue;
             }
             $xml .= "  <url>\n";
