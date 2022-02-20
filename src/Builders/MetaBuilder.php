@@ -15,16 +15,10 @@ use Flipsite\Utils\Path;
 
 class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 {
-    private Enviroment $enviroment;
-    private Reader $reader;
-    private Path $path;
     private ImageHandler $imageHandler;
 
-    public function __construct(Enviroment $enviroment, Reader $reader, Path $path)
+    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
     {
-        $this->enviroment   = $enviroment;
-        $this->reader       = $reader;
-        $this->path         = $path;
         $this->imageHandler = new ImageHandler(
             $enviroment->getAssetSources(),
             $enviroment->getImgDir(),
@@ -34,7 +28,26 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
     public function getDocument(Document $document) : Document
     {
+        $elements = [];
+        $server = $this->enviroment->getServer(true);
         $language = $this->path->getLanguage();
+        $page = $this->path->getPage();
+        $slug = $this->reader->getSlugs()->getSlug($page,$language);
+
+        $elements[] = $this->meta('canonical', $server.'/'.$slug);
+        if (count($this->reader->getLanguages()) > 1) {
+            foreach($this->reader->getLanguages() as $l) {
+                if (!$language->isSame($l)) {
+                    $el = new Element('meta', true, true);
+                    $el->setAttribute('rel', 'alternate');
+                    $slug = $this->reader->getSlugs()->getSlug($page,$l);
+                    $el->setAttribute('href', $server.'/'.$slug);
+                    $el->setAttribute('hreflang', (string)$l);
+                    $elements[] = $el;
+                }
+            }
+        }
+
         $name     = $this->reader->get('name', $language);
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
 
@@ -42,8 +55,6 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
-
-        $elements = [];
 
         // HTML meta tags
         $elements[] = $this->meta('description', $meta['description'] ?? null);
@@ -55,7 +66,6 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $elements[] = $this->og('og:title', $title);
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
 
-        $server = $this->enviroment->getServer(true);
         $active = $this->path->getPage();
         $page   = $this->reader->getSlugs()->getPath($active, $language, $active);
 
