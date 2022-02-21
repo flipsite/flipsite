@@ -249,7 +249,6 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $componentBuilder->addListener($metaBuilder);
 
     $faviconBuilder = new FaviconBuilder($enviroment, $reader);
-    $componentBuilder->addListener($metaBuilder);
 
     $scriptBuilder = new ScriptBuilder(
         $reader->getHash(),
