@@ -28,6 +28,12 @@ final class RasterEditor extends AbstractImageEditor
     private function applyOptions(Image $image, string $extension) : Image
     {
         $options = new RasterOptions($this->path);
+
+        $trim  = (bool)$options->getValue('trim') ?? false;
+        if ($trim) {
+            $image->trim('top-left', null, 10);
+            $image->trim('transparent');
+        }
         $width   = $options->getValue('width');
         $height  = $options->getValue('height');
         if ($width && $height) {
@@ -52,14 +58,7 @@ final class RasterEditor extends AbstractImageEditor
         if ($options->getValue('blackWhite')) {
             $image->greyscale();
         }
-        // $color = 'webp' !== $extension ? '#00FFFF' : '#FF69B4';
-        // $image->text($image->width().'x'.$image->width().' .'.$extension, intval($image->width() / 2), intval($image->height() / 2), function ($font) use ($color) {
-        //     $font->file('/Users/Henrik/Sites/arial.ttf');
-        //     $font->size(50);
-        //     $font->color($color);
-        //     $font->align('center');
-        //     $font->valign('top');
-        // });
+
         return $image;
     }
 }
