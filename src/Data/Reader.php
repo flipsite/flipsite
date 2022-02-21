@@ -202,6 +202,7 @@ final class Reader
         if (ArrayHelper::isAssociative($data)) {
             $data = [$data];
         }
+        $data = array_merge($this->data['before'], $data, $this->data['after']);
 
         $p     = explode('/', $page);
         $title = [];
@@ -217,32 +218,22 @@ final class Reader
 
         $meta['title'] = array_merge($title, $meta['title']);
 
+        $titleFromMeta = null;
         foreach ($data as $section) {
             if (isset($section['_meta'])) {
                 $pageMeta = $this->localize($section['_meta'], $language);
                 if (isset($pageMeta['title'])) {
-                    array_pop($meta['title']);
-                    $meta['title'][] = $pageMeta['title'];
+                    $titleFromMeta = $pageMeta['title'];
                     unset($pageMeta['title']);
                 }
                 $meta = ArrayHelper::merge($meta, $pageMeta);
             }
         }
-
+        if (null !== $titleFromMeta) {
+            $meta['title'][0] = $titleFromMeta;
+        }
         $meta['title'] = implode(' - ', $meta['title']);
 
-        // $all = $this->data['pages'][$page] ?? [];
-        // foreach ($all as $section) {
-        //     if (isset($section['_meta'])) {
-        //         if ('meta' === $type) {
-        //             $pageMeta = $this->localize($section, $language);
-        //             $meta     = ArrayHelper::merge($meta, $pageMeta);
-        //         }
-        //     }
-        // }
-        // if (!isset($meta['title'])) {
-        //     echo 'Hej';
-        // }
         return $meta;
     }
 

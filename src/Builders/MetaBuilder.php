@@ -16,6 +16,7 @@ use Flipsite\Utils\Path;
 class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 {
     private ImageHandler $imageHandler;
+    private ?string $h1 = null;
 
     public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
     {
@@ -29,18 +30,18 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
     public function getDocument(Document $document) : Document
     {
         $elements = [];
-        $server = $this->enviroment->getServer(true);
+        $server   = $this->enviroment->getServer(true);
         $language = $this->path->getLanguage();
-        $page = $this->path->getPage();
-        $slug = $this->reader->getSlugs()->getSlug($page,$language);
+        $page     = $this->path->getPage();
+        $slug     = $this->reader->getSlugs()->getSlug($page, $language);
 
         $elements[] = $this->meta('canonical', $server.'/'.$slug);
         if (count($this->reader->getLanguages()) > 1) {
-            foreach($this->reader->getLanguages() as $l) {
+            foreach ($this->reader->getLanguages() as $l) {
                 if (!$language->isSame($l)) {
                     $el = new Element('meta', true, true);
                     $el->setAttribute('rel', 'alternate');
-                    $slug = $this->reader->getSlugs()->getSlug($page,$l);
+                    $slug = $this->reader->getSlugs()->getSlug($page, $l);
                     $el->setAttribute('href', $server.'/'.$slug);
                     $el->setAttribute('hreflang', (string)$l);
                     $elements[] = $el;
@@ -52,6 +53,9 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
 
         $title    = $meta['title'] ?? $name;
+        if (str_starts_with($title, 'h1 - ')) {
+            $title = str_replace('h1 - ', $this->h1.' - ', $title);
+        }
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
@@ -98,6 +102,9 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 
     public function handleComponentEvent(Event $event) : void
     {
+        if ('h1' === $event->getType()) {
+            $this->h1 = $event->getData();
+        }
     }
 
     private function meta(string $name, ?string $content) : ?AbstractElement
