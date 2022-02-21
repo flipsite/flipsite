@@ -283,6 +283,18 @@ final class Reader
 
     private function hideSection(array $section, string $page, Language $language) : bool
     {
+        $_     = 0;
+        $total = 0;
+        foreach ($section as $attr => $val) {
+            $total++;
+            if (str_starts_with($attr, '_')) {
+                $_++;
+            }
+        }
+        if ($_ === $total) {
+            return true;
+        }
+
         if ($section['hidden'] ?? false) {
             return true;
         }
