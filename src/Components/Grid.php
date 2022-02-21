@@ -51,15 +51,15 @@ class Grid extends AbstractComponent
         if ($data['options']['reverse'] ?? false) {
             $data['cols'] = array_reverse($data['cols']);
         }
-        if (isset($data['options']['offset'])||isset($data['options']['length'])){
-            $offset  = $data['options']['offset'] ?? 0;
-            $length  = $data['options']['length'] ?? 99999;
+        if (isset($data['options']['offset']) || isset($data['options']['length'])) {
+            $offset       = $data['options']['offset'] ?? 0;
+            $length       = $data['options']['length'] ?? 99999;
             $data['cols'] = array_splice($data['cols'], $offset, $length);
         }
         if (isset($data['options']['sort'])) {
-            $tmp = explode(' ',$data['options']['sort']);
+            $tmp       = explode(' ', $data['options']['sort']);
             $sortField = $tmp[0];
-            uasort($data['cols'], function($a,$b) use($sortField) {
+            uasort($data['cols'], function ($a, $b) use ($sortField) {
                 return $a[$sortField] <=> $b[$sortField];
             });
             if ('desc' === ($tmp[1] ?? 'asc')) {
@@ -67,7 +67,10 @@ class Grid extends AbstractComponent
             }
         }
         if (isset($data['col'])) {
-            $data['cols'] = $this->expandRepeat($data['cols'], $data['col']);
+            if (null === ($data['cols'] ?? null)) {
+                $this->render = false;
+            }
+            $data['cols'] = $this->expandRepeat($data['cols'] ?? [], $data['col']);
             unset($data['col']);
         }
         return $data;
