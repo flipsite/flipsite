@@ -202,7 +202,7 @@ final class Reader
         if (ArrayHelper::isAssociative($data)) {
             $data = [$data];
         }
-        $data = array_merge($this->data['before'], $data, $this->data['after']);
+        $data = array_merge($this->data['before'] ?? [], $data, $this->data['after'] ?? []);
 
         $p     = explode('/', $page);
         $title = [];
