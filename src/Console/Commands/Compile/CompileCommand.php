@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Console\Commands\Compile;
 
 use Symfony\Component\Console\Command\Command;
@@ -36,26 +35,25 @@ final class CompileCommand extends Command
         $reader     = new \Flipsite\Data\Reader($enviroment);
         $slugs      = $reader->getSlugs();
         $allPages   = array_keys($slugs->getAll());
-        $allPages = array_slice($allPages,0,3);
 
-        $options = $reader->get('static');
+        $options   = $reader->get('static');
         $targetDir = $options['target'] ?? 'static';
-        if (!str_starts_with($targetDir,'/')) {
+        if (!str_starts_with($targetDir, '/')) {
             $targetDir = $enviroment->getSiteDir().'/'.$targetDir;
         }
         if (!is_dir($targetDir)) {
             mkdir($targetDir);
         }
-        $targetDir = rtrim($targetDir,'/');
+        $targetDir = rtrim($targetDir, '/');
         $targetDir = realpath($targetDir);
-        $https = $options['https'] ?? true;
-        $domain = $options['domain'] ?? 'flipsite.io';
+        $https     = $options['https'] ?? true;
+        $domain    = $options['domain'] ?? 'flipsite.io';
 
         $this->deleteOld($targetDir);
 
         foreach ($allPages as $page) {
             $html = $this->getResponse($https, $domain, $page);
-            $output->writeln($this->writeFile($targetDir,$page.'/index.html',$html));
+            $output->writeln($this->writeFile($targetDir, $page.'/index.html', $html));
             $assets = $this->parseAssets($html);
             // Page assets
             foreach ($assets as $asset) {
@@ -64,8 +62,32 @@ final class CompileCommand extends Command
             }
         }
 
+        // Sitemap
+        $sitemap    = $this->getResponse($https, $domain, 'sitemap.xml');
+        $filename   = $targetDir.'/sitemap.xml';
+        $filename   = str_replace('//', '/', $filename);
+        file_put_contents($filename, $sitemap);
+        $output->writeln('+ '.$filename);
+
+        // Robots
+        $robots     = $this->getResponse($https, $domain, 'robots.txt');
+        $filename   = $targetDir.'/robots.txt';
+        $filename   = str_replace('//', '/', $filename);
+        file_put_contents($filename, $robots);
+        $output->writeln('+ '.$filename);
+
+        // Manifest
+        // $sitemap    = $this->getResponse($https, $domain, 'robots.txt');
+        // $filename   = $targetDir.'/robots.txt';
+        // $filename   = str_replace('//', '/', $filename);
+        // file_put_contents($filename, $sitemap);
+        // $output->writeln('+ '.$filename);
+
+        $io->success('Static site created');
+
         return 0;
     }
+
     private function deleteOld(string $targetDir) : void
     {
         $filesystem = new Filesystem();
@@ -78,26 +100,30 @@ final class CompileCommand extends Command
             }
         }
     }
-    private function getResponse(bool $https, string $domain, string $page) : string {
+
+    private function getResponse(bool $https, string $domain, string $page) : string
+    {
         ob_start();
-        $_SERVER['REQUEST_URI'] = str_replace('//','/','/'.$page);
+        $_SERVER['REQUEST_URI']    = str_replace('//', '/', '/'.$page);
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['SCRIPT_NAME'] = '/index.php';
+        $_SERVER['SCRIPT_NAME']    = '/index.php';
         if ($https) {
             $_SERVER['SERVER_PORT'] = 443;
-            $_SERVER['HTTPS'] = 'on';
+            $_SERVER['HTTPS']       = 'on';
         } else {
             $_SERVER['SERVER_PORT'] = 80;
             unset($_SERVER['HTTPS']);
         }
-        $_SERVER['HTTP_HOST'] = $domain;
+        $_SERVER['HTTP_HOST']       = $domain;
         $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36';
         include __DIR__.'/../../../index.php';
         $html = ob_get_contents();
         ob_end_clean();
         return $html;
     }
-    private function writeFile(string $targetDir, string $page, string $html) : string {
+
+    private function writeFile(string $targetDir, string $page, string $html) : string
+    {
         $filename = $targetDir.'/'.$page;
         $filename = str_replace('//', '/', $filename);
         if (!file_exists(dirname($filename))) {
@@ -106,7 +132,9 @@ final class CompileCommand extends Command
         file_put_contents($filename, $html);
         return '+ '.$filename;
     }
-    private function parseAssets(string $html) : array {
+
+    private function parseAssets(string $html) : array
+    {
         $assets = [];
 
         $html = str_replace("\n", '', $html);
@@ -119,40 +147,54 @@ final class CompileCommand extends Command
         $doc = new \DOMDocument();
         $doc->loadHTML($html);
 
-        // $sourceTags = $doc->getElementsByTagName('source');
-        // foreach ($sourceTags as $tag) {
-        //     $tmp = explode(', ', $tag->getAttribute('srcset'));
-        //     foreach ($tmp as $t) {
-        //         $tmp2     = explode(' ', $t);
-        //         $images[] = $tmp2[0];
-        //     }
-        // }
         $imgTags = $doc->getElementsByTagName('img');
         foreach ($imgTags as $tag) {
             $assets[] = $tag->getAttribute('src');
+            $tmp      = explode(', ', $tag->getAttribute('srcset'));
+            foreach ($tmp as $t) {
+                $tmp2     = explode(' ', $t);
+                $assets[] = $tmp2[0];
+            }
         }
-        return array_unique($assets);
+
+        $videoTags = $doc->getElementsByTagName('video');
+        foreach ($videoTags as $tag) {
+            $poster = $tag->getAttribute('poster');
+            if ($poster) {
+                $assets[] = $poster;
+            }
+        }
+
+        $sourceTags = $doc->getElementsByTagName('source');
+        foreach ($sourceTags as $tag) {
+            $src = $tag->getAttribute('src');
+            if ($src) {
+                $assets[] = $src;
+            }
+        }
+
+        return array_values(array_unique($assets));
     }
 
-            // $metaTags = $doc->getElementsByTagName('meta');
-            // foreach ($metaTags as $tag) {
-            //     if ('og:image' === $tag->getAttribute('property')) {
-            //         $url      = $tag->getAttribute('content');
-            //         $url      = str_replace($domain, '', $url);
-            //         $images[] = $url;
-            //     }
-            // }
+    // $metaTags = $doc->getElementsByTagName('meta');
+    // foreach ($metaTags as $tag) {
+    //     if ('og:image' === $tag->getAttribute('property')) {
+    //         $url      = $tag->getAttribute('content');
+    //         $url      = str_replace($domain, '', $url);
+    //         $images[] = $url;
+    //     }
+    // }
 
-            // $linkTags = $doc->getElementsByTagName('link');
-            // foreach ($linkTags as $tag) {
-            //     $url      = $tag->getAttribute('href');
-            //     $pathinfo = pathinfo($url);
-            //     if (in_array($pathinfo['extension'] ?? '', ['ico', 'svg', 'png'])) {
-            //         $url      = str_replace($domain, '', $url);
-            //         $images[] = $url;
-            //     }
-            // }
-        //return $html = str_replace("\n", '', $html);
+    // $linkTags = $doc->getElementsByTagName('link');
+    // foreach ($linkTags as $tag) {
+    //     $url      = $tag->getAttribute('href');
+    //     $pathinfo = pathinfo($url);
+    //     if (in_array($pathinfo['extension'] ?? '', ['ico', 'svg', 'png'])) {
+    //         $url      = str_replace($domain, '', $url);
+    //         $images[] = $url;
+    //     }
+    // }
+    //return $html = str_replace("\n", '', $html);
     //         $html = preg_replace('/\s+/', ' ', $html);
     //         $html = str_replace('> <', '><', $html);
     //         $html = str_replace('> ', '>', $html);
