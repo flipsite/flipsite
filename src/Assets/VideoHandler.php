@@ -37,7 +37,7 @@ final class VideoHandler
 
         foreach ($files as $ext => $name) {
             $filepath               = $dir.'/'.$name.'.'.$ext;
-            $hash                   = substr(md5($filepath), 0, 6);
+            $hash                   = substr(md5_file($filepath), 0, 6);
             $src                    =
             $sources['video/'.$ext] = $vidDir.'/'.$name.'.'.$hash.'.'.$ext;
         }
