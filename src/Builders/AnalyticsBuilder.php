@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -29,7 +28,7 @@ class AnalyticsBuilder implements BuilderInterface
             $jsCode = file_get_contents(__DIR__.'/googleTagManager.js');
             $jsCode = str_replace('GTM-XXXX', $this->gtm, $jsCode);
             $script = new Script();
-            $script->addCode($jsCode);
+            $script->setContent($jsCode);
             $document->getChild('head')->prependChild($script);
 
             $noscript = new Element('noscript');
@@ -51,7 +50,7 @@ class AnalyticsBuilder implements BuilderInterface
             $jsCode = file_get_contents(__DIR__.'/googleAnalytics.js');
             $jsCode = str_replace('UA-XXXX-1', $this->ga, $jsCode);
             $script = new Script();
-            $script->addCode($jsCode);
+            $script->setContent($jsCode);
             $document->getChild('body')->addChild($script);
         }
 
