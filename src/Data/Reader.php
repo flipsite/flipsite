@@ -219,6 +219,7 @@ final class Reader
         $meta['title'] = array_merge($title, $meta['title']);
 
         $titleFromMeta = null;
+        $titleOverride = false;
         foreach ($data as $section) {
             if (isset($section['_meta'])) {
                 $pageMeta = $this->localize($section['_meta'], $language);
@@ -226,11 +227,20 @@ final class Reader
                     $titleFromMeta = $pageMeta['title'];
                     unset($pageMeta['title']);
                 }
+                if (isset($pageMeta['title:override'])) {
+                    $titleFromMeta = $pageMeta['title:override'];
+                    unset($pageMeta['title:override']);
+                    $titleOverride = true;
+                }
                 $meta = ArrayHelper::merge($meta, $pageMeta);
             }
         }
         if (null !== $titleFromMeta) {
-            $meta['title'][0] = $titleFromMeta;
+            if ($titleOverride) {
+                $meta['title'] = [$titleFromMeta];
+            } else {
+                $meta['title'][0] = $titleFromMeta;
+            }
         }
         $meta['title'] = implode(' - ', $meta['title']);
 

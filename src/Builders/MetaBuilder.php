@@ -53,8 +53,8 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
 
         $title    = $meta['title'] ?? $name;
-        if (str_starts_with($title, 'h1 - ')) {
-            $title = str_replace('h1 - ', $this->h1.' - ', $title);
+        if (str_starts_with($title, 'h1')) {
+            $title = str_replace('h1', $this->h1, $title);
         }
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
