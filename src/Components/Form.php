@@ -32,7 +32,7 @@ final class Form extends AbstractGroup
         $this->setAttribute('action', $data['action'] ?? 'form/submit/'.$data['id']);
         $this->setAttribute('method', $formData->method ?? 'post');
         if (isset($formData['data'])) {
-            $this->setAttribute('data-validate', str_replace('"', "'", json_encode(['data'=>$formData['data'], 'required'=>$formData['required'] ?? []])));
+            $this->setAttribute('data-validate', ['data'=>$formData['data'], 'required'=>$formData['required'] ?? []]);
         }
         unset($data['id']);
         $this->builder->dispatch(new Event('global-script', 'form', file_get_contents(__DIR__.'/../../js/form.min.js')));
