@@ -85,6 +85,20 @@ final class RasterContext extends AbstractImageContext
             }
         }
 
+        if (null === $width || null === $height) {
+            $imageSize  = getimagesize($filename);
+            $realWidth  = $imageSize[0];
+            $realHeight = $imageSize[1];
+            if (null === $width && null === $height) {
+                $width  = $realWidth;
+                $height = $realHeight;
+            } elseif (null === $height) {
+                $height = intval(round($width / $realWidth * $realHeight));
+            } elseif (null === $width) {
+                $width = intval(round($height / $realHeight * $realWidth));
+            }
+        }
+
         return ['width' => $width, 'height' => $height];
     }
 }
