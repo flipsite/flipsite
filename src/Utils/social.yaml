@@ -1,4 +1,9 @@
 ---
+discord:
+  name: Discord
+  color: "#7289d9"
+  icon: simple-icons/discord.svg
+  url: https://discord.com/r/{handle}
 facebook:
   name: Facebook
   color: "#4172B8"
