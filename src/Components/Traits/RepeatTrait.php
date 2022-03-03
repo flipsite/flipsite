@@ -39,6 +39,8 @@ trait RepeatTrait
                         $value = $replaceWith;
                     } elseif ($replaceWith !== null) {
                         $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
+                    } elseif ('self' === $match && $value == '{self}') {
+                        $value = $data->get();
                     } else {
                         $unset[] = $attr;
                     }
