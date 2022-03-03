@@ -15,7 +15,22 @@ class Grid extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $this->addStyle($style);
+        $wrapperStyle = $style['wrapper'] ?? false;
+        if (false !== $wrapperStyle) {
+            if (is_bool($wrapperStyle)) {
+                $wrapperStyle = [];
+            }
+            $this->tag = $wrapperStyle['tag'] ?? 'div';
+            unset($wrapperStyle['tag']);
+            $this->addStyle($wrapperStyle);
+            $content = new Element($style['tag'] ?? 'div');
+            $content->addStyle($style);
+            unset($style['tag']);
+            $this->addChild($content);
+        } else {
+            $this->addStyle($style);
+        }
+
         $children  = [];
         $totalCols = count($data['cols']);
         foreach ($data['cols'] as $i => $colData) {
@@ -33,7 +48,12 @@ class Grid extends AbstractComponent
             $type       = $colStyle['type'] ?? $type;
             $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
         }
-        $this->addChildren($children);
+
+        if (false !== $wrapperStyle) {
+            $content->addChildren($children);
+        } else {
+            $this->addChildren($children);
+        }
     }
 
     public function normalize(string|int|bool|array $data) : array
