@@ -129,7 +129,9 @@ final class CompileCommand extends Command
         if (!file_exists(dirname($filename))) {
             mkdir(dirname($filename), 0777, true);
         }
-        file_put_contents($filename, $html);
+        if (!is_dir($filename)) {
+            file_put_contents($filename, $html);
+        }
         return '+ '.$filename;
     }
 
@@ -170,6 +172,14 @@ final class CompileCommand extends Command
             $src = $tag->getAttribute('src');
             if ($src) {
                 $assets[] = $src;
+            }
+        }
+
+        $matches = [];
+        preg_match_all('/url\(\/img\/(.*?)\)/', $html, $matches);
+        if (isset($matches[1])) {
+            foreach ($matches[1] as $asset) {
+                $assets[] = '/img/'.$asset;
             }
         }
 
