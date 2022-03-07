@@ -22,6 +22,14 @@ abstract class AbstractGroup extends AbstractComponent
             $style      = ArrayHelper::merge($style, $nthStyle);
         }
 
+        if (isset($data['onclick'])) {
+            $this->setAttribute('onclick', $data['onclick']);
+            if (strpos($data['onclick'], 'javascript:toggle') === 0) {
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+            }
+            unset($data['onclick']);
+        }
+
         $wrapperStyle = $style['wrapper'] ?? false;
         if (false !== $wrapperStyle) {
             if (is_bool($wrapperStyle)) {

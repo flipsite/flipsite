@@ -13,14 +13,7 @@ final class A extends AbstractGroup
     {
         $urlData  = $this->expand($data);
         $external = false;
-        if (isset($urlData['onclick'])) {
-            $this->setAttribute('onclick', $urlData['onclick']);
-            if (strpos($urlData['onclick'], 'javascript:toggle') === 0) {
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
-            }
-            unset($urlData['onclick']);
-        }
-        $href = isset($urlData['url']) ? $this->url((string)$urlData['url'], $external) : '';
+        $href     = isset($urlData['url']) ? $this->url((string)$urlData['url'], $external) : '';
         $this->setAttribute('href', $href);
 
         if ($external) {
