@@ -26,15 +26,37 @@ trait MarkdownTrait
         $parsedown = new \Parsedown();
         $text      = trim($text);
         $html      = $parsedown->text($text);
-        $html = str_replace('<li>', '  <li>', $html);
-
+        $html      = str_replace('<li>', '  <li>', $html);
 
         if (isset($style['bullet'])) {
             $html = $this->addBullets($html, $style['bullet'], $appearance);
         }
+        $html = $this->addMarkdownImages($html, $style['img'] ?? [], $appearance);
         $html = $this->addMarkdownStyle($html, $style);
         $html = $this->addUrlsToMarkdown($html);
         return $html;
+    }
+
+    private function addMarkdownImages(string $text, array $imageStyle, string $appearance) : string
+    {
+        libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        $doc->loadHtml($text);
+        $images = [];
+        foreach ($doc->getElementsByTagName('img') as $tag) {
+            $images[] = $tag->getAttribute('src');
+        }
+        $images = array_unique($images);
+        foreach ($images as $src) {
+            $img  = $this->builder->build('image', ['src' => $src], $imageStyle, $appearance)->render();
+            $img  = str_replace('<img', '', $img);
+            $img  = str_replace('>', '', $img);
+            $img  = str_replace('alt="" ', '', $img);
+            $img  = trim($img);
+            $text = str_replace('src="'.$src.'"', $img, $text);
+        }
+
+        return $text;
     }
 
     private function addMarkdownStyle(string $html, array $style = []) : string
@@ -49,6 +71,9 @@ trait MarkdownTrait
         $html = str_replace('</code></pre>', '</pre>', $html);
         if (is_array($style) && count($style)) {
             foreach ($style as $tag => $classes) {
+                if ($tag === 'img') {
+                    continue;
+                }
                 if (is_array($classes)) {
                     $classes = implode(' ', $classes);
                 }

@@ -28,39 +28,31 @@ final class Md extends AbstractComponent
 
         $this->containerStyle = $style['container'] ?? null;
 
-
         unset($style['container']);
-
         $this->content = $this->getMarkdown($markdown ?? '', $style ?? null, $appearance);
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
     {
-        $i = str_repeat(' ', $indentation * $level);
-        $ii = str_repeat(' ', $indentation * ($level+1));
+        $i    = str_repeat(' ', $indentation * $level);
+        $ii   = str_repeat(' ', $indentation * ($level + 1));
         $html = '';
         if (null !== $this->containerStyle) {
-            $container = new Element($this->containerStyle['tag']??'div');
+            $container = new Element($this->containerStyle['tag'] ?? 'div');
             unset($this->containerStyle['tag']);
             $container->addStyle($this->containerStyle);
             $rows = explode("\n", $container->render(2, 0));
-            $html.= $i.$rows[0]."\n";
+            $html .= $i.$rows[0]."\n";
             foreach (explode("\n", $this->content) as $row) {
-                $html.= $ii.$row."\n";
+                $html .= $ii.$row."\n";
             }
-            $html.= $i.$rows[2]."\n";
+            $html .= $i.$rows[2]."\n";
         } else {
             foreach (explode("\n", $this->content) as $row) {
-                $html.= $i.$row."\n";
+                $html .= $i.$row."\n";
             }
         }
         return $html;
-
-
-
-
-
-
 
         // $i    = str_repeat(' ', $indentation * $level);
         // if ($this->container) {
