@@ -183,7 +183,7 @@ $app->post('/form/submit/{formId}', function (Request $request, Response $respon
     }
     $response = $response->withStatus(302);
     $redirect = trim($enviroment->getServer().'/'.$form['done'].'?res='.$res.'#'.$args['formId'], '/');
-    return $response->withHeader('Location', $redirect);
+    return $response->withHeader('Location', urlencode($redirect));
 });
 
 $app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
@@ -192,7 +192,7 @@ $app->get('/files/[{file:.*}]', function (Request $request, Response $response, 
     if (!file_exists($filepath)) {
         $response = $response->withStatus(302);
         $redirect = trim($enviroment->getServer());
-        return $response->withHeader('Location', $redirect);
+        return $response->withHeader('Location', urlencode($redirect));
     }
 
     $pathinfo = pathinfo($filepath);
@@ -228,7 +228,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         // Check if internal url
         $parsedUrl = parse_url($redirect);
         if (!isset($parsedUrl['scheme'])) {
-            $redirect = trim($enviroment->getServer() . '/' . $redirect, '/');
+            $redirect = trim($enviroment->getServer() . '/' . urlencode($redirect), '/');
         }
         return $response->withStatus(302)->withHeader('Location', $redirect);
     }
