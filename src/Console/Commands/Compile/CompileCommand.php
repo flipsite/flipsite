@@ -30,6 +30,7 @@ final class CompileCommand extends Command
 
         putenv('APP_BASEPATH=');
         putenv('APP_SERVER=');
+        putenv('APP_ENV=live');
 
         $enviroment = new \Flipsite\Enviroment();
         $reader     = new \Flipsite\Data\Reader($enviroment);
@@ -49,17 +50,22 @@ final class CompileCommand extends Command
         $https     = $options['https'] ?? true;
         $domain    = $options['domain'] ?? 'flipsite.io';
 
-        $this->deleteOld($targetDir);
-
+        $this->deleteSite($targetDir);
+        $assets = [];
         foreach ($allPages as $page) {
             $html = $this->getResponse($https, $domain, $page);
             $output->writeln($this->writeFile($targetDir, $page.'/index.html', $html));
-            $assets = $this->parseAssets($html);
-            // Page assets
-            foreach ($assets as $asset) {
-                $source = $this->getResponse($https, $domain, $asset);
-                $output->writeln($this->writeFile($targetDir, $asset, $source));
-            }
+            $assets = array_merge($assets, $this->parseAssets($html));
+        }
+        $assets = array_values(array_filter(array_unique($assets)));
+        $notDeleted = $this->deleteAssets($targetDir, $assets);
+
+        $assets = array_diff($assets, $notDeleted);
+
+        // Page assets
+        foreach ($assets as $asset) {
+            $source = $this->getResponse($https, $domain, $asset);
+            $output->writeln($this->writeFile($targetDir, $asset, $source));
         }
 
         // Sitemap
@@ -88,17 +94,55 @@ final class CompileCommand extends Command
         return 0;
     }
 
-    private function deleteOld(string $targetDir) : void
+    private function deleteSite(string $targetDir) : void
     {
         $filesystem = new Filesystem();
         $files      = $this->getDirContents($targetDir);
-        $filesystem->remove($targetDir.'/img');
-        $filesystem->remove($targetDir.'/videos');
         foreach ($files as $file) {
             if (false !== mb_strpos($file, 'index.html')) {
                 $filesystem->remove($file);
             }
         }
+    }
+
+    private function deleteAssets(string $targetDir, array $assets) : array
+    {
+        $notDeleted = [];
+        $filesystem = new Filesystem();
+        $images = $this->getDirContents($targetDir.'/img');
+        $dirs = [];
+        foreach ($images as $image) {
+            if (is_dir($image)) {
+                $dirs[] = $image;
+                continue;
+            }
+            $asset = str_replace($targetDir, '', $image);
+            if (in_array($asset, $assets)) {
+                $notDeleted[] = $asset;
+            } else {
+                $filesystem->remove($image);
+            }
+        }
+        $videos = $this->getDirContents($targetDir.'/videos');
+
+        foreach ($videos as $video) {
+            if (is_dir($video)) {
+                $dirs[] = $video;
+                continue;
+            }
+            $asset = str_replace($targetDir, '', $video);
+            if (in_array($asset, $assets)) {
+                $notDeleted[] = $asset;
+            } else {
+                $filesystem->remove($video);
+            }
+        }
+        foreach ($dirs as $dir) {
+            if (count(scandir($dir)) == 2) {
+                $filesystem->remove($dir);
+            }
+        }
+        return array_values(array_filter($notDeleted));
     }
 
     private function getResponse(bool $https, string $domain, string $page) : string
@@ -207,6 +251,9 @@ final class CompileCommand extends Command
 
     private function getDirContents($dir, &$results = [])
     {
+        if (!is_dir($dir)) {
+            return [];
+        }
         $files = scandir($dir);
         foreach ($files as $key => $value) {
             $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
