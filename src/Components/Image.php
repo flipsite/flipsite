@@ -45,7 +45,7 @@ final class Image extends AbstractComponent
             }
             $this->setAttribute('src', $imageContext->getSrc());
         } else {
-            if ($this->canIUse->webp()) {
+            if (($options['webp'] ?? true) && $this->canIUse->webp()) {
                 $src = str_replace('.jpg', '.webp', $src);
                 $src = str_replace('.png', '.webp', $src);
             }
