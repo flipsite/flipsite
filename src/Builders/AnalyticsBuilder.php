@@ -45,15 +45,18 @@ class AnalyticsBuilder implements BuilderInterface
             $script = new Element('script', true);
             $script->setAttribute('async', true);
             $script->setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id='.$this->ga);
-            $document->getChild('body')->addChild($script);
-
             $jsCode = file_get_contents(__DIR__.'/googleAnalytics.js');
             $jsCode = str_replace('UA-XXXX-1', $this->ga, $jsCode);
-            $script = new Script();
-            $script->setContent($jsCode);
-            $document->getChild('body')->addChild($script);
+            $inlineScript = new Script();
+            $inlineScript->setContent($jsCode);
+            if (str_starts_with($this->ga, 'UA-')) {
+                $document->getChild('body')->addChild($script);
+                $document->getChild('body')->addChild($inlineScript);
+            } elseif (str_starts_with($this->ga, 'G-')) {
+                $document->getChild('head')->prependChild($inlineScript);
+                $document->getChild('head')->prependChild($script);
+            }
         }
-
         return $document;
     }
 }
