@@ -321,8 +321,8 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Add Analytics
     $integrations = $reader->get('integrations');
-    if ($enviroment->isLive() && null !== $integrations) {
-        $analyticsBuilder = new AnalyticsBuilder($integrations);
+    if (null !== $integrations) {
+        $analyticsBuilder = new AnalyticsBuilder($enviroment->isLive(), $integrations);
         $document = $analyticsBuilder->getDocument($document);
     }
 

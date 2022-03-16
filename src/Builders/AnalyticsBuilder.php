@@ -12,7 +12,7 @@ class AnalyticsBuilder implements BuilderInterface
     private ?string $gtm = null;
     private ?string $ga  = null;
 
-    public function __construct(array $integrations)
+    public function __construct(private bool $isLive, array $integrations)
     {
         if (isset($integrations['google']['tagManager'])) {
             $this->gtm = $integrations['google']['tagManager'];
@@ -24,7 +24,7 @@ class AnalyticsBuilder implements BuilderInterface
 
     public function getDocument(Document $document) : Document
     {
-        if ($this->gtm) {
+        if ($this->isLive && $this->gtm) {
             $jsCode = file_get_contents(__DIR__.'/googleTagManager.js');
             $jsCode = str_replace('GTM-XXXX', $this->gtm, $jsCode);
             $script = new Script();
@@ -41,12 +41,12 @@ class AnalyticsBuilder implements BuilderInterface
             $document->getChild('body')->prependChild($noscript);
         }
 
-        if ($this->ga) {
+        if ($this->isLive && $this->ga) {
             $script = new Element('script', true);
             $script->setAttribute('async', true);
             $script->setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id='.$this->ga);
-            $jsCode = file_get_contents(__DIR__.'/googleAnalytics.js');
-            $jsCode = str_replace('UA-XXXX-1', $this->ga, $jsCode);
+            $jsCode       = file_get_contents(__DIR__.'/googleAnalytics.js');
+            $jsCode       = str_replace('UA-XXXX-1', $this->ga, $jsCode);
             $inlineScript = new Script();
             $inlineScript->setContent($jsCode);
             if (str_starts_with($this->ga, 'UA-')) {
@@ -56,6 +56,10 @@ class AnalyticsBuilder implements BuilderInterface
                 $document->getChild('head')->prependChild($inlineScript);
                 $document->getChild('head')->prependChild($script);
             }
+        } elseif ($this->ga) {
+            $script = new Script();
+            $script->setContent('function gtag(a,b,c){console.log(b,c)}');
+            $document->getChild('body')->addChild($script);
         }
         return $document;
     }
