@@ -25,7 +25,7 @@ final class Html extends AbstractComponent
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
     {
-        $i   = str_repeat(' ', $indentation * ($level + 1));
-        return $i.str_replace("\n","\n".$i,$this->content);
+        $i   = str_repeat(' ', $indentation * $level);
+        return $i.str_replace("\n","\n".$i,$this->content)."\n";
     }
 }
