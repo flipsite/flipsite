@@ -164,7 +164,12 @@ object-cover: object-fit:cover
 object-fill: object-fit:fill
 object-none: object-fit:none
 object-scale-down: object-fit:scale-down
-outline-none: outline:0
+outline-none:	outline:2px solid transparent;outline-offset:2px
+outline	outline-style: solid
+outline-dashed	outline-style: dashed
+outline-dotted	outline-style: dotted
+outline-double	outline-style: double
+outline-hidden	outline-style: hidden
 overflow-auto: overflow:auto
 overflow-clip: text-overflow:clip
 overflow-ellipsis: text-overflow:ellipsis
