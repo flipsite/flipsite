@@ -14,10 +14,12 @@ final class RasterEditor extends AbstractImageEditor
         $manager      = new ImageManager();
         $image        = $manager->make($this->file->getFilename());
         $filePathinfo = pathinfo($this->path);
-        $image        = $this->applyOptions($image, $filePathinfo['extension']);
+        $options      = new RasterOptions($this->path);
+        $image        = $this->applyOptions($image, $options);
         // Requested file has different format than actual asset
         if ($this->file->getExtension() !== $filePathinfo['extension']) {
-            $image->encode($this->file->getExtension(), 90); //80 if jpg
+            $quality = $options->getValue('quality') ?? 90;
+            $image->encode($this->file->getExtension(), $quality);
         }
         $cachedFilename = $this->getCachedFilename();
         $cachedPathinfo = pathinfo($cachedFilename);
@@ -25,15 +27,8 @@ final class RasterEditor extends AbstractImageEditor
         $image->save($cachedFilename);
     }
 
-    private function applyOptions(Image $image, string $extension) : Image
+    private function applyOptions(Image $image, RasterOptions $options) : Image
     {
-        $options = new RasterOptions($this->path);
-
-        $trim  = (bool)$options->getValue('trim') ?? false;
-        if ($trim) {
-            $image->trim('top-left', null, 10);
-            $image->trim('transparent');
-        }
         $width   = $options->getValue('width');
         $height  = $options->getValue('height');
         if ($width && $height) {

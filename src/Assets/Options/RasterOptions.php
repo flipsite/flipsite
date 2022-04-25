@@ -13,7 +13,7 @@ final class RasterOptions extends AbstractImageOptions
             'blur'        => new IntOption('bl'),
             'height'      => new IntOption('h', true),
             'opacity'     => new IntOption('o'),
-            'trim'        => new BoolOption('t'),
+            'quality'     => new IntOption('q'),
             'width'       => new IntOption('w', true),
         ];
     }
