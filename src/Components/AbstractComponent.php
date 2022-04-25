@@ -39,7 +39,7 @@ abstract class AbstractComponent extends AbstractElement
             $imageContext = $this->imageHandler->getContext($src, []);
             $this->setAttribute('style', 'background-image:url('.$imageContext->getSrc().');');
         } else {
-            if ($this->canIUse->webp()) {
+            if (($options['webp'] ?? true) && $this->canIUse->webp()) {
                 $src = str_replace('.jpg', '.webp', $src);
                 $src = str_replace('.png', '.webp', $src);
             }
