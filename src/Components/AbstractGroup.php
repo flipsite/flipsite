@@ -19,7 +19,7 @@ abstract class AbstractGroup extends AbstractComponent
     {
         if (isset($data['_index'])) {
             $nthStyle   = $this->getNth($data['_index'], $data['_total'], $style);
-            $style      = ArrayHelper::merge($style, $nthStyle);
+            $style      = ArrayHelper::merge($nthStyle, $style);
         }
 
         if (isset($data['onclick'])) {
