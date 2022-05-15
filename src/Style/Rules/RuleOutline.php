@@ -16,6 +16,6 @@ final class RuleOutline extends AbstractRule
             return;
         }
 
-        $this->setDeclaration('outline-offset', intval($args[0].'px'));
+        $this->setDeclaration('outline-width', intval($args[0]).'px');
     }
 }

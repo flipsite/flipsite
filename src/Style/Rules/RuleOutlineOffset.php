@@ -10,6 +10,6 @@ final class RuleOutlineOffset extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $this->setDeclaration('outline-offset', intval($args[0].'px'));
+        $this->setDeclaration('outline-offset', intval($args[0]).'px');
     }
 }
