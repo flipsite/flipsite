@@ -78,7 +78,11 @@ class ComponentBuilder
                 return null;
             }
         };
-
+        if (is_array($data) && isset($data['style:dark'])) {
+            $data['style'] = $data['style:dark'];
+            unset($data['style:dark']);
+            $appearance = 'dark';
+        }
         if (is_array($data) && isset($data['style'])) {
             // If string, => inherit
             if (is_string($data['style'])) {
@@ -230,7 +234,7 @@ class ComponentBuilder
         return $style;
     }
 
-    private function buildComponent(string $type, ) : ?AbstractComponent
+    private function buildComponent(string $type) : ?AbstractComponent
     {
         //Check external factories
         foreach ($this->factories as $factory) {
