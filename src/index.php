@@ -59,7 +59,7 @@ $svgMw         = new SvgMiddleware($container->get('enviroment'));
 
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
-    $handler = new ImageHandler(
+    $handler    = new ImageHandler(
         $enviroment->getAssetSources(),
         $enviroment->getImgDir(),
         $enviroment->getImgBasePath(),
@@ -69,7 +69,7 @@ $app->get('/img[/{file:.*}]', function (Request $request, Response $response, ar
 
 $app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
-    $handler = new VideoHandler(
+    $handler    = new VideoHandler(
         $enviroment->getSiteDir().'/assets',
         $enviroment->getVideoDir(),
         $enviroment->getVideoBasePath(),
@@ -79,15 +79,15 @@ $app->get('/videos[/{file:.*}]', function (Request $request, Response $response,
 
 $app->get('/sitemap.xml', function (Request $request, Response $response) {
     $enviroment = $this->get('enviroment');
-    $reader = $this->get('reader');
-    $sitemap = new Sitemap($enviroment->getServer(), $reader->getSlugs());
+    $reader     = $this->get('reader');
+    $sitemap    = new Sitemap($enviroment->getServer(), $reader->getSlugs());
     $response->getBody()->write((string) $sitemap);
     return $response->withHeader('Content-type', 'application/xml');
 });
 
 $app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
     $enviroment = $this->get('enviroment');
-    $js = file_get_contents(__DIR__.'/../js/sw.js');
+    $js         = file_get_contents(__DIR__.'/../js/sw.js');
     if (preg_match('/[abcdef0-9]{6}/', $args['version'])) {
         $js = str_replace('const OFFLINE_VERSION=1', 'const OFFLINE_VERSION="'.$args['version'].'"', $js);
     }
@@ -97,13 +97,13 @@ $app->get('/sw.{version}.js', function (Request $request, Response $response, $a
 
 $app->get('/robots.txt', function (Request $request, Response $response) {
     $enviroment = $this->get('enviroment');
-    $robots = new Robots($enviroment->isLive(), $enviroment->getServer());
+    $robots     = new Robots($enviroment->isLive(), $enviroment->getServer());
     $response->getBody()->write((string) $robots);
     return $response->withHeader('Content-type', 'text/plain');
 });
 
 $app->get('/manifest.json', function (Request $request, Response $response) {
-    $enviroment = $this->get('enviroment');
+    $enviroment   = $this->get('enviroment');
     $imageHandler = new ImageHandler(
         $enviroment->getAssetSources(),
         $enviroment->getImgDir(),
@@ -114,25 +114,25 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
         $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
         return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
     };
-    $reader = $this->get('reader');
-    $manifest = [];
+    $reader                 = $this->get('reader');
+    $manifest               = [];
     $manifest['short_name'] = $reader->get('name');
-    $manifest['name'] = $reader->get('name');
-    $manifest['icons'] = [];
+    $manifest['name']       = $reader->get('name');
+    $manifest['icons']      = [];
 
     $icons = $reader->get('favicon');
     $image = $imageHandler->getContext($icons[512], ['width' => 512, 'height' => 512]);
-    $icon = [
+    $icon  = [
         'src'  => $image->getSrc(),
         'type' => 'image/png',
         'sizes'=> '512x512'
     ];
-    $manifest['icons'][] = $icon;
-    $manifest['start_url'] = '/';
+    $manifest['icons'][]          = $icon;
+    $manifest['start_url']        = '/';
     $manifest['background_color'] = $toHex($reader->get('pwa.bgColor') ?? $reader->get('theme.colors.dark') ?? '#ffffff');
-    $manifest['display'] = 'minimal-ui';
-    $manifest['scope'] = '/';
-    $manifest['theme_color'] = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
+    $manifest['display']          = 'minimal-ui';
+    $manifest['scope']            = '/';
+    $manifest['theme_color']      = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
 
     // $enviroment = $this->get('enviroment');
     // $reader = $this->get('reader');
@@ -143,9 +143,9 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
 
 $app->post('/form/submit/{formId}', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
-    $form = $this->get('reader')->get('forms.'.$args['formId']);
+    $form       = $this->get('reader')->get('forms.'.$args['formId']);
     $parsedBody = $request->getParsedBody();
-    $res = 'error';
+    $res        = 'error';
     if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'] ?? [], $form['dummy'] ?? [], $parsedBody)) {
         if ('postmarkapp' === $form['type']) {
             try {
@@ -181,23 +181,24 @@ $app->post('/form/submit/{formId}', function (Request $request, Response $respon
             }
         }
     }
-    $response = $response->withStatus(302);
-    $redirect = trim($enviroment->getServer().'/'.$form['done'].'?res='.$res.'#'.$args['formId'], '/');
-    return $response->withHeader('Location', urlencode($redirect));
+
+    $response      = $response->withStatus(302);
+    $redirect      = trim($enviroment->getServer().'/'.$form['done'].'?res='.$res.'#'.$args['formId'], '/');
+    return $response->withHeader('Location', $redirect);
 });
 
 $app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
-    $filepath = $enviroment->getSiteDir().'/files/'.$args['file'];
+    $filepath   = $enviroment->getSiteDir().'/files/'.$args['file'];
     if (!file_exists($filepath)) {
         $response = $response->withStatus(302);
         $redirect = trim($enviroment->getServer());
         return $response->withHeader('Location', urlencode($redirect));
     }
 
-    $pathinfo = pathinfo($filepath);
+    $pathinfo  = pathinfo($filepath);
     $extension = $pathinfo['extension'];
-    $fileName = $pathinfo['basename'];
+    $fileName  = $pathinfo['basename'];
 
     $response = $response->withHeader('Content-Type', 'application/'.$extension);
     $response = $response->withHeader('Content-Disposition', sprintf('attachment; filename="%s"', $fileName));
@@ -222,7 +223,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     );
 
     // Check if the requested path needs to redirect
-    $redirect = $path->getRedirect();
+    $redirect   = $path->getRedirect();
     $enviroment = $this->get('enviroment');
     if (null !== $redirect) {
         // Check if internal url
@@ -233,7 +234,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         return $response->withStatus(302)->withHeader('Location', $redirect);
     }
 
-    $documentBuilder = new DocumentBuilder($enviroment, $reader, $path);
+    $documentBuilder  = new DocumentBuilder($enviroment, $reader, $path);
     $componentBuilder = new ComponentBuilder($request, $enviroment, $reader, $path, $this->get('caniuse'));
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
@@ -323,7 +324,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $integrations = $reader->get('integrations');
     if (null !== $integrations) {
         $analyticsBuilder = new AnalyticsBuilder($enviroment->isLive(), $integrations);
-        $document = $analyticsBuilder->getDocument($document);
+        $document         = $analyticsBuilder->getDocument($document);
     }
 
     $response->getBody()->write($document->render());
