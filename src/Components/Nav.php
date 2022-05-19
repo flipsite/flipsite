@@ -91,16 +91,30 @@ class Nav extends AbstractGroup
             unset($data['append']);
         }
 
-        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
-
         return $data;
     }
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $items = $data['items'] ?? [];
+        $js = in_array('js', $data['flags'] ?? []);
+        if (!$js) {
+            $items = $this->addActive($data['items'], $this->path->getPage());
+        } else {
+            $this->builder->dispatch(new Event('global-script', 'nav', file_get_contents(__DIR__.'/../../js/nav.js')));
+            $items = [];
+            foreach ($data['items'] as $item) {
+                $url = $item['url'];
+                unset($item['url']);
+                $item['onclick'] = "javascript:navSelect('".$url."')";
+                $items[]         = $item;
+            }
+            $this->setAttribute('data-not-active', implode(' ', $style['notActive'] ?? []));
+            $this->setAttribute('data-active', implode(' ', $style['active'] ?? []));
+        }
         unset($data['items']);
+
         $last = count($items) - 1;
+
         foreach ($items as $i => $item) {
             $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
             if ($i === 0 && isset($style['first'])) {
@@ -121,7 +135,6 @@ class Nav extends AbstractGroup
             $data['empty'] = '&nbsp;';
         }
         unset($style['items'], $style['active'], $style['first'], $style['last']);
-
         parent::build($data, $style, $appearance);
     }
 
