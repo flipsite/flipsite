@@ -54,6 +54,8 @@ class YamlExpander
                             if ($parsed) {
                                 $item                         = $parsed;
                                 $list[$parsed['key'] ?? $i++] = $parsed;
+                            } elseif (!str_starts_with($file, '.')) {
+                                $list[$parsed['key'] ?? $i++] = $file;
                             }
                         }
                         self::$cache[$name] = $list;
