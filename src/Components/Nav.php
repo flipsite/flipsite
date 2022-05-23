@@ -96,16 +96,19 @@ class Nav extends AbstractGroup
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $js = in_array('js', $data['flags'] ?? []);
-        if (!$js) {
+        $setState = in_array('setState', $data['flags'] ?? []);
+        if (!$setState) {
             $items = $this->addActive($data['items'], $this->path->getPage());
         } else {
-            $this->builder->dispatch(new Event('global-script', 'nav', file_get_contents(__DIR__.'/../../js/nav.js')));
+            if (!isset($data['flags'][1])) {
+                throw new \Exception('No setstate target');
+            }
+            $this->builder->dispatch(new Event('global-script', 'setState', file_get_contents(__DIR__.'/../../js/setState.min.js')));
             $items = [];
             foreach ($data['items'] as $item) {
                 $url = $item['url'];
                 unset($item['url']);
-                $item['onclick'] = "javascript:navSelect('".$url."')";
+                $item['onclick'] = "javascript:setState('".$data['flags'][1]."','".$url."')";
                 $items[]         = $item;
             }
             $this->setAttribute('data-not-active', implode(' ', $style['notActive'] ?? []));
@@ -115,6 +118,7 @@ class Nav extends AbstractGroup
 
         $last = count($items) - 1;
 
+        $notActiveStyle = $style['notActive'] ?? [];
         foreach ($items as $i => $item) {
             $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
             if ($i === 0 && isset($style['first'])) {
@@ -128,6 +132,8 @@ class Nav extends AbstractGroup
                     $item['style'] = [];
                 }
                 $item['style'] = ArrayHelper::merge($item['style'], $style['active']);
+            } elseif (!($item['active'] ?? false) && $notActiveStyle) {
+                $item['style'] = ArrayHelper::merge($item['style'], $notActiveStyle);
             }
             $data['a:'.$i] = $item;
         }
