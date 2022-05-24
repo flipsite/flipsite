@@ -28,6 +28,7 @@ final class RunCommand extends Command
         if ($port) {
             $io->success('Server listening on '.$host.':'.$port);
             $io->writeln('// Quit the server with CONTROL-C.');
+            $io->writeln('');
             exec('cd vendor/flipsite/flipsite; php -S '.$host.':'.$port.' router.php');
         } else {
             $io->error('Could not start server, too many running');
