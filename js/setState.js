@@ -5,7 +5,7 @@ function setState(target,state) {
   var notActiveClasses = nav.getAttribute('data-not-active').split(' ');
   var activeClasses = nav.getAttribute('data-active').split(' ');
   nav.childNodes.forEach(el=>{
-    if ('A' === el.tagName) {
+    if (el.tagName !== undefined) {
       for (var i=0; i<notActiveClasses.length; i++) el.classList.add(notActiveClasses[i]);
       for (var i=0; i<activeClasses.length; i++) el.classList.remove(activeClasses[i]);
     }
