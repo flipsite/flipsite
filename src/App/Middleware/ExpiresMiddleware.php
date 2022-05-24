@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\App\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
@@ -20,9 +19,9 @@ class ExpiresMiddleware implements MiddlewareInterface
     public function process(Request $request, $handler) : Response
     {
         $response = $handler->handle($request);
-        $now      = gmstrftime('%a, %d %b %Y %H:%M:%S GMT', time());
+        $now      = gmdate('D, d M Y H:i:s \G\M\T', time());
         $response = $response->withHeader('Last-Modified', $now);
-        $nextYear = gmstrftime('%a, %d %b %Y %H:%M:%S GMT', time() + $this->offset);
+        $nextYear = gmdate('D, d M Y H:i:s \G\M\T', time() + $this->offset);
         return $response->withHeader('Expires', $nextYear);
     }
 }
