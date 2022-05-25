@@ -277,6 +277,7 @@ text-center: text-align:center
 text-justify: text-align:justify
 text-left: text-align:left
 text-right: text-align:right
+text-shadow-none: text-shadow:none
 touch-auto: touch-action:auto
 touch-none: touch-action:none
 touch-pan-x: touch-action:pan-x

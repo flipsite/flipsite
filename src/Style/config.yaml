@@ -305,6 +305,12 @@ strokeWidth:
   0: 0
   1: 1
   2: 2
+textShadow:
+  DEFAULT: 0px 1px 1px rgba(0,0,0,0.5)
+  sm: 0px 1px 2px rgba(0,0,0,0.5)
+  md: 0px 1px 3px rgba(0,0,0,0.5)
+  lg: 0px 2px 4px rgba(0,0,0,0.5)
+  xl: 0px 2px 5px rgba(0,0,0,0.5)
 translate:
   full: 100%'
 transitionProperty:
