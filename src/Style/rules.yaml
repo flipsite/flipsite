@@ -224,6 +224,14 @@ row-end-auto: grid-row-end:auto
 row-start-auto: grid-row-start:auto
 scroll-auto: scroll-behavior:auto
 scroll-smooth: scroll-behavior:smooth
+scrollbar-auto: scrollbar-width:auto
+scrollbar-thin: scrollbar-width:thin
+scrollbar-none: scrollbar-width:none
+scrollbar-inherit: scrollbar-width:inherit
+scrollbar-initial: scrollbar-width:initial
+scrollbar-revert: scrollbar-width:revert
+scrollbar-revert-layer: scrollbar-width:revert-layer
+scrollbar-unset: scrollbar-width:unset
 select-all: user-select:all
 select-auto: user-select:auto
 select-none: user-select:none
