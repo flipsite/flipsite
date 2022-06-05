@@ -50,6 +50,9 @@ class YamlExpander
                         $list = [];
                         $i    = 0;
                         foreach (scandir($filepath) as $file) {
+                            if (is_dir($filepath.'/'.$file)) {
+                                continue;
+                            }
                             $parsed = YamlFront::parseFile($filepath.'/'.$file);
                             if ($parsed) {
                                 $item                         = $parsed;
