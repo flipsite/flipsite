@@ -48,7 +48,12 @@ pinterest:
   name: Pinterest
   color: "#BD081C"
   icon: simple-icons/pinterest.svg
-  url: https://www.pinterest.com/{{handle}}
+  url: https://www.pinterest.com/{handle}
+scholar:
+  name: Google Scholar
+  color: "#4285F4"
+  icon: simple-icons/googlescholar.svg
+  url: https://scholar.google.com/{handle}
 slack:
   name: Slack
   color: "#4A154B"
