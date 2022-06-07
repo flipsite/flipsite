@@ -9,8 +9,10 @@ use Flipsite\Components\Script;
 
 class AnalyticsBuilder implements BuilderInterface
 {
-    private ?string $gtm = null;
-    private ?string $ga  = null;
+    private ?string $gtm        = null;
+    private ?string $ga         = null;
+    private ?string $metaPixel  = null;
+    private ?string $cookieBot  = null;
 
     public function __construct(private bool $isLive, array $integrations)
     {
@@ -20,10 +22,17 @@ class AnalyticsBuilder implements BuilderInterface
         if (isset($integrations['google']['analytics'])) {
             $this->ga = $integrations['google']['analytics'];
         }
+        if (isset($integrations['meta']['pixel'])) {
+            $this->metaPixel = (string)$integrations['meta']['pixel'];
+        }
+        if (isset($integrations['cookieBot'])) {
+            $this->cookieBot = $integrations['cookieBot'];
+        }
     }
 
     public function getDocument(Document $document) : Document
     {
+        // Google
         if ($this->isLive && $this->gtm) {
             $jsCode = file_get_contents(__DIR__.'/googleTagManager.js');
             $jsCode = str_replace('GTM-XXXX', $this->gtm, $jsCode);
@@ -60,6 +69,30 @@ class AnalyticsBuilder implements BuilderInterface
             $script = new Script();
             $script->setContent('function gtag(a,b,c){console.log(b,c)}');
             $document->getChild('body')->addChild($script);
+        }
+
+        // Meta
+        if ($this->isLive && $this->metaPixel) {
+            $jsCode       = file_get_contents(__DIR__.'/metaPixel.js');
+            $jsCode       = str_replace('XXXX', $this->metaPixel, $jsCode);
+            $inlineScript = new Script();
+            $inlineScript->setContent($jsCode);
+            $document->getChild('head')->addChild($inlineScript);
+            $noScript = new Script();
+            $noScript->setTag('noscript');
+            $noScript->setContent('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='.$this->metaPixel.'&ev=PageView&noscript=1"/>');
+            $document->getChild('head')->addChild($noScript);
+        }
+
+        // Cookiebot
+        if ($this->isLive && $this->cookieBot) {
+            $script = new Script();
+            $script->setAttribute('id', 'Cookiebot');
+            $script->setAttribute('src', 'https://consent.cookiebot.com/uc.js');
+            $script->setAttribute('data-cbid', $this->cookieBot);
+            $script->setAttribute('type', 'text/javascript');
+            $script->setAttribute('data-blockingmode', 'auto');
+            $document->getChild('head')->addChild($script);
         }
         return $document;
     }
