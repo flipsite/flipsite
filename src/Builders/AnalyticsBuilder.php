@@ -82,6 +82,10 @@ class AnalyticsBuilder implements BuilderInterface
             $noScript->setTag('noscript');
             $noScript->setContent('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='.$this->metaPixel.'&ev=PageView&noscript=1"/>');
             $document->getChild('head')->addChild($noScript);
+        } elseif ($this->metaPixel) {
+            $script = new Script();
+            $script->setContent('function fbq(a,b,c){console.log(a,b,c)}');
+            $document->getChild('body')->addChild($script);
         }
 
         // Cookiebot
