@@ -90,13 +90,21 @@ class AnalyticsBuilder implements BuilderInterface
 
         // Cookiebot
         if ($this->isLive && $this->cookieBot) {
+            // Consent mode
+            if ($this->ga) {
+                $script = new Script();
+                $script->setAttribute('data-cookieconsent', 'ignore');
+                $script->setContent(file_get_contents(__DIR__.'/cookieBotGoogleAnalyticsConset.js'));
+                $document->getChild('head')->prependChild($script);
+            }
+
             $script = new Script();
             $script->setAttribute('id', 'Cookiebot');
             $script->setAttribute('src', 'https://consent.cookiebot.com/uc.js');
             $script->setAttribute('data-cbid', $this->cookieBot);
             $script->setAttribute('type', 'text/javascript');
             $script->setAttribute('data-blockingmode', 'auto');
-            $document->getChild('head')->addChild($script);
+            $document->getChild('head')->prependChild($script);
         }
         return $document;
     }
