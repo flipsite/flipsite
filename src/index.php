@@ -46,6 +46,8 @@ $container = new Container();
 $container->add('enviroment', 'Flipsite\Enviroment', true);
 $container->add('caniuse', 'Flipsite\Utils\CanIUse', true);
 $container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment');
+$container->add('plugins', 'Flipsite\Utils\Plugins', true)->addArgument($plugins ?? []);
+
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
@@ -110,7 +112,7 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
         $enviroment->getImgBasePath(),
     );
 
-    $toHex = function (string $color) : string {
+    $toHex   = function (string $color) : string {
         $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
         return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
     };
@@ -211,7 +213,8 @@ $app->get('/files/[{file:.*}]', function (Request $request, Response $response, 
 });
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
-    $reader = $this->get('reader');
+    $reader  = $this->get('reader');
+    $plugins = $this->get('plugins');
 
     // Parse request path to determine language and requested page
     $path = new Path(
@@ -263,7 +266,8 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     $page = $path->getPage();
 
-    foreach ($reader->getSections($page, $path->getLanguage()) as $sectionData) {
+    foreach ($reader->getSections($page, $path->getLanguage()) as $sectionId => $sectionData) {
+        $document    = $plugins->run('section', $sectionData);
         $parentStyle = $sectionData['parentStyle'] ?? ['type' => 'group'];
         unset($sectionData['parentStyle']);
         $section = $componentBuilder->build('section', $sectionData, $parentStyle, $reader->get('theme.appearance') ?? 'light');
@@ -326,6 +330,9 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         $analyticsBuilder = new AnalyticsBuilder($enviroment->isLive(), $integrations);
         $document         = $analyticsBuilder->getDocument($document);
     }
+
+    // If any plugins
+    $document = $plugins->run('document', $document);
 
     $response->getBody()->write($document->render());
 
