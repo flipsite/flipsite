@@ -112,7 +112,7 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
         $enviroment->getImgBasePath(),
     );
 
-    $toHex   = function (string $color) : string {
+    $toHex   = function (string $color): string {
         $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
         return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
     };
@@ -267,7 +267,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $page = $path->getPage();
 
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionId => $sectionData) {
-        $document    = $plugins->run('section', $sectionData);
+        $sectionData = $plugins->run('section', $sectionData);
         $parentStyle = $sectionData['parentStyle'] ?? ['type' => 'group'];
         unset($sectionData['parentStyle']);
         $section = $componentBuilder->build('section', $sectionData, $parentStyle, $reader->get('theme.appearance') ?? 'light');
