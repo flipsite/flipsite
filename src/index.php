@@ -45,8 +45,8 @@ if (!getenv('APP_BASEPATH')) {
 $container = new Container();
 $container->add('enviroment', 'Flipsite\Enviroment', true);
 $container->add('caniuse', 'Flipsite\Utils\CanIUse', true);
-$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment');
 $container->add('plugins', 'Flipsite\Utils\Plugins', true)->addArgument($plugins ?? []);
+$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment')->addArgument('plugins');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();

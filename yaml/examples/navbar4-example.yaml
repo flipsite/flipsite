@@ -1,9 +1,0 @@
-back:
-  url: home
-  icon: zondicons/arrow-thin-left
-  sr: Link to Home
-close:
-  url: home
-  icon: zondicons/close
-  sr: Close page and go Home
-heading:sm: Flipsite

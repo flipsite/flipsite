@@ -1,6 +1,0 @@
-display: block
-textColor: text-black-o65
-minHeight: min-h-0vh
-textSize: text-3
-dark:
-  textColor: text-white-o70

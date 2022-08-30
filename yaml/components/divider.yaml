@@ -1,7 +1,0 @@
-bgColor: bg-primary
-borderRadius: rounded-sm
-display: inline-block
-height: h-1.5
-width: w-20
-dark:
-  bgColor: bg-primary2

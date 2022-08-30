@@ -1,6 +1,0 @@
-type: div
-textColor: text-primary
-fontWeight: font-bold
-textTransform: uppercase
-dark:
-  textColor: text-primary2

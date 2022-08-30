@@ -7,11 +7,11 @@ use Flipsite\Enviroment;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
+use Flipsite\Utils\Plugins;
 use Flipsite\Utils\YamlExpander;
 
 final class Reader
 {
-    private Enviroment $enviroment;
     /**
      * @var array<Language>
      */
@@ -33,12 +33,13 @@ final class Reader
 
     private string $hash = '';
 
-    public function __construct(Enviroment $enviroment)
+    public function __construct(private Enviroment $enviroment, private Plugins $plugins)
     {
-        $this->enviroment = $enviroment;
         $siteDir          = $this->enviroment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
-            $this->loadSite(YamlExpander::parseFile($siteDir.'/site.yaml'));
+            $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
+            $siteYaml = $this->plugins->run('beforeSiteLoad',$siteYaml);
+            $this->loadSite($siteYaml);
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }

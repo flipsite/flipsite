@@ -1,7 +1,0 @@
-container:
-  shadow: shadow
-link:
-  display: block
-  cursor: hover:cursor-pointer
-  transform: transform hover:scale-102
-  transition: transition ease-in-out duration-150

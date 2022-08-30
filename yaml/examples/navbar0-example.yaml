@@ -1,9 +1,0 @@
-logo:
-  svg: flipsite.svg
-  sr: Flipsite
-  url: home
-nav:
-  flipsite: Home
-  features: Features
-  about: About
-  contact: Contact

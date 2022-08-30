@@ -1,6 +1,0 @@
-section:
-  container:
-    maxWidth: max-w-screen-md
-    marginX: mx-auto
-    textAlign: text-center
-    spaceY: space-y-7
