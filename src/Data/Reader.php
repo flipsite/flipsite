@@ -124,8 +124,9 @@ final class Reader
         return $this->pageNameResolver->getName($page, $language);
     }
 
-    public function getSections(string $page, Language $language) : array
+    public function getSections(string $page, ?Language $language = null) : array
     {
+        $language ??= $this->getDefaultLanguage();
         if ('offline' === $page) {
             return $this->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
         }
