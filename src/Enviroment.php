@@ -38,7 +38,7 @@ final class Enviroment extends AbstractEnviroment
         $this->server = trim(getenv('APP_SERVER'), '/');
  
         if (false !== getenv('ASSET_DIRS')) {
-            $this->externalAssetDirsexplode = explode(',', getenv('ASSET_DIRS'));
+            $this->externalAssetDirs = explode(',', getenv('ASSET_DIRS'));
         }
     }
 }
