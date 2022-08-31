@@ -6,33 +6,25 @@ namespace Flipsite\Assets\Sources;
 
 final class AssetSources
 {
-    private string $vendorDir;
-    private string $siteDir;
     /**
      * @var array<AbstractAssetSource>
      */
     private array $sources = [];
     private array $videoFormats = ['ogg','webm','mp4'];
 
-    public function __construct(string $vendorDir, string $siteDir)
+    public function __construct(private string $vendorDir, private array $assetDirs = [])
     {
-        $this->vendorDir = $vendorDir;
-        $this->siteDir   = $siteDir;
+        $this->assetDirs[] = $this->vendorDir.'/flipsite/flipsite/assets';
     }
 
     public function getFilename(string $src) : ?string
     {
-        $assetDirs = [
-            $this->siteDir.'/assets/',
-            $this->vendorDir.'/flipsite/flipsite/assets/',
-        ];
-
-        foreach ($assetDirs as $assetDir) {
-            if (file_exists($assetDir.$src)) {
-                return $assetDir.$src;
+        foreach ($this->assetDirs as $assetDir) {
+            if (file_exists($assetDir.'/'.$src)) {
+                return $assetDir.'/'.$src;
             }
             if (mb_strpos($src, '.webp')) {
-                $filename = $assetDir.$src;
+                $filename = $assetDir.'/'.$src;
                 foreach (['jpg', 'png'] as $ext) {
                     $alt = str_replace('.webp', '.'.$ext, $filename);
                     if (file_exists($alt)) {
@@ -41,7 +33,6 @@ final class AssetSources
                 }
             }
         }
-
 
         $parts = explode('/', $src);
         $type  = $parts[0];

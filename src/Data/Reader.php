@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Data;
 
-use Flipsite\Enviroment;
+use Flipsite\AbstractEnviroment;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
@@ -33,7 +33,7 @@ final class Reader
 
     private string $hash = '';
 
-    public function __construct(private Enviroment $enviroment, private Plugins $plugins)
+    public function __construct(private AbstractEnviroment $enviroment, private Plugins $plugins)
     {
         $siteDir          = $this->enviroment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
