@@ -6,7 +6,7 @@ namespace Flipsite\Components;
 
 final class InlineScript extends AbstractElement
 {
-    protected string $type = 'script';
+    protected string $tag = 'script';
 
     private array $code = [];
 
@@ -18,7 +18,7 @@ final class InlineScript extends AbstractElement
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
     {
         $spaces = str_repeat(' ', $indentation * $level);
-        $html   = $spaces.'<'.$this->type.$this->renderAttributes().'>'."\n";
+        $html   = $spaces.'<'.$this->tag.$this->renderAttributes().'>'."\n";
         foreach ($this->code as $code) {
             $lines           = explode("\n", $code);
             $spacesNextLevel = str_repeat(' ', $indentation * ($level + 1));
@@ -26,6 +26,6 @@ final class InlineScript extends AbstractElement
                 $html .= $spacesNextLevel.$line."\n";
             }
         }
-        return $html .= $spaces.'</script>'."\n";
+        return $html .= $spaces.'</'.$this->tag.'>'."\n";
     }
 }

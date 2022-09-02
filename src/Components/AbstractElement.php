@@ -17,10 +17,13 @@ abstract class AbstractElement
     protected bool $render      = true;
     private ?string $cache      = null;
 
-    public function addStyle(?array $style) : self
+    public function addStyle(null|array|string $style) : self
     {
         if (null === $style) {
             return $this;
+        }
+        if (is_string($style)) {
+            $style = ['_' => $style];
         }
         $this->cache = null;
         $this->style = ArrayHelper::merge($this->style, $style);
@@ -119,6 +122,13 @@ abstract class AbstractElement
         } else {
             $this->children[] = $child;
         }
+        return $this;
+    }
+
+    public function replaceChildren(array $children) : self
+    {
+        $this->cache = null;
+        $this->children = $children;
         return $this;
     }
 
