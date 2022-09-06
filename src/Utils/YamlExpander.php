@@ -35,6 +35,27 @@ class YamlExpander
         return self::mergeExtend($data);
     }
 
+    /**
+     * Parses a YAML string into a PHP value.
+     *
+     * @return array the YAML converted to a PHP value
+     */
+    public static function parse(array|string $data)
+    {
+        if (is_string($data)) {
+            $data = Symfony\Component\Yaml\Yaml::parse($data);
+        }
+
+        // Undot data
+        $data = self::unDot($data);
+
+        // Parse references (both string and object)
+        $data = self::parseRef($data, $data);
+
+        // Merge extend
+        return self::mergeExtend($data);
+    }
+
     public static function parseIncludes(array $data, string $rootDir) : array
     {
         foreach ($data as $attr => &$val) {
