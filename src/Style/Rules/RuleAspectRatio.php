@@ -11,19 +11,5 @@ final class RuleAspectRatio extends AbstractRuleSpacing
     protected function process(array $args) : void
     {
         $this->setDeclaration('aspect-ratio', implode('/', $args));
-        // $properties = ['left', 'right', 'top', 'bottom'];
-        // if ('x' === $args[0]) {
-        //     array_shift($args);
-        //     $properties = ['left', 'right'];
-        // } elseif ('y' === $args[0]) {
-        //     array_shift($args);
-        //     $properties = ['top', 'bottom'];
-        // }
-        // $value = $this->getConfig('inset', $args[0]);
-        // $value ??= $this->getConfig('spacing', $args[0]);
-        // $value ??= $this->checkCallbacks('size', $args);
-        // foreach ($properties as $property) {
-        //     $this->setDeclaration($property, $value);
-        // }
     }
 }

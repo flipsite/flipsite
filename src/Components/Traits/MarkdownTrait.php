@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components\Traits;
 
+use Flipsite\Utils\ArrayHelper;
+
 trait MarkdownTrait
 {
     use UrlTrait;
@@ -17,7 +19,7 @@ trait MarkdownTrait
         if (isset($style['bullet'])) {
             $html = $this->addBullets($html, $style['bullet'], $appearance);
         }
-        $html = $this->addMarkdownStyle($html, $style);
+        $html = $this->addMarkdownStyle($html, $style, $appearance);
         return $this->addUrlsToMarkdown($html);
     }
 
@@ -32,7 +34,7 @@ trait MarkdownTrait
             $html = $this->addBullets($html, $style['bullet'], $appearance);
         }
         $html = $this->addMarkdownImages($html, $style['img'] ?? [], $appearance);
-        $html = $this->addMarkdownStyle($html, $style);
+        $html = $this->addMarkdownStyle($html, $style, $appearance);
         $html = $this->addUrlsToMarkdown($html);
         return $html;
     }
@@ -59,7 +61,7 @@ trait MarkdownTrait
         return $text;
     }
 
-    private function addMarkdownStyle(string $html, array $style = []) : string
+    private function addMarkdownStyle(string $html, array $style = [], string $appearance = 'light') : string
     {
         if (isset($style['tableWrap'])) {
             $classes = implode(' ', $style['tableWrap']);
@@ -74,7 +76,15 @@ trait MarkdownTrait
                 if ($tag === 'img') {
                     continue;
                 }
+                $dark = [];
+                if (isset($classes['dark'])) {
+                    $dark = $classes['dark'];
+                    unset($classes['dark']);
+                }
                 if (is_array($classes)) {
+                    if ('dark' === $appearance) {
+                        $classes = ArrayHelper::merge($classes, $dark);
+                    }
                     $classes = implode(' ', $classes);
                 }
                 $matches = [];

@@ -33,7 +33,8 @@ trait ColorTrait
         if (0 === count($args)) {
             return null;
         }
-        $colors = $this->getConfig('colors', $args[0]);
+        $tmp    = explode('/', $args[0]);
+        $colors = $this->getConfig('colors', $tmp[0]);
         if (null === $colors) {
             if (substr($args[0], 0, 2) === '[#') {
                 $colors = substr($args[0], 1, 7);
@@ -41,13 +42,24 @@ trait ColorTrait
                 return null;
             }
         }
+        $alpha = null;
+        if (isset($tmp[1]) && is_numeric($tmp[1])) {
+            $alpha = floatval($tmp[1]) / 100.0;
+        }
         array_shift($args);
+
         if (is_string($colors)) {
             $colors = [500 => $colors];
         }
 
         if (isset($args[0]) && is_numeric($args[0])) {
             $shade = array_shift($args);
+        } elseif (isset($args[0]) && is_string($args[0]) && strpos($args[0], '/')) {
+            $tmp = explode('/', array_shift($args));
+            if (count($tmp) === 2) {
+                $shade = intval($tmp[0]);
+                $alpha = floatval($tmp[1]) / 100.0;
+            }
         } else {
             $shade = 500;
         }
@@ -65,8 +77,12 @@ trait ColorTrait
             $color = $this->getShade($color, intval($shade));
         }
 
+        // Old deprecated oValue opacity
         if (isset($args[0]) && is_string($args[0])) {
             $alpha = floatval(str_replace('o', '', $args[0]) / 100.0);
+        }
+
+        if (null !== $alpha) {
             $color = $color->with(['alpha' => $alpha]);
         }
 

@@ -8,6 +8,9 @@ align-top: vertical-align:top
 animate-none: animation:none
 antialiased: -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
 appearance-none: appearance:none
+aspect-auto: aspect-ratio:auto
+aspect-square: aspect-ratio:1/1
+aspect-video: aspect-ratio:16/9
 auto-cols-auto: grid-auto-columns:auto
 auto-cols-fr: grid-auto-columns:minmax(0,1fr)
 auto-cols-max: grid-auto-columns:max-content
