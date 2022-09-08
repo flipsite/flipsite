@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -43,19 +44,18 @@ class ComponentBuilder
         $this->theme = $reader->get('theme') ?? [];
     }
 
-    public function addFactory(AbstractComponentFactory $factory) : void
+    public function addFactory(AbstractComponentFactory $factory): void
     {
         $this->factories[] = $factory;
     }
 
-    public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance) : ?AbstractComponent
+    public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance): ?AbstractComponent
     {
         if (isset($data['_merge'])) {
             $merge = $data['_merge'];
             unset($data['_merge']);
             $data = ArrayHelper::merge($data, $merge);
         }
-
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
         }
@@ -120,6 +120,11 @@ class ComponentBuilder
             unset($style['type'],$style['section']);
         }
 
+        if (isset($data['use'])) {
+            $use = $data['use'];
+            unset($data['use']);
+            $data = $this->attachDataToTpl($data, new \Adbar\Dot($use));
+        }
         if (isset($style['tpl'])) {
             if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
                 $data = ['value' => $data];
@@ -193,19 +198,19 @@ class ComponentBuilder
         return null;
     }
 
-    public function addListener(ComponentListenerInterface $listener) : void
+    public function addListener(ComponentListenerInterface $listener): void
     {
         $this->listeners[] = $listener;
     }
 
-    public function dispatch(Event $event) : void
+    public function dispatch(Event $event): void
     {
         foreach ($this->listeners as $listener) {
             $listener->handleComponentEvent($event);
         }
     }
 
-    public function getStyle(string $type, array $flags = []) : array
+    public function getStyle(string $type, array $flags = []): array
     {
         $style = $this->getComponentStyle($type, $flags);
         foreach ($flags as $flag) {
@@ -217,7 +222,7 @@ class ComponentBuilder
         return $style;
     }
 
-    private function getLayout(string $layout) : array
+    private function getLayout(string $layout): array
     {
         $variants = explode(':', $layout);
         $layout   = array_shift($variants);
@@ -234,7 +239,7 @@ class ComponentBuilder
         return $style;
     }
 
-    private function buildComponent(string $type) : ?AbstractComponent
+    private function buildComponent(string $type): ?AbstractComponent
     {
         //Check external factories
         foreach ($this->factories as $factory) {
@@ -270,7 +275,7 @@ class ComponentBuilder
         return null;
     }
 
-    private function handleIf(array $if) : bool
+    private function handleIf(array $if): bool
     {
         if (isset($if['isset']) && !$if['isset']) {
             return true;
@@ -278,7 +283,7 @@ class ComponentBuilder
         return false;
     }
 
-    private function getComponentStyle(string $type, array $flags = []) : array
+    private function getComponentStyle(string $type, array $flags = []): array
     {
         $style = $this->theme['components'][$type] ?? [];
         if (count($flags)) {
@@ -290,7 +295,7 @@ class ComponentBuilder
         return $style;
     }
 
-    private function addVars(string $value) : string
+    private function addVars(string $value): string
     {
         if (strpos($value, '%date.year%') !== false) {
             $value = str_replace('%date.year%', date('Y'), $value);
@@ -305,7 +310,7 @@ class ComponentBuilder
         return $value;
     }
 
-    private function addLoc(string $value) : string
+    private function addLoc(string $value): string
     {
         if (count($this->localization) === 0) {
             $flipsite = \Symfony\Component\Yaml\Yaml::parseFile($this->enviroment->getVendorDir().'/flipsite/flipsite/localization/flipsite.yaml');
