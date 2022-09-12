@@ -30,6 +30,17 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['onclick']);
         }
 
+        $that = $this; // reference to component that holds actual content, not wrappers or overlays
+
+        // Background + overlay
+        if ($this->hasBackground && isset($style['overlay'])) {
+            $overlay = new Element('div');
+            $overlay->addStyle($style['overlay']);
+            unset($style['overlay']);
+            $that = $overlay;
+            $this->addChild($overlay);
+        }
+
         $wrapperStyle = $style['wrapper'] ?? false;
         if (false !== $wrapperStyle) {
             if (is_bool($wrapperStyle)) {
@@ -37,14 +48,17 @@ abstract class AbstractGroup extends AbstractComponent
             }
             $this->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
-            $this->addStyle($wrapperStyle);
+            $that->addStyle($wrapperStyle);
             $content = new Element($style['tag'] ?? 'div');
             $content->addStyle($style);
             unset($style['tag']);
-            $this->addChild($content);
+            $that->addChild($content);
+            $content->addStyle($style);
+            $that = $content;
         } else {
-            $this->addStyle($style);
+            $that->addStyle($style);
         }
+
         $children = [];
         $i        = 0;
         $total    = count($data);
@@ -65,10 +79,6 @@ abstract class AbstractGroup extends AbstractComponent
             $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
             $i++;
         }
-        if (false !== $wrapperStyle) {
-            $content->addChildren($children);
-        } else {
-            $this->addChildren($children);
-        }
+        $that->addChildren($children);
     }
 }

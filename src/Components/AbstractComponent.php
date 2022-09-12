@@ -7,6 +7,8 @@ use Flipsite\Utils\ArrayHelper;
 
 abstract class AbstractComponent extends AbstractElement
 {
+    protected bool $hasBackground = false;
+
     abstract public function build(array $data, array $style, string $appearance) : void;
 
     public function normalize(string|int|bool|array $data) : array
@@ -52,6 +54,7 @@ abstract class AbstractComponent extends AbstractElement
 
         unset($style['options']);
         $this->addStyle($style);
+        $this->hasBackground = true;
     }
 
     private function isSvg(string $filename) : bool

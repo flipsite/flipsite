@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -51,6 +50,7 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance): ?AbstractComponent
     {
+        $debug = $type === 'primary';
         if (isset($data['_merge'])) {
             $merge = $data['_merge'];
             unset($data['_merge']);
@@ -62,6 +62,11 @@ class ComponentBuilder
         $flags = explode(':', $type);
         $type  = array_shift($flags);
 
+        $parentType = false;
+        if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
+            $parentType = $parentStyle['type'];
+        }
+
         if (in_array('var', $flags) && is_string($data)) {
             $data = $this->addVars($data);
         }
@@ -72,6 +77,13 @@ class ComponentBuilder
 
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
+
+        if ($parentType) {
+            $parentTypeflags = explode(':', $parentType);
+            $parentType      = array_shift($parentTypeflags);
+            $parentTypeStyle = $this->getStyle($parentType, $parentTypeflags);
+            $style           = ArrayHelper::merge($style, $parentTypeStyle);
+        }
 
         if (isset($data['options'],$data['options']['isset'])) {
             if (!$data['options']['isset']) {
