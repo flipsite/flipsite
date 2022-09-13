@@ -30,34 +30,42 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['onclick']);
         }
 
-        $that = $this; // reference to component that holds actual content, not wrappers or overlays
+        $that         = $this; // reference to component that holds actual content, not wrappers or overlays
 
-        // Background + overlay
-        if ($this->hasBackground && isset($style['overlay'])) {
-            $overlay = new Element('div');
-            $overlay->addStyle($style['overlay']);
-            unset($style['overlay']);
-            $that = $overlay;
+        $overlayStyle = $style['overlay'] ?? false;
+        $wrapperStyle = $style['wrapper'] ?? false;
+        unset($style['overlay'], $style['wrapper']);
+
+        if ($this->hasBackground && $overlayStyle) {
+            $overlay = new Element($overlayStyle['tag'] ?? 'div');
+            unset($overlayStyle['tag']);
+            $overlay->addStyle($overlayStyle);
             $this->addChild($overlay);
+            $that = $overlay;
+        } elseif (!$this->hasBackground && $overlayStyle) { // Overlay, no bg
+            $that->addStyle($overlayStyle);
         }
 
-        $wrapperStyle = $style['wrapper'] ?? false;
-        if (false !== $wrapperStyle) {
-            if (is_bool($wrapperStyle)) {
-                $wrapperStyle = [];
-            }
+        if ($wrapperStyle && $overlayStyle) {
+            $wrapper = new Element($wrapperStyle['tag'] ?? 'div');
+            unset($wrapperStyle['tag']);
+            $wrapper->addStyle($wrapperStyle);
+            $that->addChild($wrapper);
+            $content = new Element($style['tag'] ?? 'div');
+            unset($style['tag']);
+            $wrapper->addChild($content);
+            $that = $content;
+        } elseif ($wrapperStyle) {
             $this->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
             $that->addStyle($wrapperStyle);
             $content = new Element($style['tag'] ?? 'div');
-            $content->addStyle($style);
             unset($style['tag']);
             $that->addChild($content);
-            $content->addStyle($style);
             $that = $content;
-        } else {
-            $that->addStyle($style);
-        }
+        } 
+
+        $that->addStyle($style);
 
         $children = [];
         $i        = 0;
@@ -79,6 +87,7 @@ abstract class AbstractGroup extends AbstractComponent
             $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
             $i++;
         }
+
         $that->addChildren($children);
     }
 }
