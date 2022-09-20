@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flipsite\Style\Rules;
 
-final class RuleFlexGrow extends AbstractRule
+final class RuleOrder extends AbstractRule
 {
     /**
      * @param array<string> $args
