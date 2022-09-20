@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use TypeError;
@@ -12,7 +11,7 @@ final class Language
     /**
      * @var array<string>
      */
-    private array $languages = ['aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar',
+    const LANGUAGES = ['aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar',
         'as', 'av', 'ay', 'az', 'ba', 'be', 'bg', 'bh', 'bi', 'bm', 'bn', 'bo',
         'br', 'bs', 'ca', 'ce', 'ch', 'co', 'cr', 'cs', 'cu', 'cv', 'cy', 'da',
         'de', 'dv', 'dz', 'ee', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'ff',
@@ -32,10 +31,15 @@ final class Language
 
     public function __construct(string $language)
     {
-        if (!in_array($language, $this->languages)) {
+        if (!in_array($language, self::LANGUAGES)) {
             throw new TypeError('Invalid language ('.$language.')');
         }
         $this->language = $language;
+    }
+
+    public static function getList() : array
+    {
+        return self::LANGUAGES;
     }
 
     public function __toString() : string

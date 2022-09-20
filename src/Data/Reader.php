@@ -9,6 +9,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\YamlExpander;
+use Flipsite\Utils\Localizer;
 
 final class Reader
 {
@@ -38,7 +39,7 @@ final class Reader
         $siteDir          = $this->enviroment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
-            $siteYaml = $this->plugins->run('beforeSiteLoad',$siteYaml);
+            $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
             $this->loadSite($siteYaml);
         } else {
             throw new NoSiteFileFoundException($siteDir);
@@ -72,25 +73,10 @@ final class Reader
     public function get(string $path, ?Language $language = null)
     {
         $data = ArrayHelper::getDot(explode('.', $path), $this->data);
-        if (null === $data || is_string($data) || null === $language) {
+        if (null === $data || !is_array($data) || null === $language) {
             return $data;
         }
-        return $this->localize($data, $language);
-    }
-
-    public function localize(array $data, Language $language)
-    {
-        if ($this->isLoc($data)) {
-            return $data[(string) $language]
-                ?? $data[(string) $this->getDefaultLanguage()]
-                ?? array_shift($data);
-        }
-        foreach ($data as &$val) {
-            if (is_array($val)) {
-                $val = $this->localize($val, $language);
-            }
-        }
-        return $data;
+        return $this->localizer->localize($data, $language);
     }
 
     /**
@@ -128,7 +114,7 @@ final class Reader
     {
         $language ??= $this->getDefaultLanguage();
         if ('offline' === $page) {
-            return $this->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
+            return $this->localizer->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
         }
         $before = $this->data['before'] ?? [];
         if (ArrayHelper::isAssociative($before)) {
@@ -183,7 +169,7 @@ final class Reader
                 }
             }
         }
-        return $this->localize($sections ?? [], $language) ?? [];
+        return $this->localizer->localize($sections ?? [], $language) ?? [];
     }
 
     public function getMeta(string $page, Language $language) : ?array
@@ -224,7 +210,7 @@ final class Reader
         $titleOverride = false;
         foreach ($data as $section) {
             if (isset($section['_meta'])) {
-                $pageMeta = $this->localize($section['_meta'], $language);
+                $pageMeta = $this->localizer->localize($section['_meta'], $language);
                 if (isset($pageMeta['title'])) {
                     $titleFromMeta = $pageMeta['title'];
                     unset($pageMeta['title']);
@@ -340,20 +326,6 @@ final class Reader
         return false;
     }
 
-    private function isLoc(array $data) : bool
-    {
-        $keys = array_keys($data);
-        foreach ($keys as $key) {
-            if (is_numeric($key)) {
-                return false;
-            }
-            if (!in_array($key, $this->languageCodes)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private function parseLanguages() : void
     {
         $languages = $this->data['languages'] ?? null;
@@ -366,9 +338,9 @@ final class Reader
             $languages = ['en'];
         }
         foreach ($languages as $language) {
-            $this->languages[]     = new Language($language);
-            $this->languageCodes[] = $language;
+            $this->languages[] = new Language($language);
         }
+        $this->localizer = new Localizer($this->languages);
     }
 
     private function expandPagesAndSlugs() : void
