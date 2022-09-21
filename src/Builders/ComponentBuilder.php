@@ -142,11 +142,11 @@ class ComponentBuilder
                 $data = ['value' => $data];
             }
             if (isset($style['tplDefault'])) {
-                $default = $this->reader->localize($style['tplDefault'], $this->path->getLanguage());
+                $default = $this->reader->getLocalizer()->localize($style['tplDefault'], $this->path->getLanguage());
                 $data    = $this->addTplDefaultData($data, $default);
                 unset($style['tplDefault']);
             }
-            $tpl   = $this->reader->localize($style['tpl'], $this->path->getLanguage());
+            $tpl   = $this->reader->getLocalizer()->localize($style['tpl'], $this->path->getLanguage());
             $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data));
             unset($style['tpl']);
         }

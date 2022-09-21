@@ -92,6 +92,11 @@ final class Reader
         return $this->languages[0];
     }
 
+    public function getLocalizer() : Localizer
+    {
+        return $this->localizer;
+    }
+
     public function getSlugs() : Slugs
     {
         return $this->slugs;
