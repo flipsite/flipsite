@@ -5,9 +5,10 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-abstract class AbstractComponent extends AbstractElement
-{
-    protected bool $hasBackground = false;
+abstract class AbstractComponent extends AbstractElement {
+
+    use Traits\ImageHandlerTrait;
+    use Traits\CanIUseTrait;
 
     abstract public function build(array $data, array $style, string $appearance) : void;
 
@@ -21,40 +22,53 @@ abstract class AbstractComponent extends AbstractElement
         $this->tag = $tag;
     }
 
-    public function setBackground(string|array $background, array $style = []) : void
+    public function setBackground(AbstractElement $target, array $style) : void
     {
-        if (is_string($background)) {
-            $background = ['src' => $background];
-        }
-        if (isset($background['style'])) {
-            $style = ArrayHelper::merge($style, $background['style']);
-        }
-        $src     = $background['src'];
-        $options = $style['options'] ?? [];
-
-        if (isset($background['style'])) {
-            $style = ArrayHelper::merge($style, $background['style']);
-            unset($background['style']);
-        }
-
-        if ($this->isSvg($src)) {
-            $imageContext = $this->imageHandler->getContext($src, []);
-            $this->setAttribute('style', 'background-image:url('.$imageContext->getSrc().');');
-        } else {
-            if (($options['webp'] ?? true) && $this->canIUse->webp()) {
-                $src = str_replace('.jpg', '.webp', $src);
-                $src = str_replace('.png', '.webp', $src);
+        $src     = $style['src'] ?? false;
+        $options = $style['options'] ?? ['width' => 480,'srcset' => ['1x','2x']];
+        unset($style['src'],$style['options']);
+        
+        if ($src) {
+            $gradient = '';
+            foreach ($style as $key => &$val) {
+                $classes = explode(' ',$val);
+                $new = [];
+                foreach ($classes as $cls) {
+                    if (strpos($cls,'bg-gradient') !== false) {
+                        $gradient = $cls;
+                    } else {
+                        $new[] = $cls;
+                    }
+                }
+                $val = count($new) ? implode(' ',$new) : null;
             }
-            $imageContext = $this->imageHandler->getContext($src, $options);
-            $this->setAttribute('style', 'background-image: -webkit-image-set('.$imageContext->getSrcset('url').')');
-        }
-        if (($style['options']['loading'] ?? '') === 'eager') {
-            $this->builder->dispatch(new Event('preload', 'background', $imageContext));
-        }
 
+            if ($gradient) {
+                // TODO can this horrible hack be fixed? if bg gradient it needs to be added to element style
+                $callback = new \Flipsite\Style\Callbacks\BgGradientCallback();
+                $tmp = explode('-',$gradient);
+                array_shift($tmp);
+                $gradient = $callback($tmp).',';
+            }
+            
+            if ($this->isSvg($src)) {
+                $imageContext = $this->imageHandler->getContext($src, []);
+                $target->setAttribute('style', 'background-image:'.$gradient.'url('.$imageContext->getSrc().');');
+            } else {
+                if (($options['webp'] ?? true) && $this->canIUse->webp()) {
+                    $src = str_replace('.jpg', '.webp', $src);
+                    $src = str_replace('.png', '.webp', $src);
+                }
+                $imageContext = $this->imageHandler->getContext($src, $options);
+                $target->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$imageContext->getSrcset('url').')');
+            }
+            if (($style['options']['loading'] ?? '') === 'eager') {
+                $this->builder->dispatch(new Event('preload', 'background', $imageContext));
+            }  
+        }
         unset($style['options']);
-        $this->addStyle($style);
-        $this->hasBackground = true;
+        $target->addStyle($style);
+
     }
 
     private function isSvg(string $filename) : bool

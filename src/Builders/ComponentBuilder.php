@@ -199,10 +199,7 @@ class ComponentBuilder
                     unset($style['tag']);
                 }
                 unset($data['_meta'],$data['_name']);
-                if (isset($data['background'])) {
-                    $component->setBackground($data['background'], $style['background'] ?? []);
-                    unset($data['background']);
-                }
+
                 $component->build($data, $style ?? [], $appearance);
                 return $component;
             }

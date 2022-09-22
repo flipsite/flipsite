@@ -72,7 +72,6 @@ class CssMiddleware implements MiddlewareInterface
         $tailwind->addCallback('background-image', new \Flipsite\Style\Callbacks\BgGradientCallback());
 
         $css           = $tailwind->getCss($elements, $classes);
-        $css           = $this->compress($css);
         $search        = '</head>';
         $replace       = '  <style>'.$css."\n    ".'</style>'."\n  </head>";
         $htmlWithStyle = str_replace($search, $replace, $html);
@@ -80,55 +79,5 @@ class CssMiddleware implements MiddlewareInterface
         $streamFactory = new StreamFactory();
         $stream        = $streamFactory->createStream($htmlWithStyle);
         return $response->withBody($stream);
-    }
-
-    private function compress(string $css) : string
-    {
-        $css  = str_replace(', ', ',', $css);
-        $vars = [
-            '--tw-gradient-from'          => '--a',
-            '--tw-gradient-stops'         => '--b',
-            '--tw-gradient-to'            => '--c',
-            '--tw-bg-opacity'             => '--d',
-            '--tw-border-opacity'         => '--e',
-            '--tw-text-opacity'           => '--f',
-            '--tw-placeholder-opacity'    => '--g',
-            '--tw-ring-opacity'           => '--h',
-            '--tw-divide-opacity'         => '--i',
-            '--tw-space-x-reverse'        => '--j',
-            '--tw-space-y-reverse'        => '--k',
-            '--tw-translate-x'            => '--l',
-            '--tw-translate-y'            => '--m',
-            '--tw-rotate'                 => '--n',
-            '--tw-skew-x'                 => '--o',
-            '--tw-skew-y'                 => '--p',
-            '--tw-scale-x'                => '--q',
-            '--tw-scale-y'                => '--r',
-            '--tw-backdrop-blur'          => '--s',
-            '--tw-backdrop-brightness'    => '--t',
-            '--tw-backdrop-contrast'      => '--u',
-            '--tw-backdrop-grayscale'     => '--v',
-            '--tw-backdrop-hue-rotate'    => '--x',
-            '--tw-backdrop-invert'        => '--y',
-            '--tw-backdrop-opacity'       => '--z',
-            '--tw-backdrop-saturate'      => '--aa',
-            '--tw-backdrop-sepia'         => '--ab',
-            '--tw-blur'                   => '--ac',
-            '--tw-brightness'             => '--ad',
-            '--tw-contrast'               => '--ar',
-            '--tw-grayscale'              => '--af',
-            '--tw-hue-rotate'             => '--ag',
-            '--tw-invert'                 => '--ah',
-            '--tw-saturate'               => '--ai',
-            '--tw-sepia'                  => '--aj',
-            '--tw-drop-shadow'            => '--ak',
-            '--tw-divide-x-reverse'       => '--al',
-            '--tw-divide-y-reverse'       => '--am',
-            '--tw-scroll-snap-strictness' => '--an',
-        ];
-        foreach ($vars as $search => $replace) {
-            $css = str_replace($search, $replace, $css);
-        }
-        return $css;
     }
 }
