@@ -7,7 +7,7 @@ use Flipsite\Utils\ArrayHelper;
 
 trait RepeatTrait
 {
-    protected function expandRepeat(array $data, array $tpl) : array
+    protected function expandRepeat(array $data, array $tpl, bool $unsetNotFound = true) : array
     {
         $expanded = [];
         foreach ($data as $key => $item) {
@@ -15,12 +15,12 @@ trait RepeatTrait
                 $item = ['self' => $item];
             }
             $item['key'] = $key;
-            $expanded[]  = $this->attachDataToTpl($tpl, new \Adbar\Dot($item));
+            $expanded[]  = $this->attachDataToTpl($tpl, new \Adbar\Dot($item), $unsetNotFound);
         }
         return $expanded;
     }
 
-    protected function attachDataToTpl(array $tpl, \Adbar\Dot $data)
+    protected function attachDataToTpl(array $tpl, \Adbar\Dot $data, bool $unsetNotFound = true)
     {
         $unset  = [];
         $subTpl = null;
@@ -29,7 +29,7 @@ trait RepeatTrait
             if ($attr === 'tpl') {
                 $subTpl = $value;
             } elseif (is_array($value)) {
-                $value = $this->attachDataToTpl($value, $data);
+                $value = $this->attachDataToTpl($value, $data, $unsetNotFound);
             } elseif (false !== mb_strpos((string)$value, '{')) {
                 $matches = [];
                 preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
@@ -41,8 +41,10 @@ trait RepeatTrait
                         $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
                     } elseif ('self' === $match && $value == '{self}') {
                         $value = $data->get();
-                    } else {
+                    } elseif ($unsetNotFound) {
                         $unset[] = $attr;
+                    } else {
+                        $value = str_replace('{'.$match.'}', (string)$replaceWith, '');
                     }
                 }
             }

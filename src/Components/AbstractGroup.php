@@ -36,7 +36,7 @@ abstract class AbstractGroup extends AbstractComponent
             $that->addChild($content);
             $that = $content;
         } else {
-            $that->tag = $style['tag'] ?? 'div';
+            $that->tag = $style['tag'] ?? $that->tag;
             unset($style['tag']);
         }
 

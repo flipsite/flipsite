@@ -135,7 +135,7 @@ class ComponentBuilder
         if (isset($data['use'])) {
             $use = $data['use'];
             unset($data['use']);
-            $data = $this->attachDataToTpl($data, new \Adbar\Dot($use));
+            $data = $this->attachDataToTpl($data, new \Adbar\Dot($use), false);
         }
         if (isset($style['tpl'])) {
             if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
@@ -147,7 +147,7 @@ class ComponentBuilder
                 unset($style['tplDefault']);
             }
             $tpl   = $this->reader->getLocalizer()->localize($style['tpl'], $this->path->getLanguage());
-            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data));
+            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data), false); // TODO option?
             unset($style['tpl']);
         }
 
