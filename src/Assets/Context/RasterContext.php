@@ -74,7 +74,8 @@ final class RasterContext extends AbstractImageContext
             $width = intval($options['srcset'][0]);
         }
         if (isset($options['aspectRatio'])) {
-            $tmp = explode('by', $options['aspectRatio']);
+
+            $tmp = explode('by', str_replace('/','by',$options['aspectRatio']));
             if (2 === count($tmp)) {
                 $factor = floatval($tmp[0] / $tmp[1]);
                 if ($width) {
