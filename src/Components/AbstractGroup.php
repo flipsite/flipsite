@@ -19,15 +19,19 @@ abstract class AbstractGroup extends AbstractComponent
             $nthStyle   = $this->getNth($data['_index'], $data['_total'], $style);
             $style      = ArrayHelper::merge($nthStyle, $style);
         }
-        
-        $that = $this;
-        $wrapperStyle = $style['wrapper'] ?? false;
+
+        $that           = $this;
+        $wrapperStyle   = $style['wrapper'] ?? false;
         $containerStyle = $style['container'] ?? false;
         unset($style['wrapper'],$style['container']);
         if ($wrapperStyle) {
             $that->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
             if (isset($wrapperStyle['background'])) {
+                if (isset($data['background'])) {
+                    $wrapperStyle['background']['src'] = $data['background'];
+                    unset($data['background']);
+                }
                 $this->setBackground($that, $wrapperStyle['background']);
                 unset($wrapperStyle['background']);
             }
@@ -41,6 +45,10 @@ abstract class AbstractGroup extends AbstractComponent
         }
 
         if (isset($style['background'])) {
+            if (isset($data['background'])) {
+                $style['background']['src'] = $data['background'];
+                unset($data['background']);
+            }
             $this->setBackground($that, $style['background']);
             unset($style['background']);
         }
@@ -76,5 +84,4 @@ abstract class AbstractGroup extends AbstractComponent
 
         $that->addChildren($children);
     }
-    
 }
