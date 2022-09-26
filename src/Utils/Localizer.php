@@ -6,9 +6,14 @@ namespace Flipsite\Utils;
 final class Localizer
 {
     private array $allLanguages;
+    private array $languagesCodes;
+
     public function __construct(private array $languages)
     {
         $this->allLanguages = Language::getList();
+        foreach ($languages as $language) {
+            $this->languagesCodes[] = (string)$language;
+        }
     }
 
     public function localize(array $data, Language $language)
@@ -29,6 +34,9 @@ final class Localizer
     private function isLoc(array $data) : bool
     {
         $keys = array_keys($data);
+        if (count($keys) === 1) {
+            return in_array((string)$keys[0], $this->languagesCodes);
+        }
         foreach ($keys as $key) {
             if (is_numeric($key)) {
                 return false;
