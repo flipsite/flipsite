@@ -16,7 +16,7 @@ use Flipsite\Utils\Path;
 class MetaBuilder implements BuilderInterface, ComponentListenerInterface
 {
     private ImageHandler $imageHandler;
-    private ?string $h1 = null;
+    private string $h1 = '404';
 
     public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
     {
@@ -52,7 +52,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $name     = $this->reader->get('name', $language);
         $meta     = $this->reader->getMeta($this->path->getPage(), $language);
 
-        $title    = $meta['title'] ?? $name;
+        $title    = $meta['title'] ?? $name ?? '404';
         if (str_starts_with($title, 'h1')) {
             $title = str_replace('h1', $this->h1, $title);
         }
