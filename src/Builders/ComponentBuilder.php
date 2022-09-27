@@ -147,7 +147,7 @@ class ComponentBuilder
                 unset($style['tplDefault']);
             }
             $tpl   = $this->reader->getLocalizer()->localize($style['tpl'], $this->path->getLanguage());
-            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data), false); // TODO option?
+            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data), $tpl['_unsetEmpty'] ?? false); // TODO option?
             unset($style['tpl']);
         }
 

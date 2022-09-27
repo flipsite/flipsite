@@ -9,6 +9,7 @@ trait RepeatTrait
 {
     protected function expandRepeat(array $data, array $tpl, bool $unsetNotFound = true) : array
     {
+        unset($tpl['_unsetEmpty']);
         $expanded = [];
         foreach ($data as $key => $item) {
             if (is_string($item)) {
@@ -25,6 +26,7 @@ trait RepeatTrait
         $unset  = [];
         $subTpl = null;
         $unset  = [];
+        unset($tpl['_unsetEmpty']);
         foreach ($tpl as $attr => &$value) {
             if ($attr === 'tpl') {
                 $subTpl = $value;
