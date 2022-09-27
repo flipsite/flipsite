@@ -20,6 +20,7 @@ final class Map extends AbstractComponent
         }
         $src = 'https://maps.google.com/maps?q='.$data['name'].','.urlencode($data['address']).'&t=&z=15&ie=UTF8&iwloc=&output=embed';
         $this->setAttribute('data-src-onenter', $src);
+        $this->setAttribute('title', $data['title'] ?? $data['name'].', '.$data['address']);
         $this->builder->dispatch(new Event('ready-script', 'iframe-onenter', file_get_contents(__DIR__.'/../../js/ready.iframe-onenter.min.js')));
     }
 }
