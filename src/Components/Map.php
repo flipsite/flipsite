@@ -3,50 +3,23 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-final class Map extends AbstractGroup
+final class Map extends AbstractComponent
 {
     use Traits\BuilderTrait;
 
-    protected string $tag = 'iframe';
+    protected bool $oneline = true;
+    protected string $tag   = 'iframe';
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $src = 'https://maps.google.com/maps?q='.$data['name'].','.urlencode($data['address']).'&t=&z=15&ie=UTF8&iwloc=&output=embed';
-        $this->setAttribute('src', $src);
         $this->setAttribute('loading', 'lazy');
-        $this->setAttribute('title', $data['name'].', '.$data['address']);
         $this->addStyle($style);
-
-        // $this->setAttribute('onclick', 'playIframeVideo(this)');
-
-        // $title = $data['title'];
-        // unset($data['title']);
-
-        // if (isset($data['youtube'])) {
-        //     $data['iframe'] = [
-        //         'title' => $title,
-        //         '_attr' => [
-        //             'loading'         => 'lazy',
-        //             'frameborder'     => '0',
-        //             'allow'           => 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
-        //             'allowfullscreen' => true,
-        //             'data-src'        => '//www.youtube.com/embed/'.$data['youtube'].'?autoplay=1&mute=1',
-        //         ]
-        //     ];
-        // } elseif (isset($data['vimeo'])) {
-        //     $data['iframe'] = [
-        //         'title' => $title,
-        //         '_attr' => [
-        //             'loading'         => 'lazy',
-        //             'frameborder'     => '0',
-        //             'allow'           => 'autoplay; fullscreen',
-        //             'allowfullscreen' => true,
-        //             'data-src'        => '//player.vimeo.com/video/'.$data['vimeo'].'?autoplay=1&muted=1'
-        //         ]
-        //     ];
-        // }
-
-        // parent::build($data, $style, $appearance);
-        // $this->builder->dispatch(new Event('global-script', 'youtube', file_get_contents(__DIR__.'/../../js/play-iframe-video.min.js')));
+        unset($data['flags']);
+        foreach ($data as $key => $val) {
+            $this->setAttribute($key, $val);
+        }
+        $src = 'https://maps.google.com/maps?q='.$data['name'].','.urlencode($data['address']).'&t=&z=15&ie=UTF8&iwloc=&output=embed';
+        $this->setAttribute('data-src-onenter', $src);
+        $this->builder->dispatch(new Event('ready-script', 'iframe-onenter', file_get_contents(__DIR__.'/../../js/ready.iframe-onenter.min.js')));
     }
 }
