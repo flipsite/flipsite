@@ -70,6 +70,9 @@ class YamlExpander
                     } else {
                         $list = [];
                         $i    = 0;
+                        $tmp  = explode('/', $val);
+                        array_shift($tmp);
+                        $dir = implode('/', $tmp);
                         foreach (scandir($filepath) as $file) {
                             if (is_dir($filepath.'/'.$file)) {
                                 continue;
@@ -79,7 +82,7 @@ class YamlExpander
                                 $item                         = $parsed;
                                 $list[$parsed['key'] ?? $i++] = $parsed;
                             } elseif (!str_starts_with($file, '.')) {
-                                $list[$parsed['key'] ?? $i++] = $file;
+                                $list[$parsed['key'] ?? $i++] = $dir.'/'.$file;
                             }
                         }
                         self::$cache[$name] = $list;
