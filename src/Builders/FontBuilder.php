@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -10,6 +9,7 @@ use Flipsite\Components\Element;
 class FontBuilder implements BuilderInterface
 {
     private array $links;
+    private ?string $bodyWeight = null;
 
     public function __construct(array $fonts)
     {
@@ -38,6 +38,10 @@ class FontBuilder implements BuilderInterface
                 'onload' => "this.media='all'",
             ]);
             $this->links[] = $link;
+
+            if (isset($fonts['sans']['body'])) {
+                $this->bodyWeight = $fonts['sans']['body'];
+            }
         }
     }
 
@@ -45,6 +49,9 @@ class FontBuilder implements BuilderInterface
     {
         foreach ($this->links as $link) {
             $document->getChild('head')->addChild($link);
+        }
+        if ($this->bodyWeight) {
+            $document->getChild('body')->addStyle(['fontWeight' => 'font-'.$this->bodyWeight]);
         }
         return $document;
     }
