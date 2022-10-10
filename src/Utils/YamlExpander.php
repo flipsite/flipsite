@@ -92,7 +92,7 @@ class YamlExpander
                     $pathinfo = pathinfo($filepath);
                     $val      = Yaml::parseFile($filepath);
                     $dir      = $pathinfo['dirname'];
-                    $val      = self::parseIncludes($val, $dir);
+                    $val      = self::parseIncludes($val ?? [], $dir);
                     $val      = self::parseRef($val, $val);
                 }
             }
