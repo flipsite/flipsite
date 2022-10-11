@@ -133,6 +133,12 @@ final class Reader
         if (ArrayHelper::isAssociative($all)) {
             $all = [$all];
         }
+        foreach ($before as &$b) {
+            $b['_before'] = true;
+        }
+        foreach ($after as &$a) {
+            $a['_after'] = true;
+        }
         $all      = array_merge($before, $all, $after);
         $sections = [];
         foreach ($all as $section) {
