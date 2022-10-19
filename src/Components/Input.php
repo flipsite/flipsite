@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Input extends AbstractComponent
@@ -10,34 +11,14 @@ final class Input extends AbstractComponent
     protected bool $empty   = true;
     protected string $tag   = 'input';
 
-    // public function normalize(string|int|bool|array $data) : array
-    // {
-    //     return $data;
-    // }
-
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         $this->addStyle($style);
-        $type = array_shift($data['flags']);
-        if ($this->isType($type)) {
-            $this->setAttribute('type', $type);
-            $name = $data['name'] ?? $data['flags'][0];
-        } else {
-            $this->setAttribute('type', 'text');
-            $name = $data['name'] ?? $type;
+        $this->setAttribute('type', $data['type'] ?? 'text');
+        unset($data['type']);
+        unset($data['flags']);
+        foreach ($data as $attribute => $value) {
+            $this->setAttribute($attribute, $value);
         }
-        $this->setAttribute('name', $name);
-        $this->setAttribute('id', $name);
-        $this->addStyle($style);
-    }
-
-    private function isType(string $type) : bool
-    {
-        return in_array($type, [
-            'text',
-            'email',
-            'tel',
-            'password'
-        ]);
     }
 }

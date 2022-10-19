@@ -143,52 +143,6 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
     return $response->withHeader('Content-type', 'application/json');
 });
 
-$app->post('/form/submit/{formId}', function (Request $request, Response $response, array $args) {
-    $enviroment = $this->get('enviroment');
-    $form       = $this->get('reader')->get('forms.'.$args['formId']);
-    $parsedBody = $request->getParsedBody();
-    $res        = 'error';
-    if (Flipsite\Utils\FormValidator::validate($form['data'], $form['required'] ?? [], $form['dummy'] ?? [], $parsedBody)) {
-        if ('postmarkapp' === $form['type']) {
-            try {
-                $html = '';
-                $body = '';
-                foreach ($parsedBody as $attr => $val) {
-                    if ($val) {
-                        $html .= '<b>'.strtoupper($attr).':</b><br>';
-                        $html .= $val.'<br><br>';
-                        $body .= strtoupper($attr).":\r\n";
-                        $body .= $val."\r\n\r\n";
-                    }
-                }
-                $body .= '- flipsite';
-                if ('localhost' === getenv('APP_ENV')) {
-                    error_log('SUBJECT: '.$form['subject']);
-                    error_log('BODY:');
-                    error_log($body);
-                } else {
-                    $client     = new Postmark\PostmarkClient($form['token']);
-                    $sendResult = $client->sendEmail(
-                        'noreply@flipsite.io',
-                        $form['to'],
-                        $form['subject'],
-                        $html,
-                        $body
-                    );
-                }
-                $res = 'success';
-            } catch (Exception $generalException) {
-                error_log(print_r($generalException->getMessage(), true));
-                die();
-            }
-        }
-    }
-
-    $response      = $response->withStatus(302);
-    $redirect      = trim($enviroment->getServer().'/'.$form['done'].'?res='.$res.'#'.$args['formId'], '/');
-    return $response->withHeader('Location', $redirect);
-});
-
 $app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
     $enviroment = $this->get('enviroment');
     $filepath   = $enviroment->getSiteDir().'/files/'.$args['file'];
