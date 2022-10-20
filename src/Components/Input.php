@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Input extends AbstractComponent
@@ -15,8 +14,10 @@ final class Input extends AbstractComponent
     {
         $this->addStyle($style);
         $this->setAttribute('type', $data['type'] ?? 'text');
-        unset($data['type']);
-        unset($data['flags']);
+        unset($data['type'], $data['flags']);
+        if (!isset($data['id']) && isset($data['name'])) {
+            $this->setAttribute('id', $data['name']);
+        }
         foreach ($data as $attribute => $value) {
             $this->setAttribute($attribute, $value);
         }
