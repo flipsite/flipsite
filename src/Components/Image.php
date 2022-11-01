@@ -44,6 +44,8 @@ final class Image extends AbstractComponent
                 $this->setAttribute('height', $imageContext->getHeight());
             }
             $this->setAttribute('src', $imageContext->getSrc());
+        } elseif ($this->isExternal($src)) {
+            $this->setAttribute('src', $src);
         } else {
             if (($options['webp'] ?? true) && $this->canIUse->webp()) {
                 $src = str_replace('.jpg', '.webp', $src);
@@ -64,6 +66,11 @@ final class Image extends AbstractComponent
     private function isSvg(string $filename) : bool
     {
         return false !== mb_strpos($filename, '.svg');
+    }
+
+    private function isExternal(string $src) : bool
+    {
+        return str_starts_with($src, 'http');
     }
 
     private function normalizeOptions(array $options):array
