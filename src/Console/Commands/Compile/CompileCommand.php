@@ -33,7 +33,8 @@ final class CompileCommand extends Command
         putenv('APP_ENV=live');
 
         $enviroment = new \Flipsite\Enviroment();
-        $reader     = new \Flipsite\Data\Reader($enviroment);
+        $plugins    = new \Flipsite\Utils\Plugins([]);
+        $reader     = new \Flipsite\Data\Reader($enviroment, $plugins);
         $slugs      = $reader->getSlugs();
         $allPages   = array_keys($slugs->getAll());
 
@@ -57,7 +58,7 @@ final class CompileCommand extends Command
             $output->writeln($this->writeFile($targetDir, $page.'/index.html', $html));
             $assets = array_merge($assets, $this->parseAssets($html));
         }
-        $assets = array_values(array_filter(array_unique($assets)));
+        $assets     = array_values(array_filter(array_unique($assets)));
         $notDeleted = $this->deleteAssets($targetDir, $assets);
 
         $assets = array_diff($assets, $notDeleted);
@@ -109,8 +110,8 @@ final class CompileCommand extends Command
     {
         $notDeleted = [];
         $filesystem = new Filesystem();
-        $images = $this->getDirContents($targetDir.'/img');
-        $dirs = [];
+        $images     = $this->getDirContents($targetDir.'/img');
+        $dirs       = [];
         foreach ($images as $image) {
             if (is_dir($image)) {
                 $dirs[] = $image;
