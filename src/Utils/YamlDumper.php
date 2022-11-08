@@ -15,13 +15,29 @@ class YamlDumper
 
         $matches = [];
         preg_match_all("/\s*\\'{1}[a-zA-Z:]+\\'{1}\:/", $yaml, $matches);
+        foreach ($matches[0] as $match) {
+            $with = str_replace("'", '', $match);
+            $yaml = str_replace($match, $with, $yaml);
+        }
+
+        $matches = [];
+        preg_match_all("/\s+\'[a-zA-Z\:0-9]+\'\:/", $yaml, $matches);
+        foreach ($matches[0] as $match) {
+            $with = str_replace("'", '', $match);
+            $yaml = str_replace($match, $with, $yaml);
+        }
+
+        $matches = [];
+        
+
+        preg_match_all("/\:\s{1}[\']{1}[\\$]{1}\{[a-z\.0-9]+[\}]{1}[\']{1}/", $yaml, $matches);
 
         foreach ($matches[0] as $match) {
             $with = str_replace("'", '', $match);
             $yaml = str_replace($match, $with, $yaml);
         }
-        preg_match_all("/\:\s{1}\'[a-zA-Z]{1}.*\'/", $yaml, $matches);
 
+        preg_match_all("/\:\s{1}\'[a-zA-Z]{1}.*\'/", $yaml, $matches);
         foreach ($matches[0] as $match) {
             if (strpos($match, "''") === false) {
                 $with = ltrim($match, ": '");
@@ -29,6 +45,12 @@ class YamlDumper
                 $yaml = str_replace($match, ': '.$with, $yaml);
             }
         }
+
+        
+
+        $yaml = str_replace(": {  }\n", ":\n", $yaml);
+        $yaml = str_replace(": null\n", ":\n", $yaml);
+
         return $yaml;
     }
 }
