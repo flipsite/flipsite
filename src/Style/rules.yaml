@@ -71,6 +71,10 @@ border-solid: border-style:solid
 border-transparent: border-color:transparent
 box-border: box-sizing:border-box
 box-content: box-sizing:content-box
+break-inside-auto: break-inside:auto
+break-inside-avoid: break-inside:avoid
+break-inside-avoid-page: break-inside:avoid-page
+break-inside-avoid-column: break-inside:avoid-column
 break-all: word-break:break-all
 break-normal: word-break:normal;overflow-wrap:normal
 break-words: overflow-wrap:break-word
