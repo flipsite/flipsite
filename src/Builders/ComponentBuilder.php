@@ -50,12 +50,6 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance): ?AbstractComponent
     {
-        $debug = $type === 'primary';
-        if (isset($data['_merge'])) {
-            $merge = $data['_merge'];
-            unset($data['_merge']);
-            $data = ArrayHelper::merge($data, $merge);
-        }
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
         }
