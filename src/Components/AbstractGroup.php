@@ -86,7 +86,8 @@ abstract class AbstractGroup extends AbstractComponent
                     $componentStyle = ArrayHelper::merge($style[$baseType], $componentStyle);
                 }
             }
-            $children[] = $this->builder->build($type, $componentData, $componentStyle, $appearance);
+
+            $children[] = $this->builder->build($type, $componentData ?? [], $componentStyle, $appearance);
             $i++;
         }
 

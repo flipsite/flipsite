@@ -46,7 +46,7 @@ class Grid extends AbstractComponent
                 unset($colStyle['type']);
             }
             $type       = $colStyle['type'] ?? $type;
-            $children[] = $this->builder->build($type, $colData, $colStyle, $appearance);
+            $children[] = $this->builder->build($type, $colData ?? [], $colStyle, $appearance);
         }
 
         if (false !== $wrapperStyle) {
