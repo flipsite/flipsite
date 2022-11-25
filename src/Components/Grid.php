@@ -15,21 +15,7 @@ class Grid extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $wrapperStyle = $style['wrapper'] ?? false;
-        if (false !== $wrapperStyle) {
-            if (is_bool($wrapperStyle)) {
-                $wrapperStyle = [];
-            }
-            $this->tag = $wrapperStyle['tag'] ?? 'div';
-            unset($wrapperStyle['tag']);
-            $this->addStyle($wrapperStyle);
-            $content = new Element($style['tag'] ?? 'div');
-            $content->addStyle($style);
-            unset($style['tag']);
-            $this->addChild($content);
-        } else {
-            $this->addStyle($style);
-        }
+        $this->addStyle($style);
 
         $children  = [];
         $totalCols = count($data['cols']);
@@ -48,12 +34,7 @@ class Grid extends AbstractComponent
             $type       = $colStyle['type'] ?? $type;
             $children[] = $this->builder->build($type, $colData ?? [], $colStyle, $appearance);
         }
-
-        if (false !== $wrapperStyle) {
-            $content->addChildren($children);
-        } else {
-            $this->addChildren($children);
-        }
+        $this->addChildren($children);
     }
 
     public function normalize(string|int|bool|array $data) : array
@@ -61,9 +42,9 @@ class Grid extends AbstractComponent
         if (!ArrayHelper::isAssociative($data)) {
             $data = ['cols' => $data];
         }
-        if (isset($data['data'])) {
-            $data['cols'] = $data['data'];
-            unset($data['data']);
+        if (isset($data['dataSourceList'])) {
+            $data['cols'] = $data['dataSourceList'];
+            unset($data['dataSourceList']);
         }
         if ($data['options']['shuffle'] ?? false) {
             shuffle($data['cols']);
@@ -90,7 +71,11 @@ class Grid extends AbstractComponent
             if (null === ($data['cols'] ?? null)) {
                 $this->render = false;
             }
-            $data['cols'] = $this->expandRepeat($data['cols'] ?? [], $data['col']);
+            foreach ($data['cols'] as $index => &$col) {
+                $dataSource = $col;
+                $col = $data['col'];
+                $col['dataSource'] = $dataSource;
+            }
             unset($data['col']);
         }
         return $data;

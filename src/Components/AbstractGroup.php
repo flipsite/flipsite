@@ -15,11 +15,7 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        if (isset($data['_index'])) {
-            $nthStyle   = $this->getNth($data['_index'], $data['_total'], $style);
-            $style      = ArrayHelper::merge($nthStyle, $style);
-        }
-
+        // Hmm 
         if (isset($data['onclick'])) {
             $this->setAttribute('onclick', $data['onclick']);
             if (strpos($data['onclick'], 'javascript:toggle') === 0) {
@@ -30,8 +26,7 @@ abstract class AbstractGroup extends AbstractComponent
 
         $that           = $this;
         $wrapperStyle   = $style['wrapper'] ?? false;
-        $containerStyle = $style['container'] ?? false;
-        unset($style['wrapper'],$style['container']);
+        unset($style['wrapper']);
         if ($wrapperStyle) {
             $that->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
@@ -62,23 +57,11 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $that->addStyle($style);
 
-        if ($containerStyle) {
-            $container = new Group($containerStyle['tag'] ?? 'div');
-            $container->addStyle($containerStyle);
-            $that->addChild($container);
-            $that = $container;
-        }
-
         $children = [];
         $i        = 0;
         $total    = count($data);
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
-
-            $colStyle = $this->getNth($i, $total, $style['cols'] ?? []);
-            unset($colStyle['type']);
-            $componentStyle = ArrayHelper::merge($componentStyle, $colStyle);
-
             if (strpos($type, ':')) {
                 $tmp      = explode(':', $type);
                 $baseType = array_shift($tmp);

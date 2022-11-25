@@ -19,8 +19,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ComponentBuilder
 {
-    use RepeatTrait;
-
     private ImageHandler $imageHandler;
     private VideoHandler $videoHandler;
     private array $listeners                = [];
@@ -61,14 +59,6 @@ class ComponentBuilder
             $parentType = $parentStyle['type'];
         }
 
-        if (in_array('var', $flags) && is_string($data)) {
-            $data = $this->addVars($data);
-        }
-
-        if (in_array('loc', $flags) && is_string($data)) {
-            $data = $this->addLoc($data);
-        }
-
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
 
@@ -84,11 +74,7 @@ class ComponentBuilder
                 return null;
             }
         };
-        if (is_array($data) && isset($data['style:dark'])) {
-            $data['style'] = $data['style:dark'];
-            unset($data['style:dark']);
-            $appearance = 'dark';
-        }
+        
         if (is_array($data) && isset($data['style'])) {
             // If string, => inherit
             if (is_string($data['style'])) {
@@ -126,23 +112,8 @@ class ComponentBuilder
             unset($style['type'],$style['section']);
         }
 
-        if (isset($data['use'])) {
-            $use = $data['use'];
-            unset($data['use']);
-            $data = $this->attachDataToTpl($data, new \Adbar\Dot($use), false);
-        }
-        if (isset($style['tpl'])) {
-            if (is_string($data) || (is_array($data) && !ArrayHelper::isAssociative($data))) {
-                $data = ['value' => $data];
-            }
-            if (isset($style['tplDefault'])) {
-                $default = $this->reader->getLocalizer()->localize($style['tplDefault'], $this->path->getLanguage());
-                $data    = $this->addTplDefaultData($data, $default);
-                unset($style['tplDefault']);
-            }
-            $tpl   = $this->reader->getLocalizer()->localize($style['tpl'], $this->path->getLanguage());
-            $data  = $this->attachDataToTpl($tpl, new \Adbar\Dot($data), $tpl['_unsetEmpty'] ?? false); // TODO option?
-            unset($style['tpl']);
+        if (isset($data['dataSource'])) {
+            $data = $this->applyData($data, $data['dataSource'], 'dataSource');
         }
 
         // Check external factories
@@ -225,67 +196,6 @@ class ComponentBuilder
         return $style;
     }
 
-    private function getLayout(string $layout): array
-    {
-        $variants = explode(':', $layout);
-        $layout   = array_shift($variants);
-        $style    = [];
-        if (isset($this->theme['layouts'][$layout])) {
-            $style = ArrayHelper::merge($style, $this->theme['layouts'][$layout]);
-        }
-        foreach ($variants as $variant) {
-            if (isset($style['variants'][$variant])) {
-                $style = ArrayHelper::merge($style, $style['variants'][$variant]);
-                unset($style['variants'][$variant]);
-            }
-        }
-        return $style;
-    }
-
-    private function buildComponent(string $type): ?AbstractComponent
-    {
-        //Check external factories
-        foreach ($this->factories as $factory) {
-            $component = $factory->get($type, );
-            if (null !== $component) {
-                if (method_exists($component, 'addBuilder')) {
-                    $component->addBuilder($this);
-                }
-                if (method_exists($component, 'addEnviroment')) {
-                    $component->addEnviroment($this->enviroment);
-                }
-                if (method_exists($component, 'addImageHandler')) {
-                    $component->addImageHandler($this->imageHandler);
-                }
-                if (method_exists($component, 'addPath')) {
-                    $component->addPath($this->path);
-                }
-                if (method_exists($component, 'addReader')) {
-                    $component->addReader($this->reader);
-                }
-                if (method_exists($component, 'addSlugs')) {
-                    $component->addSlugs($this->reader->getSlugs());
-                }
-                if (method_exists($component, 'addCanIUse')) {
-                    $component->addCanIUse($this->canIUse);
-                }
-                if (method_exists($component, 'addRequest')) {
-                    $component->addRequest($this->request);
-                }
-                return $component;
-            }
-        }
-        return null;
-    }
-
-    private function handleIf(array $if): bool
-    {
-        if (isset($if['isset']) && !$if['isset']) {
-            return true;
-        }
-        return false;
-    }
-
     private function getComponentStyle(string $type, array $flags = []): array
     {
         $style = $this->theme['components'][$type] ?? [];
@@ -296,36 +206,6 @@ class ComponentBuilder
             }
         }
         return $style;
-    }
-
-    private function addVars(string $value): string
-    {
-        if (strpos($value, '%date.year%') !== false) {
-            $value = str_replace('%date.year%', date('Y'), $value);
-        }
-        $matches = [];
-        preg_match_all('/\%page.(.*).name\%/', $value, $matches);
-
-        foreach ($matches[1] as $page) {
-            $page  = $page === 'current' ? $this->path->getPage() : $page;
-            $value = str_replace('%page.'.$page.'.name%', date('Y'), $this->reader->getPageName($page, $this->path->getLanguage()));
-        }
-        return $value;
-    }
-
-    private function addLoc(string $value): string
-    {
-        if (count($this->localization) === 0) {
-            $flipsite = \Symfony\Component\Yaml\Yaml::parseFile($this->enviroment->getVendorDir().'/flipsite/flipsite/localization/flipsite.yaml');
-            foreach ($flipsite as $key => $loc) {
-                if (!isset($this->localization[$key])) {
-                    $this->localization[$key] = $loc;
-                }
-            }
-        }
-
-        $language = (string)$this->path->getLanguage();
-        return $this->localization[$value][$language] ?? $language.':'.$value;
     }
 
     private function handleScripts(array $scripts)
@@ -342,5 +222,25 @@ class ComponentBuilder
                 $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
             }
         }
+    }
+
+    private function applyData(array $data, array $dataSource, string $dataSourceKey = 'dataSource') : array {
+        if (isset($data[$dataSourceKey])) {
+            $dataSource = ArrayHelper::merge($dataSource,$data[$dataSourceKey]);
+            unset($data[$dataSourceKey]);
+        }
+        $dataSourceDot = new \Adbar\Dot($dataSource);
+        foreach ($data as $attr => &$value) {
+            if (is_array($value)) {
+                $value = $this->applyData($value, $dataSource, $dataSourceKey);
+            } else {
+                preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
+                foreach ($matches[1] as $match) {
+                    $replaceWith = $dataSourceDot->get($match);
+                    $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
+                }
+            }
+        }
+        return $data;
     }
 }
