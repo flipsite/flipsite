@@ -62,7 +62,7 @@ abstract class AbstractGroup extends AbstractComponent
         $total    = count($data);
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
-            if (strpos($type, ':')) {
+            if (strpos($type, ':') && $componentStyle === []) {
                 $tmp      = explode(':', $type);
                 $baseType = array_shift($tmp);
                 if (isset($style[$baseType])) {

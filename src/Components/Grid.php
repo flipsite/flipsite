@@ -15,6 +15,20 @@ class Grid extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
+        if (isset($style['col'])) {
+            $style['cols'] ??= [];
+            $style['cols']['all'] = ArrayHelper::merge($style['cols']['all'], $style['col']);
+        }
+
+        if (isset($style['background'])) {
+            if (isset($data['background'])) {
+                $style['background']['src'] = $data['background'];
+                unset($data['background']);
+            }
+            $this->setBackground($this, $style['background']);
+            unset($style['background']);
+        }
+        
         $this->addStyle($style);
 
         $children  = [];
@@ -72,9 +86,9 @@ class Grid extends AbstractComponent
                 $this->render = false;
             }
             foreach ($data['cols'] as $index => &$col) {
-                $dataSource = $col;
+                $dataSource = $col ?? [];
                 $col = $data['col'];
-                $col['dataSource'] = $dataSource;
+                $col['dataSource'] = $dataSource ;
             }
             unset($data['col']);
         }

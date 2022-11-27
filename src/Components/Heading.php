@@ -12,11 +12,6 @@ final class Heading extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        foreach ($data['flags'] as $flag) {
-            if (in_array($flag, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) {
-                $this->tag = $flag;
-            }
-        }
         $markdown  = $this->getMarkdownLine((string)$data['value'], $style['markdown'] ?? [], $appearance);
         $this->addStyle($style);
         if ('h1' === $this->tag) {

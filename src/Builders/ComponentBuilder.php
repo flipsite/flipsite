@@ -58,7 +58,7 @@ class ComponentBuilder
         if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
             $parentType = $parentStyle['type'];
         }
-
+        
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
 
@@ -82,24 +82,23 @@ class ComponentBuilder
             }
             // Resolve inheritance
             if (isset($data['style']['inherit'])) {
-                $inheritFlags = explode(':', $data['style']['inherit']);
-                unset($data['style']['inherit']);
-                $inheritType   = array_shift($inheritFlags);
-                $data['style'] = ArrayHelper::merge($this->getStyle($inheritType, $inheritFlags), $data['style']);
+                $inheritType = $data['style']['inherit'];
+                $data['style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['style']);
             }
             $style = ArrayHelper::merge($style, $data['style']);
             unset($data['style']);
         }
 
-        // If still has variants
-        if (isset($style['variants'])) {
-            foreach ($flags as $flag) {
-                if (isset($style['variants'][$flag])) {
-                    $style = ArrayHelper::merge($style, $style['variants'][$flag]);
-                }
-            }
-            unset($style['variants']);
-        }
+        // // If still has variants
+        // if (isset($style['variants'])) {
+        //     foreach ($flags as $flag) {
+        //         if (isset($style['variants'][$flag])) {
+        //             echo $flag;
+        //             $style = ArrayHelper::merge($style, $style['variants'][$flag]);
+        //         }
+        //     }
+        //     unset($style['variants']);
+        // }
 
         $appearance = $style['appearance'] ?? $appearance;
         unset($style['appearance']);
@@ -148,7 +147,6 @@ class ComponentBuilder
                     $component->addRequest($this->request);
                 }
                 $data          = $component->normalize($data);
-                $data['flags'] = $flags;
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
                         if (str_ends_with($attr, ':loc')) {
@@ -186,6 +184,7 @@ class ComponentBuilder
 
     public function getStyle(string $type, array $flags = []): array
     {
+        
         $style = $this->getComponentStyle($type, $flags);
         foreach ($flags as $flag) {
             if (isset($style['variants'][$flag])) {
@@ -198,6 +197,7 @@ class ComponentBuilder
 
     private function getComponentStyle(string $type, array $flags = []): array
     {
+
         $style = $this->theme['components'][$type] ?? [];
         if (count($flags)) {
             $type = $type.':'.implode(':', $flags);
@@ -234,7 +234,7 @@ class ComponentBuilder
             if (is_array($value)) {
                 $value = $this->applyData($value, $dataSource, $dataSourceKey);
             } else {
-                preg_match_all('/\{([^\{\}]+)\}/', $value, $matches);
+                preg_match_all('/\{([^\{\}]+)\}/', (string)$value, $matches);
                 foreach ($matches[1] as $match) {
                     $replaceWith = $dataSourceDot->get($match);
                     $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);

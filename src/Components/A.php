@@ -44,11 +44,11 @@ final class A extends AbstractGroup
                     } catch (\libphonenumber\NumberParseException $e) {
                     }
                     $format = \libphonenumber\PhoneNumberFormat::NATIONAL;
-                    if (in_array('international', $data['flags'])) {
-                        $format = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
-                    } elseif (in_array('e164', $data['flags'])) {
-                        $format = \libphonenumber\PhoneNumberFormat::E164;
-                    }
+                    // if (in_array('international', [])) {
+                    //     $format = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
+                    // } elseif (in_array('e164', [])) {
+                    //     $format = \libphonenumber\PhoneNumberFormat::E164;
+                    // }
                     $number = $phoneUtil->format($numberProto, $format);
                     if (isset($data['text'])) {
                         $expanded['text'] = sprintf($data['text'], $number);
