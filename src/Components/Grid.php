@@ -81,14 +81,16 @@ class Grid extends AbstractComponent
                 $data['cols'] = array_reverse($data['cols']);
             }
         }
-        if (isset($data['col'])) {
+        
+        $keys = array_keys($data);
+        if (in_array('col',$keys)) {
             if (null === ($data['cols'] ?? null)) {
                 $this->render = false;
             }
             foreach ($data['cols'] as $index => &$col) {
                 $dataSource = $col ?? [];
                 $col = $data['col'];
-                $col['dataSource'] = $dataSource ;
+                $col['dataSource'] = $dataSource;
             }
             unset($data['col']);
         }
