@@ -9,7 +9,6 @@ use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
-use Flipsite\Components\Traits\RepeatTrait;
 use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\ArrayHelper;
@@ -58,7 +57,7 @@ class ComponentBuilder
         if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
             $parentType = $parentStyle['type'];
         }
-        
+
         $style = $this->getStyle($type, $flags);
         $style = ArrayHelper::merge($style, $parentStyle);
 
@@ -74,7 +73,7 @@ class ComponentBuilder
                 return null;
             }
         };
-        
+
         if (is_array($data) && isset($data['style'])) {
             // If string, => inherit
             if (is_string($data['style'])) {
@@ -82,7 +81,7 @@ class ComponentBuilder
             }
             // Resolve inheritance
             if (isset($data['style']['inherit'])) {
-                $inheritType = $data['style']['inherit'];
+                $inheritType   = $data['style']['inherit'];
                 $data['style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['style']);
             }
             $style = ArrayHelper::merge($style, $data['style']);
@@ -112,7 +111,7 @@ class ComponentBuilder
         }
 
         if (isset($data['dataSource'])) {
-            $data = $this->applyData($data, $data['dataSource'], 'dataSource');
+            $data = $this->applyData($data, $data['dataSource'], 'dataSource', ['dataSourceList']);
         }
 
         // Check external factories
@@ -184,7 +183,6 @@ class ComponentBuilder
 
     public function getStyle(string $type, array $flags = []): array
     {
-        
         $style = $this->getComponentStyle($type, $flags);
         foreach ($flags as $flag) {
             if (isset($style['variants'][$flag])) {
@@ -197,7 +195,6 @@ class ComponentBuilder
 
     private function getComponentStyle(string $type, array $flags = []): array
     {
-
         $style = $this->theme['components'][$type] ?? [];
         if (count($flags)) {
             $type = $type.':'.implode(':', $flags);
@@ -224,20 +221,30 @@ class ComponentBuilder
         }
     }
 
-    private function applyData(array $data, array $dataSource, string $dataSourceKey = 'dataSource') : array {
+    private function applyData(array $data, array $dataSource, string $dataSourceKey = 'dataSource', array $stopIfAttr = []) : array
+    {
         if (isset($data[$dataSourceKey])) {
-            $dataSource = ArrayHelper::merge($dataSource,$data[$dataSourceKey]);
+            $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);
             unset($data[$dataSourceKey]);
         }
         $dataSourceDot = new \Adbar\Dot($dataSource);
         foreach ($data as $attr => &$value) {
             if (is_array($value)) {
-                $value = $this->applyData($value, $dataSource, $dataSourceKey);
+                $attrs = array_keys($value);
+                $stop  = false;
+                foreach ($attrs as $attr) {
+                    if (!$stop && in_array($attr, $stopIfAttr)) {
+                        $stop = true;
+                    }
+                }
+                if (!$stop) {
+                    $value = $this->applyData($value, $dataSource, $dataSourceKey, $stopIfAttr);
+                }
             } else {
                 preg_match_all('/\{([^\{\}]+)\}/', (string)$value, $matches);
                 foreach ($matches[1] as $match) {
                     $replaceWith = $dataSourceDot->get($match);
-                    $value = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
+                    $value       = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value);
                 }
             }
         }
