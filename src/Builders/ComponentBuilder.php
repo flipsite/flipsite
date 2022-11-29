@@ -65,7 +65,7 @@ class ComponentBuilder
             $parentTypeflags = explode(':', $parentType);
             $parentType      = array_shift($parentTypeflags);
             $parentTypeStyle = $this->getStyle($parentType, $parentTypeflags);
-            $style           = ArrayHelper::merge($style, $parentTypeStyle);
+            $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
 
         if (isset($data['options'],$data['options']['isset'])) {
