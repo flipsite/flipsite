@@ -148,10 +148,6 @@ class ComponentBuilder
                 $data          = $component->normalize($data);
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
-                        if (str_ends_with($attr, ':loc')) {
-                            $value = $this->addLoc($value);
-                            $attr  = rtrim($attr, ':loc');
-                        }
                         $component->setAttribute($attr, $value);
                     }
                     unset($data['_attr']);

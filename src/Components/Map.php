@@ -14,13 +14,12 @@ final class Map extends AbstractComponent
     {
         $this->setAttribute('loading', 'lazy');
         $this->addStyle($style);
-        unset($data['flags']);
+        $src = $data['src'] ?? 'https://maps.google.com/maps?q='.$data['name'].','.urlencode($data['address']).'&t=&z=15&ie=UTF8&iwloc=&output=embed';
+        $this->setAttribute('data-src-onenter', $src);
+        unset($data['flags'], $data['src'], $data['name'], $data['address']);
         foreach ($data as $key => $val) {
             $this->setAttribute($key, $val);
         }
-        $src = $data['src'] ?? 'https://maps.google.com/maps?q='.$data['name'].','.urlencode($data['address']).'&t=&z=15&ie=UTF8&iwloc=&output=embed';
-        $this->setAttribute('data-src-onenter', $src);
-        $this->setAttribute('title', $data['title'] ?? $data['name'] ?? 'map'.','.($data['address'] ?? ''));
         $this->builder->dispatch(new Event('ready-script', 'iframe-onenter', file_get_contents(__DIR__.'/../../js/ready.iframe-onenter.min.js')));
     }
 }
