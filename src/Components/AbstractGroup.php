@@ -30,13 +30,14 @@ abstract class AbstractGroup extends AbstractComponent
         if ($wrapperStyle) {
             $that->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
+            if (isset($data['wrapperBackground'])) {
+                $wrapperStyle['background'] ??= [];
+                $wrapperStyle['background']['src'] = $data['wrapperBackground'];
+                unset($data['wrapperBackground']);
+            }
             if (isset($wrapperStyle['background'])) {
-                if (isset($data['background'])) {
-                    $wrapperStyle['background']['src'] = $data['background'];
-                    unset($data['background']);
-                }
                 $this->setBackground($that, $wrapperStyle['background']);
-                unset($wrapperStyle['background']);
+                unset($wrapperStyle['wrapperBackground']);
             }
             $that->addStyle($wrapperStyle);
             $content = new Group($style['tag'] ?? 'div');
@@ -46,12 +47,12 @@ abstract class AbstractGroup extends AbstractComponent
             $that->tag = $style['tag'] ?? $that->tag;
             unset($style['tag']);
         }
-
+        if (isset($data['background'])) {
+            $style['background'] ??= [];
+            $style['background']['src'] = $data['background'];
+            unset($data['background']);
+        }
         if (isset($style['background'])) {
-            if (isset($data['background'])) {
-                $style['background']['src'] = $data['background'];
-                unset($data['background']);
-            }
             $this->setBackground($that, $style['background']);
             unset($style['background']);
         }

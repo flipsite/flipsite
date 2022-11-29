@@ -26,6 +26,9 @@ abstract class AbstractComponent extends AbstractElement {
     {
         $src     = $style['src'] ?? false;
         $options = $style['options'] ?? ['width' => 480,'srcset' => ['1x','2x']];
+        $style['position'] ??= 'bg-center';
+        $style['size'] ??= 'bg-cover';
+        $style['repeat'] ??= 'bg-no-repeat';
         unset($style['src'],$style['options']);
         
         if ($src) {
@@ -64,11 +67,10 @@ abstract class AbstractComponent extends AbstractElement {
             }
             if (($style['options']['loading'] ?? '') === 'eager') {
                 $this->builder->dispatch(new Event('preload', 'background', $imageContext));
-            }  
+            }
+            unset($style['options']);
+            $target->addStyle($style);
         }
-        unset($style['options']);
-        $target->addStyle($style);
-
     }
 
     private function isSvg(string $filename) : bool

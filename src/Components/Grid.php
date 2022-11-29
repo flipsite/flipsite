@@ -20,11 +20,12 @@ class Grid extends AbstractComponent
             $style['cols']['all'] = ArrayHelper::merge($style['cols']['all'], $style['col']);
         }
 
+        if (isset($data['background'])) {
+            $style['background'] ??= [];
+            $style['background']['src'] = $data['background'];
+            unset($data['background']);
+        }
         if (isset($style['background'])) {
-            if (isset($data['background'])) {
-                $style['background']['src'] = $data['background'];
-                unset($data['background']);
-            }
             $this->setBackground($this, $style['background']);
             unset($style['background']);
         }
