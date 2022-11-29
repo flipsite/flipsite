@@ -70,8 +70,10 @@ abstract class AbstractComponent extends AbstractElement
                 $this->builder->dispatch(new Event('preload', 'background', $imageContext));
             }
             unset($style['options']);
-            $target->addStyle($style);
+        } else {
+            unset($style['options'], $style['position'], $style['size'], $style['repeat']);
         }
+        $target->addStyle($style);
     }
 
     private function isSvg(string $filename) : bool
