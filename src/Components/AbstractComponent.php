@@ -3,10 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-use Flipsite\Utils\ArrayHelper;
-
-abstract class AbstractComponent extends AbstractElement {
-
+abstract class AbstractComponent extends AbstractElement
+{
     use Traits\ImageHandlerTrait;
     use Traits\CanIUseTrait;
 
@@ -25,35 +23,38 @@ abstract class AbstractComponent extends AbstractElement {
     public function setBackground(AbstractElement $target, array $style) : void
     {
         $src     = $style['src'] ?? false;
-        $options = $style['options'] ?? ['width' => 480,'srcset' => ['1x','2x']];
+        $options = $style['options'] ?? ['width' => 480, 'srcset' => ['1x', '2x']];
         $style['position'] ??= 'bg-center';
         $style['size'] ??= 'bg-cover';
         $style['repeat'] ??= 'bg-no-repeat';
         unset($style['src'],$style['options']);
-        
+
         if ($src) {
             $gradient = '';
             foreach ($style as $key => &$val) {
-                $classes = explode(' ',$val);
-                $new = [];
+                if (null === $val) {
+                    continue;
+                }
+                $classes = explode(' ', $val);
+                $new     = [];
                 foreach ($classes as $cls) {
-                    if (strpos($cls,'bg-gradient') !== false) {
+                    if (strpos($cls, 'bg-gradient') !== false) {
                         $gradient = $cls;
                     } else {
                         $new[] = $cls;
                     }
                 }
-                $val = count($new) ? implode(' ',$new) : null;
+                $val = count($new) ? implode(' ', $new) : null;
             }
 
             if ($gradient) {
                 // TODO can this horrible hack be fixed? if bg gradient it needs to be added to element style
                 $callback = new \Flipsite\Style\Callbacks\BgGradientCallback();
-                $tmp = explode('-',$gradient);
+                $tmp      = explode('-', $gradient);
                 array_shift($tmp);
                 $gradient = $callback($tmp).',';
             }
-            
+
             if ($this->isSvg($src)) {
                 $imageContext = $this->imageHandler->getContext($src, []);
                 $target->setAttribute('style', 'background-image:'.$gradient.'url('.$imageContext->getSrc().');');
