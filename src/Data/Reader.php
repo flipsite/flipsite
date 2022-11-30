@@ -58,6 +58,10 @@ final class Reader
             $this->getLanguages()
         );
         $this->hash = md5(json_encode($this->data));
+        if (isset($this->data['theme']['extend'])) {
+            $this->data['theme']['components'] = ArrayHelper::merge($this->data['theme']['components'], $this->data['theme']['extend']);
+            unset($this->data['theme']['extend']);
+        }
     }
 
     public function getHash(int $length = 6) : string

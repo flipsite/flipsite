@@ -10,8 +10,11 @@ trait UrlTrait
     use EnviromentTrait;
     use ReaderTrait;
 
-    private function url(string $url, bool &$external) : string
+    private function url(?string $url, bool &$external) : ?string
     {
+        if (!$url) {
+            return null;
+        }
         $external = false;
         // Just return if empty
         if ('#' === $url) {

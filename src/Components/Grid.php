@@ -38,6 +38,9 @@ class Grid extends AbstractComponent
             $colStyle = $this->getNth($i, $totalCols, $style['cols'] ?? []);
             if (is_array($colData)) {
                 $type = $colData['type'] ?? 'group';
+                if (isset($colData['href'])) {
+                    $type = 'a';
+                }
                 unset($colData['type']);
             } else {
                 $type = 'group';

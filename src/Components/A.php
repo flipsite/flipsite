@@ -11,14 +11,22 @@ final class A extends AbstractGroup
 
     public function build(array $data, array $style, string $appearance) : void
     {
+        // Old fallback
+        if (isset($data['url'])) {
+            $data['href'] = $data['url'];
+            unset($data['url']);
+        }
         $urlData  = $this->expand($data);
         $external = false;
-        $href     = isset($urlData['url']) ? $this->url((string)$urlData['url'], $external) : '';
-        $this->setAttribute('href', $href);
-
-        if ($external) {
-            $this->setAttribute('target', '_blank');
-            $this->setAttribute('rel', 'noopener noreferrer');
+        $href     = isset($urlData['href']) ? $this->url((string)$urlData['href'], $external) : '';
+        if ($href) {
+            $this->setAttribute('href', $href);
+            if ($external) {
+                $this->setAttribute('target', '_blank');
+                $this->setAttribute('rel', 'noopener noreferrer');
+            }
+        } else {
+            $this->tag = 'div';
         }
         parent::build($urlData, $style, $appearance);
     }
@@ -26,7 +34,7 @@ final class A extends AbstractGroup
     public function normalize(string|int|bool|array $data) : array
     {
         if (!is_array($data)) {
-            return ['text' => $data, 'url' => '#'];
+            return ['text' => $data, 'href' => '#'];
         }
         return $data;
     }
@@ -37,7 +45,7 @@ final class A extends AbstractGroup
         foreach ($data as $key => $val) {
             switch ($key) {
                 case 'tel':
-                    $expanded['url'] = 'tel:'.$val;
+                    $expanded['href'] = 'tel:'.$val;
                     $phoneUtil       = \libphonenumber\PhoneNumberUtil::getInstance();
                     try {
                         $numberProto = $phoneUtil->parse($val, '');
@@ -57,7 +65,7 @@ final class A extends AbstractGroup
                     }
                     break;
                 case 'mailto':
-                    $expanded['url']  = 'mailto:'.$val;
+                    $expanded['href']  = 'mailto:'.$val;
                     if (isset($data['text'])) {
                         $expanded['text'] = sprintf($data['text'], $val);
                     } else {

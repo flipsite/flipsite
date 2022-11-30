@@ -23,7 +23,9 @@ abstract class AbstractComponent extends AbstractElement
     public function setBackground(AbstractElement $target, array $style) : void
     {
         $src     = $style['src'] ?? false;
-        $options = $style['options'] ?? ['width' => 480, 'srcset' => ['1x', '2x']];
+        $options = $style['options'] ?? [];
+        $options['width'] ??= 480;
+        $options['srcset'] ??= ['1x', '2x'];
         $style['position'] ??= 'bg-center';
         $style['size'] ??= 'bg-cover';
         $style['repeat'] ??= 'bg-no-repeat';
