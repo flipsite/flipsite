@@ -148,6 +148,7 @@ abstract class AbstractElement
         if ($this->cache) {
             return $this->cache;
         }
+        $this->purgeInvalidAttributes();
         $html = '';
         $i    = str_repeat(' ', $indentation * $level);
         if ('' === $this->tag) {
@@ -230,4 +231,28 @@ abstract class AbstractElement
         }
         return trim(implode(' ', array_merge($before, $after)));
     }
+
+    private function purgeInvalidAttributes() : void {
+        $allowed = ['onclick'];
+        switch ($this->tag) {
+            case 'button':
+                $allowed = array_merge($allowed,
+                    ['disabled','form','formaction','formenctype','formmethod',
+                    'formnovalidate','formtarget','name','type','value',]);
+                break;
+            default:
+                return;
+        }
+        
+        $purge = [];
+        foreach ($this->attributes as $attribute => $value) {
+            if (!in_array($attribute,$allowed) && !str_starts_with($attribute,'data-') && !str_starts_with($attribute,'aria-')) {
+                $purge[] = $attribute;
+            }
+        }
+        foreach ($purge as $purgeAttribute) {
+            unset($this->attributes[$purgeAttribute]);
+        }
+    }
 }
+
