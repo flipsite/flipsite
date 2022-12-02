@@ -111,8 +111,9 @@ final class Reader
         return $this->data['redirects'] ?? [];
     }
 
-    public function getPageName(string $page, Language $language) : string
+    public function getPageName(string $page, ?Language $language = null) : string
     {
+        $language ??= $this->getDefaultLanguage();
         if (is_null($this->pageNameResolver)) {
             $this->pageNameResolver = new PageNameResolver($this->data['pages'], $this->getSlugs());
         }
