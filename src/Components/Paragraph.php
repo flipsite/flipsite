@@ -10,7 +10,7 @@ final class Paragraph extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        $markdown  = $this->getMarkdownLine($data['markdown'] ?? [], $style['markdown'] ?? [], $appearance);
+        $markdown  = $this->getMarkdownLine($data['value'] ?? [], $style['value'] ?? [], $appearance);
         $this->setContent($markdown);
         $this->addStyle($style);
     }
@@ -18,7 +18,7 @@ final class Paragraph extends AbstractComponent
     public function normalize(string|int|bool|array $data) : array
     {
         if (is_string($data)) {
-            return ['markdown' => $data];
+            return ['value' => $data];
         }
         return $data;
     }

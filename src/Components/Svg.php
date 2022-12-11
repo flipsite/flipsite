@@ -12,6 +12,9 @@ final class Svg extends AbstractComponent
     {
         if (!is_array($data)) {
             return ['src' => $data];
+        } elseif (isset($data['value'])) {
+            $data['src'] = $data['value'];
+            unset($data['value']);
         }
         return $data;
     }
