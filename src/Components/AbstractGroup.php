@@ -63,13 +63,13 @@ abstract class AbstractGroup extends AbstractComponent
         $total    = count($data);
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
-            if (strpos($type, ':') && $componentStyle === []) {
-                $tmp      = explode(':', $type);
-                $baseType = array_shift($tmp);
-                if (isset($style[$baseType])) {
-                    $componentStyle = ArrayHelper::merge($style[$baseType], $componentStyle);
-                }
-            }
+            // if (strpos($type, ':') && $componentStyle === []) {
+            //     $tmp      = explode(':', $type);
+            //     $baseType = array_shift($tmp);
+            //     if (isset($style[$baseType])) {
+            //         $componentStyle = ArrayHelper::merge($style[$baseType], $componentStyle);
+            //     }
+            // }
 
             $children[] = $this->builder->build($type, $componentData ?? [], $componentStyle, $appearance);
             $i++;
