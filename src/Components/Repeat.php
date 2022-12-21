@@ -62,7 +62,7 @@ final class Repeat extends AbstractGroup
             unset($data[$key]);
         }
         $data['_repeatTpl']  = $components;
-        $data['_repeatData'] = $dataSourceList;
+        $data['_repeatData'] = $dataSourceList ?? [];
         return $data;
     }
 }
