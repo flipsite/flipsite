@@ -68,24 +68,24 @@ class ComponentBuilder
             $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
 
-        if (isset($data['options'],$data['options']['isset'])) {
-            if (!$data['options']['isset']) {
+        if (isset($data['_options'],$data['_options']['isset'])) {
+            if (!$data['_options']['isset']) {
                 return null;
             }
         };
 
-        if (is_array($data) && isset($data['style'])) {
+        if (is_array($data) && isset($data['_style'])) {
             // If string, => inherit
-            if (is_string($data['style'])) {
-                $data['style'] = ['inherit' => $data['style']];
+            if (is_string($data['_style'])) {
+                $data['_style'] = ['inherit' => $data['_style']];
             }
             // Resolve inheritance
-            if (isset($data['style']['inherit'])) {
-                $inheritType   = $data['style']['inherit'];
-                $data['style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['style']);
+            if (isset($data['_style']['inherit'])) {
+                $inheritType    = $data['_style']['inherit'];
+                $data['_style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['_style']);
             }
-            $style = ArrayHelper::merge($style, $data['style']);
-            unset($data['style']);
+            $style = ArrayHelper::merge($style, $data['_style']);
+            unset($data['_style']);
         }
 
         // // If still has variants
@@ -110,8 +110,8 @@ class ComponentBuilder
             unset($style['type'],$style['section']);
         }
 
-        if (isset($data['dataSource'])) {
-            $data = $this->applyData($data, $data['dataSource'], 'dataSource', ['dataSourceList']);
+        if (isset($data['_dataSource'])) {
+            $data = $this->applyData($data, $data['_dataSource'], '_dataSource', ['_dataSourceList']);
         }
 
         // Check external factories
@@ -217,7 +217,7 @@ class ComponentBuilder
         }
     }
 
-    private function applyData(array $data, array $dataSource, string $dataSourceKey = 'dataSource', array $stopIfAttr = []) : array
+    private function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', array $stopIfAttr = []) : array
     {
         if (isset($data[$dataSourceKey])) {
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);

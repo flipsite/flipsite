@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -14,19 +13,18 @@ final class Rating extends AbstractGroup
     {
         $starData = [];
         $this->addStyle($style);
-        for ($i=0; $i<5;$i++) {
+        for ($i=0; $i < 5; $i++) {
             $starStyle = $style['icon'];
             if ($data['value'] > $i && isset($style['active'])) {
-                $starStyle = ArrayHelper::merge($starStyle,$style['active']);
+                $starStyle = ArrayHelper::merge($starStyle, $style['active']);
             }
             $starData['icon:'.$i] = [
-                'src' => 'zondicons/star-full',
-                'style' => $starStyle
+                'src'    => 'zondicons/star-full',
+                '_style' => $starStyle
             ];
-            
         }
-        unset($style['icon']);
-        unset($style['active']);
+        unset($style['icon'], $style['active']);
+
         parent::build($starData, $style, $appearance);
     }
 

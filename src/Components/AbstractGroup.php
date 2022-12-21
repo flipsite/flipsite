@@ -15,7 +15,7 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        // Hmm 
+        // Hmm
         if (isset($data['onclick'])) {
             $this->setAttribute('onclick', $data['onclick']);
             if (strpos($data['onclick'], 'javascript:toggle') === 0) {
@@ -30,10 +30,10 @@ abstract class AbstractGroup extends AbstractComponent
         if ($wrapperStyle) {
             $that->tag = $wrapperStyle['tag'] ?? 'div';
             unset($wrapperStyle['tag']);
-            if (isset($data['wrapperBackground'])) {
+            if (isset($data['_bgWrapper'])) {
                 $wrapperStyle['background'] ??= [];
-                $wrapperStyle['background']['src'] = $data['wrapperBackground'];
-                unset($data['wrapperBackground']);
+                $wrapperStyle['background']['src'] = $data['_bgWrapper'];
+                unset($data['_bgWrapper']);
             }
             if (isset($wrapperStyle['background'])) {
                 $this->setBackground($that, $wrapperStyle['background']);
@@ -47,10 +47,10 @@ abstract class AbstractGroup extends AbstractComponent
             $that->tag = $style['tag'] ?? $that->tag;
             unset($style['tag']);
         }
-        if (isset($data['background'])) {
+        if (isset($data['_bg'])) {
             $style['background'] ??= [];
-            $style['background']['src'] = $data['background'];
-            unset($data['background']);
+            $style['background']['src'] = $data['_bg'];
+            unset($data['_bg']);
         }
         if (isset($style['background'])) {
             $this->setBackground($that, $style['background']);
@@ -63,14 +63,6 @@ abstract class AbstractGroup extends AbstractComponent
         $total    = count($data);
         foreach ($data as $type => $componentData) {
             $componentStyle = $style[$type] ?? [];
-            // if (strpos($type, ':') && $componentStyle === []) {
-            //     $tmp      = explode(':', $type);
-            //     $baseType = array_shift($tmp);
-            //     if (isset($style[$baseType])) {
-            //         $componentStyle = ArrayHelper::merge($style[$baseType], $componentStyle);
-            //     }
-            // }
-
             $children[] = $this->builder->build($type, $componentData ?? [], $componentStyle, $appearance);
             $i++;
         }
