@@ -12,6 +12,7 @@ use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Builders\AnalyticsBuilder;
 use Flipsite\Builders\ComponentBuilder;
+use Flipsite\Builders\CustomBuilder;
 use Flipsite\Builders\DocumentBuilder;
 use Flipsite\Builders\FaviconBuilder;
 use Flipsite\Builders\FontBuilder;
@@ -274,6 +275,14 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     if (null !== $integrations) {
         $analyticsBuilder = new AnalyticsBuilder($enviroment->isLive(), $integrations);
         $document         = $analyticsBuilder->getDocument($document);
+    }
+    $document->getChild('head')->addChild(new Flipsite\Components\Custom('<style></style>'));
+
+    // Custom HTML
+    $customFile = $enviroment->getSiteDir().'/custom.html';
+    if (file_exists($customFile)) {
+        $customBuilder = new CustomBuilder($page, $customFile);
+        $document      = $customBuilder->getDocument($document);
     }
 
     // If any plugins

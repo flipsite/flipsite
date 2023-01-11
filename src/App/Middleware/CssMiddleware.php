@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\App\Middleware;
 
 use Flipsite\Style\Parsers\HtmlParser;
@@ -22,13 +23,13 @@ class CssMiddleware implements MiddlewareInterface
         unset($this->theme['components'], $this->theme['style']);
     }
 
-    public function process(Request $request, $handler) : Response
+    public function process(Request $request, $handler): Response
     {
         $response = $handler->handle($request);
         return $this->getResponse($response);
     }
 
-    public function getResponse(Response $response) : Response
+    public function getResponse(Response $response): Response
     {
         $html = (string) $response->getBody();
 
@@ -72,9 +73,7 @@ class CssMiddleware implements MiddlewareInterface
         $tailwind->addCallback('background-image', new \Flipsite\Style\Callbacks\BgGradientCallback());
 
         $css           = $tailwind->getCss($elements, $classes);
-        $search        = '</head>';
-        $replace       = '  <style>'.$css."\n    ".'</style>'."\n  </head>";
-        $htmlWithStyle = str_replace($search, $replace, $html);
+        $htmlWithStyle = str_replace('<style></style>', '<style>'.$css."\n    ".'</style>', $html);
 
         $streamFactory = new StreamFactory();
         $stream        = $streamFactory->createStream($htmlWithStyle);

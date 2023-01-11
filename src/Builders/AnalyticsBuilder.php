@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -12,25 +13,21 @@ class AnalyticsBuilder implements BuilderInterface
     private ?string $gtm        = null;
     private ?string $ga         = null;
     private ?string $metaPixel  = null;
-    private ?string $cookieBot  = null;
 
     public function __construct(private bool $isLive, array $integrations)
     {
-        if (isset($integrations['google']['tagManager'])) {
-            $this->gtm = $integrations['google']['tagManager'];
+        if (isset($integrations['googleTagManager'])) {
+            $this->gtm = $integrations['googleTagManager'];
         }
-        if (isset($integrations['google']['analytics'])) {
-            $this->ga = $integrations['google']['analytics'];
+        if (isset($integrations['googleAnalytics'])) {
+            $this->ga = $integrations['googleAnalytics'];
         }
-        if (isset($integrations['meta']['pixel'])) {
-            $this->metaPixel = (string)$integrations['meta']['pixel'];
-        }
-        if (isset($integrations['cookieBot'])) {
-            $this->cookieBot = $integrations['cookieBot'];
+        if (isset($integrations['metaPixel'])) {
+            $this->metaPixel = (string)$integrations['metaPixel'];
         }
     }
 
-    public function getDocument(Document $document) : Document
+    public function getDocument(Document $document): Document
     {
         // Google
         if ($this->isLive && $this->gtm) {
@@ -88,24 +85,6 @@ class AnalyticsBuilder implements BuilderInterface
             $document->getChild('body')->addChild($script);
         }
 
-        // Cookiebot
-        if ($this->isLive && $this->cookieBot) {
-            // Consent mode
-            if ($this->ga) {
-                $script = new Script();
-                $script->setAttribute('data-cookieconsent', 'ignore');
-                $script->setContent(file_get_contents(__DIR__.'/cookieBotGoogleAnalyticsConset.js'));
-                $document->getChild('head')->prependChild($script);
-            }
-
-            $script = new Script();
-            $script->setAttribute('id', 'Cookiebot');
-            $script->setAttribute('src', 'https://consent.cookiebot.com/uc.js');
-            $script->setAttribute('data-cbid', $this->cookieBot);
-            $script->setAttribute('type', 'text/javascript');
-            $script->setAttribute('data-blockingmode', 'auto');
-            $document->getChild('head')->prependChild($script);
-        }
         return $document;
     }
 }
