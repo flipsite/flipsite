@@ -1,11 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Components\AbstractElement;
-use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
 use Flipsite\Components\Event;
@@ -13,7 +13,7 @@ use Flipsite\Data\Reader;
 use Flipsite\Enviroment;
 use Flipsite\Utils\Path;
 
-class MetaBuilder implements BuilderInterface, ComponentListenerInterface
+class MetaBuilder implements BuilderInterface
 {
     private ImageHandler $imageHandler;
     private string $h1 = '404';
@@ -27,7 +27,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         );
     }
 
-    public function getDocument(Document $document) : Document
+    public function getDocument(Document $document): Document
     {
         $elements = [];
         $server   = $this->enviroment->getServer(true);
@@ -49,22 +49,16 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
             }
         }
 
-        $name     = $this->reader->get('name', $language);
-        $meta     = $this->reader->getMeta($this->path->getPage(), $language);
+        $name  = $this->reader->get('name', $language);
+        $meta = $this->reader->getMeta($this->path->getPage(), $language);
 
-        $title    = $meta['title'] ?? $name ?? '404';
-        if (str_starts_with($title, 'h1')) {
-            $title = str_replace('h1', $this->h1, $title);
-        }
+        $title = $meta['title'];
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
 
         // HTML meta tags
         $elements[] = $this->meta('description', $meta['description'] ?? null);
-        $elements[] = $this->meta('keywords', $meta['keywords']);
-        $elements[] = $this->meta('author', $meta['author'] ?? null);
-        $elements[] = $this->meta('generator', $meta['generator'] ?? null);
 
         // Facebook opengraph tags
         $elements[] = $this->og('og:title', $title);
@@ -73,9 +67,8 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         $active = $this->path->getPage();
         $page   = $this->reader->getSlugs()->getPath($active, $language, $active);
 
-        $share = $meta['share'] ?? $this->reader->get('share');
-        if ($share) {
-            $image      = $this->imageHandler->getContext($share, ['width' => 1200, 'height' => 630]);
+        if ($meta['share']) {
+            $image      = $this->imageHandler->getContext($meta['share'], ['width' => 1200, 'height' => 630]);
             $elements[] = $this->og('og:image', $this->enviroment->getServer(false) . $image->getSrc());
         }
 
@@ -100,14 +93,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
-    {
-        if ('h1' === $event->getType()) {
-            $this->h1 = $event->getData();
-        }
-    }
-
-    private function meta(string $name, ?string $content) : ?AbstractElement
+    private function meta(string $name, ?string $content): ?AbstractElement
     {
         if (null === $content) {
             return null;
@@ -118,7 +104,7 @@ class MetaBuilder implements BuilderInterface, ComponentListenerInterface
         return $el;
     }
 
-    private function og(string $property, ?string $content) : ?AbstractElement
+    private function og(string $property, ?string $content): ?AbstractElement
     {
         if (null === $content) {
             return null;

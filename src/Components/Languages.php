@@ -1,11 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 class Languages extends Nav
 {
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         $active = $this->path->getLanguage();
         if (is_string($data) || is_string($data['items'])) {
@@ -23,10 +24,10 @@ class Languages extends Nav
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         // TODO add aria stuff for accessibility
-        if (in_array('full', $data['flags']) || ($data['options']['full'] ?? false)) {
+        if (in_array('full', $data['flags']??[]) || ($data['options']['full'] ?? false)) {
             foreach ($data['items'] as &$item) {
                 $item['text'] = $this->getString($item['url']);
             }
@@ -34,7 +35,7 @@ class Languages extends Nav
         parent::build($data, $style, $appearance);
     }
 
-    private function getString(string $languageCode) : string
+    private function getString(string $languageCode): string
     {
         switch ($languageCode) {
             case 'en': return 'In English';

@@ -1,22 +1,19 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Heading extends AbstractComponent
 {
-    use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         $markdown  = $this->getMarkdownLine((string)$data['value'], $style['markdown'] ?? [], $appearance);
         $this->addStyle($style);
-        if ('h1' === $this->tag) {
-            $this->builder->dispatch(new Event('h1', '', strip_tags($markdown)));
-        }
         if (isset($data['name'])) {
             $a = new Element('a');
             $a->setContent($markdown);
@@ -27,7 +24,7 @@ final class Heading extends AbstractComponent
         }
     }
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         if (!is_array($data)) {
             return ['value' => (string)$data];

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Utils\ArrayHelper;
@@ -8,21 +9,21 @@ use Flipsite\Utils\Language;
 
 interface PageNameResolverInterface
 {
-    public function getName(string $page, Language $language) : ?string;
+    public function getName(string $page, Language $language): ?string;
 }
 
 class PageNameResolver implements PageNameResolverInterface
 {
     private array $resolvers = [];
 
-    public function __construct(array $pages, Slugs $slugs)
+    public function __construct(array $meta, Slugs $slugs)
     {
-        $this->resolvers[] = new SectionNameResolver($pages);
+        $this->resolvers[] = new MetaNameResolver($meta);
         $this->resolvers[] = new HomeNameResolver();
         $this->resolvers[] = new SlugNameResolver($slugs);
     }
 
-    public function getName(string $page, Language $language) : string
+    public function getName(string $page, Language $language): string
     {
         foreach ($this->resolvers as $resolver) {
             $name = $resolver->getName($page, $language);
@@ -34,28 +35,20 @@ class PageNameResolver implements PageNameResolverInterface
     }
 }
 
-class SectionNameResolver implements PageNameResolverInterface
+class MetaNameResolver implements PageNameResolverInterface
 {
     private array $names = [];
 
-    public function __construct(array $pages)
+    public function __construct(array $meta)
     {
-        foreach ($pages as $page => $sections) {
-            if (null === $sections) {
-                continue;
-            }
-            if (ArrayHelper::isAssociative($sections)) {
-                $sections = [$sections];
-            }
-            foreach ($sections as $section) {
-                if (isset($section['_name'])) {
-                    $this->names[$page] = $section['_name'];
-                }
+        foreach ($meta as $page => $metaData) {
+            if (isset($metaData['name'])) {
+                $this->names[$page] = $metaData['name'];
             }
         }
     }
 
-    public function getName(string $page, Language $language) : ?string
+    public function getName(string $page, Language $language): ?string
     {
         if (isset($this->names[$page])) {
             $name = $this->names[$page];
@@ -78,7 +71,7 @@ class SectionNameResolver implements PageNameResolverInterface
 
 class HomeNameResolver implements PageNameResolverInterface
 {
-    public function getName(string $page, Language $language) : ?string
+    public function getName(string $page, Language $language): ?string
     {
         if ('home' === $page) {
             switch ((string)$language) {
@@ -97,7 +90,7 @@ class SlugNameResolver implements PageNameResolverInterface
     {
     }
 
-    public function getName(string $page, Language $language) : ?string
+    public function getName(string $page, Language $language): ?string
     {
         $slug = $this->slugs->getSlug($page, $language);
         if (null === $slug) {

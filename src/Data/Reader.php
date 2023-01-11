@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\AbstractEnviroment;
@@ -50,7 +51,10 @@ final class Reader
     {
         $this->data          = $yaml;
         $this->expandPagesAndSlugs();
-        $this->parseLanguages();
+        foreach (explode(',', $this->data['languages']) as $language) {
+            $this->languages[] = new Language($language);
+        }
+        $this->localizer = new Localizer($this->languages);
         $this->slugs = new Slugs(
             array_keys($this->data['pages']),
             $this->data['slugs'] ?? null,
@@ -64,12 +68,12 @@ final class Reader
         }
     }
 
-    public function getHash(int $length = 6) : string
+    public function getHash(int $length = 6): string
     {
         return substr($this->hash, 0, $length);
     }
 
-    public function isOnline() : bool
+    public function isOnline(): bool
     {
         return true;
     }
@@ -86,41 +90,44 @@ final class Reader
     /**
      * @return array<Language>
      */
-    public function getLanguages() : array
+    public function getLanguages(): array
     {
         return $this->languages;
     }
 
-    public function getDefaultLanguage() : Language
+    public function getDefaultLanguage(): Language
     {
         return $this->languages[0];
     }
 
-    public function getLocalizer() : Localizer
+    public function getLocalizer(): Localizer
     {
         return $this->localizer;
     }
 
-    public function getSlugs() : Slugs
+    public function getSlugs(): Slugs
     {
         return $this->slugs;
     }
 
-    public function getRedirects() : ?array
+    public function getRedirects(): ?array
     {
         return $this->data['redirects'] ?? [];
     }
 
-    public function getPageName(string $page, ?Language $language = null) : string
+    public function getPageName(string $page, ?Language $language = null): string
     {
         $language ??= $this->getDefaultLanguage();
         if (is_null($this->pageNameResolver)) {
-            $this->pageNameResolver = new PageNameResolver($this->data['pages'], $this->getSlugs());
+            $this->pageNameResolver = new PageNameResolver(
+                $this->data['meta'] ?? [],
+                $this->getSlugs()
+            );
         }
         return $this->pageNameResolver->getName($page, $language);
     }
 
-    public function getSections(string $page, ?Language $language = null) : array
+    public function getSections(string $page, ?Language $language = null): array
     {
         $language ??= $this->getDefaultLanguage();
         if ('offline' === $page) {
@@ -185,70 +192,45 @@ final class Reader
         return $this->localizer->localize($sections ?? [], $language) ?? [];
     }
 
-    public function getMeta(string $page, Language $language) : ?array
+    public function getMeta(string $page, Language $language): ?array
     {
         $meta = [
-            'title'       => [$this->get('name')],
+            'title'       => $this->get('name'),
             'description' => $this->get('description', $language),
-            'keywords'    => $this->get('keywords', $language),
-            'author'      => $this->get('author', $language),
+            'share'       => $this->get('share') ?? null
         ];
 
         if ($language != $this->languages[0]) {
-            $meta['title'][0] .= ' ('.strtoupper((string)$language).')';
+            $meta['title'] .= ' ('.strtoupper((string)$language).')';
         }
 
-        $data = $this->data['pages'][$page] ?? [];
-
-        if (ArrayHelper::isAssociative($data)) {
-            $data = [$data];
-        }
-        $data = array_merge($this->data['before'] ?? [], $data, $this->data['after'] ?? []);
-
-        $p     = explode('/', $page);
-        $title = [];
-        while (count($p) > 0) {
-            $page  = implode('/', $p);
-            $pages = array_keys($this->data['pages']);
-            if (in_array($page, $pages)) {
-                $name    = $this->getPageName($page, $language);
-                $title[] = $name;
+        if (isset($this->data['meta'][$page])) {
+            $pageMeta = $this->data['meta'][$page];
+            if (isset($pageMeta['title'])) {
+                $meta['title'] = $pageMeta['title'].' - '.$meta['title'];
             }
-            array_pop($p);
-        }
-
-        $meta['title'] = array_merge($title, $meta['title']);
-
-        $titleFromMeta = null;
-        $titleOverride = false;
-        foreach ($data as $section) {
-            if (isset($section['_meta'])) {
-                $pageMeta = $this->localizer->localize($section['_meta'], $language);
-                if (isset($pageMeta['title'])) {
-                    $titleFromMeta = $pageMeta['title'];
-                    unset($pageMeta['title']);
+            unset($pageMeta['_name'],$pageMeta['title']);
+            $meta = ArrayHelper::merge($meta, $pageMeta);
+        } elseif ('home' !== $page) {
+            $p = explode('/', $page);
+            $title = [];
+            while (count($p) > 0) {
+                $page  = implode('/', $p);
+                $pages = array_keys($this->data['pages']);
+                if (in_array($page, $pages)) {
+                    $name    = $this->getPageName($page, $language);
+                    $title[] = $name;
                 }
-                if (isset($pageMeta['title:override'])) {
-                    $titleFromMeta = $pageMeta['title:override'];
-                    unset($pageMeta['title:override']);
-                    $titleOverride = true;
-                }
-                $meta = ArrayHelper::merge($meta, $pageMeta);
+                array_pop($p);
             }
+            $title[] = $meta['title'];
+            $meta['title'] = implode(' - ', $title);
         }
-        if (null !== $titleFromMeta) {
-            if ($titleOverride) {
-                $meta['title'] = [$titleFromMeta];
-            } else {
-                $meta['title'][0] = $titleFromMeta;
-            }
-        }
-        $meta['title'] = implode(' - ', $meta['title']);
 
         return $meta;
     }
 
-    public function getLayout(string $page) : ?array
+    public function getLayout(string $page): ?array
     {
         $all = array_merge(
             $this->data['before'] ?? [],
@@ -264,7 +246,7 @@ final class Reader
         return null;
     }
 
-    public function getComponentFactories() : array
+    public function getComponentFactories(): array
     {
         $factories = [];
         $import    = $this->data['theme']['import'] ?? [];
@@ -283,7 +265,7 @@ final class Reader
         return $factories;
     }
 
-    private function hideSection(array $section, string $page, Language $language) : bool
+    private function hideSection(array $section, string $page, Language $language): bool
     {
         $_     = 0;
         $total = 0;
@@ -339,24 +321,7 @@ final class Reader
         return false;
     }
 
-    private function parseLanguages() : void
-    {
-        $languages = $this->data['languages'] ?? null;
-        $language  = $this->data['language'] ?? null;
-        if (null === $languages && null !== $language) {
-            $languages = [$language];
-        } elseif (is_string($languages)) {
-            $languages = explode(',', str_replace(' ', '', $languages));
-        } elseif (!is_array($languages)) {
-            $languages = ['en'];
-        }
-        foreach ($languages as $language) {
-            $this->languages[] = new Language($language);
-        }
-        $this->localizer = new Localizer($this->languages);
-    }
-
-    private function expandPagesAndSlugs() : void
+    private function expandPagesAndSlugs(): void
     {
         $pages         = $this->data['pages'] ?? [];
         $slugs         = $this->data['slugs'] ?? [];
@@ -395,7 +360,7 @@ final class Reader
         $this->data['slugs'] = $expandedSlugs;
     }
 
-    private function extendSlug(array $extendedSlugs, string $page, string|array $slugs, array $params, array $permutation) : array
+    private function extendSlug(array $extendedSlugs, string $page, string|array $slugs, array $params, array $permutation): array
     {
         foreach ($params as $i => $param) {
             $page = str_replace($param, (string)$permutation[$i], $page);
@@ -411,7 +376,7 @@ final class Reader
         return $extendedSlugs;
     }
 
-    private function getPermutations(int $level, int $max, array $data, array $parents = []) : array
+    private function getPermutations(int $level, int $max, array $data, array $parents = []): array
     {
         $permutations = [];
         foreach ($data as $key => $val) {
@@ -424,7 +389,7 @@ final class Reader
         return $permutations;
     }
 
-    private function getRepeated(array $data) : array
+    private function getRepeated(array $data): array
     {
         $repeat = $data['repeat'];
         foreach ($repeat as $key => &$val) {
@@ -449,13 +414,13 @@ final class Reader
 
 class DataMapper
 {
-    public function apply(array $tpl, array $data) : array
+    public function apply(array $tpl, array $data): array
     {
         $dot = new \Adbar\Dot($data);
         return $this->search($tpl, $dot);
     }
 
-    private function search(array $tpl, \Adbar\Dot $dot) : array
+    private function search(array $tpl, \Adbar\Dot $dot): array
     {
         foreach ($tpl as $attr => &$value) {
             if (is_array($value)) {

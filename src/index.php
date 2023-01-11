@@ -8,7 +8,6 @@ use Flipsite\App\Middleware\DiagnosticsMiddleware;
 use Flipsite\App\Middleware\ExpiresMiddleware;
 use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
-use Flipsite\App\Middleware\FlipsiteMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Builders\AnalyticsBuilder;
@@ -197,14 +196,8 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());
     }
-    // $sectionBuilder = new SectionBuilder(
-    //     $enviroment,
-    //     $reader,
-    //     $componentBuilder,
-    // );
 
     $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
-    $componentBuilder->addListener($metaBuilder);
 
     $faviconBuilder = new FaviconBuilder($enviroment, $reader);
 
@@ -290,9 +283,6 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     return $response->withHeader('Content-type', 'text/html');
 })->add($cssMw)->add($svgMw)->add($offlineMw)->add($diagnosticsMw);
-if ('localhost' === getenv('APP_ENV')) {
-    $app->add(new FlipsiteMiddleware($container->get('reader')));
-}
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));
