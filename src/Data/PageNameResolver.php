@@ -18,14 +18,17 @@ class PageNameResolver implements PageNameResolverInterface
 
     public function __construct(array $meta, Slugs $slugs)
     {
-        $this->resolvers[] = new MetaNameResolver($meta);
-        $this->resolvers[] = new HomeNameResolver();
-        $this->resolvers[] = new SlugNameResolver($slugs);
+        $this->resolvers['meta'] = new MetaNameResolver($meta);
+        $this->resolvers['home'] = new HomeNameResolver();
+        $this->resolvers['slug'] = new SlugNameResolver($slugs);
     }
 
-    public function getName(string $page, Language $language): string
+    public function getName(string $page, Language $language, array $exclude = []): string
     {
-        foreach ($this->resolvers as $resolver) {
+        foreach ($this->resolvers as $type => $resolver) {
+            if (in_array($type, $exclude)) {
+                continue;
+            }
             $name = $resolver->getName($page, $language);
             if ($name) {
                 return $name;

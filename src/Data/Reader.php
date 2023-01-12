@@ -115,7 +115,7 @@ final class Reader
         return $this->data['redirects'] ?? [];
     }
 
-    public function getPageName(string $page, ?Language $language = null): string
+    public function getPageName(string $page, ?Language $language = null, array $exclude = []): string
     {
         $language ??= $this->getDefaultLanguage();
         if (is_null($this->pageNameResolver)) {
@@ -124,7 +124,7 @@ final class Reader
                 $this->getSlugs()
             );
         }
-        return $this->pageNameResolver->getName($page, $language);
+        return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
     public function getSections(string $page, ?Language $language = null): array
