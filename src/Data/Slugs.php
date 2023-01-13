@@ -34,9 +34,7 @@ final class Slugs
                     // slug is an object
                     if (is_array($slug)) {
                         $this->slugs[$page][(string) $language] = $slug[(string) $language] ?? trim($language.'/'.$page, '/');
-                    } elseif ($this->isBilingual()) {
-                        $this->slugs[$page][(string) $language] = $slug;
-                    } // TODO throw exception
+                    }
                 } else {
                     $this->slugs[$page][(string) $language] = self::HOME === $page ? (string) $language : $language.'/'.$page;
                 }

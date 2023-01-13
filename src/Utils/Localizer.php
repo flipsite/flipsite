@@ -31,6 +31,14 @@ final class Localizer
         return $data;
     }
 
+    public function expand(string|array $data): array
+    {
+        if (is_array($data)) {
+            return $data;
+        }
+        return [(string) $this->languages[0] => $data];
+    }
+
     private function isLoc(array $data) : bool
     {
         $keys = array_keys($data);

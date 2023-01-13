@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\AbstractEnviroment;
@@ -55,7 +54,7 @@ final class Reader
             $this->languages[] = new Language($language);
         }
         $this->localizer = new Localizer($this->languages);
-        $this->slugs = new Slugs(
+        $this->slugs     = new Slugs(
             array_keys($this->data['pages']),
             $this->data['slugs'] ?? null,
             $this->getDefaultLanguage(),
@@ -205,14 +204,15 @@ final class Reader
         }
 
         if (isset($this->data['meta'][$page])) {
-            $pageMeta = $this->data['meta'][$page];
+            $pageMeta = $this->get('meta.'.$page, $language);
             if (isset($pageMeta['title'])) {
                 $meta['title'] = $pageMeta['title'].' - '.$meta['title'];
             }
             unset($pageMeta['_name'],$pageMeta['title']);
+
             $meta = ArrayHelper::merge($meta, $pageMeta);
         } elseif ('home' !== $page) {
-            $p = explode('/', $page);
+            $p     = explode('/', $page);
             $title = [];
             while (count($p) > 0) {
                 $page  = implode('/', $p);
@@ -223,7 +223,7 @@ final class Reader
                 }
                 array_pop($p);
             }
-            $title[] = $meta['title'];
+            $title[]       = $meta['title'];
             $meta['title'] = implode(' - ', $title);
         }
 
