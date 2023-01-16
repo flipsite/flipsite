@@ -10,7 +10,7 @@ use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
 use Flipsite\Data\Reader;
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\CanIUse;
@@ -25,17 +25,17 @@ class ComponentBuilder
     private array $theme                    = [];
     private array $localization             = [];
 
-    public function __construct(private Request $request, private Enviroment $enviroment, private Reader $reader, private Path $path, private CanIUse $canIUse)
+    public function __construct(private Request $request, private Environment $environment, private Reader $reader, private Path $path, private CanIUse $canIUse)
     {
         $this->imageHandler = new ImageHandler(
-            $enviroment->getAssetSources(),
-            $enviroment->getImgDir(),
-            $enviroment->getImgBasePath(),
+            $environment->getAssetSources(),
+            $environment->getImgDir(),
+            $environment->getImgBasePath(),
         );
         $this->videoHandler = new VideoHandler(
-            $enviroment->getSiteDir().'/assets',
-            $enviroment->getVideoDir(),
-            $enviroment->getVideoBasePath(),
+            $environment->getSiteDir().'/assets',
+            $environment->getVideoDir(),
+            $environment->getVideoBasePath(),
         );
         $this->theme = $reader->get('theme') ?? [];
     }
@@ -121,8 +121,8 @@ class ComponentBuilder
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);
                 }
-                if (method_exists($component, 'addEnviroment')) {
-                    $component->addEnviroment($this->enviroment);
+                if (method_exists($component, 'addEnvironment')) {
+                    $component->addEnvironment($this->environment);
                 }
                 if (method_exists($component, 'addImageHandler')) {
                     $component->addImageHandler($this->imageHandler);
@@ -204,13 +204,13 @@ class ComponentBuilder
     private function handleScripts(array $scripts)
     {
         foreach ($scripts['global'] ?? [] as $id => $script) {
-            $filepath = $this->enviroment->getSiteDir().'/'.$script;
+            $filepath = $this->environment->getSiteDir().'/'.$script;
             if (file_exists($filepath)) {
                 $this->dispatch(new Event('global-script', $id, file_get_contents($filepath)));
             }
         }
         foreach ($scripts['ready'] ?? [] as $id => $script) {
-            $filepath = $this->enviroment->getSiteDir().'/'.$script;
+            $filepath = $this->environment->getSiteDir().'/'.$script;
             if (file_exists($filepath)) {
                 $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
             }

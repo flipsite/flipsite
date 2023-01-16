@@ -1,17 +1,16 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 
-trait EnviromentTrait
+trait EnvironmentTrait
 {
-    protected Enviroment $enviroment;
+    protected Environment $environment;
 
-    public function addEnviroment(Enviroment $enviroment) : void
+    public function addEnvironment(Environment $environment) : void
     {
-        $this->enviroment = $enviroment;
+        $this->environment = $environment;
     }
 }

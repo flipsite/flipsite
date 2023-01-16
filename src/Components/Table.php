@@ -8,7 +8,7 @@ use League\Csv\Reader;
 final class Table extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\EnviromentTrait;
+    use Traits\EnvironmentTrait;
     use Traits\NthTrait;
     protected string $tag = 'table';
 
@@ -18,7 +18,7 @@ final class Table extends AbstractComponent
             $data = ['import' => $data];
         }
         if (isset($data['import'])) {
-            $filename = $this->enviroment->getSiteDir().'/'.$data['import'];
+            $filename = $this->environment->getSiteDir().'/'.$data['import'];
             unset($data['import']);
             if (file_exists($filename)) {
                 $csv = Reader::createFromPath($filename, 'r');

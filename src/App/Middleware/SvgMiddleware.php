@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\App\Middleware;
 
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 use Flipsite\Utils\SvgData;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -12,7 +12,7 @@ use Slim\Psr7\Factory\StreamFactory;
 
 class SvgMiddleware implements MiddlewareInterface
 {
-    public function __construct(private Enviroment $enviroment)
+    public function __construct(private Environment $environment)
     {
     }
 
@@ -21,7 +21,7 @@ class SvgMiddleware implements MiddlewareInterface
         $response = $handler->handle($request);
         $html     = (string) $response->getBody();
         $html     = str_replace("<svg></svg>\n", "<dummysvg></dummysvg>\n", $html);
-        $oneline = str_replace("\n", "", $html);
+        $oneline  = str_replace("\n", '', $html);
         $oneline  = preg_replace('/\s\s+/', ' ', $oneline);
         preg_match_all('/<svg(.|\n)*?src="(.*?)" xmlns(.|\n)*?<\/svg>/', $oneline, $matches);
 
@@ -33,7 +33,7 @@ class SvgMiddleware implements MiddlewareInterface
             $svgs = [];
             foreach ($matches[2] as $i => $src) {
                 if (!isset($svgs[$src])) {
-                    $file = $this->enviroment->getAssetSources()->getFilename($src);
+                    $file = $this->environment->getAssetSources()->getFilename($src);
                     if (null !== $file) {
                         $svgData    = new SvgData($file);
                         $svgs[$src] = [

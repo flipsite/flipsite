@@ -1,14 +1,13 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
 use Flipsite\Components\Script;
 
-class AnalyticsBuilder implements BuilderInterface
+class IntegrationsBuilder implements BuilderInterface
 {
     private ?string $gtm        = null;
     private ?string $ga         = null;
@@ -29,12 +28,13 @@ class AnalyticsBuilder implements BuilderInterface
 
     public function getDocument(Document $document): Document
     {
-        // Google
-        if ($this->isLive && $this->gtm) {
+        // Google Tag Manager
+        if ($this->gtm) {
             $jsCode = file_get_contents(__DIR__.'/googleTagManager.js');
             $jsCode = str_replace('GTM-XXXX', $this->gtm, $jsCode);
             $script = new Script();
             $script->setContent($jsCode);
+            $script->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->prependChild($script);
 
             $noscript = new Element('noscript');
@@ -44,15 +44,19 @@ class AnalyticsBuilder implements BuilderInterface
             $iframe->setAttribute('width', '0');
             $iframe->setAttribute('style', 'display:none;visibility:hidden');
             $noscript->addChild($iframe);
+            $noscript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('body')->prependChild($noscript);
         }
 
-        if ($this->isLive && $this->ga) {
+        // Google Analytics
+        if ($this->ga) {
             $script = new Element('script', true);
             $script->setAttribute('async', true);
             $script->setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id='.$this->ga);
+            $script->commentOut(!$this->isLive, 'Not live environment');
             $jsCode       = file_get_contents(__DIR__.'/googleAnalytics.js');
             $jsCode       = str_replace('UA-XXXX-1', $this->ga, $jsCode);
+            $jsCode->commentOut(!$this->isLive, 'Not live environment');
             $inlineScript = new Script();
             $inlineScript->setContent($jsCode);
             if (str_starts_with($this->ga, 'UA-')) {
@@ -62,27 +66,21 @@ class AnalyticsBuilder implements BuilderInterface
                 $document->getChild('head')->prependChild($inlineScript);
                 $document->getChild('head')->prependChild($script);
             }
-        } elseif ($this->ga) {
-            $script = new Script();
-            $script->setContent('function gtag(a,b,c){console.log(b,c)}');
-            $document->getChild('body')->addChild($script);
         }
 
-        // Meta
-        if ($this->isLive && $this->metaPixel) {
+        // Meta Pixel
+        if ($this->metaPixel) {
             $jsCode       = file_get_contents(__DIR__.'/metaPixel.js');
             $jsCode       = str_replace('XXXX', $this->metaPixel, $jsCode);
             $inlineScript = new Script();
             $inlineScript->setContent($jsCode);
+            $inlineScript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->addChild($inlineScript);
             $noScript = new Script();
             $noScript->setTag('noscript');
             $noScript->setContent('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='.$this->metaPixel.'&ev=PageView&noscript=1"/>');
+            $noScript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->addChild($noScript);
-        } elseif ($this->metaPixel) {
-            $script = new Script();
-            $script->setContent('function fbq(a,b,c){console.log(a,b,c)}');
-            $document->getChild('body')->addChild($script);
         }
 
         return $document;

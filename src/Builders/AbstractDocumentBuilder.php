@@ -7,22 +7,22 @@ use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
 use Flipsite\Data\Reader;
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 use Flipsite\Utils\Language;
 use Flipsite\Utils\Path;
 
 abstract class AbstractDocumentBuilder
 {
     protected Document $document;
-    protected Enviroment $enviroment;
+    protected Environment $environment;
     protected Reader $reader;
     protected Path $path;
 
-    public function __construct(Enviroment $enviroment, Reader $reader, Path $path)
+    public function __construct(Environment $environment, Reader $reader, Path $path)
     {
-        $this->enviroment = $enviroment;
-        $this->reader     = $reader;
-        $this->path       = $path;
+        $this->environment = $environment;
+        $this->reader      = $reader;
+        $this->path        = $path;
         $this->reset($path->getLanguage());
     }
 

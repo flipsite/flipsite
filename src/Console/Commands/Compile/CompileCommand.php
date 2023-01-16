@@ -32,16 +32,16 @@ final class CompileCommand extends Command
         putenv('APP_SERVER=');
         putenv('APP_ENV=live');
 
-        $enviroment = new \Flipsite\Enviroment();
-        $plugins    = new \Flipsite\Utils\Plugins([]);
-        $reader     = new \Flipsite\Data\Reader($enviroment, $plugins);
-        $slugs      = $reader->getSlugs();
-        $allPages   = array_keys($slugs->getAll());
+        $environment = new \Flipsite\Environment();
+        $plugins     = new \Flipsite\Utils\Plugins([]);
+        $reader      = new \Flipsite\Data\Reader($environment, $plugins);
+        $slugs       = $reader->getSlugs();
+        $allPages    = array_keys($slugs->getAll());
 
         $options   = $reader->get('static');
         $targetDir = $options['target'] ?? 'static';
         if (!str_starts_with($targetDir, '/')) {
-            $targetDir = $enviroment->getSiteDir().'/'.$targetDir;
+            $targetDir = $environment->getSiteDir().'/'.$targetDir;
         }
         if (!is_dir($targetDir)) {
             mkdir($targetDir);

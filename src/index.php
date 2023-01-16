@@ -10,16 +10,14 @@ use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
-use Flipsite\Builders\AnalyticsBuilder;
+use Flipsite\Builders\IntegrationsBuilder;
 use Flipsite\Builders\ComponentBuilder;
-use Flipsite\Builders\CustomBuilder;
 use Flipsite\Builders\DocumentBuilder;
 use Flipsite\Builders\FaviconBuilder;
 use Flipsite\Builders\FontBuilder;
 use Flipsite\Builders\MetaBuilder;
 use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\PreloadBuilder;
-use Flipsite\Builders\SectionBuilder;
 use Flipsite\Components\ComponentFactory;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\Robots;
@@ -43,10 +41,10 @@ if (!getenv('APP_BASEPATH')) {
 }
 
 $container = new Container();
-$container->add('enviroment', 'Flipsite\Enviroment', true);
+$container->add('environment', 'Flipsite\Environment', true);
 $container->add('caniuse', 'Flipsite\Utils\CanIUse', true);
 $container->add('plugins', 'Flipsite\Utils\Plugins', true)->addArgument($plugins ?? []);
-$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('enviroment')->addArgument('plugins');
+$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('environment')->addArgument('plugins');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
@@ -56,40 +54,40 @@ $app->setBasePath(getenv('APP_BASEPATH'));
 $cssMw         = new CssMiddleware($container->get('reader')->get('theme'), $container->get('caniuse'));
 $diagnosticsMw = new DiagnosticsMiddleware();
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
-$offlineMw     = new OfflineMiddleware($container->get('enviroment'), $container->get('reader'));
-$svgMw         = new SvgMiddleware($container->get('enviroment'));
+$offlineMw     = new OfflineMiddleware($container->get('environment'), $container->get('reader'));
+$svgMw         = new SvgMiddleware($container->get('environment'));
 
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
-    $enviroment = $this->get('enviroment');
-    $handler    = new ImageHandler(
-        $enviroment->getAssetSources(),
-        $enviroment->getImgDir(),
-        $enviroment->getImgBasePath(),
+    $environment = $this->get('environment');
+    $handler     = new ImageHandler(
+        $environment->getAssetSources(),
+        $environment->getImgDir(),
+        $environment->getImgBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
 
 $app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
-    $enviroment = $this->get('enviroment');
-    $handler    = new VideoHandler(
-        $enviroment->getSiteDir().'/assets',
-        $enviroment->getVideoDir(),
-        $enviroment->getVideoBasePath(),
+    $environment = $this->get('environment');
+    $handler     = new VideoHandler(
+        $environment->getSiteDir().'/assets',
+        $environment->getVideoDir(),
+        $environment->getVideoBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
 
 $app->get('/sitemap.xml', function (Request $request, Response $response) {
-    $enviroment = $this->get('enviroment');
-    $reader     = $this->get('reader');
-    $sitemap    = new Sitemap($enviroment->getServer(), $reader->getSlugs());
+    $environment = $this->get('environment');
+    $reader      = $this->get('reader');
+    $sitemap     = new Sitemap($environment->getServer(), $reader->getSlugs());
     $response->getBody()->write((string) $sitemap);
     return $response->withHeader('Content-type', 'application/xml');
 });
 
 $app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
-    $enviroment = $this->get('enviroment');
-    $js         = file_get_contents(__DIR__.'/../js/sw.js');
+    $environment = $this->get('environment');
+    $js          = file_get_contents(__DIR__.'/../js/sw.js');
     if (preg_match('/[abcdef0-9]{6}/', $args['version'])) {
         $js = str_replace('const OFFLINE_VERSION=1', 'const OFFLINE_VERSION="'.$args['version'].'"', $js);
     }
@@ -98,18 +96,18 @@ $app->get('/sw.{version}.js', function (Request $request, Response $response, $a
 })->add($expiresMw);
 
 $app->get('/robots.txt', function (Request $request, Response $response) {
-    $enviroment = $this->get('enviroment');
-    $robots     = new Robots($enviroment->isLive(), $enviroment->getServer());
+    $environment = $this->get('environment');
+    $robots      = new Robots($environment->isLive(), $environment->getServer());
     $response->getBody()->write((string) $robots);
     return $response->withHeader('Content-type', 'text/plain');
 });
 
 $app->get('/manifest.json', function (Request $request, Response $response) {
-    $enviroment   = $this->get('enviroment');
-    $imageHandler = new ImageHandler(
-        $enviroment->getAssetSources(),
-        $enviroment->getImgDir(),
-        $enviroment->getImgBasePath(),
+    $environment   = $this->get('environment');
+    $imageHandler  = new ImageHandler(
+        $environment->getAssetSources(),
+        $environment->getImgDir(),
+        $environment->getImgBasePath(),
     );
 
     $toHex   = function (string $color): string {
@@ -136,19 +134,19 @@ $app->get('/manifest.json', function (Request $request, Response $response) {
     $manifest['scope']            = '/';
     $manifest['theme_color']      = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
 
-    // $enviroment = $this->get('enviroment');
+    // $environment = $this->get('environment');
     // $reader = $this->get('reader');
-    // $sitemap = new Sitemap($enviroment->getServer(), $reader->getSlugs());
+    // $sitemap = new Sitemap($environment->getServer(), $reader->getSlugs());
     $response->getBody()->write(json_encode($manifest));
     return $response->withHeader('Content-type', 'application/json');
 });
 
 $app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
-    $enviroment = $this->get('enviroment');
-    $filepath   = $enviroment->getSiteDir().'/files/'.$args['file'];
+    $environment = $this->get('environment');
+    $filepath    = $environment->getSiteDir().'/files/'.$args['file'];
     if (!file_exists($filepath)) {
         $response = $response->withStatus(302);
-        $redirect = trim($enviroment->getServer());
+        $redirect = trim($environment->getServer());
         return $response->withHeader('Location', urlencode($redirect));
     }
 
@@ -180,31 +178,31 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     );
 
     // Check if the requested path needs to redirect
-    $redirect   = $path->getRedirect();
-    $enviroment = $this->get('enviroment');
+    $redirect    = $path->getRedirect();
+    $environment = $this->get('environment');
     if (null !== $redirect) {
         // Check if internal url
         $parsedUrl = parse_url($redirect);
         if (!isset($parsedUrl['scheme'])) {
-            $redirect = trim($enviroment->getServer() . '/' . urlencode($redirect), '/');
+            $redirect = trim($environment->getServer() . '/' . urlencode($redirect), '/');
         }
         return $response->withStatus(302)->withHeader('Location', $redirect);
     }
 
-    $documentBuilder  = new DocumentBuilder($enviroment, $reader, $path);
-    $componentBuilder = new ComponentBuilder($request, $enviroment, $reader, $path, $this->get('caniuse'));
+    $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
+    $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path, $this->get('caniuse'));
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());
     }
 
-    $metaBuilder = new MetaBuilder($enviroment, $reader, $path);
+    $metaBuilder = new MetaBuilder($environment, $reader, $path);
 
-    $faviconBuilder = new FaviconBuilder($enviroment, $reader);
+    $faviconBuilder = new FaviconBuilder($environment, $reader);
 
     $scriptBuilder = new ScriptBuilder(
         $reader->getHash(),
-        $enviroment->getBasePath(),
+        $environment->getBasePath(),
         (bool)$reader->get('offline')
     );
     $componentBuilder->addListener($scriptBuilder);
@@ -216,7 +214,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     foreach ($reader->getSections($page, $path->getLanguage()) as $sectionId => $sectionData) {
         $sectionData = $plugins->run('section', $sectionData);
-        $section = $componentBuilder->build('group', $sectionData, [], $reader->get('theme.appearance') ?? 'light');
+        $section     = $componentBuilder->build('group', $sectionData, [], $reader->get('theme.appearance') ?? 'light');
         $documentBuilder->addSection($section);
     }
 
@@ -249,7 +247,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
         if ($reader->get('offline')) {
             $manifestLink = new \Flipsite\Components\Element('link', true, true);
             $manifestLink->setAttribute('rel', 'manifest');
-            $baseUrl = $enviroment->getBasePath();
+            $baseUrl = $environment->getBasePath();
             $manifestLink->setAttribute('href', $baseUrl.'/manifest.json');
             $document->getChild('head')->addChild($manifestLink);
         }
@@ -273,16 +271,16 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     // Add Analytics
     $integrations = $reader->get('integrations');
     if (null !== $integrations) {
-        $analyticsBuilder = new AnalyticsBuilder($enviroment->isLive(), $integrations);
+        $analyticsBuilder = new IntegrationsBuilder($environment->isLive(), $integrations);
         $document         = $analyticsBuilder->getDocument($document);
     }
-    $document->getChild('head')->addChild(new Flipsite\Components\Custom('<style></style>'));
+    $document->getChild('head')->addChild(new Flipsite\Components\CustomCode('<style></style>'));
 
     // Custom HTML
-    $customFile = $enviroment->getSiteDir().'/custom.html';
+    $customCodeFile = $environment->getSiteDir().'/custom.html';
     if (file_exists($customFile)) {
-        $customBuilder = new CustomBuilder($page, $customFile);
-        $document      = $customBuilder->getDocument($document);
+        $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile);
+        $document          = $customCodeBuilder->getDocument($document);
     }
 
     // If any plugins

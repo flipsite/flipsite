@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Flipsite;
 
 use Flipsite\Assets\Sources\AssetSources;
-use Flipsite\Exceptions\EnviromentException;
 
-abstract class AbstractEnviroment 
+abstract class AbstractEnvironment
 {
     protected bool $live;
     protected string $siteDir;
@@ -14,7 +13,7 @@ abstract class AbstractEnviroment
     protected string $imgDir;
     protected string $basePath;
     protected string $server;
-    protected array $externalAssetDirs = [];
+    protected array $externalAssetDirs    = [];
     protected ?AssetSources $imageSources = null;
     protected ?AssetSources $videoSources = null;
 

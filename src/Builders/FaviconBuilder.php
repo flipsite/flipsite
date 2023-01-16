@@ -7,22 +7,22 @@ use Flipsite\Assets\ImageHandler;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
 use Flipsite\Data\Reader;
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 
 class FaviconBuilder implements BuilderInterface
 {
-    private Enviroment $enviroment;
+    private Environment $environment;
     private Reader $reader;
     private ImageHandler $imageHandler;
 
-    public function __construct(Enviroment $enviroment, Reader $reader)
+    public function __construct(Environment $environment, Reader $reader)
     {
-        $this->enviroment   = $enviroment;
-        $this->reader       = $reader;
-        $this->imageHandler = new ImageHandler(
-            $enviroment->getAssetSources(),
-            $enviroment->getImgDir(),
-            $enviroment->getImgBasePath(),
+        $this->environment   = $environment;
+        $this->reader        = $reader;
+        $this->imageHandler  = new ImageHandler(
+            $environment->getAssetSources(),
+            $environment->getImgDir(),
+            $environment->getImgBasePath(),
         );
     }
 

@@ -9,7 +9,7 @@ use Flipsite\Utils\StyleAppearanceHelper;
 final class Md extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\EnviromentTrait;
+    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     protected string $type = 'div';
 
@@ -18,7 +18,7 @@ final class Md extends AbstractComponent
     public function build(array $data, array $style, string $appearance) : void
     {
         if (mb_strpos($data['value'], '.md')) {
-            $filename = $this->enviroment->getSiteDir().'/'.$data['value'];
+            $filename = $this->environment->getSiteDir().'/'.$data['value'];
             if (file_exists($filename)) {
                 $markdown = file_get_contents($filename);
             }

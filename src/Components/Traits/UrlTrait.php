@@ -7,7 +7,7 @@ trait UrlTrait
 {
     use SlugsTrait;
     use PathTrait;
-    use EnviromentTrait;
+    use EnvironmentTrait;
     use ReaderTrait;
 
     private function url(?string $url, bool &$external) : ?string
@@ -21,8 +21,8 @@ trait UrlTrait
             return '#';
         }
 
-        if (str_starts_with($url, 'files/') && file_exists($this->enviroment->getSiteDir().'/'.$url)) {
-            $basePath = $this->enviroment->getBasePath();
+        if (str_starts_with($url, 'files/') && file_exists($this->environment->getSiteDir().'/'.$url)) {
+            $basePath = $this->environment->getBasePath();
             return $basePath.'/'.$url;
         }
         $redirects = $this->reader->getRedirects();
@@ -60,7 +60,7 @@ trait UrlTrait
         }
 
         // Add base path
-        $basePath = $this->enviroment->getBasePath();
+        $basePath = $this->environment->getBasePath();
         if (mb_strlen($basePath)) {
             $parsed['path'] = rtrim($basePath.$parsed['path'], '/');
         }

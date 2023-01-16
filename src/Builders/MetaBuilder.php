@@ -1,16 +1,14 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Components\Event;
 use Flipsite\Data\Reader;
-use Flipsite\Enviroment;
+use Flipsite\Environment;
 use Flipsite\Utils\Path;
 
 class MetaBuilder implements BuilderInterface
@@ -18,19 +16,19 @@ class MetaBuilder implements BuilderInterface
     private ImageHandler $imageHandler;
     private string $h1 = '404';
 
-    public function __construct(private Enviroment $enviroment, private Reader $reader, private Path $path)
+    public function __construct(private Environment $environment, private Reader $reader, private Path $path)
     {
         $this->imageHandler = new ImageHandler(
-            $enviroment->getAssetSources(),
-            $enviroment->getImgDir(),
-            $enviroment->getImgBasePath(),
+            $environment->getAssetSources(),
+            $environment->getImgDir(),
+            $environment->getImgBasePath(),
         );
     }
 
     public function getDocument(Document $document): Document
     {
         $elements = [];
-        $server   = $this->enviroment->getServer(true);
+        $server   = $this->environment->getServer(true);
         $language = $this->path->getLanguage();
         $page     = $this->path->getPage();
         $slug     = $this->reader->getSlugs()->getSlug($page, $language);
@@ -50,7 +48,7 @@ class MetaBuilder implements BuilderInterface
         }
 
         $name  = $this->reader->get('name', $language);
-        $meta = $this->reader->getMeta($this->path->getPage(), $language);
+        $meta  = $this->reader->getMeta($this->path->getPage(), $language);
 
         $title = $meta['title'];
 
@@ -69,7 +67,7 @@ class MetaBuilder implements BuilderInterface
 
         if ($meta['share']) {
             $image      = $this->imageHandler->getContext($meta['share'], ['width' => 1200, 'height' => 630]);
-            $elements[] = $this->og('og:image', $this->enviroment->getServer(false) . $image->getSrc());
+            $elements[] = $this->og('og:image', $this->environment->getServer(false) . $image->getSrc());
         }
 
         $elements[] = $this->og('og:url', trim($server . $page, '/'));
