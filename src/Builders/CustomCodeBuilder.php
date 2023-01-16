@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
-use Flipsite\Components\Custom;
+use Flipsite\Components\CustomCode;
 use Flipsite\Utils\CustomHtmlParser;
 
 class CustomCodeBuilder implements BuilderInterface
@@ -21,25 +21,25 @@ class CustomCodeBuilder implements BuilderInterface
     {
         $headStart = $this->parser->get('headStart', $this->page);
         if ($headStart) {
-            $custom = new Custom($headStart);
+            $custom = new CustomCode($headStart);
             $document->getChild('head')->prependChild($custom);
         }
 
         $headEnd = $this->parser->get('headEnd', $this->page);
         if ($headEnd) {
-            $custom = new Custom($headEnd);
+            $custom = new CustomCode($headEnd);
             $document->getChild('head')->addChild($custom);
         }
 
         $bodyStart = $this->parser->get('bodyStart', $this->page);
         if ($bodyStart) {
-            $custom = new Custom();
+            $custom = new CustomCode($bodyStart);
             $document->getChild('body')->prependChild($custom);
         }
 
         $bodyEnd = $this->parser->get('bodyEnd', $this->page);
         if ($bodyEnd) {
-            $custom = new Custom($bodyEnd);
+            $custom = new CustomCode($bodyEnd);
             $document->getChild('body')->addChild($custom);
         }
         return $document;

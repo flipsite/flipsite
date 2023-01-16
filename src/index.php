@@ -10,6 +10,7 @@ use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
+use Flipsite\Builders\CustomCodeBuilder;
 use Flipsite\Builders\IntegrationsBuilder;
 use Flipsite\Builders\ComponentBuilder;
 use Flipsite\Builders\DocumentBuilder;
@@ -278,7 +279,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
 
     // Custom HTML
     $customCodeFile = $environment->getSiteDir().'/custom.html';
-    if (file_exists($customFile)) {
+    if (file_exists($customCodeFile)) {
         $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile);
         $document          = $customCodeBuilder->getDocument($document);
     }

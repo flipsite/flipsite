@@ -16,6 +16,7 @@ abstract class AbstractElement
     protected array $style      = [];
     protected bool $render      = true;
     private ?string $cache      = null;
+    private ?string $commentOut = null;
 
     public function addStyle(null|array|string $style) : self
     {
@@ -30,6 +31,10 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function commentOut(bool $commentOut, string $comment) 
+    {
+        $this->commentOut = $commentOut ? $comment : null;
+    }
     public function getTag() : string
     {
         return $this->tag;
@@ -179,6 +184,10 @@ abstract class AbstractElement
             $html .= $i.'</'.$this->tag.'>'."\n";
         } else {
             $html .= '</'.$this->tag.'>'."\n";
+        }
+        
+        if ($this->commentOut) {
+            $html = $i.'<!-- '.$this->commentOut."\n".$html.$i.'--!>'."\n";
         }
         return $this->cache = $html;
     }

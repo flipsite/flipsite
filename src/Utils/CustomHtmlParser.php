@@ -38,6 +38,6 @@ class CustomHtmlParser
 
     public function get(string $pos, string $page, bool $fallback = true): ?string
     {
-        return $this->code[$pos][$page] ?? ($fallback ? $this->code['_site'] ?? null : null);
+        return $this->code[$pos][$page] ?? ($fallback ? $this->code[$pos]['_site'] ?? null : null);
     }
 }

@@ -56,9 +56,9 @@ class IntegrationsBuilder implements BuilderInterface
             $script->commentOut(!$this->isLive, 'Not live environment');
             $jsCode       = file_get_contents(__DIR__.'/googleAnalytics.js');
             $jsCode       = str_replace('UA-XXXX-1', $this->ga, $jsCode);
-            $jsCode->commentOut(!$this->isLive, 'Not live environment');
             $inlineScript = new Script();
             $inlineScript->setContent($jsCode);
+            $inlineScript->commentOut(!$this->isLive, 'Not live environment');
             if (str_starts_with($this->ga, 'UA-')) {
                 $document->getChild('body')->addChild($script);
                 $document->getChild('body')->addChild($inlineScript);
