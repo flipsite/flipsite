@@ -40,4 +40,20 @@ class CustomHtmlParser
     {
         return $this->code[$pos][$page] ?? ($fallback ? $this->code[$pos]['_site'] ?? null : null);
     }
+
+    public function getAll(string $page) : array
+    {
+        $list = [];
+        foreach ($this->code as $pos => $pages) {
+            foreach ($pages as $page_ => $code) {
+                if ($page_ === $page) {
+                    $list[] = [
+                        'position' => $pos,
+                        'code' => $code
+                    ];
+                }
+            }
+        }
+        return $list;
+    }
 }
