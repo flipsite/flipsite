@@ -34,8 +34,11 @@ final class Reader
 
     private string $hash = '';
 
-    public function __construct(private AbstractEnvironment $environment, private Plugins $plugins)
+    public function __construct(private AbstractEnvironment $environment, private ?Plugins $plugins = null)
     {
+        if (null === $plugins) {
+            $this->plugins = new Plugins([]);
+        }
         $siteDir          = $this->environment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
