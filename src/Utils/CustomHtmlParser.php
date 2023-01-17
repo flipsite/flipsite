@@ -56,4 +56,28 @@ class CustomHtmlParser
         }
         return $list;
     }
+
+    public function set(string $pos, string $page, ?string $code) {
+        if (null === $code ||!trim($code)) {
+            unset($this->code[$pos][$page]);
+        } else {
+            $this->code[$pos][$page] = trim($code);
+        }
+    }
+    public function getHtml() : string {
+        $htmlBlocks = [];
+        foreach ($this->code as $pos => $pages) {
+            foreach ($pages as $page => $code) {
+                $html = '<!-- '.$pos;
+                if ('_site' !== $page) {
+                    $html.= ' | '.$page;
+                }
+                $html.= " -->\n";
+                $html.= trim($code);
+                $htmlBlocks[] = $html;
+            }
+        }
+        $html = implode("\n<!-- --- -->\n\n", $htmlBlocks);
+        return $html;
+    }
 }
