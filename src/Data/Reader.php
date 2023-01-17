@@ -34,6 +34,8 @@ final class Reader
 
     private string $hash = '';
 
+    private Localizer $localizer;
+
     public function __construct(private AbstractEnvironment $environment, private ?Plugins $plugins = null)
     {
         if (null === $plugins) {
