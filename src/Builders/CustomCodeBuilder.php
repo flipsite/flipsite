@@ -19,25 +19,25 @@ class CustomCodeBuilder implements BuilderInterface
 
     public function getDocument(Document $document): Document
     {
-        $headStart = $this->parser->get('headStart', $this->page);
+        $headStart = $this->parser->get('headStart', $this->page, true);
         if ($headStart) {
             $custom = new CustomCode($headStart);
             $document->getChild('head')->prependChild($custom);
         }
 
-        $headEnd = $this->parser->get('headEnd', $this->page);
+        $headEnd = $this->parser->get('headEnd', $this->page, true);
         if ($headEnd) {
             $custom = new CustomCode($headEnd);
             $document->getChild('head')->addChild($custom);
         }
 
-        $bodyStart = $this->parser->get('bodyStart', $this->page);
+        $bodyStart = $this->parser->get('bodyStart', $this->page, true);
         if ($bodyStart) {
             $custom = new CustomCode($bodyStart);
             $document->getChild('body')->prependChild($custom);
         }
 
-        $bodyEnd = $this->parser->get('bodyEnd', $this->page);
+        $bodyEnd = $this->parser->get('bodyEnd', $this->page, true);
         if ($bodyEnd) {
             $custom = new CustomCode($bodyEnd);
             $document->getChild('body')->addChild($custom);
