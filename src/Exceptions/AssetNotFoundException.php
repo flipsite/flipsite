@@ -8,9 +8,9 @@ use Exception;
 
 final class AssetNotFoundException extends Exception
 {
-    public function __construct(string $asset, string $filename)
+    public function __construct(string $asset)
     {
-        $msg = 'Asset `'.$asset.'` not found folder `'.str_replace('/'.$asset, '', $filename).'`';
+        $msg = 'Asset `'.$asset.'` not found';
         parent::__construct($msg);
     }
 }

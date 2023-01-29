@@ -6,10 +6,6 @@ namespace Flipsite\Assets\Sources;
 
 final class AssetSources
 {
-    /**
-     * @var array<AbstractAssetSource>
-     */
-    private array $sources = [];
     private array $videoFormats = ['ogg','webm','mp4'];
 
     public function __construct(private string $vendorDir, private array $assetDirs = [])
@@ -17,7 +13,7 @@ final class AssetSources
         $this->assetDirs[] = $this->vendorDir.'/flipsite/flipsite/assets';
     }
 
-    public function getFilename(string $src) : ?string
+    public function getFilename(string $src): ?string
     {
         foreach ($this->assetDirs as $assetDir) {
             if (file_exists($assetDir.'/'.$src)) {
@@ -33,26 +29,6 @@ final class AssetSources
                 }
             }
         }
-
-        $parts = explode('/', $src);
-        $type  = $parts[0];
-        $asset = str_replace($type.'/', '', $src);
-        if (isset($this->sources[$type])) {
-            return $this->sources[$type]->resolve($asset);
-        }
-
-        $class = str_replace(' ', '', ucwords(str_replace('-', ' ', ucfirst($type))));
-        $class = 'Flipsite\Icons\\'.$class;
-        if (class_exists($class)) {
-            $source = new $class($this->vendorDir, $type);
-            $source->isInstalled(); //throws exception if not installed
-            $this->sources[$type] = $source;
-            $filename             = $this->sources[$type]->resolve($asset);
-            if (!file_exists($filename)) {
-                throw new \Flipsite\Exceptions\AssetNotFoundException($asset, $filename);
-            }
-            return $filename;
-        }
-        throw new \Flipsite\Exceptions\AssetNotFoundException($asset, $src);
+        throw new \Flipsite\Exceptions\AssetNotFoundException($src);
     }
 }
