@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 final class Items extends AbstractItems
 {
     public function normalize(string|int|bool|array $data): array
