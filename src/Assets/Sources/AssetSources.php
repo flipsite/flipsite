@@ -32,7 +32,7 @@ final class AssetSources
         }
         if ($runPlugins && $this->plugins->has('assetNotFound')) {
             $this->plugins->run('assetNotFound', $src);
-            $this->getFilename($src, false);
+            return $this->getFilename($src, false);
         }
         throw new \Flipsite\Exceptions\AssetNotFoundException($src);
     }
