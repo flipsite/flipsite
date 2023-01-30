@@ -7,7 +7,6 @@ final class Image extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\ImageHandlerTrait;
-    use Traits\CanIUseTrait;
 
     protected string $tag  = 'img';
     protected bool $empty  = true;
@@ -50,7 +49,7 @@ final class Image extends AbstractComponent
         } elseif ($this->isExternal($src)) {
             $this->setAttribute('src', $src);
         } else {
-            if (($options['webp'] ?? true) && $this->canIUse->webp()) {
+            if (($options['webp'] ?? true)) {
                 $src = str_replace('.jpg', '.webp', $src);
                 $src = str_replace('.png', '.webp', $src);
             }

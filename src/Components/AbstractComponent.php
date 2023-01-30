@@ -6,7 +6,6 @@ namespace Flipsite\Components;
 abstract class AbstractComponent extends AbstractElement
 {
     use Traits\ImageHandlerTrait;
-    use Traits\CanIUseTrait;
 
     abstract public function build(array $data, array $style, string $appearance) : void;
 
@@ -61,7 +60,7 @@ abstract class AbstractComponent extends AbstractElement
                 $imageContext = $this->imageHandler->getContext($src, []);
                 $target->setAttribute('style', 'background-image:'.$gradient.'url('.$imageContext->getSrc().');');
             } else {
-                if (($options['webp'] ?? true) && $this->canIUse->webp()) {
+                if (($options['webp'] ?? true)) {
                     $src = str_replace('.jpg', '.webp', $src);
                     $src = str_replace('.png', '.webp', $src);
                 }
