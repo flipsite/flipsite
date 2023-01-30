@@ -13,7 +13,6 @@ use Flipsite\Data\Reader;
 use Flipsite\Environment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
-use Flipsite\Utils\CanIUse;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class ComponentBuilder
@@ -25,7 +24,7 @@ class ComponentBuilder
     private array $theme                    = [];
     private array $localization             = [];
 
-    public function __construct(private Request $request, private Environment $environment, private Reader $reader, private Path $path, private CanIUse $canIUse)
+    public function __construct(private Request $request, private Environment $environment, private Reader $reader, private Path $path)
     {
         $this->imageHandler = new ImageHandler(
             $environment->getAssetSources(),
@@ -138,9 +137,6 @@ class ComponentBuilder
                 }
                 if (method_exists($component, 'addSlugs')) {
                     $component->addSlugs($this->reader->getSlugs());
-                }
-                if (method_exists($component, 'addCanIUse')) {
-                    $component->addCanIUse($this->canIUse);
                 }
                 if (method_exists($component, 'addRequest')) {
                     $component->addRequest($this->request);

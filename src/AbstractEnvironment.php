@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite;
 
 use Flipsite\Assets\Sources\AssetSources;
+use Flipsite\Utils\Plugins;
 
 abstract class AbstractEnvironment
 {
@@ -15,7 +16,15 @@ abstract class AbstractEnvironment
     protected string $server;
     protected array $externalAssetDirs    = [];
     protected ?AssetSources $imageSources = null;
-    protected ?AssetSources $videoSources = null;
+
+    public function __construct(protected Plugins $plugins)
+    {
+    }
+
+    public function getPlugins() : Plugins
+    {
+        return $this->plugins;
+    }
 
     public function getAssetSources() : AssetSources
     {
@@ -26,7 +35,8 @@ abstract class AbstractEnvironment
             }
             $this->imageSources = new AssetSources(
                 $this->getVendorDir(),
-                $assetDirs
+                $this->plugins,
+                $assetDirs,
             );
         }
         return $this->imageSources;

@@ -27,12 +27,12 @@ instagram:
 email:
   name: E-Mail
   color: "#1f96f0"
-  icon: zondicons/envelope
+  icon: zondicons/envelope.svg
   url: mailto:{handle}
 maps:
   name: Google Maps
   color: "#4285F4"
-  icon: zondicons/location
+  icon: zondicons/location.svg
   url: '{handle}'
 messenger:
   name: Messenger
@@ -42,7 +42,7 @@ messenger:
 phone:
   name: Phone
   color: "#5ec640"
-  icon: zondicons/phone
+  icon: zondicons/phone.svg
   url: tel:{handle}
 pinterest:
   name: Pinterest

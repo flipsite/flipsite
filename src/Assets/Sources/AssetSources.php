@@ -1,19 +1,20 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets\Sources;
+
+use Flipsite\Utils\Plugins;
 
 final class AssetSources
 {
-    private array $videoFormats = ['ogg','webm','mp4'];
+    private array $videoFormats = ['ogg', 'webm', 'mp4'];
 
-    public function __construct(private string $vendorDir, private array $assetDirs = [])
+    public function __construct(private string $vendorDir, private Plugins $plugins, private array $assetDirs = [])
     {
         $this->assetDirs[] = $this->vendorDir.'/flipsite/flipsite/assets';
     }
 
-    public function getFilename(string $src): ?string
+    public function getFilename(string $src, bool $runPlugins = true): ?string
     {
         foreach ($this->assetDirs as $assetDir) {
             if (file_exists($assetDir.'/'.$src)) {
@@ -28,6 +29,10 @@ final class AssetSources
                     }
                 }
             }
+        }
+        if ($runPlugins && $this->plugins->has('assetNotFound')) {
+            $this->plugins->run('assetNotFound', $src);
+            $this->getFilename($src, false);
         }
         throw new \Flipsite\Exceptions\AssetNotFoundException($src);
     }

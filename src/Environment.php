@@ -3,10 +3,14 @@
 declare(strict_types=1);
 namespace Flipsite;
 
+use Flipsite\Utils\Plugins;
+
 final class Environment extends AbstractEnvironment
 {
-    public function __construct()
+    public function __construct(Plugins $plugins)
     {
+        parent::__construct($plugins);
+
         $this->live = 'live' === getenv('APP_ENV');
 
         if (false === getenv('IMG_DIR')) {

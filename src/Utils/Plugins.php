@@ -9,6 +9,11 @@ final class Plugins
     {
     }
 
+    public function has(string $type): bool
+    {
+        return isset($this->callbacks[$type]);
+    }
+
     public function run(string $type, $args)
     {
         if (isset($this->callbacks[$type])) {

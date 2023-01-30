@@ -42,17 +42,16 @@ if (!getenv('APP_BASEPATH')) {
 }
 
 $container = new Container();
-$container->add('environment', 'Flipsite\Environment', true);
-$container->add('caniuse', 'Flipsite\Utils\CanIUse', true);
 $container->add('plugins', 'Flipsite\Utils\Plugins', true)->addArgument($plugins ?? []);
-$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('environment')->addArgument('plugins');
+$container->add('environment', 'Flipsite\Environment', true)->addArgument('plugins');
+$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('environment');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
-$cssMw         = new CssMiddleware($container->get('reader')->get('theme'), $container->get('caniuse'));
+$cssMw         = new CssMiddleware($container->get('reader')->get('theme'));
 $diagnosticsMw = new DiagnosticsMiddleware();
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
 $offlineMw     = new OfflineMiddleware($container->get('environment'), $container->get('reader'));
@@ -191,7 +190,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     }
 
     $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
-    $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path, $this->get('caniuse'));
+    $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path);
     $componentBuilder->addFactory(new ComponentFactory());
     foreach ($reader->getComponentFactories() as $class) {
         $componentBuilder->addFactory(new $class());

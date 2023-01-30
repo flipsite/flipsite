@@ -7,7 +7,6 @@ use Flipsite\AbstractEnvironment;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
-use Flipsite\Utils\Plugins;
 use Flipsite\Utils\YamlExpander;
 use Flipsite\Utils\Localizer;
 
@@ -36,12 +35,10 @@ final class Reader
 
     private Localizer $localizer;
 
-    public function __construct(private AbstractEnvironment $environment, private ?Plugins $plugins = null)
+    public function __construct(private AbstractEnvironment $environment)
     {
-        if (null === $plugins) {
-            $this->plugins = new Plugins([]);
-        }
-        $siteDir          = $this->environment->getSiteDir();
+        $this->plugins = $environment->getPlugins();
+        $siteDir       = $this->environment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
             $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
