@@ -10,9 +10,16 @@ final class Items extends AbstractItems
 {
     public function normalize(string|int|bool|array $data): array
     {
-        if (!ArrayHelper::isAssociative($data)) {
-            $data['items'] = $data;
+        if (isset($data['items'])) {
+            return $data;
         }
-        return $data;
+        $items = array_filter($data, function ($key) {
+            return is_numeric($key);
+        }, ARRAY_FILTER_USE_KEY);
+        $_ = array_filter($data, function ($key) {
+            return !is_numeric($key);
+        }, ARRAY_FILTER_USE_KEY);
+
+        return array_merge($_, ['items'=>$items]);
     }
 }
