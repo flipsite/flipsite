@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractItems extends AbstractComponent
@@ -9,7 +10,7 @@ abstract class AbstractItems extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         $itemStyle = $style['item'] ?? [];
         unset($style['item']);
