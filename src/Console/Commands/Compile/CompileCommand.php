@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Console\Commands\Compile;
 
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +18,7 @@ final class CompileCommand extends Command
      */
     protected static $defaultName = 'compile';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->setDescription('Compiles a static version of the site');
         // $this->addArgument('target', InputArgument::REQUIRED, 'Path to target folder');
@@ -32,9 +33,8 @@ final class CompileCommand extends Command
         putenv('APP_SERVER=');
         putenv('APP_ENV=live');
 
-        $environment = new \Flipsite\Environment();
-        $plugins     = new \Flipsite\Utils\Plugins([]);
-        $reader      = new \Flipsite\Data\Reader($environment, $plugins);
+        $environment = new \Flipsite\Environment(new \Flipsite\Utils\Plugins([]));
+        $reader      = new \Flipsite\Data\Reader($environment);
         $slugs       = $reader->getSlugs();
         $allPages    = array_keys($slugs->getAll());
 
@@ -95,7 +95,7 @@ final class CompileCommand extends Command
         return 0;
     }
 
-    private function deleteSite(string $targetDir) : void
+    private function deleteSite(string $targetDir): void
     {
         $filesystem = new Filesystem();
         $files      = $this->getDirContents($targetDir);
@@ -106,7 +106,7 @@ final class CompileCommand extends Command
         }
     }
 
-    private function deleteAssets(string $targetDir, array $assets) : array
+    private function deleteAssets(string $targetDir, array $assets): array
     {
         $notDeleted = [];
         $filesystem = new Filesystem();
@@ -146,7 +146,7 @@ final class CompileCommand extends Command
         return array_values(array_filter($notDeleted));
     }
 
-    private function getResponse(bool $https, string $domain, string $page) : string
+    private function getResponse(bool $https, string $domain, string $page): string
     {
         ob_start();
         $_SERVER['REQUEST_URI']    = str_replace('//', '/', '/'.$page);
@@ -167,7 +167,7 @@ final class CompileCommand extends Command
         return $html;
     }
 
-    private function writeFile(string $targetDir, string $page, string $html) : string
+    private function writeFile(string $targetDir, string $page, string $html): string
     {
         $filename = $targetDir.'/'.$page;
         $filename = str_replace('//', '/', $filename);
@@ -180,7 +180,7 @@ final class CompileCommand extends Command
         return '+ '.$filename;
     }
 
-    private function parseAssets(string $html) : array
+    private function parseAssets(string $html): array
     {
         $assets = [];
 
@@ -196,7 +196,11 @@ final class CompileCommand extends Command
 
         $imgTags = $doc->getElementsByTagName('img');
         foreach ($imgTags as $tag) {
-            $assets[] = $tag->getAttribute('src');
+            $src = $tag->getAttribute('src');
+            if (str_starts_with($src, 'data:')) {
+                continue;
+            }
+            $assets[] = $src;
             $tmp      = explode(', ', $tag->getAttribute('srcset'));
             foreach ($tmp as $t) {
                 $tmp2     = explode(' ', $t);
@@ -232,9 +236,10 @@ final class CompileCommand extends Command
         foreach ($linkTags as $tag) {
             if ('icon' === $tag->getAttribute('rel')) {
                 $url      = $tag->getAttribute('href');
-                $assets[] = $url;
             } elseif ('apple-touch-icon' === $tag->getAttribute('rel')) {
                 $url      = $tag->getAttribute('href');
+            }
+            if (!str_starts_with($url, 'data:')) {
                 $assets[] = $url;
             }
         }
