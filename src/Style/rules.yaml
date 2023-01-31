@@ -122,7 +122,7 @@ flex-col: flex-direction:column
 flex-grow-0: flex-grow:0
 flex-grow: flex-grow:1
 flex-initial: flex:0 1 auto
-flex-no-wrap: flex-wrap:nowrap
+flex-nowrap: flex-wrap:nowrap
 flex-none: flex:none
 flex-row-reverse: flex-direction:row-reverse
 flex-row: flex-direction:row
