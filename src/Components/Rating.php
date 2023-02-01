@@ -5,34 +5,31 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class Rating extends AbstractGroup
+final class Rating extends AbstractComponent
 {
     protected string $tag   = 'div';
+    use Traits\BuilderTrait;
 
     public function build(array $data, array $style, string $appearance): void
     {
         $starData = [];
         $this->addStyle($style);
-        for ($i=0; $i < 5; $i++) {
-            $starStyle = $style['icon'];
-            if ($data['value'] > $i && isset($style['active'])) {
-                $starStyle = ArrayHelper::merge($starStyle, $style['active']);
-            }
-            $starData['icon:'.$i] = [
-                'src'    => 'zondicons/star-full',
-                '_style' => $starStyle
-            ];
+        $children = [];
+        $itemStyle = $style['item'] ?? [];
+        $activeStyle = ArrayHelper::merge($itemStyle , $style['active'] ?? []);
+        for ($i=0; $i < $data['max']; $i++) {
+            $children[] = $this->builder->build('icon', ['value'=>$data['icon']], $data['value'] > $i ? $activeStyle : $itemStyle, $appearance);
         }
-        unset($style['icon'], $style['active']);
-
-        parent::build($starData, $style, $appearance);
+        $this->addChildren($children);
     }
 
     public function normalize(string|int|bool|array $data): array
     {
         if (!is_array($data)) {
-            return ['value' => (int)$data];
+            $data = ['value' => (int)$data];
         }
+        $data['max'] ??= 5;
+        $data['icon'] ??= 'zondicons/star-full.svg';
         return $data;
     }
 }

@@ -24,8 +24,8 @@ final class RasterContext extends AbstractImageContext
         $size                         = $this->getSize($options, $file->getFilename());
         $options['width']             = $size['width'];
         $options['height']            = $size['height'];
-        $this->width                  = $options['width'];
-        $this->height                 = $options['height'];
+        $this->width                  = intval($options['width']);
+        $this->height                 = intval($options['height']);
         unset($options['aspectRatio'], $options['srcset']);
         $this->options = new RasterOptions($options);
     }
