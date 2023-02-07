@@ -18,15 +18,16 @@ final class A extends AbstractGroup
             unset($data['url']);
         }
 
-        $href = null;
+        $href    = null;
         $replace = [];
         $data['attr'] ??= [];
+        unset($data['href']);
         switch ($data['action'] ?? []) {
             case 'page':
             case 'url':
             case 'url-blank':
                 $external = false;
-                $href = $this->url($data['target'], $external);
+                $href     = $this->url($data['target'], $external);
                 if ($external) {
                     $data['attr']['rel'] = 'noopener noreferrer';
                     if ('url-blank' === $data['action']) {
@@ -35,31 +36,34 @@ final class A extends AbstractGroup
                 }
                 break;
             case 'tel':
-                $tel = '+'.trim($data['target'], '+');
                 $phoneUtil  = \libphonenumber\PhoneNumberUtil::getInstance();
                 try {
+                    $tel         = '+'.trim($data['target'], '+');
                     $numberProto = $phoneUtil->parse($tel, '');
+                    $replace     = [
+                        '{{tel}}'      => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
+                        '{{tel.int}}'  => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
+                        '{{tel.e164}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::E164),
+                    ];
                 } catch (\libphonenumber\NumberParseException $e) {
                 }
                 $href = 'tel:'.$tel;
-                $replace = [
-                    '{{tel}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
-                    '{{tel.int}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                    '{{tel.e164}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::E164),
-                ];
                 break;
             case 'mailto':
-                $href = 'mailto:'.$data['target'];
+                $href    = 'mailto:'.$data['target'];
                 $replace = [
                     '{{email}}' => $data['target']
                 ];
+                break;
+            case 'scroll':
+                $href = '#'.trim($data['target'], '#');
                 break;
             default:
                 $href = '#';
         }
         $data['_attr']['href'] = $href;
-        unset($data['action']);
-        unset($data['traget']);
+        unset($data['action'], $data['traget']);
+
         return $data;
     }
 }
