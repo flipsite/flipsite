@@ -41,8 +41,8 @@ final class Repeat extends AbstractGroup
         }
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
-            $offset         = $data['_options']['offset'] ?? 0;
-            $length         = $data['_options']['length'] ?? 999999;
+            $offset         = intval($data['_options']['offset'] ?? 0);
+            $length         = intval($data['_options']['length'] ?? 999999);
             $dataSourceList = array_splice($dataSourceList, $offset, $length);
         }
         if (isset($data['_options']['sort'])) {
