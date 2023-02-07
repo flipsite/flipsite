@@ -83,6 +83,7 @@ class ComponentBuilder
                 $inheritType    = $data['_style']['inherit'];
                 $data['_style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['_style']);
             }
+            unset($data['_style']['inherit']);
             $style = ArrayHelper::merge($style, $data['_style']);
             unset($data['_style']);
         }
