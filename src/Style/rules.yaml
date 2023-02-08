@@ -119,15 +119,15 @@ flex-1: flex:1 1 0%
 flex-auto: flex:1 1 auto
 flex-col-reverse: flex-direction:column-reverse
 flex-col: flex-direction:column
-flex-grow-0: flex-grow:0
-flex-grow: flex-grow:1
+grow-0: flex-grow:0
+grow: flex-grow:1
 flex-initial: flex:0 1 auto
 flex-nowrap: flex-wrap:nowrap
 flex-none: flex:none
 flex-row-reverse: flex-direction:row-reverse
 flex-row: flex-direction:row
-flex-shrink-0: flex-shrink:0
-flex-shrink: flex-shrink:1
+shrink-0: flex-shrink:0
+shrink: flex-shrink:1
 flex-wrap-reverse: flex-wrap:wrap-reverse
 flex-wrap: flex-wrap:wrap
 flex: display:flex
