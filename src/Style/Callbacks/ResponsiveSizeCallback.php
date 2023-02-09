@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Callbacks;
 
 class ResponsiveSizeCallback
@@ -36,13 +37,13 @@ class ResponsiveSizeCallback
         if (0.0 === $interceptPx) {
             $between = $slope . 'vw';
         } else {
-            $between = round($interceptPx / 16.0, 2) . 'rem + ' . $slope . 'vw';
+            $between = round($interceptPx / 16.0, 2) . 'rem + ' . round($slope, 2) . 'vw';
         }
 
         return 'min(max(' . $minSizeRem . 'rem,' . $between . '),' . $maxSizeRem . 'rem)';
     }
 
-    private function getPx($value) : float
+    private function getPx($value): float
     {
         if (is_numeric($value)) {
             $value = floatval($value) * 4.0;

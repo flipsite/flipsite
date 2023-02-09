@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Rules;
 
 final class RuleBg extends AbstractRule
@@ -10,13 +11,13 @@ final class RuleBg extends AbstractRule
     /**
      * @param array<string> $args
      */
-    protected function process(array $args) : void
+    protected function process(array $args): void
     {
         if ('transparent' === $args[0]) {
             $this->setDeclaration('background-color', $args[0]);
             return;
         }
-        if ($this->setColor($args, 'background-color', '--tw-bg-opacity')) {
+        if ($this->setColor($args, 'background-color')) {
             return;
         }
 

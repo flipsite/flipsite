@@ -11,13 +11,13 @@ final class RuleText extends AbstractRule
     /**
      * @param array<string> $args
      */
-    protected function process(array $args) : void
+    protected function process(array $args): void
     {
         if ('transparent' === $args[0]) {
             $this->setDeclaration('color', 'transparent');
             return;
         }
-        if ($this->setColor($args, 'color', '--tw-text-opacity')) {
+        if ($this->setColor($args, 'color')) {
             return;
         }
         $fontSize = $this->getConfig('textSize', $args[0]);

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Rules\Traits;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -10,25 +11,18 @@ use SSNepenthe\ColorUtils\Transformers\Lighten;
 
 trait ColorTrait
 {
-    protected function setColor(array $args, string $property, ?string $opacityVar = null) : bool
+    protected function setColor(array $args, string $property): bool
     {
         $color = $this->getColor($args);
+
         if (null === $color) {
             return false;
         }
-        if (null === $opacityVar) {
-            $this->setDeclaration($property, (string) $color);
-        } else {
-            $rgb  = $color->getRgb();
-            $rgba = 'rgba('.$rgb->getRed().','.$rgb->getGreen();
-            $rgba .= ','.$rgb->getBlue().',var('.$opacityVar.'))';
-            $this->setDeclaration($opacityVar, $rgb->getAlpha());
-            $this->setDeclaration($property, $rgba);
-        }
+        $this->setDeclaration($property, (string) $color);
         return true;
     }
 
-    protected function getColor(array $args) : ?Color
+    protected function getColor(array $args): ?Color
     {
         if (0 === count($args)) {
             return null;
@@ -89,7 +83,7 @@ trait ColorTrait
         return $color;
     }
 
-    private function getShade(Color $color, int $value = 500) : Color
+    private function getShade(Color $color, int $value = 500): Color
     {
         $diff = 500 - $value;
         if (0 === $diff) {

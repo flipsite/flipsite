@@ -11,9 +11,9 @@ final class RuleRing extends AbstractRule
     /**
      * @param array<string> $args
      */
-    protected function process(array $args) : void
+    protected function process(array $args): void
     {
-        if ($this->setColor($args, '--tw-ring-color', '--tw-ring-opacity')) {
+        if ($this->setColor($args, '--tw-ring-color')) {
             return;
         }
 
