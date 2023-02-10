@@ -1,24 +1,44 @@
 
 var toggleElements = {};
-function toggle(id,prefix,self) {
+function toggle(self,prefix) {
+    prefix = prefix || 'open'
+    var getParents = function (elem) {
+      let parents = [];
+      for ( ; elem && elem.tagName !== 'BODY'; elem = elem.parentNode ) {
+        parents.push(elem);
+      }
+      return parents;
+    };
     e = window.event;
     e.preventDefault();
     if (self.hasAttribute('aria-expanded')) {
       self.setAttribute('aria-expanded','false' == self.getAttribute('aria-expanded') ? 'true' : 'false');
     }
-    var target = document.getElementById(id);
+    
+    let target = null;
+    let parents = getParents(self);
+    while (!target) {
+      const p = parents.shift();
+      if (p.hasAttribute('data-toggle-target')) {
+        target = p;
+        continue;
+      }
+      if (parents.length === 0) {
+        target = p;
+      }
+    }
     if (!target.getAttribute('data-toggle')) {
-      toggleElements[id+'-'+prefix] = [target];
-      target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]').forEach((node)=>{
-        toggleElements[id+'-'+prefix].push(node);
+      let elements = [target];
+      target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]').forEach((el)=>{
+        elements.push(el);
       });
-      toggleElements[id+'-'+prefix].forEach((el) => {
-        var classes = el.getAttribute('class').split(' ');
-        var toggleClasses = [];
+      elements.forEach(el => {
+        const classes = el.getAttribute('class').split(' ');
+        let toggleClasses = [];
         for (var i=0; i<classes.length; i++) {
           if (classes[i].indexOf(prefix+':') !== -1) {
             el.classList.remove(classes[i]);
-            var tmp = classes[i].split(':');
+            let tmp = classes[i].split(':');
             tmp.shift();
             toggleClasses.push(tmp.join(':'));
           }
@@ -27,14 +47,17 @@ function toggle(id,prefix,self) {
       });
       target.setAttribute('data-toggle',1);
     }
-    toggleElements[id+'-'+prefix].forEach((el) => {
-      el.getAttribute('data-toggle-'+prefix).split(' ').forEach((cls)=>{
+    const toggle = function(el,prefix) {
+      let classes = el.getAttribute('data-toggle-'+prefix).split(' ');
+      classes.forEach((cls)=>{
         if (cls) {
           el.classList.toggle(cls)
         }
       });
+    }
+    toggle(target,prefix);
+    target.querySelectorAll('[data-toggle-'+prefix+']').forEach((el)=>{
+      toggle(el,prefix);
     });
+    
 }
-document.body.addEventListener("dummy", function(e) {
-  // something that does nothing
-});

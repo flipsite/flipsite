@@ -77,6 +77,14 @@ final class Tailwind implements CallbackInterface
         if (count($matches[1])) {
             $css .= $this->addKeyframes($matches[1]);
         }
+
+        // Optimize vars
+        $matches = [];
+        preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
+        foreach (array_unique($matches[0]) as $i => $var) {
+            $css = str_replace($var, '--v'.$i, $css);
+        }
+
         return $css;
     }
 

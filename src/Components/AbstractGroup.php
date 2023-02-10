@@ -11,15 +11,10 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance) : void
     {
-        // Hmm
-        if (isset($data['onclick'])) {
-            $this->setAttribute('onclick', $data['onclick']);
-            if (strpos($data['onclick'], 'javascript:toggle') === 0) {
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
-            }
-            unset($data['onclick']);
+        foreach ($data['_attr'] ?? [] as $attr => $val) {
+            $this->setAttribute($attr, $val);
         }
-
+        unset($data['_attr']);
         $this->tag ??= $style['tag'];
         unset($style['tag']);
 

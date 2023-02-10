@@ -76,9 +76,9 @@ class Nav extends AbstractGroup
         //     $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__.'/../../js/ready.remember.min.js')));
         // }
 
-        if (isset($data['options'])) {
-            $offset        = $data['options']['offset'] ?? 0;
-            $length        = $data['options']['length'] ?? 999999;
+        if (isset($data['_options'])) {
+            $offset        = intval($data['_options']['offset'] ?? 0);
+            $length        = intval($data['_options']['length'] ?? 999999);
             $data['items'] = array_slice($data['items'], $offset, $length);
         }
 
@@ -207,8 +207,8 @@ class Nav extends AbstractGroup
         $items = [];
         foreach ($pages as $page) {
             $item            = [
-                'action' => 'page',
-                'target'  => $page,
+                '_action' => 'page',
+                '_target'  => $page,
                 'text' => $this->reader->getPageName((string)$page, $this->path->getLanguage())
             ];
             if ($firstExact) {
