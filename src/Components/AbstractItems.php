@@ -12,14 +12,14 @@ abstract class AbstractItems extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance): void
     {
-        $itemStyle = $style['item'] ?? [];
-        unset($style['item']);
+        $itemStyle = $style['items'] ?? [];
+        unset($style['items']);
         $this->tag ??= $style['tag'];
         unset($style['tag']);
         $this->addStyle($style);
 
         $children = [];
-        $type = $itemStyle['type'];
+        $type = $itemStyle['type'] ?? 'group';
         unset($itemStyle['type']);
         foreach ($data['items'] as $itemData) {
             $children[] = $this->builder->build($type, $itemData ?? [], $itemStyle, $appearance);

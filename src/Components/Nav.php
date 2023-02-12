@@ -1,11 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-class Nav extends AbstractGroup
+class Nav extends AbstractItems
 {
     use Traits\PathTrait;
     use Traits\RepeatTrait;
@@ -14,7 +15,22 @@ class Nav extends AbstractGroup
 
     protected string $tag = 'nav';
 
-    public function normalize(string|int|bool|array $data) : array
+    public function build(array $data, array $style, string $appearance): void
+    {
+        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
+        $activeStyle = $style['active'] ?? [];
+        unset($style['active']);
+        if ($activeStyle) {
+            foreach ($data['items'] as &$item) {
+                if ($item['active']) {
+                    $item['_style'] = ArrayHelper::merge($item['_style']??[], $activeStyle);
+                }
+            }
+        }
+        parent::build($data, $style, $appearance);
+    }
+
+    public function normalize(string|int|bool|array $data): array
     {
         if (is_array($data) && !ArrayHelper::isAssociative($data)) {
             $data = ['items' => $data];
@@ -82,75 +98,16 @@ class Nav extends AbstractGroup
             $data['items'] = array_slice($data['items'], $offset, $length);
         }
 
-        // if (isset($data['prepend'])) {
-        //     $data['items'] = array_merge($data['prepend'], $data['items']);
-        //     unset($data['prepend']);
-        // }
-        // if (isset($data['append'])) {
-        //     $data['items'] = array_merge($data['items'], $data['append']);
-        //     unset($data['append']);
-        // }
-
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
-    {
-        // $setState = in_array('setState', $data['flags'] ?? []);
-        // if (!$setState) {
-            $items = $this->addActive($data['items'], $this->path->getPage());
-        // } else {
-        //     if (!isset($data['flags'][1])) {
-        //         throw new \Exception('No setstate target');
-        //     }
-        //     $this->builder->dispatch(new Event('global-script', 'setState', file_get_contents(__DIR__.'/../../js/setState.min.js')));
-        //     $items = [];
-        //     foreach ($data['items'] as $item) {
-        //         $url = $item['url'];
-        //         unset($item['url']);
-        //         $item['onclick'] = "javascript:setState('".$data['flags'][1]."','".$url."')";
-        //         $items[]         = $item;
-        //     }
-        //     $this->setAttribute('data-not-active', implode(' ', $style['notActive'] ?? []));
-        //     $this->setAttribute('data-active', implode(' ', $style['active'] ?? []));
-        // }
-        unset($data['items']);
-
-        $last = count($items) - 1;
-
-        $notActiveStyle = $style['notActive'] ?? [];
-        foreach ($items as $i => $item) {
-            $item['_style'] = ArrayHelper::merge($style['items'] ?? [], $item['_style'] ?? []);
-            if ($i === 0 && isset($style['first'])) {
-                $item['_style'] = ArrayHelper::merge($item['_style'], $style['first']);
-            } elseif ($i === $last && isset($style['last'])) {
-                $item['_style'] = ArrayHelper::merge($item['_style'], $style['last']);
-            }
-            if (isset($item['active']) && $item['active'] && isset($style['active'])) {
-                unset($item['active']);
-                if (!isset($item['_style'])) {
-                    $item['_style'] = [];
-                }
-                $item['_style'] = ArrayHelper::merge($item['_style'], $style['active']);
-            } elseif (!($item['active'] ?? false) && $notActiveStyle) {
-                $item['_style'] = ArrayHelper::merge($item['_style'], $notActiveStyle);
-            }
-            $data['a:'.$i] = $item;
-        }
-        if (isset($style['empty'])) {
-            $data['empty'] = '&nbsp;';
-        }
-        unset($style['items'], $style['active'], $style['first'], $style['last']);
-        parent::build($data, $style, $appearance);
-    }
-
-    private function addActive(array $items, string $active) : array
+    private function addActive(array $items, string $active): array
     {
         $activeParts = explode('/', $active);
         foreach ($items as &$item) {
             // If URL is an array, it's a localized external URL that cannot be active
-            if (isset($item['target']) && is_string($item['target'])) {
-                $slug              = explode('#', $item['target'])[0];
+            if (isset($item['_target']) && is_string($item['_target'])) {
+                $slug              = explode('#', $item['_target'])[0];
                 $item['active']   = $item['active'] ?? false;
                 $item['exact']    = $item['exact'] ?? false;
                 if ($item['exact'] && $slug === $active) {
@@ -176,7 +133,7 @@ class Nav extends AbstractGroup
         return $same >= count($slug);
     }
 
-    private function getFromSlugs(string $page) : ?array
+    private function getFromSlugs(string $page): ?array
     {
         $pages      = [];
         $all        = $this->slugs->getPages();
