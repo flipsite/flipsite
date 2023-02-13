@@ -205,15 +205,17 @@ final class Reader
             $meta['title'] .= ' ('.strtoupper((string)$language).')';
         }
 
+        $titleSet = false;
         if (isset($this->data['meta'][$page])) {
             $pageMeta = $this->get('meta.'.$page, $language);
             if (isset($pageMeta['title'])) {
                 $meta['title'] = $pageMeta['title'].' - '.$meta['title'];
+                $titleSet = true;
             }
-            unset($pageMeta['_name'],$pageMeta['title']);
-
+            unset($pageMeta['name'],$pageMeta['title']);
             $meta = ArrayHelper::merge($meta, $pageMeta);
-        } elseif ('home' !== $page) {
+        }
+        if ('home' !== $page && !$titleSet) {
             $p     = explode('/', $page);
             $title = [];
             while (count($p) > 0) {
