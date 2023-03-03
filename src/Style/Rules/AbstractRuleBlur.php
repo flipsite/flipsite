@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 abstract class AbstractRuleBlur extends AbstractRule
@@ -16,8 +15,8 @@ abstract class AbstractRuleBlur extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $value = $this->getConfig('blur', $args[0] ?? 'DEFAULT');
-        $value ??= $this->checkCallbacks('size', $args);
+        $value = $this->checkCallbacks('size', $args);
+        $value ??= $this->getConfig('blur', $args[0] ?? 'DEFAULT');
         $this->setDeclaration($this->properties[0], 'blur('.$value.')');
     }
 }

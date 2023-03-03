@@ -1,22 +1,23 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Callbacks;
 
 class ResponsiveSizeCallback
 {
     public function __construct(private array $screens, private bool $isCssMathFunctionsSupported)
     {
+        $this->screens['base'] = 0;
     }
 
     public function __invoke(array $args)
     {
-        $tmp = explode('|', $args[0]);
-        if (2 === count($tmp)) {
-            $args = ['xs', $tmp[0], 'xl', $tmp[1]];
+        $screens = array_keys($this->screens);
+        if (count($args) === 3 && in_array($args[1], $screens)) {
+            array_unshift($args, 'base');
         }
-        if (4 !== count($args)) {
+
+        if (count($args) !== 4 || !in_array($args[0], $screens) || !in_array($args[2], $screens)) {
             return null;
         }
 
@@ -48,6 +49,8 @@ class ResponsiveSizeCallback
         if (is_numeric($value)) {
             $value = floatval($value) * 4.0;
         } elseif (mb_strpos($value, 'px')) {
+            $value = str_replace('[', '', $value);
+            $value = str_replace(']', '', $value);
             $value = floatval(str_replace('px', '', $value));
         }
         return $value ?? 0.0;

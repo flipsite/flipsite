@@ -17,9 +17,8 @@ abstract class AbstractRuleSpacing extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $value = $this->getConfig('spacing', $args[0]);
-        $value ??= $this->checkCallbacks('size', $args);
-
+        $value = $this->checkCallbacks('size', $args);
+        $value ??= $this->getConfig('spacing', $args[0]);
         $safe = $this->safeAreaInset && in_array('safe', $args);
         foreach ($this->properties as $i => $property) {
             if ($safe) {

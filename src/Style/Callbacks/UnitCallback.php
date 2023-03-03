@@ -7,20 +7,27 @@ class UnitCallback
 {
     public function __invoke(array $args)
     {
+        if (count($args) > 1) {
+            return null;
+        }
+
         if (is_numeric($args[0])) {
-            $spacing = floatval($args[0]);
-            return ($spacing / 4.0).'rem';
+            $value = floatval($args[0]);
+            return ($value / 4.0).'rem';
         }
         if (false !== mb_strpos($args[0], '/')) {
             $tmp     = explode('/', $args[0]);
-            $spacing = 100.0 * floatval($tmp[0]) / floatval($tmp[1]);
-            return $spacing.'%';
+            $value   = 100.0 * floatval($tmp[0]) / floatval($tmp[1]);
+            return $value.'%';
         }
-        $units = ['px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch'];
-        foreach ($units as $unit) {
-            if (false !== mb_strpos($args[0], $unit)) {
-                $spacing = floatval(str_replace($unit, '', $args[0]));
-                return $spacing.$unit;
+        if (str_starts_with($args[0], '[') && str_ends_with($args[0], ']')) {
+            $value = substr($args[0], 1, strlen($args[0]) - 2);
+            $units = ['px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch'];
+            foreach ($units as $unit) {
+                if (false !== mb_strpos($value, $unit)) {
+                    $value = floatval(str_replace($unit, '', $value));
+                    return $value.$unit;
+                }
             }
         }
         return null;
