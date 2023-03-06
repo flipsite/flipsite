@@ -11,7 +11,6 @@ final class RuleMaxW extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->checkCallbacks('size', $args);
-        $value ??= $this->getConfig('maxWidth', $args[0]);
         $this->setDeclaration('max-width', $value);
     }
 }

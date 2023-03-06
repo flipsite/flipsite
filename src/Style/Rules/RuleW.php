@@ -11,8 +11,6 @@ final class RuleW extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->checkCallbacks('size', $args);
-        $value ??= $this->getConfig('width', $args[0]);
-        $value ??= $this->getConfig('spacing', $args[0]);
         $this->setDeclaration('width', $value);
     }
 }

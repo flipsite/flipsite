@@ -11,7 +11,6 @@ final class RuleMaxH extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->checkCallbacks('size', $args);
-        $value ??= $this->getConfig('maxHeight', $args[0]);
         $this->setDeclaration('max-height', $value);
     }
 }

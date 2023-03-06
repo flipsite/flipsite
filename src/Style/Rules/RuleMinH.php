@@ -11,7 +11,6 @@ final class RuleMinH extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->checkCallbacks('size', $args);
-        $value ??= $this->getConfig('minHeight', $args[0]);
         $this->setDeclaration('min-height', $value);
     }
 }

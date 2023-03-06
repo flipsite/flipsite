@@ -7,14 +7,14 @@ class ResponsiveSizeCallback
 {
     public function __construct(private array $screens, private bool $isCssMathFunctionsSupported)
     {
-        $this->screens['base'] = 0;
     }
 
     public function __invoke(array $args)
     {
         $screens = array_keys($this->screens);
-        if (count($args) === 3 && in_array($args[1], $screens)) {
-            array_unshift($args, 'base');
+        $tmp     = explode('|', $args[0]);
+        if (2 === count($tmp) && count($args) === 1) {
+            $args = ['xs', $tmp[0], 'xl', $tmp[1]];
         }
 
         if (count($args) !== 4 || !in_array($args[0], $screens) || !in_array($args[2], $screens)) {

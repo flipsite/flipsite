@@ -11,7 +11,6 @@ final class RuleMinW extends AbstractRule
     protected function process(array $args) : void
     {
         $value = $this->checkCallbacks('size', $args);
-        $value ??= $this->getConfig('minWidth', $args[0]);
         $this->setDeclaration('min-width', $value);
     }
 }
