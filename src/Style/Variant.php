@@ -71,7 +71,7 @@ class Variant
     protected function getRulesets(string $parent, string $prefix, string $pseudo) : string
     {
         $css    = '';
-        $escape = ['/', '.', '|', '#', '[', ']'];
+        $escape = ['/', '.', '|', '#', '[', ']','%'];
         foreach ($this->classes as $class) {
             $childCombinator = null;
             $pseudoElement   = null;

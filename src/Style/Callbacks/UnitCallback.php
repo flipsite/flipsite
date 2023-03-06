@@ -22,7 +22,7 @@ class UnitCallback
         }
         if (str_starts_with($args[0], '[') && str_ends_with($args[0], ']')) {
             $value = substr($args[0], 1, strlen($args[0]) - 2);
-            $units = ['px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch'];
+            $units = ['%', 'px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch'];
             foreach ($units as $unit) {
                 if (false !== mb_strpos($value, $unit)) {
                     $value = floatval(str_replace($unit, '', $value));
