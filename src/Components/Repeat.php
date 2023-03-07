@@ -6,6 +6,7 @@ namespace Flipsite\Components;
 final class Repeat extends AbstractGroup
 {
     use Traits\BuilderTrait;
+    use Traits\StyleOptimizerTrait;
 
     protected string $tag = 'div';
 
@@ -15,18 +16,20 @@ final class Repeat extends AbstractGroup
         $repeatData  = $data['_repeatData'];
         unset($data['_repeatTpl'], $data['_repeatData']);
         $children = [];
-        foreach ($repeatData as $repeatDataItem) {
+        $total    = count($repeatData);
+
+        foreach ($repeatData as $i => $repeatDataItem) {
             foreach ($repeatTpl as $type => $repeatTplComponent) {
                 if (!is_array($repeatTplComponent)) {
                     $repeatTplComponent = ['value'=>$repeatTplComponent];
                 }
                 $repeatTplComponent['_dataSource'] = $repeatDataItem;
-                $children[] = $this->builder->build($type, $repeatTplComponent, $style[$type] ?? [], $appearance);
+                $optimizedStyle = $this->optimizeStyle($style[$type] ?? [], $i, $total);
+                if (isset($optimizedStyle['background'])) {
+                    $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $i, $total);
+                }
+                $children[] = $this->builder->build($type, $repeatTplComponent, $optimizedStyle, $appearance);
             }
-            //     //$dataItemData['_dataSource'] = $repeatDataItem[$type] ?? [];
-            //     echo $type;
-            //     //$children[] = $this->builder->build($type, $dataItemData, $style[$type], $appearance);
-            // }
         }
         $this->addChildren($children);
 
@@ -66,3 +69,4 @@ final class Repeat extends AbstractGroup
         return $data;
     }
 }
+

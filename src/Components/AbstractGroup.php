@@ -6,6 +6,7 @@ namespace Flipsite\Components;
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
+    use Traits\StyleOptimizerTrait;
 
     protected string $tag = 'div';
 
@@ -33,7 +34,7 @@ abstract class AbstractGroup extends AbstractComponent
         $i        = 0;
         $total    = count($data);
         foreach ($data as $type => $componentData) {
-            $componentStyle = $style[$type] ?? [];
+            $componentStyle = $this->optimizeStyle($style[$type] ?? [], $i, $total);
             $children[]     = $this->builder->build($type, $componentData ?? [], $componentStyle, $appearance);
             $i++;
         }
