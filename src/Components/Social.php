@@ -20,16 +20,18 @@ final class Social extends AbstractItems
             $data['items'] = $data;
             return $data;
         }
-        
+
         $name     = $this->reader->get('name');
         $language = $this->path->getLanguage();
         $items    = [];
         $i        = 0;
-        foreach ($data as $type => $handle) {
-            $item = SocialHelper::getData($type, (string)$handle, $name, $language);
-            unset($item['color'], $item['name']);
 
-            $items[] = $item;
+        foreach ($data as $type => $handle) {
+            if (!is_array($handle)) {
+                $item = SocialHelper::getData($type, (string)$handle, $name, $language);
+                unset($item['color'], $item['name']);
+                $items[] = $item;
+            }
         }
         $data['items'] = $items;
         return $data;
