@@ -23,7 +23,7 @@ abstract class AbstractComponent extends AbstractElement
     {
         $src     = $style['src'] ?? false;
         $options = $style['options'] ?? [];
-        $options['width'] ??= 480;
+        $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
         $style['position'] ??= 'bg-center';
         $style['size'] ??= 'bg-cover';

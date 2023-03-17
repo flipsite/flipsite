@@ -44,10 +44,10 @@ bg-blend-hue: background-blend-mode:hue
 bg-blend-saturation: background-blend-mode:saturation
 bg-blend-color: background-blend-mode:color
 bg-blend-luminosity: background-blend-mode:luminosity
-bg-clip-border: -webkit-background-clip:border-box
-bg-clip-content: -webkit-background-clip:content-box
-bg-clip-padding: -webkit-background-clip:padding-box
-bg-clip-text: -webkit-background-clip:text
+bg-clip-border: background-clip:border-box
+bg-clip-content: background-clip:content-box
+bg-clip-padding: background-clip:padding-box
+bg-clip-text: background-clip:text
 bg-contain: background-size:contain
 bg-cover: background-size:cover
 bg-fixed: background-attachment:fixed
@@ -105,6 +105,11 @@ cursor-not-allowed: cursor:not-allowed
 cursor-pointer: cursor:pointer
 cursor-text: cursor:text
 cursor-wait: cursor:wait
+decoration-solid: text-decoration-style:solid
+decoration-double: text-decoration-style:double
+decoration-dotted: text-decoration-style:dotted
+decoration-dashed: text-decoration-style:dashed
+decoration-wavy: text-decoration-style:wavy
 ease-in-out: transition-timing-function:cubic-bezier(0.4,0,0.2,1)
 ease-in: transition-timing-function:cubic-bezier(0.4,0,1,1)
 ease-linear: transition-timing-function:linear
@@ -180,7 +185,7 @@ justify-self-end: justify-self:end
 justify-self-start: justify-self:start
 justify-self-stretch: justify-self:stretch
 justify-start: justify-content:flex-start
-line-through: text-decoration:line-through
+line-through: text-decoration-line:line-through
 list-decimal: list-style-type:decimal
 list-disc: list-style-type:disc
 list-inside: list-style-position:inside
@@ -226,7 +231,7 @@ mix-blend-saturation: mix-blend-mode:saturation
 mix-blend-color: mix-blend-mode:color
 mix-blend-luminosity: mix-blend-mode:luminosity
 mix-blend-plus-lighter: mix-blend-mode:pluslighter
-no-underline: text-decoration:none
+no-underline: text-decoration-line:none
 normal-case: text-transform:none
 not-italic: font-style:normal
 not-sr-only: position:static;width:auto;height:auto;padding:0;margin:0;overflow:visible;clip:auto;white-space:normal
@@ -255,6 +260,7 @@ overflow-y-auto: overflow-y:auto
 overflow-y-hidden: overflow-y:hidden
 overflow-y-scroll: overflow-y:scroll
 overflow-y-visible: overflow-y:visible
+overline: text-decoration-line:overline
 overscroll-auto: overscroll-behavior:auto
 overscroll-contain: overscroll-behavior:contain
 overscroll-none: overscroll-behavior:none
@@ -368,7 +374,7 @@ transition-shadow: transition-property:box-shadow
 transition-transform: transition-property:transform
 transition: transition-property:background-color,border-color,color,fill,stroke,opacity,box-shadow,transform
 truncate: overflow:hidden;text-overflow:ellipsis;white-space:nowrap
-underline: text-decoration:underline
+underline: text-decoration-line:underline
 uppercase: text-transform:uppercase
 visible: visibility:visible
 w-px: width:1px
