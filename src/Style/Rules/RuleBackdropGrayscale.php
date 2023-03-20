@@ -10,4 +10,6 @@ final class RuleBackdropGrayscale extends AbstractRuleGrayscale
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-grayscale'];
+
+    protected bool $backdrop = true;
 }

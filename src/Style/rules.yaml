@@ -87,6 +87,7 @@ clearfix:after: content:'';display:table;clear:both
 col-auto: grid-column:auto
 col-end-auto: grid-column-end:auto
 col-start-auto: grid-column-start:auto
+col-span-full: grid-column:1 / -1
 contents: display:contents
 content-center: align-content:center
 content-start: align-content:flex-start
@@ -240,7 +241,10 @@ object-cover: object-fit:cover
 object-fill: object-fit:fill
 object-none: object-fit:none
 object-scale-down: object-fit:scale-down
-outline-none:	outline:2px solid transparent;outline-offset:2px
+order-first: order:-9999
+order-last: order:9999
+order-none: order:0
+outline-none: outline:2px solid transparent;outline-offset:2px
 outline: outline-style:solid
 outline-dashed: outline-style:dashed
 outline-dotted: outline-style:dotted
@@ -295,6 +299,7 @@ resize-x: resize:horizontal
 resize-y: resize:vertical
 resize: resize:both
 row-auto: grid-row:auto
+row-span-full: grid-row:1 / -1
 row-end-auto: grid-row-end:auto
 row-start-auto: grid-row-start:auto
 scroll-auto: scroll-behavior:auto

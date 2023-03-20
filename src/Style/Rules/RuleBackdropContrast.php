@@ -10,4 +10,6 @@ final class RuleBackdropContrast extends AbstractRuleContrast
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-contrast'];
+
+    protected bool $backdrop = true;
 }

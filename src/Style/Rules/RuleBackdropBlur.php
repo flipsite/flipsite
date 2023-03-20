@@ -10,4 +10,6 @@ final class RuleBackdropBlur extends AbstractRuleBlur
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-blur'];
+
+    protected bool $backdrop = true;
 }

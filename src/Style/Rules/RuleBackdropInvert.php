@@ -10,4 +10,6 @@ final class RuleBackdropInvert extends AbstractRuleInvert
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-invert'];
+
+    protected bool $backdrop = true;
 }

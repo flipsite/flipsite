@@ -227,18 +227,8 @@ abstract class AbstractElement
             }
         }
         $classes = array_unique($classes);
-        $before  = [];
-        $after   = [];
-        foreach ($classes as $class) {
-            if (false !== mb_strpos($class, 'transform')) {
-                $before[] = $class;
-            } elseif (false !== mb_strpos($class, 'transition')) {
-                $before[] = $class;
-            } else {
-                $after[] = $class;
-            }
-        }
-        return trim(implode(' ', array_merge($before, $after)));
+        $classString = trim(implode(' ', $classes));
+        return str_replace('last|','',$classString);
     }
 
     private function purgeInvalidAttributes() : void {

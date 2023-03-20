@@ -10,4 +10,6 @@ final class RuleBackdropBrightness extends AbstractRuleBrightness
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-brightness'];
+
+    protected bool $backdrop = true;
 }

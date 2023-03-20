@@ -10,4 +10,6 @@ final class RuleBackdropSaturate extends AbstractRuleSaturate
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-saturate'];
+
+    protected bool $backdrop = true;
 }

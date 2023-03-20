@@ -10,4 +10,6 @@ final class RuleBackdropHueRotate extends AbstractRuleHueRotate
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-hue-rotate'];
+
+    protected bool $backdrop = true;
 }

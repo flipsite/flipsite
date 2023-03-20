@@ -82,7 +82,15 @@ final class Tailwind implements CallbackInterface
         $matches = [];
         preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
         $addDefaultValues = [];
+        $vars = [];
         foreach (array_unique($matches[0]) as $i => $var) {
+            $vars[] = $var;
+        }
+        usort($vars, function($a, $b) {
+            return strlen($b) - strlen($a);
+        });
+
+        foreach ($vars as $i => $var) {
             $addDefaultValues[$var] = '--v'.$i;
             $css                    = str_replace($var, '--v'.$i, $css);
         }

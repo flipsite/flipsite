@@ -10,4 +10,6 @@ final class RuleBackdropSepia extends AbstractRuleSepia
      * @var array<string>
      */
     protected array $properties = ['--tw-backdrop-sepia'];
+
+    protected bool $backdrop = true;
 }

@@ -11,6 +11,8 @@ abstract class AbstractRuleHueRotate extends AbstractRule
      */
     protected array $properties = [];
 
+    protected bool $backdrop = false;
+    
     /**
      * @param array<string> $args
      */
@@ -22,5 +24,11 @@ abstract class AbstractRuleHueRotate extends AbstractRule
             $this->negative = false;
         }
         $this->setDeclaration($this->properties[0], 'hue-rotate('.$value.')');
+
+        if ($this->backdrop) {
+            $this->setDeclaration('backdrop-filter', 'var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)');
+        } else {
+            $this->setDeclaration('filter', 'var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)');
+        }
     }
 }
