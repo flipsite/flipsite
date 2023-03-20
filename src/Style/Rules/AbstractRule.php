@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Rules;
 
 use Flipsite\Style\CallbackInterface;
@@ -17,6 +18,8 @@ abstract class AbstractRule
 
     protected ?string $pseudoElement = null;
 
+    protected int $order = 100;
+
     protected array $config;
     private CallbackInterface $callbacks;
 
@@ -28,7 +31,7 @@ abstract class AbstractRule
         $this->process($args);
     }
 
-    public function getDeclarations() : string
+    public function getDeclarations(): string
     {
         $declarations = [];
         foreach ($this->declarations as $property => $value) {
@@ -39,12 +42,16 @@ abstract class AbstractRule
         return implode(';', $declarations);
     }
 
-    public function getChildCombinator() : ?string
+    public function getOrder(): int
+    {
+        return $this->order;
+    }
+    public function getChildCombinator(): ?string
     {
         return $this->childCombinator;
     }
 
-    public function getPseudoElement() : ?string
+    public function getPseudoElement(): ?string
     {
         return $this->pseudoElement;
     }
@@ -57,14 +64,14 @@ abstract class AbstractRule
         return $this->config[$property][$value] ?? null;
     }
 
-    protected function setDeclaration(string $property, $value) : void
+    protected function setDeclaration(string $property, $value): void
     {
         if (null !== $value && !is_array($value)) {
             $this->declarations[$property] = $value;
         }
     }
 
-    protected function checkCallbacks(string $property, array $args) : ?string
+    protected function checkCallbacks(string $property, array $args): ?string
     {
         return $this->callbacks->call($property, $args);
     }

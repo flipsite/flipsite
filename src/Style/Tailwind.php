@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -20,7 +21,7 @@ final class Tailwind implements CallbackInterface
         $this->config = $config;
     }
 
-    public function call(string $property, array $args) : ?string
+    public function call(string $property, array $args): ?string
     {
         if (!isset($this->callbacks[$property])) {
             return null;
@@ -35,7 +36,7 @@ final class Tailwind implements CallbackInterface
         return null;
     }
 
-    public function addCallback(string $property, callable $callback) : self
+    public function addCallback(string $property, callable $callback): self
     {
         if (!isset($this->callbacks[$property])) {
             $this->callbacks[$property] = [];
@@ -44,7 +45,7 @@ final class Tailwind implements CallbackInterface
         return $this;
     }
 
-    public function getCss(array $elements, array $classes) : string
+    public function getCss(array $elements, array $classes): string
     {
         $hasBorders = $this->hasBorders($elements, $classes);
         $css        = $this->getPreflight(
@@ -86,7 +87,7 @@ final class Tailwind implements CallbackInterface
         foreach (array_unique($matches[0]) as $i => $var) {
             $vars[] = $var;
         }
-        usort($vars, function($a, $b) {
+        usort($vars, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
 
@@ -158,7 +159,7 @@ final class Tailwind implements CallbackInterface
         return str_replace('*,::before,::after{', '*,::before,::after{'.$default, $css);
     }
 
-    public function getRules(string $className, ?string &$childCombinator, ?string &$pseudoElement) : ?string
+    public function getRules(string $className): null|string|AbstractRule
     {
         if (isset($this->rules[$className])) {
             return $this->rules[$className];
@@ -167,12 +168,10 @@ final class Tailwind implements CallbackInterface
         if (null === $class) {
             return null;
         }
-        $childCombinator = $class->getChildCombinator();
-        $pseudoElement   = $class->getPseudoElement();
-        return $class->getDeclarations();
+        return $class;
     }
 
-    private function hasBorders(array $elements, array $classes) : bool
+    private function hasBorders(array $elements, array $classes): bool
     {
         if (in_array('hr', $elements)) {
             return true;
@@ -185,7 +184,7 @@ final class Tailwind implements CallbackInterface
         return false;
     }
 
-    private function getRule(string $className) : ?AbstractRule
+    private function getRule(string $className): ?AbstractRule
     {
         if (!mb_strlen($className)) {
             return null;
@@ -228,7 +227,7 @@ final class Tailwind implements CallbackInterface
         return null;
     }
 
-    private function addToVariant(array $variants, string $class) : void
+    private function addToVariant(array $variants, string $class): void
     {
         $variantId = implode(':', $variants);
         if (!isset($this->variants[$variantId])) {
@@ -256,7 +255,7 @@ final class Tailwind implements CallbackInterface
         return $css;
     }
 
-    private function createVariant(array $variants) : Variant
+    private function createVariant(array $variants): Variant
     {
         $variant = new Variant($this);
         foreach ($variants as $variantId) {
@@ -285,7 +284,7 @@ final class Tailwind implements CallbackInterface
         return $variant;
     }
 
-    private function addKeyframes(array $keyframes) : string
+    private function addKeyframes(array $keyframes): string
     {
         $css = '';
         foreach ($keyframes as $keyframe) {

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 use Flipsite\Style\Variants\AbstractType;
@@ -23,17 +24,17 @@ class Variant
         $this->tailwind = $tailwind;
     }
 
-    public function addType(AbstractType $type) : void
+    public function addType(AbstractType $type): void
     {
         $this->types[] = $type;
     }
 
-    public function addClass(string $class) : void
+    public function addClass(string $class): void
     {
         $this->classes[] = $class;
     }
 
-    public function getCss() : string
+    public function getCss(): string
     {
         $css          = '';
         $mediaQueries = [];
@@ -63,22 +64,30 @@ class Variant
         return $css;
     }
 
-    public function order() : int
+    public function order(): int
     {
         return !isset($this->types[0]) ? 100 : $this->types[0]->order();
     }
 
-    protected function getRulesets(string $parent, string $prefix, string $pseudo) : string
+    protected function getRulesets(string $parent, string $prefix, string $pseudo): string
     {
-        $css    = '';
+        $rulesets = [];
         $escape = ['/', '.', '|', '#', '[', ']','%'];
         foreach ($this->classes as $class) {
-            $childCombinator = null;
-            $pseudoElement   = null;
-            $rules           = $this->tailwind->getRules($class, $childCombinator, $pseudoElement);
+            $css = '';
+            $order = 100;
+            $rules = $this->tailwind->getRules($class);
             if (null === $rules) {
                 continue;
             }
+            $childCombinator = $pseudoElement = null;
+            if (!is_string($rules)) {
+                $childCombinator = $rules->getChildCombinator();
+                $pseudoElement   = $rules->getPseudoElement();
+                $order = $rules->getOrder();
+                $rules = $rules->getDeclarations();
+            }
+
             if ($parent) {
                 $css .= '.'.$parent;
             }
@@ -97,7 +106,10 @@ class Variant
                 $css .= '>'.$childCombinator;
             }
             $css .= '{'.$rules.'}';
+
+            $rulesets[$order] ??= '';
+            $rulesets[$order].= $css;
         }
-        return $css;
+        return implode('', $rulesets);
     }
 }

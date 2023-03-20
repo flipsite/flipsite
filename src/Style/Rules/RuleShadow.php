@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Rules;
 
 final class RuleShadow extends AbstractRule
@@ -45,12 +46,13 @@ final class RuleShadow extends AbstractRule
         ],
     ];
 
-    protected function process(array $args) : void
+    protected function process(array $args): void
     {
         $color = $this->getColor($args);
         if ($color) {
             $this->setDeclaration('--tw-shadow-color', (string)$color);
             $this->setDeclaration('--tw-shadow', 'var(--tw-shadow-colored)');
+            $this->order = 110;
             return;
         }
         $shadow =count($args) === 0 ? 'base' : $args[0];
@@ -58,6 +60,7 @@ final class RuleShadow extends AbstractRule
             foreach ($this->shadows[$shadow] as $attr => $value) {
                 $this->setDeclaration($attr, $value);
             }
+            $this->order = 100;
             $this->setDeclaration('box-shadow', 'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)');
         }
     }

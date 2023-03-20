@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -18,7 +19,7 @@ abstract class AbstractElement
     private ?string $cache      = null;
     private ?string $commentOut = null;
 
-    public function addStyle(null|array|string $style) : self
+    public function addStyle(null|array|string $style): self
     {
         if (null === $style) {
             return $this;
@@ -31,31 +32,31 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function commentOut(bool $commentOut, string $comment) 
+    public function commentOut(bool $commentOut, string $comment)
     {
         $this->commentOut = $commentOut ? $comment : null;
     }
-    public function getTag() : string
+    public function getTag(): string
     {
         return $this->tag;
     }
 
-    public function childCount() : int
+    public function childCount(): int
     {
         return count($this->children);
     }
 
-    public function attributeCount() : int
+    public function attributeCount(): int
     {
         return count($this->attributes) + count($this->style) ? 1 : 0;
     }
 
-    public function getChild(string $name) : ?AbstractElement
+    public function getChild(string $name): ?AbstractElement
     {
         return $this->children[$name] ?? null;
     }
 
-    public function getChildren() : array
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -65,7 +66,7 @@ abstract class AbstractElement
         return $this->attributes[$attr] ?? null;
     }
 
-    public function setAttribute(string $attr, $value, bool $append = false) : self
+    public function setAttribute(string $attr, $value, bool $append = false): self
     {
         $this->cache = null;
         if (null === $value) {
@@ -78,7 +79,7 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function setAttributes(array $attributes, bool $append = false) : self
+    public function setAttributes(array $attributes, bool $append = false): self
     {
         foreach ($attributes as $attr => $value) {
             $this->setAttribute($attr, $value, $append);
@@ -86,21 +87,21 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function setContent(string $content) : self
+    public function setContent(string $content): self
     {
         $this->cache   = null;
         $this->content = $content;
         return $this;
     }
 
-    public function appendContent(string $content) : self
+    public function appendContent(string $content): self
     {
         $this->cache = null;
         $this->content .= $content;
         return $this;
     }
 
-    public function prependChild(?AbstractElement $child = null, ?string $name = null) : self
+    public function prependChild(?AbstractElement $child = null, ?string $name = null): self
     {
         if (null === $child) {
             return $this;
@@ -116,7 +117,7 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function addChild(?AbstractElement $child = null, ?string $name = null) : self
+    public function addChild(?AbstractElement $child = null, ?string $name = null): self
     {
         $this->cache = null;
         if (null === $child) {
@@ -130,14 +131,14 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function replaceChildren(array $children) : self
+    public function replaceChildren(array $children): self
     {
         $this->cache = null;
         $this->children = $children;
         return $this;
     }
 
-    public function addChildren(array $children) : self
+    public function addChildren(array $children): self
     {
         foreach ($children as $child) {
             $this->addChild($child);
@@ -145,7 +146,7 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : ?string
+    public function render(int $indentation = 2, int $level = 0, bool $oneline = false): ?string
     {
         if (!$this->render) {
             return null;
@@ -185,14 +186,14 @@ abstract class AbstractElement
         } else {
             $html .= '</'.$this->tag.'>'."\n";
         }
-        
+
         if ($this->commentOut) {
             $html = $i.'<!-- '.$this->commentOut."\n".$html.$i.'--!>'."\n";
         }
         return $this->cache = $html;
     }
 
-    protected function renderAttributes() : string
+    protected function renderAttributes(): string
     {
         if (count($this->style)) {
             $class = $this->getClasses();
@@ -216,10 +217,9 @@ abstract class AbstractElement
         return $html;
     }
 
-    private function getClasses() : string
+    private function getClasses(): string
     {
         $classes = [];
-        sort($this->style);
         foreach ($this->style as $attr => $class) {
             if (is_string($class)) {
                 $classes_ = explode(' ', trim($class));
@@ -227,25 +227,28 @@ abstract class AbstractElement
             }
         }
         $classes = array_unique($classes);
-        $classString = trim(implode(' ', $classes));
-        return str_replace('last|','',$classString);
+        sort($classes);
+        return trim(implode(' ', $classes));
     }
 
-    private function purgeInvalidAttributes() : void {
+    private function purgeInvalidAttributes(): void
+    {
         $allowed = ['onclick'];
         switch ($this->tag) {
             case 'button':
-                $allowed = array_merge($allowed,
+                $allowed = array_merge(
+                    $allowed,
                     ['disabled','form','formaction','formenctype','formmethod',
-                    'formnovalidate','formtarget','name','type','value',]);
+                    'formnovalidate','formtarget','name','type','value',]
+                );
                 break;
             default:
                 return;
         }
-        
+
         $purge = [];
         foreach ($this->attributes as $attribute => $value) {
-            if (!in_array($attribute,$allowed) && !str_starts_with($attribute,'data-') && !str_starts_with($attribute,'aria-')) {
+            if (!in_array($attribute, $allowed) && !str_starts_with($attribute, 'data-') && !str_starts_with($attribute, 'aria-')) {
                 $purge[] = $attribute;
             }
         }
@@ -254,4 +257,3 @@ abstract class AbstractElement
         }
     }
 }
-
