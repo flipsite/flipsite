@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 abstract class AbstractRuleScale extends AbstractRule
@@ -21,5 +20,6 @@ abstract class AbstractRuleScale extends AbstractRule
         foreach ($this->properties as $property) {
             $this->setDeclaration($property, $value);
         }
+        $this->setDeclaration('transform', 'translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));');
     }
 }
