@@ -17,6 +17,10 @@ abstract class AbstractRuleScale extends AbstractRule
     {
         $value = $this->getConfig('scale', $args[0]);
         $value ??= floatval($args[0]) / 100.0;
+        if ($this->negative) {
+            $this->negative = false;
+            $value*=-1.0;
+        }
         foreach ($this->properties as $property) {
             $this->setDeclaration($property, $value);
         }
