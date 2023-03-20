@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -155,6 +156,15 @@ class ComponentBuilder
                 }
                 unset($data['_meta'],$data['_name']);
 
+                if (isset($data['_bg'])) {
+                    $style['background'] ??= [];
+                    $style['background']['src'] = $data['_bg'];
+                    unset($data['_bg']);
+                }
+                if (isset($style['background'])) {
+                    $component->setBackground($component, $style['background']);
+                    unset($style['background']);
+                }
                 $component->build($data, $style ?? [], $appearance);
                 return $component;
             }
@@ -214,7 +224,7 @@ class ComponentBuilder
         }
     }
 
-    private function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', array $stopIfAttr = []) : array
+    private function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', array $stopIfAttr = []): array
     {
         if (isset($data[$dataSourceKey])) {
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);

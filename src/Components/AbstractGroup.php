@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -10,7 +11,7 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         foreach ($data['_attr'] ?? [] as $attr => $val) {
             $this->setAttribute($attr, $val);
@@ -19,15 +20,6 @@ abstract class AbstractGroup extends AbstractComponent
         $this->tag ??= $style['tag'];
         unset($style['tag']);
 
-        if (isset($data['_bg'])) {
-            $style['background'] ??= [];
-            $style['background']['src'] = $data['_bg'];
-            unset($data['_bg']);
-        }
-        if (isset($style['background'])) {
-            $this->setBackground($this, $style['background']);
-            unset($style['background']);
-        }
         $this->addStyle($style);
 
         $children = [];
