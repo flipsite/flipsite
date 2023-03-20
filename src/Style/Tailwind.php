@@ -143,7 +143,9 @@ final class Tailwind implements CallbackInterface
             '--tw-backdrop-sepia'         => '',
         ];
         foreach ($addDefaultValues as $var => $optimized) {
-            $default .= $optimized.':'.$defaultValues[$var].';';
+            if (isset($defaultValues[$var])) {
+                $default .= $optimized.':'.$defaultValues[$var].';';
+            }
         }
         return str_replace('*,::before,::after{', '*,::before,::after{'.$default, $css);
     }
