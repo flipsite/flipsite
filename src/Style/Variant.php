@@ -110,6 +110,7 @@ class Variant
             $rulesets[$order] ??= '';
             $rulesets[$order].= $css;
         }
+        ksort($rulesets);
         return implode('', $rulesets);
     }
 }
