@@ -32,9 +32,10 @@ final class RuleRounded extends AbstractRule
         } else {
             $properties = ['border-radius'];
         }
-
-        $value = $this->getConfig('borderRadius', $args[0] ?? 'DEFAULT');
-        $value ??= $this->checkCallbacks('size', $args);
+        if (!isset($args[0])) {
+            $args[0] = '1';
+        }
+        $value = $this->checkCallbacks('size', $args);
         foreach ($properties as $property) {
             $this->setDeclaration($property, $value);
         }
