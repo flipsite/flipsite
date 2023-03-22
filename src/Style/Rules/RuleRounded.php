@@ -35,7 +35,11 @@ final class RuleRounded extends AbstractRule
         if (!isset($args[0])) {
             $args[0] = '1';
         }
-        $value = $this->checkCallbacks('size', $args);
+        $value = null;
+        if ($args[0] === 'full') {
+            $value = '9999px';
+        }
+        $value ??= $this->checkCallbacks('size', $args);
         foreach ($properties as $property) {
             $this->setDeclaration($property, $value);
         }
