@@ -17,6 +17,7 @@ class ScreenWidthCallback
             if (isset($tmp[1])) {
                 return intval(floatval($value) / floatval($tmp[1])).'px';
             }
+            return intval($value).'px'; 
         }
         return null;
     }
