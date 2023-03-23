@@ -16,9 +16,11 @@ abstract class AbstractRuleTranslate extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $value = $this->getConfig('translate', $args[0]);
-        $value = $this->getConfig('spacing', $args[0]);
-        $value ??= $this->checkCallbacks('size', $args);
+        $value = $this->checkCallbacks('size', $args);
+        if ($this->negative) {
+            $this->negative = false;
+            $value = '-'.$value;
+        }
         foreach ($this->properties as $property) {
             $this->setDeclaration($property, $value);
         }
