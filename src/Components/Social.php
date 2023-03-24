@@ -29,7 +29,9 @@ final class Social extends AbstractItems
         foreach ($data as $type => $handle) {
             if (!is_array($handle)) {
                 $item = SocialHelper::getData($type, (string)$handle, $name, $language);
-                unset($item['color'], $item['name']);
+                $item['_action'] = 'url-blank';
+                $item['_target'] = $item['url'];
+                unset($item['url'], $item['color'], $item['name']);
                 $items[] = $item;
             }
         }
