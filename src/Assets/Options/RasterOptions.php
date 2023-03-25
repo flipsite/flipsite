@@ -1,11 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Options;
 
 final class RasterOptions extends AbstractImageOptions
 {
-    protected function defineOptions() : array
+    protected function defineOptions(): array
     {
         return [
             'alpha'       => new IntOption('a'),

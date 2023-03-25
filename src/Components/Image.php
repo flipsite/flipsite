@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Image extends AbstractComponent
@@ -12,7 +13,7 @@ final class Image extends AbstractComponent
     protected bool $empty  = true;
     protected bool $online = true;
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         if (!is_array($data)) {
             return ['src' => $data];
@@ -23,7 +24,7 @@ final class Image extends AbstractComponent
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         $src               = $data['src'];
         $options           = $this->normalizeOptions($style['options'] ?? []);
@@ -46,8 +47,6 @@ final class Image extends AbstractComponent
                 $this->setAttribute('height', $imageContext->getHeight());
             }
             $this->setAttribute('src', $imageContext->getSrc());
-        } elseif ($this->isExternal($src)) {
-            $this->setAttribute('src', $src);
         } else {
             if (($options['webp'] ?? true)) {
                 $src = str_replace('.jpg', '.webp', $src);
@@ -65,17 +64,17 @@ final class Image extends AbstractComponent
         }
     }
 
-    private function isSvg(string $filename) : bool
+    private function isSvg(string $filename): bool
     {
         return false !== mb_strpos($filename, '.svg');
     }
 
-    private function isExternal(string $src) : bool
+    private function isExternal(string $src): bool
     {
         return str_starts_with($src, 'http');
     }
 
-    private function normalizeOptions(array $options):array
+    private function normalizeOptions(array $options): array
     {
         $screens = [
             'xs'  => 440,

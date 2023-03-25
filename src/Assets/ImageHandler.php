@@ -1,11 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets;
 
 use Exception;
 use Flipsite\Assets\Context\AbstractImageContext;
 use Flipsite\Assets\Context\ExternalContext;
+use Flipsite\Assets\Context\UnsplashContext;
 use Flipsite\Assets\Context\IcoContext;
 use Flipsite\Assets\Context\RasterContext;
 use Flipsite\Assets\Context\SvgContext;
@@ -26,10 +28,13 @@ final class ImageHandler
         $this->webpServer   = (extension_loaded('gd') && function_exists('imagewebp')) || (function_exists('\Imagick::queryFormats') && \Imagick::queryFormats('WEBP'));
     }
 
-    public function getContext(string $image, ?array $options = null) : AbstractImageContext
+    public function getContext(string $image, ?array $options = null): AbstractImageContext
     {
         if (0 === mb_strpos($image, 'http')) {
-            return new ExternalContext($src);
+            if (str_starts_with($image, 'https://images.unsplash.com')) {
+                return new UnsplashContext($image, $options);
+            }
+            return new ExternalContext($image);
         }
         $file = new AssetFile($image, $this->assetSources);
         if ('svg' === $file->getExtension()) {
@@ -41,7 +46,7 @@ final class ImageHandler
         return new RasterContext($image, $this->imgBasePath, $file, $options);
     }
 
-    public function getResponse(Response $response, string $path) : Response
+    public function getResponse(Response $response, string $path): Response
     {
         if ($this->inCache($path)) {
             return $this->getCached($response, $path);
@@ -69,12 +74,12 @@ final class ImageHandler
         return $this->getCached($response, $path);
     }
 
-    private function inCache(string $path) : bool
+    private function inCache(string $path): bool
     {
         return file_exists($this->cacheDir . '/' . $path);
     }
 
-    private function getCached(Response $response, string $path) : Response
+    private function getCached(Response $response, string $path): Response
     {
         $filename = $this->cacheDir . '/' . $path;
         $pathinfo = pathinfo($path);
@@ -89,7 +94,7 @@ final class ImageHandler
         return $image->psrResponse();
     }
 
-    private function notFound() : Response
+    private function notFound(): Response
     {
         $manager = new ImageManager();
         $image   = $manager->canvas(16, 9, '#eee');
