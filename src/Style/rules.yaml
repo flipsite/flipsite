@@ -111,6 +111,8 @@ decoration-double: text-decoration-style:double
 decoration-dotted: text-decoration-style:dotted
 decoration-dashed: text-decoration-style:dashed
 decoration-wavy: text-decoration-style:wavy
+decoration-auto: text-decoration-thickness:auto
+decoration-from-font: text-decoration-thickness:from-font
 ease-in-out: transition-timing-function:cubic-bezier(0.4,0,0.2,1)
 ease-in: transition-timing-function:cubic-bezier(0.4,0,1,1)
 ease-linear: transition-timing-function:linear
@@ -379,6 +381,7 @@ transition-transform: transition-property:transform
 transition: color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter
 truncate: overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 underline: text-decoration-line:underline
+underline-offset-auto: text-underline-offset:auto
 uppercase: text-transform:uppercase
 visible: visibility:visible
 w-px: width:1px
