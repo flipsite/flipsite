@@ -22,7 +22,7 @@ final class UnsplashContext extends AbstractImageContext
         $tmp = explode('?', $image);
         $query = explode('&', $tmp[1]);
         foreach ($query as $q) {
-            $tmp2 = explode('=',$q);
+            $tmp2 = explode('=', $q);
             if ($tmp2[0] === 'w') {
                 $this->realWidth = intval($tmp2[1]);
             } elseif ($tmp2[0] === 'h') {
@@ -31,7 +31,7 @@ final class UnsplashContext extends AbstractImageContext
                 $this->query[$tmp2[0]] = $tmp2[1];
             }
         }
-        
+
         $this->image  = $tmp[0];
         $this->srcset = $options['srcset'] ?? null;
         $size         = $this->getSize($options);
@@ -71,6 +71,7 @@ final class UnsplashContext extends AbstractImageContext
     {
         $this->query['w'] = round($this->width * $this->scale, 0);
         $this->query['h'] = round($this->height * $this->scale, 0);
+        $this->query['fit'] = 'crop';
         return $this->image.'?'.http_build_query($this->query);
     }
 
