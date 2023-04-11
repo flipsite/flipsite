@@ -47,7 +47,7 @@ bg-blend-luminosity: background-blend-mode:luminosity
 bg-clip-border: background-clip:border-box
 bg-clip-content: background-clip:content-box
 bg-clip-padding: background-clip:padding-box
-bg-clip-text: background-clip:text
+bg-clip-text: background-clip:text;-webkit-background-clip:text
 bg-contain: background-size:contain
 bg-cover: background-size:cover
 bg-fixed: background-attachment:fixed
