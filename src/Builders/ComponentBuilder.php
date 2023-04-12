@@ -79,26 +79,17 @@ class ComponentBuilder
             if (is_string($data['_style'])) {
                 $data['_style'] = ['inherit' => $data['_style']];
             }
+
             // Resolve inheritance
-            if (isset($data['_style']['inherit'])) {
+            while (isset($data['_style']['inherit'])) {
                 $inheritType    = $data['_style']['inherit'];
+                unset($data['_style']['inherit']);
                 $data['_style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['_style']);
             }
-            unset($data['_style']['inherit']);
+            
             $style = ArrayHelper::merge($style, $data['_style']);
             unset($data['_style']);
         }
-
-        // // If still has variants
-        // if (isset($style['variants'])) {
-        //     foreach ($flags as $flag) {
-        //         if (isset($style['variants'][$flag])) {
-        //             echo $flag;
-        //             $style = ArrayHelper::merge($style, $style['variants'][$flag]);
-        //         }
-        //     }
-        //     unset($style['variants']);
-        // }
 
         $appearance = $style['appearance'] ?? $appearance;
         unset($style['appearance']);
