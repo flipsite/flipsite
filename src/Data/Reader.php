@@ -9,6 +9,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
 use Flipsite\Utils\YamlExpander;
 use Flipsite\Utils\Localizer;
+use Flipsite\Utils\Plugins;
 
 final class Reader
 {
@@ -34,6 +35,8 @@ final class Reader
     private string $hash = '';
 
     private Localizer $localizer;
+
+    private Plugins $plugins;
 
     public function __construct(private AbstractEnvironment $environment)
     {
@@ -210,7 +213,7 @@ final class Reader
             $pageMeta = $this->get('meta.'.$page, $language);
             if (isset($pageMeta['title'])) {
                 $meta['title'] = $pageMeta['title'].' - '.$meta['title'];
-                $titleSet = true;
+                $titleSet      = true;
             }
             unset($pageMeta['name'],$pageMeta['title']);
             $meta = ArrayHelper::merge($meta, $pageMeta);

@@ -12,6 +12,7 @@ abstract class AbstractEnvironment
     protected string $siteDir;
     protected string $vendorDir;
     protected string $imgDir;
+    protected string $videoDir;
     protected string $basePath;
     protected string $server;
     protected array $externalAssetDirs    = [];
