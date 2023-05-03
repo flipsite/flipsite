@@ -67,7 +67,11 @@ class MetaBuilder implements BuilderInterface
 
         if ($meta['share']) {
             $image      = $this->imageHandler->getContext($meta['share'], ['width' => 1200, 'height' => 630]);
-            $elements[] = $this->og('og:image', $this->environment->getServer(false) . $image->getSrc());
+            $src        = $image->getSrc();
+            if (!str_starts_with($src, 'http')) {
+                $src = $this->environment->getServer(false).$src;
+            }
+            $elements[] = $this->og('og:image', $src);
         }
 
         $elements[] = $this->og('og:url', trim($server . $page, '/'));
