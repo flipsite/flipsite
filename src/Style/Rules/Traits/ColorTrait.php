@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules\Traits;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -93,11 +92,17 @@ trait ColorTrait
         if ($diff > 0) {
             $max     = 100.0 - $lightness;
             $amount  = (500 - $value) / 500 * $max;
+            if (!$amount) {
+                return $color;
+            }
             $lighten = new Lighten($amount);
             return $lighten->transform($color);
         }
         $max    = $lightness;
         $amount = ($value - 500) / 500 * $max;
+        if (!$amount) {
+            return $color;
+        }
         $darken = new Darken($amount);
         return $darken->transform($color);
     }
