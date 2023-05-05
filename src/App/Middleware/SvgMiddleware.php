@@ -33,7 +33,11 @@ class SvgMiddleware implements MiddlewareInterface
             $svgs = [];
             foreach ($matches[2] as $i => $src) {
                 if (!isset($svgs[$src])) {
-                    $file = $this->environment->getAssetSources()->getFilename($src);
+                    try {
+                        $file = $this->environment->getAssetSources()->getFilename($src);
+                    } catch (\Exception $e) {
+                        $file = __DIR__.'/missing.svg';
+                    }
                     if (null !== $file) {
                         $svgData    = new SvgData($file);
                         $svgs[$src] = [
