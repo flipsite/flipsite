@@ -10,6 +10,7 @@ use Flipsite\Assets\Context\ExternalContext;
 use Flipsite\Assets\Context\UnsplashContext;
 use Flipsite\Assets\Context\IcoContext;
 use Flipsite\Assets\Context\RasterContext;
+use Flipsite\Assets\Context\MissingRasterContext;
 use Flipsite\Assets\Context\SvgContext;
 use Flipsite\Assets\Editors\IcoEditor;
 use Flipsite\Assets\Editors\RasterEditor;
@@ -36,14 +37,19 @@ final class ImageHandler
             }
             return new ExternalContext($image);
         }
-        $file = new AssetFile($image, $this->assetSources);
-        if ('svg' === $file->getExtension()) {
-            return new SvgContext($image, $this->imgBasePath, $file, new SvgOptions($options));
+        try {
+            $file = new AssetFile($image, $this->assetSources);
+            if ('svg' === $file->getExtension()) {
+                return new SvgContext($image, $this->imgBasePath, $file, new SvgOptions($options));
+            }
+            if ('ico' === $file->getExtension()) {
+                return new IcoContext($image, $this->imgBasePath, $file);
+            }
+            return new RasterContext($image, $this->imgBasePath, $file, $options);
+        } catch (\Flipsite\Exceptions\AssetNotFoundException) {
+            
+            return new MissingRasterContext($image);
         }
-        if ('ico' === $file->getExtension()) {
-            return new IcoContext($image, $this->imgBasePath, $file);
-        }
-        return new RasterContext($image, $this->imgBasePath, $file, $options);
     }
 
     public function getResponse(Response $response, string $path): Response
