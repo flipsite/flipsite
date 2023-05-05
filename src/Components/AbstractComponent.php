@@ -65,7 +65,13 @@ abstract class AbstractComponent extends AbstractElement
                     $src = str_replace('.png', '.webp', $src);
                 }
                 $imageContext = $this->imageHandler->getContext($src, $options);
-                $target->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$imageContext->getSrcset('url').')');
+                $srcset = $imageContext->getSrcset('url');
+                if (null !== $srcset) {
+                    $target->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$srcset.')');
+                } else {
+                    // Missing image
+                    $target->setAttribute('style', 'background-color:#EF4444');
+                }
             }
             if (($style['options']['loading'] ?? '') === 'eager') {
                 $this->builder->dispatch(new Event('preload', 'background', $imageContext));
