@@ -28,6 +28,9 @@ trait MarkdownTrait
         $parsedown = new \Parsedown();
         $text      = trim($text);
         $html      = $parsedown->text($text);
+        if (!$html) {
+            return $html;
+        }
         $html      = str_replace('<li>', '  <li>', $html);
 
         if (isset($style['bullet'])) {
