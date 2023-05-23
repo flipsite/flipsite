@@ -318,13 +318,13 @@ final class Reader
         $expandedSlugs = [];
         $expandedMeta = [];
         foreach ($pages as $page => $pageData) {
-            if (false !== mb_strpos((string)$page, '[')) {
-                $matches = [];
-                preg_match_all('/\[([^\[\]]*)\]/', $page, $matches);
-                $field = str_replace(']', '', str_replace('[', '', $matches[0][0]));
+            if (false !== mb_strpos((string)$page, ':')) {
+                $tmp = explode(':', (string)$page);
+                $field = array_pop($tmp);
+
                 $sections = $pageData['sections'];
                 foreach ($pageData['_dataSourceList'] as $dataItem) {
-                    $expandedPage = str_replace('['.$field.']', (string)$dataItem[$field], $page);
+                    $expandedPage = str_replace(':'.$field, (string)$dataItem[$field], $page);
                     $pageSections = $sections;
                     foreach ($pageSections as &$pageSection) {
                         $pageSection['_dataSource'] = $dataItem;
