@@ -80,7 +80,7 @@ $app->get('/videos[/{file:.*}]', function (Request $request, Response $response,
 $app->get('/sitemap.xml', function (Request $request, Response $response) {
     $environment = $this->get('environment');
     $reader      = $this->get('reader');
-    $sitemap     = new Sitemap($environment->getServer(), $reader->getSlugs());
+    $sitemap     = new Sitemap($environment->getServer(), $reader->getSlugs(), $reader->getHiddenPages());
     $response->getBody()->write((string) $sitemap);
     return $response->withHeader('Content-type', 'application/xml');
 });

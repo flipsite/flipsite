@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\AbstractEnvironment;
@@ -10,6 +11,7 @@ use Flipsite\Utils\Language;
 use Flipsite\Utils\YamlExpander;
 use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
+use Flipsite\Utils\DataHelper;
 
 final class Reader
 {
@@ -162,11 +164,7 @@ final class Reader
             if ($this->hideSection($section, $page, $language)) {
                 continue;
             }
-            if (isset($section['repeat'])) {
-                $sections = array_merge($sections, $this->getRepeated($section));
-            } else {
-                $sections[] = $section;
-            }
+            $sections[] = $section;
         }
         foreach ($sections as $i => &$section) {
             $parentStyle = [];
@@ -237,22 +235,6 @@ final class Reader
         return $meta;
     }
 
-    public function getLayout(string $page): ?array
-    {
-        $all = array_merge(
-            $this->data['before'] ?? [],
-            $this->data['pages'][$page] ?? [],
-            $this->data['after'] ?? []
-        );
-        foreach ($all as $section) {
-            $type = $section['type'] ?? 'default';
-            if ('layout' === $type) {
-                return $section;
-            }
-        }
-        return null;
-    }
-
     public function getComponentFactories(): array
     {
         $factories = [];
@@ -270,6 +252,17 @@ final class Reader
             }
         }
         return $factories;
+    }
+
+    public function getHiddenPages(): array
+    {
+        $hidden = ['404'];
+        foreach ($this->data['meta'] ?? [] as $page => $meta) {
+            if ($meta['hidden'] ?? false) {
+                $hidden[] = $page;
+            }
+        }
+        return $hidden;
     }
 
     private function hideSection(array $section, string $page, Language $language): bool
@@ -320,39 +313,45 @@ final class Reader
     {
         $pages         = $this->data['pages'] ?? [];
         $slugs         = $this->data['slugs'] ?? [];
+        $meta          = $this->data['meta'] ?? [];
         $expandedPages = [];
         $expandedSlugs = [];
+        $expandedMeta = [];
         foreach ($pages as $page => $pageData) {
             if (false !== mb_strpos((string)$page, '[')) {
                 $matches = [];
                 preg_match_all('/\[([^\[\]]*)\]/', $page, $matches);
-
-                $params       = $matches[0];
-                $permutations = $this->getPermutations(0, count($params), $pageData['data']);
-
-                // TODO add support for localized slugs
-                foreach ($permutations as $permutation) {
-                    $expandedPage = $page;
-                    $sections     = $pageData['content'];
-                    foreach ($params as $i => $param) {
-                        $expandedPage = str_replace($param, (string)$permutation[$i], $expandedPage);
-                        $sections     = ArrayHelper::strReplace($param, (string)$permutation[$i], $sections);
+                $field = str_replace(']', '', str_replace('[', '', $matches[0][0]));
+                $sections = $pageData['sections'];
+                foreach ($pageData['_dataSourceList'] as $dataItem) {
+                    $expandedPage = str_replace('['.$field.']', (string)$dataItem[$field], $page);
+                    $pageSections = $sections;
+                    foreach ($pageSections as &$pageSection) {
+                        $pageSection['_dataSource'] = $dataItem;
                     }
-                    $dataMapper                   = new DataMapper();
-                    $expandedPages[$expandedPage] = $dataMapper->apply($sections, $pageData['data']);
-                    if (isset($slugs[$page])) {
-                        $expandedSlugs = $this->extendSlug($expandedSlugs, $page, $slugs[$page], $params, $permutation);
+                    $expandedPages[$expandedPage] = $pageSections;
+                    // if (isset($slugs[$page])) {
+                    //     $expandedSlugs[$page] = $slugs[$page];
+                    // }
+                    // TODO localized slugs
+
+                    if (isset($meta[$page])) {
+                        $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $dataItem);
                     }
                 }
             } else {
                 $expandedPages[$page] = $pageData;
-                if (isset($slugs[$page])) {
-                    $expandedSlugs[$page] = $slugs[$page];
+                // if (isset($slugs[$page])) {
+                //     $expandedSlugs[$page] = $slugs[$page];
+                // }
+                if (isset($meta[$page])) {
+                    $expandedMeta[$page] = $meta[$page];
                 }
             }
         }
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
+        $this->data['meta'] = $expandedMeta;
     }
 
     private function extendSlug(array $extendedSlugs, string $page, string|array $slugs, array $params, array $permutation): array
@@ -382,57 +381,5 @@ final class Reader
             }
         }
         return $permutations;
-    }
-
-    private function getRepeated(array $data): array
-    {
-        $repeat = $data['repeat'];
-        foreach ($repeat as $key => &$val) {
-            $val['key'] = $key;
-        }
-        unset($data['repeat']);
-        if (!isset($data['sections'])) {
-            $sections = [$data];
-        } else {
-            $sections = $data['sections'];
-        }
-
-        $dataMapper                   = new DataMapper();
-        $repeated                     = [];
-        foreach ($repeat as $data) {
-            $repeated = array_merge($repeated, $dataMapper->apply($sections, $data));
-        }
-
-        return $repeated;
-    }
-}
-
-class DataMapper
-{
-    public function apply(array $tpl, array $data): array
-    {
-        $dot = new \Adbar\Dot($data);
-        return $this->search($tpl, $dot);
-    }
-
-    private function search(array $tpl, \Adbar\Dot $dot): array
-    {
-        foreach ($tpl as $attr => &$value) {
-            if (is_array($value)) {
-                $value = $this->search($value, $dot);
-            } elseif (is_string($value) && false !== mb_strpos($value, '{data.')) {
-                $matches = [];
-                preg_match_all('/\{data\.(.*?)\}/', $value, $matches);
-                foreach ($matches[1] as $i => $replace) {
-                    $replace = $dot->get($replace);
-                    if (is_array($replace)) {
-                        $value = $replace;
-                    } else {
-                        $value = str_replace($matches[0][$i], $replace ?? '', $value);
-                    }
-                }
-            }
-        }
-        return $tpl;
     }
 }
