@@ -326,7 +326,7 @@ final class Reader
                 foreach ($pageData['_dataSourceList'] as $dataItem) {
                     $expandedPage = str_replace(':'.$field, (string)$dataItem[$field], $page);
                     $pageSections = $sections;
-                    foreach ($pageSections as &$pageSection) {
+                    foreach ($pageSections ?? [] as &$pageSection) {
                         $pageSection['_dataSource'] = $dataItem;
                     }
                     $expandedPages[$expandedPage] = $pageSections;
