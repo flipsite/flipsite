@@ -42,7 +42,9 @@ class YamlDumper
             if (strpos($match, "''") === false) {
                 $with = ltrim($match, ": '");
                 $with = rtrim($with, "'");
-                $yaml = str_replace($match, ': '.$with, $yaml);
+                if (strpos($with, ':') === false) {
+                    $yaml = str_replace($match, ': '.$with, $yaml);
+                }
             }
         }
 
