@@ -26,7 +26,11 @@ final class Image extends AbstractComponent
 
     public function build(array $data, array $style, string $appearance): void
     {
-        $src               = $data['src'];
+        $src = $data['src'];
+        if (!$src) {
+            $this->render = false;
+            return;
+        }
         $options           = $this->normalizeOptions($style['options'] ?? []);
         $sizes             = $options['sizes'] ?? null;
         unset($options['sizes']);

@@ -9,7 +9,6 @@ use Flipsite\Utils\ArrayHelper;
 class Nav extends AbstractItems
 {
     use Traits\PathTrait;
-    use Traits\RepeatTrait;
     use Traits\SlugsTrait;
     use Traits\ReaderTrait;
 
