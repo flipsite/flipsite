@@ -6,6 +6,7 @@ namespace Flipsite\Components;
 final class Group extends AbstractGroup
 {
     use Traits\UrlTrait;
+    use Traits\SlugsTrait;
 
     protected string $tag = 'div';
 
@@ -16,6 +17,26 @@ final class Group extends AbstractGroup
         }
         $replace   = [];
         $this->tag = 'a';
+
+        if ('auto' === $data['_action']) {
+            $target = $data['_target'];
+            $page = $this->slugs->getPage($target);
+            if ($page) {
+                $data['_action'] = 'page';
+            } elseif (str_starts_with($target,'http')) {
+                $data['_action'] = 'url-blank';
+            } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
+                $emailErr = "Invalid email format";
+                $data['_action'] = 'mailto';
+            } else {
+                $matches = [];
+                preg_match('/\+[0-9]{9,20}/', $target, $matches);
+                if (count($matches)) {
+                    $data['_action'] = 'tel';
+                }
+            } 
+        }
+
         switch ($data['_action'] ?? []) {
             case 'page':
             case 'url':
@@ -23,9 +44,9 @@ final class Group extends AbstractGroup
                 $external              = false;
                 $data['_attr']['href'] = $this->url($data['_target'], $external);
                 if ($external) {
-                    $data['attr']['rel'] = 'noopener noreferrer';
+                    $data['_attr']['rel'] = 'noopener noreferrer';
                     if ('url-blank' === $data['_action']) {
-                        $data['attr']['target'] = '_blank';
+                        $data['_attr']['target'] = '_blank';
                     }
                 }
                 break;
