@@ -43,5 +43,9 @@ final class Environment extends AbstractEnvironment
         if (false !== getenv('ASSET_DIRS')) {
             $this->externalAssetDirs = explode(',', getenv('ASSET_DIRS'));
         }
+
+        if (false !== getenv('TRAILING_SLASH')) {
+            $this->trailingSlash = true;
+        }
     }
 }

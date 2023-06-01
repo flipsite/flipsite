@@ -15,6 +15,7 @@ abstract class AbstractEnvironment
     protected string $videoDir;
     protected string $basePath;
     protected string $server;
+    protected bool $trailingSlash = false;
     protected array $externalAssetDirs    = [];
     protected ?AssetSources $imageSources = null;
 
@@ -89,5 +90,10 @@ abstract class AbstractEnvironment
     public function isLive() : bool
     {
         return $this->live;
+    }
+
+    public function hasTrailingSlash() : bool
+    {
+        return $this->trailingSlash;
     }
 }

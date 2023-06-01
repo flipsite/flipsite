@@ -66,6 +66,15 @@ trait UrlTrait
         }
 
         $url = http_build_url($parsed);
-        return 1 === mb_strlen($url) ? $url : rtrim($url, '/');
+        if (1 === mb_strlen($url)) {
+            return $url;
+        } 
+        $url = rtrim($url, '/');
+        if ($this->environment->hasTrailingSlash()) {
+            $url.='/';
+        }
+        return $url;
+
+
     }
 }

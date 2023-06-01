@@ -8,7 +8,7 @@ use Flipsite\Data\Slugs;
 
 final class Sitemap
 {
-    public function __construct(private string $baseUrl, private Slugs $slugs, private array $hidden)
+    public function __construct(private string $baseUrl, private Slugs $slugs, private array $hidden, protected bool $trailingSlash)
     {
     }
 
@@ -39,7 +39,11 @@ final class Sitemap
 
     private function getUrl(string $url): string
     {
-        return trim($this->baseUrl.'/'.$url, '/');
+        $url = trim($this->baseUrl.'/'.$url, '/');
+        if ($this->trailingSlash) {
+            $url.= '/';
+        }
+        return $url;
     }
 
     /**
