@@ -311,22 +311,21 @@ final class Reader
 
     private function expandPagesAndSlugs(): void
     {
-        $pages         = $this->data['pages'] ?? [];
-        $slugs         = $this->data['slugs'] ?? [];
-        $meta          = $this->data['meta'] ?? [];
+        $pages    = $this->data['pages'] ?? [];
+        $slugs    = $this->data['slugs'] ?? [];
+        $meta     = $this->data['meta'] ?? [];
+
         $expandedPages = [];
         $expandedSlugs = [];
         $expandedMeta = [];
-        foreach ($pages as $page => $pageData) {
+        foreach ($pages as $page => $sections) {
             if (false !== mb_strpos((string)$page, ':')) {
                 $tmp = explode(':', (string)$page);
                 $field = array_pop($tmp);
-
-                $sections = $pageData['sections'];
-                foreach ($pageData['_dataSourceList'] as $dataItem) {
+                foreach ($this->data['pageData'][$page] ?? [] as $dataItem) {
                     $expandedPage = str_replace(':'.$field, (string)$dataItem[$field], $page);
-                    $pageSections = $sections;
-                    foreach ($pageSections ?? [] as &$pageSection) {
+                    $pageSections = $sections ?? [];
+                    foreach ($pageSections as &$pageSection) {
                         $pageSection['_dataSource'] = $dataItem;
                     }
                     $expandedPages[$expandedPage] = $pageSections;
@@ -340,7 +339,7 @@ final class Reader
                     }
                 }
             } else {
-                $expandedPages[$page] = $pageData;
+                $expandedPages[$page] = $sections;
                 // if (isset($slugs[$page])) {
                 //     $expandedSlugs[$page] = $slugs[$page];
                 // }
@@ -349,6 +348,7 @@ final class Reader
                 }
             }
         }
+        
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
         $this->data['meta'] = $expandedMeta;
