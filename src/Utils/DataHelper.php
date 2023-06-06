@@ -6,24 +6,27 @@ namespace Flipsite\Utils;
 
 final class DataHelper
 {
-    public static function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', array $stopIfAttr = []): array
+    public static function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource'): array
     {
         if (isset($data[$dataSourceKey])) {
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);
             unset($data[$dataSourceKey]);
         }
         $dataSourceDot = new \Adbar\Dot($dataSource);
-        foreach ($data as $attr => &$value) {
+        foreach ($data as &$value) {
             if (is_array($value)) {
                 $attrs = array_keys($value);
                 $stop  = false;
                 foreach ($attrs as $attr) {
-                    if (!$stop && in_array($attr, $stopIfAttr)) {
+                    if ($dataSourceKey.'List' === $attr) {
+                        foreach ($value[$attr] as &$dataItem) {
+                            $dataItem = ArrayHelper::merge($dataItem, $dataSource);
+                        }
                         $stop = true;
                     }
                 }
                 if (!$stop) {
-                    $value = self::applyData($value, $dataSource, $dataSourceKey, $stopIfAttr);
+                    $value = self::applyData($value, $dataSource, $dataSourceKey);
                 }
             } else {
                 preg_match_all('/\{([^\{\}]+)\}/', (string)$value, $matches);

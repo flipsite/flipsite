@@ -104,7 +104,7 @@ class ComponentBuilder
         }
 
         if (isset($data['_dataSource'])) {
-            $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource', ['_dataSourceList']);
+            $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource');
         }
 
         // Check external factories

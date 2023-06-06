@@ -48,15 +48,21 @@ final class Repeat extends AbstractGroup
             $length         = intval($data['_options']['length'] ?? 999999);
             $dataSourceList = array_splice($dataSourceList, $offset, $length);
         }
-        if (isset($data['_options']['sort'])) {
-            $tmp       = explode(' ', $data['_options']['sort']);
-            $sortField = $tmp[0];
+
+        error_log($data['_options']['filter']);
+        error_log($data['_options']['filterBy']);
+
+        if (isset($data['_options']['sortBy'])) {
+            $sortField = $data['_options']['sortBy'];
             uasort($dataSourceList, function ($a, $b) use ($sortField) {
-                return $a[$sortField] <=> $b[$sortField];
+                if (isset($a[$sortField],$b[$sortField])) {
+                    return $a[$sortField] <=> $b[$sortField];
+                }
+                return 0;
             });
-            if ('desc' === ($tmp[1] ?? 'asc')) {
-                $dataSourceList = array_reverse($dataSourceList);
-            }
+        }
+        if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
+            $dataSourceList = array_reverse($dataSourceList);
         }
         $components = array_filter($data, function ($key) : bool {
             return !str_starts_with($key, '_');
