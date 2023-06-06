@@ -20,7 +20,7 @@ class RawPath
             return strpos($item, ':') !== false;
         }));
         $tmp = trim(array_shift($tmp),':');
-        $tmp = explode('.',$tmp);
+        $tmp = explode('|',$tmp);
         $this->content = $tmp[0];
         $this->key = $tmp[1];
     }
@@ -38,6 +38,6 @@ class RawPath
     public function getPage(array $dataItem): string
     {
         $replaceWith = $dataItem[$this->key];
-        return str_replace(':'.$this->content.'.'.$this->key, $replaceWith, $this->rawPath);
+        return str_replace(':'.$this->content.'|'.$this->key, $replaceWith, $this->rawPath);
     }
 }
