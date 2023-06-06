@@ -319,32 +319,27 @@ final class Reader
         $expandedSlugs = [];
         $expandedMeta = [];
         foreach ($pages as $page => $sections) {
-            if (false !== mb_strpos((string)$page, ':')) {
-                $tmp = explode(':', (string)$page);
-                $field = array_pop($tmp);
-                foreach ($this->data['pageData'][$page] ?? [] as $dataItem) {
-                    $expandedPage = str_replace(':'.$field, (string)$dataItem[$field], $page);
+            $path = new RawPath($page);
+            if ($path->hasParams()) {
+                foreach ($this->data['content'][$path->getContent()] as $dataItem) {
+                    $expandedPage = $path->getPage($dataItem);
                     $pageSections = $sections ?? [];
                     foreach ($pageSections as &$pageSection) {
                         $pageSection['_dataSource'] = $dataItem;
                     }
                     $expandedPages[$expandedPage] = $pageSections;
-                    // if (isset($slugs[$page])) {
-                    //     $expandedSlugs[$page] = $slugs[$page];
-                    // }
-                    // TODO localized slugs
-
                     if (isset($meta[$page])) {
                         $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $dataItem);
                     }
+                    // TODO localized slugs
                 }
             } else {
                 $expandedPages[$page] = $sections;
-                // if (isset($slugs[$page])) {
-                //     $expandedSlugs[$page] = $slugs[$page];
-                // }
                 if (isset($meta[$page])) {
                     $expandedMeta[$page] = $meta[$page];
+                }
+                if (isset($slugs[$page])) {
+                    $expandedSlugs[$page] = $slugs[$page];
                 }
             }
         }

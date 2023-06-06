@@ -26,7 +26,7 @@ class YamlExpander
         $data     = self::parseIncludes($data, $dir);
 
         // Undot data
-        $data = self::unDot($data);
+        //$data = self::unDot($data);
 
         // Parse references (both string and object)
         $data = self::parseRef($data, $data);
@@ -47,7 +47,7 @@ class YamlExpander
         }
 
         // Undot data
-        $data = self::unDot($data);
+        //$data = self::unDot($data);
 
         // Parse references (both string and object)
         $data = self::parseRef($data, $data);
