@@ -323,13 +323,18 @@ final class Reader
             if ($path->hasParams()) {
                 foreach ($this->data['content'][$path->getContent()] as $dataItem) {
                     $expandedPage = $path->getPage($dataItem);
+                    // Add page. prefix to data item attributes
+                    $pageDataItem = [];
+                    foreach ($dataItem as $attr => $val) {
+                        $pageDataItem['page.'.$attr] = $val;
+                    }
                     $pageSections = $sections ?? [];
                     foreach ($pageSections as &$pageSection) {
-                        $pageSection['_dataSource'] = $dataItem;
+                        $pageSection['_dataSource'] = $pageDataItem;
                     }
                     $expandedPages[$expandedPage] = $pageSections;
                     if (isset($meta[$page])) {
-                        $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $dataItem);
+                        $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
                     }
                     // TODO localized slugs
                 }
@@ -343,7 +348,7 @@ final class Reader
                 }
             }
         }
-        
+
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
         $this->data['meta'] = $expandedMeta;

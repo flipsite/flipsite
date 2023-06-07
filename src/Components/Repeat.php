@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Repeat extends AbstractGroup
@@ -10,10 +11,11 @@ final class Repeat extends AbstractGroup
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, string $appearance): void
     {
         $repeatTpl   = $data['_repeatTpl'];
         $repeatData  = $data['_repeatData'];
+
         unset($data['_repeatTpl'], $data['_repeatData']);
         $children = [];
         $total    = count($repeatData);
@@ -36,11 +38,19 @@ final class Repeat extends AbstractGroup
         parent::build($data, $style, $appearance);
     }
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         if (isset($data['_dataSourceList'])) {
             $dataSourceList = $data['_dataSourceList'];
             unset($data['_dataSourceList']);
+        }
+
+        if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
+            $filter = $data['_options']['filter'];
+            $filterBy = $data['_options']['filterBy'];
+            $dataSourceList = array_values(array_filter($dataSourceList, function ($item) use ($filter, $filterBy) {
+                return $item[$filterBy] === $filter;
+            }));
         }
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
@@ -48,9 +58,6 @@ final class Repeat extends AbstractGroup
             $length         = intval($data['_options']['length'] ?? 999999);
             $dataSourceList = array_splice($dataSourceList, $offset, $length);
         }
-
-        error_log($data['_options']['filter']);
-        error_log($data['_options']['filterBy']);
 
         if (isset($data['_options']['sortBy'])) {
             $sortField = $data['_options']['sortBy'];
@@ -64,7 +71,8 @@ final class Repeat extends AbstractGroup
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
             $dataSourceList = array_reverse($dataSourceList);
         }
-        $components = array_filter($data, function ($key) : bool {
+
+        $components = array_filter($data, function ($key): bool {
             return !str_starts_with($key, '_');
         }, ARRAY_FILTER_USE_KEY);
         foreach (array_keys($components) as $key) {
@@ -75,4 +83,3 @@ final class Repeat extends AbstractGroup
         return $data;
     }
 }
-
