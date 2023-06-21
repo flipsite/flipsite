@@ -1,12 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 final class DataHelper
 {
-    public static function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', bool $replaceIfMissing = true): array
+    public static function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', bool $replaceIfMissing = false): array
     {
         if (isset($data[$dataSourceKey])) {
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);
@@ -17,7 +16,7 @@ final class DataHelper
         foreach ($data as &$value) {
             if (is_array($value)) {
                 if (isset($value[$dataSourceKey.'List'])) {
-                    $dataItemAttrs = array_keys($value[$dataSourceKey.'List'][0]);
+                    $dataItemAttrs     = array_keys($value[$dataSourceKey.'List'][0]);
                     $stripedDataSource = [];
                     foreach ($dataSource as $attr => $val) {
                         if (!in_array($attr, $dataItemAttrs)) {

@@ -6,11 +6,13 @@ namespace Flipsite\Components;
 final class Paragraph extends AbstractComponent
 {
     use Traits\MarkdownTrait;
+    use Traits\GlobalVarsTrait;
     protected string $tag = 'p';
 
     public function build(array $data, array $style, string $appearance) : void
     {
         $markdown  = $this->getMarkdownLine($data['value'] ?? [], $style['value'] ?? [], $appearance);
+        $markdown  = $this->checkGlobalVars($markdown);
         $this->setContent($markdown);
         $this->addStyle($style);
     }

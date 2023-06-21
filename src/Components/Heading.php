@@ -1,18 +1,19 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Heading extends AbstractComponent
 {
     use Traits\MarkdownTrait;
+    use Traits\GlobalVarsTrait;
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
     public function build(array $data, array $style, string $appearance): void
     {
         $markdown  = $this->getMarkdownLine((string)$data['value'], $style['markdown'] ?? [], $appearance);
+        $markdown  = $this->checkGlobalVars($markdown);
         $this->addStyle($style);
         if (isset($data['name'])) {
             $a = new Element('a');
