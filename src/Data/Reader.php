@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\AbstractEnvironment;
@@ -317,12 +316,17 @@ final class Reader
 
         $expandedPages = [];
         $expandedSlugs = [];
-        $expandedMeta = [];
+        $expandedMeta  = [];
         foreach ($pages as $page => $sections) {
             $path = new RawPath($page);
             if ($path->hasParams()) {
                 foreach ($this->data['content'][$path->getContent()] as $dataItem) {
                     $expandedPage = $path->getPage($dataItem);
+
+                    // Dont overwrite existing page
+                    if (isset($expandedPages[$expandedPage])) {
+                        continue 2;
+                    }
                     // Add page. prefix to data item attributes
                     $pageDataItem = [];
                     foreach ($dataItem as $attr => $val) {
@@ -351,7 +355,7 @@ final class Reader
 
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
-        $this->data['meta'] = $expandedMeta;
+        $this->data['meta']  = $expandedMeta;
     }
 
     private function extendSlug(array $extendedSlugs, string $page, string|array $slugs, array $params, array $permutation): array
