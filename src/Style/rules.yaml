@@ -195,7 +195,7 @@ list-inside: list-style-position:inside
 list-none: list-style-type:none
 list-outside: list-style-position:outside
 lowercase: text-transform:lowercase
-min-w-none: min-height:0px
+min-h-none: min-height:0px
 min-h-full: min-height:100%
 min-h-screen: min-height:100vh
 min-h-min: min-height:min-content
