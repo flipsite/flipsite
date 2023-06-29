@@ -325,7 +325,7 @@ final class Reader
 
                     // Dont overwrite existing page
                     if (isset($expandedPages[$expandedPage])) {
-                        continue 2;
+                        continue;
                     }
                     // Add page. prefix to data item attributes
                     $pageDataItem = [];
