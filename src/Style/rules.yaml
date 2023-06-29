@@ -195,6 +195,7 @@ list-inside: list-style-position:inside
 list-none: list-style-type:none
 list-outside: list-style-position:outside
 lowercase: text-transform:lowercase
+min-w-none: min-height:0px
 min-h-full: min-height:100%
 min-h-screen: min-height:100vh
 min-h-min: min-height:min-content
@@ -207,6 +208,7 @@ max-h-screen: max-height:100vh
 max-h-min: max-height:min-content
 max-h-max: max-height:max-content
 max-h-fit: max-height:fit-content
+min-w-none: min-width:0px
 min-w-full: min-width:100%
 min-w-min: min-width:min-content
 min-w-max: min-width:max-content
