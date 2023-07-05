@@ -7,12 +7,13 @@ final class Group extends AbstractGroup
 {
     use Traits\UrlTrait;
     use Traits\SlugsTrait;
+    use Traits\BuilderTrait;
 
     protected string $tag = 'div';
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (!isset($data['_action'],$data['_target'])) {
+        if (!isset($data['_action'])) {
             return $data;
         }
         $replace   = [];
@@ -20,13 +21,13 @@ final class Group extends AbstractGroup
 
         if ('auto' === $data['_action']) {
             $target = $data['_target'];
-            $page = $this->slugs->getPage($target);
+            $page   = $this->slugs->getPage($target);
             if ($page) {
                 $data['_action'] = 'page';
-            } elseif (str_starts_with($target,'http')) {
+            } elseif (str_starts_with($target, 'http')) {
                 $data['_action'] = 'url-blank';
             } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
-                $emailErr = "Invalid email format";
+                $emailErr        = 'Invalid email format';
                 $data['_action'] = 'mailto';
             } else {
                 $matches = [];
@@ -34,9 +35,8 @@ final class Group extends AbstractGroup
                 if (count($matches)) {
                     $data['_action'] = 'tel';
                 }
-            } 
+            }
         }
-
         switch ($data['_action'] ?? []) {
             case 'page':
             case 'url':
@@ -76,6 +76,11 @@ final class Group extends AbstractGroup
             case 'submit':
                 $this->tag             = 'button';
                 $data['_attr']['type'] = 'submit';
+                break;
+            case 'toggle':
+                $this->tag             = 'button';
+                $this->setAttribute('onclick', 'javascript:toggle(this)');
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
                 break;
             default:
                 $data['_attr']['href'] = '#';

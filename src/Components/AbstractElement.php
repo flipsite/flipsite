@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -36,6 +35,7 @@ abstract class AbstractElement
     {
         $this->commentOut = $commentOut ? $comment : null;
     }
+
     public function getTag(): string
     {
         return $this->tag;
@@ -133,7 +133,7 @@ abstract class AbstractElement
 
     public function replaceChildren(array $children): self
     {
-        $this->cache = null;
+        $this->cache    = null;
         $this->children = $children;
         return $this;
     }
@@ -221,6 +221,9 @@ abstract class AbstractElement
     {
         $classes = [];
         foreach ($this->style as $attr => $class) {
+            if ($attr[0] === '_') {
+                continue;
+            }
             if (is_string($class)) {
                 $classes_ = explode(' ', trim($class));
                 $classes  = array_merge($classes, $classes_);
@@ -238,8 +241,8 @@ abstract class AbstractElement
             case 'button':
                 $allowed = array_merge(
                     $allowed,
-                    ['disabled','form','formaction','formenctype','formmethod',
-                    'formnovalidate','formtarget','name','type','value',]
+                    ['disabled', 'form', 'formaction', 'formenctype', 'formmethod',
+                        'formnovalidate', 'formtarget', 'name', 'type', 'value', ]
                 );
                 break;
             default:
