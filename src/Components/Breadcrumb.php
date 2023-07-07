@@ -55,7 +55,7 @@ final class Breadcrumb extends AbstractGroup
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
         $items = $data['items'] ?? [];
@@ -83,6 +83,6 @@ final class Breadcrumb extends AbstractGroup
         }
         unset($style['items'], $style['active']);
 
-        parent::build($data, $style, $appearance);
+        parent::build($data, $style, $options);
     }
 }

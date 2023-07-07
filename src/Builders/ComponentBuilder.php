@@ -45,7 +45,7 @@ class ComponentBuilder
         $this->factories[] = $factory;
     }
 
-    public function build(string $type, array|string|int|bool $data, array $parentStyle, string $appearance): ?AbstractComponent
+    public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
     {
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
@@ -91,10 +91,10 @@ class ComponentBuilder
             unset($data['_style']);
         }
 
-        $appearance = $style['appearance'] ?? $appearance;
+        $options['appearance'] = $style['appearance'] ?? $options['appearance'];
         unset($style['appearance']);
         if (isset($style['dark'])) {
-            $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $appearance);
+            $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
         }
 
         if (is_array($style)) {
@@ -134,7 +134,20 @@ class ComponentBuilder
                 if (method_exists($component, 'addRequest')) {
                     $component->addRequest($this->request);
                 }
-                $data          = $component->normalize($data);
+                // Handle nav stuff
+                if (in_array($data['_action'] ?? '',['page','auto']) && isset($data['_target'])) {
+                    $options['nav'] = 'none';
+                    if (str_starts_with($data['_target'], $this->path->getPage())) {
+                        $options['nav'] = 'active';
+                    }
+                    $style = $this->handleStyleNav($style, $options['nav']);
+                } elseif (isset($options['nav'])) {
+                    $style = $this->handleStyleNav($style, $options['nav']);
+                }
+
+                $data = $component->normalize($data);
+                
+
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
                         $component->setAttribute($attr, $value);
@@ -156,7 +169,7 @@ class ComponentBuilder
                     $component->setBackground($component, $style['background']);
                     unset($style['background']);
                 }
-                $component->build($data, $style ?? [], $appearance);
+                $component->build($data, $style ?? [], $options);
                 return $component;
             }
         }
@@ -213,5 +226,29 @@ class ComponentBuilder
                 $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
             }
         }
+    }
+
+    private function handleStyleNav(array $style, string $type) : array {
+        $style = ArrayHelper::applyStringCallback($style, function($str) use ($type) {
+            if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
+                return $str;
+            }
+            $res = [];
+            $tmp = explode(' ',$str);
+            foreach ($tmp as $cls) {
+                $active = str_starts_with($cls, 'nav-active:');
+                $exact = str_starts_with($cls, 'nav-exact:');
+                if ('none' === $type && !$active && !$exact) {
+                    $res[] = $cls;
+                } elseif ('active' === $type && $active) {
+                    $res[] = str_replace('nav-active:','',$cls);
+                } elseif ('exact' === $type && $exact) {
+                    $res[] = str_replace('nav-exact:','',$cls);
+                } 
+            }
+            return implode(' ',$res);
+
+        });
+        return $style;
     }
 }

@@ -7,7 +7,7 @@ abstract class AbstractComponent extends AbstractElement
 {
     use Traits\ImageHandlerTrait;
 
-    abstract public function build(array $data, array $style, string $appearance) : void;
+    abstract public function build(array $data, array $style, array $options) : void;
 
     public function normalize(string|int|bool|array $data) : array
     {

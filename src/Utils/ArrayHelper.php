@@ -112,4 +112,15 @@ final class ArrayHelper
         }
         return $new;
     }
+
+    public static function applyStringCallback(array $data, callable $callback) : array {
+        foreach ($data as &$value) {
+            if (is_string($value)) {
+                $value = $callback($value);
+            } elseif (is_object($value)) {
+                $value = self::applyTypeCallback($value, $callback);
+            }
+        }
+        return $data;
+    }
 }

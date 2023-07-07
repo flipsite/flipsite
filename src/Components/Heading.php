@@ -10,9 +10,9 @@ final class Heading extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
-    public function build(array $data, array $style, string $appearance): void
+    public function build(array $data, array $style, array $options): void
     {
-        $markdown  = $this->getMarkdownLine((string)$data['value'], $style['markdown'] ?? [], $appearance);
+        $markdown  = $this->getMarkdownLine((string)$data['value'], $style['markdown'] ?? [], $options['appearance']);
         $markdown  = $this->checkGlobalVars($markdown);
         $this->addStyle($style);
         if (isset($data['name'])) {

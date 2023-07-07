@@ -8,7 +8,7 @@ final class Sr extends AbstractComponent
     protected string $tag   = 'span';
     protected bool $oneline = true;
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle(['screenReaders' => 'sr-only']);
         $this->setContent($data['value']);

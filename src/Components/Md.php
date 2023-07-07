@@ -15,7 +15,7 @@ final class Md extends AbstractComponent
 
     private ?array $containerStyle = null;
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         if (mb_strpos($data['value'], '.md')) {
             $filename = $this->environment->getSiteDir().'/'.$data['value'];
@@ -28,7 +28,7 @@ final class Md extends AbstractComponent
 
         $this->containerStyle = $style ?? null;
 
-        $this->content = $this->getMarkdown($markdown ?? '', $style ?? null, $appearance);
+        $this->content = $this->getMarkdown($markdown ?? '', $style ?? null, $options['appearance']);
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string

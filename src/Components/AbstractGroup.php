@@ -14,7 +14,7 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, string $appearance): void
+    public function build(array $data, array $style, array $options) : void
     {
         foreach ($data['_attr'] ?? [] as $attr => $val) {
             $this->setAttribute($attr, $val);
@@ -42,7 +42,7 @@ abstract class AbstractGroup extends AbstractComponent
                     if (isset($optimizedStyle['background'])) {
                         $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $i, $total);
                     }
-                    $children[] = $this->builder->build($type, $repeatTplComponent, $optimizedStyle, $appearance);
+                    $children[] = $this->builder->build($type, $repeatTplComponent, $optimizedStyle, $options);
                 }
             }
             $this->addChildren($children);
@@ -52,7 +52,7 @@ abstract class AbstractGroup extends AbstractComponent
             $total    = count($data);
             foreach ($data as $type => $componentData) {
                 $componentStyle = $this->optimizeStyle($style[$type] ?? [], $i, $total);
-                $children[]     = $this->builder->build($type, $componentData ?? [], $componentStyle, $appearance);
+                $children[]     = $this->builder->build($type, $componentData ?? [], $componentStyle, $options);
                 $i++;
             }
 

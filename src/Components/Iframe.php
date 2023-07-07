@@ -8,7 +8,7 @@ final class Iframe extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'iframe';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->setAttribute('loading', 'lazy');
         $this->setAttribute('data-load-onenter', 'lazy');

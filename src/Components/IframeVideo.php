@@ -9,7 +9,7 @@ final class IframeVideo extends AbstractGroup
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style,array $options) : void
     {
         $this->setAttribute('onclick', 'playIframeVideo(this)');
 
@@ -40,7 +40,7 @@ final class IframeVideo extends AbstractGroup
             ];
         }
 
-        parent::build($data, $style, $appearance);
+        parent::build($data, $style, $options);
         $this->builder->dispatch(new Event('global-script', 'youtube', file_get_contents(__DIR__.'/../../js/play-iframe-video.min.js')));
     }
 }

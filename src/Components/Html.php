@@ -7,7 +7,7 @@ final class Html extends AbstractComponent
 {
     use Traits\EnvironmentTrait;
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         if (mb_strpos($data['value'], '.html')) {
             $filename = $this->environment->getSiteDir().'/'.$data['value'];

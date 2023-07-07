@@ -24,7 +24,7 @@ class Languages extends Nav
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance): void
+    public function build(array $data, array $style, array $options): void
     {
         // TODO add aria stuff for accessibility
         if (in_array('full', $data['flags']??[]) || ($data['options']['full'] ?? false)) {
@@ -32,7 +32,7 @@ class Languages extends Nav
                 $item['text'] = $this->getString($item['url']);
             }
         }
-        parent::build($data, $style, $appearance);
+        parent::build($data, $style, $options);
     }
 
     private function getString(string $languageCode): string

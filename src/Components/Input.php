@@ -10,7 +10,7 @@ final class Input extends AbstractComponent
     protected bool $empty   = true;
     protected string $tag   = 'input';
 
-    public function build(array $data, array $style, string $appearance): void
+    public function build(array $data, array $style, arrat $options): void
     {
         $this->addStyle($style);
         $this->setAttribute('type', $data['type'] ?? 'text');

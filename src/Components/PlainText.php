@@ -12,7 +12,7 @@ final class PlainText extends AbstractComponent
         return ['value' => (string)$data];
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->plainText = $data['value'];
     }

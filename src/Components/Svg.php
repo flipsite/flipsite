@@ -19,7 +19,7 @@ final class Svg extends AbstractComponent
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         if (isset($style['wrapper'])) {
             $this->addStyle($style['wrapper']);

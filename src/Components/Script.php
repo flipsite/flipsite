@@ -16,7 +16,7 @@ final class Script extends AbstractComponent
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->setAttribute('src',$data['src']);
     }

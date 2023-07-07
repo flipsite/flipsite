@@ -8,7 +8,7 @@ final class Divider extends AbstractComponent
     protected string $tag  = 'hr';
     protected bool $empty  = true;
 
-    public function build(array $data, array $style, string $appearance) : void
+    public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
     }
