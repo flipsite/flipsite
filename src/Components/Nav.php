@@ -6,7 +6,7 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-class Nav extends AbstractItems
+class Nav extends AbstractGroup
 {
     use Traits\PathTrait;
     use Traits\SlugsTrait;
@@ -14,23 +14,9 @@ class Nav extends AbstractItems
 
     protected string $tag = 'nav';
 
-    public function build(array $data, array $style, string $appearance): void
-    {
-        $data['items'] = $this->addActive($data['items'], $this->path->getPage());
-        $activeStyle = $style['active'] ?? [];
-        unset($style['active']);
-        if ($activeStyle) {
-            foreach ($data['items'] as &$item) {
-                if ($item['active']) {
-                    $item['_style'] = ArrayHelper::merge($item['_style']??[], $activeStyle);
-                }
-            }
-        }
-        parent::build($data, $style, $appearance);
-    }
-
     public function normalize(string|int|bool|array $data): array
     {
+        return [];
         if (is_array($data) && !ArrayHelper::isAssociative($data)) {
             $data = ['items' => $data];
         }
