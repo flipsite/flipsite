@@ -24,7 +24,7 @@ final class Image extends AbstractComponent
         return $data;
     }
 
-    public function build(array $data, array $style, string $appearance): void
+    public function build(array $data, array $style, array $options): void
     {
         $src = $data['src'];
         if (!$src) {
