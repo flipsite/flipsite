@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -14,7 +15,7 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(array $data, array $style, array $options): void
     {
         foreach ($data['_attr'] ?? [] as $attr => $val) {
             $this->setAttribute($attr, $val);
@@ -60,48 +61,61 @@ abstract class AbstractGroup extends AbstractComponent
         }
     }
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         $data = $this->normalizeAction($data);
         $data = $this->normalizeRepeat($data);
         return $data;
     }
 
-    private function normalizeAction(string|int|bool|array $data) : array
+    private function normalizeAction(string|int|bool|array $data): array
     {
-        if (!isset($data['_action'])) {
+        if (isset($data['_page'])) {
+            $data['_target'] = $data['_page'];
+            unset($data['_page']);
+        }
+        $action = $data['_action'] ?? false;
+        $target = $data['_target'] ?? false;
+        unset($data['_action'],$data['_target']);
+
+        if (!$action) {
             return $data;
         }
         $replace   = [];
         $this->tag = 'a';
 
-        if ('auto' === $data['_action']) {
-            $target = $data['_target'];
+        if ('auto' === $action) {
+            if (!$target) {
+                return $data;
+            }
             $page   = $this->slugs->getPage($target);
             if ($page) {
-                $data['_action'] = 'page';
+                $action = 'page';
             } elseif (str_starts_with($target, 'http')) {
-                $data['_action'] = 'url-blank';
+                $action = 'url-blank';
             } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
                 $emailErr        = 'Invalid email format';
-                $data['_action'] = 'mailto';
+                $action = 'mailto';
             } else {
                 $matches = [];
                 preg_match('/\+[0-9]{9,20}/', $target, $matches);
                 if (count($matches)) {
-                    $data['_action'] = 'tel';
+                    $action = 'tel';
                 }
             }
         }
-        switch ($data['_action'] ?? []) {
+        switch ($action) {
             case 'page':
             case 'url':
             case 'url-blank':
+                if (!$target) {
+                    return $data;
+                }
                 $external              = false;
-                $data['_attr']['href'] = $this->url($data['_target'], $external);
+                $data['_attr']['href'] = $this->url($target, $external);
                 if ($external) {
                     $data['_attr']['rel'] = 'noopener noreferrer';
-                    if ('url-blank' === $data['_action']) {
+                    if ('url-blank' === $action) {
                         $data['_attr']['target'] = '_blank';
                     }
                 }
@@ -109,7 +123,7 @@ abstract class AbstractGroup extends AbstractComponent
             case 'tel':
                 $phoneUtil  = \libphonenumber\PhoneNumberUtil::getInstance();
                 try {
-                    $tel         = '+'.trim($data['_target'], '+');
+                    $tel         = '+'.trim($target, '+');
                     $numberProto = $phoneUtil->parse($tel, '');
                     $replace     = [
                         '{{tel}}'      => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
@@ -121,13 +135,13 @@ abstract class AbstractGroup extends AbstractComponent
                 $data['_attr']['href'] = 'tel:'.$tel;
                 break;
             case 'mailto':
-                $data['_attr']['href'] = 'mailto:'.$data['_target'];
+                $data['_attr']['href'] = 'mailto:'.$target;
                 $replace               = [
-                    '{{email}}' => $data['_target']
+                    '{{email}}' => $target
                 ];
                 break;
             case 'scroll':
-                $data['_attr']['href'] = '#'.trim($data['_target'], '#');
+                $data['_attr']['href'] = '#'.trim($target, '#');
                 break;
             case 'submit':
                 $this->tag             = 'button';
@@ -141,7 +155,6 @@ abstract class AbstractGroup extends AbstractComponent
             default:
                 $data['_attr']['href'] = '#';
         }
-        unset($data['_action'], $data['_target']);
         return $data;
     }
 
@@ -153,9 +166,9 @@ abstract class AbstractGroup extends AbstractComponent
         } else {
             return $data;
         }
-        if (str_starts_with($dataSourceList,'_pages')) {
-            $dataSourceList = $this->getPages(intval(str_replace('_pages-','',$dataSourceList)));
-        } else if('_social' === $dataSourceList) {
+        if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
+            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)));
+        } elseif(is_string($dataSourceList) && '_social' === $dataSourceList) {
             $dataSourceList = $this->getSocial();
         }
 
@@ -197,7 +210,8 @@ abstract class AbstractGroup extends AbstractComponent
         return $data;
     }
 
-    private function getPages(int $level) : array {
+    private function getPages(int $level): array
+    {
         $pages      = [];
         $all        = $this->slugs->getPages();
         $firstExact = false;
@@ -226,7 +240,7 @@ abstract class AbstractGroup extends AbstractComponent
         }
         return $items;
     }
-    private function getSocial() : array 
+    private function getSocial(): array
     {
         $name     = $this->reader->get('name');
         $language = $this->path->getLanguage();
