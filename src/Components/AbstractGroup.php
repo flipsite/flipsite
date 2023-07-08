@@ -163,6 +163,9 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_dataSourceList'])) {
             $dataSourceList = $data['_dataSourceList'];
             unset($data['_dataSourceList']);
+            if ('_none' === $dataSourceList) {
+                return $data;
+            }
         } else {
             return $data;
         }
