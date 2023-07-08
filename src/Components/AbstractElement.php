@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -203,12 +204,18 @@ abstract class AbstractElement
         }
         $html = '';
         foreach ($this->attributes as $attr => $value) {
-            if (is_bool($value)) {
+            if (is_bool($value) && !str_starts_with($attr, 'aria-')) {
                 if ($value) {
                     $html .= ' '.$attr;
+                } else {
+                    $html .= ' '.$attr.'="false"';
                 }
             } else {
-                if (is_array($value)) {
+                if (is_bool($value) && $value) {
+                    $value = 'true';
+                } elseif (is_bool($value) && !$value) {
+                    $value = 'false';
+                } elseif (is_array($value)) {
                     $value = htmlentities(json_encode($value), ENT_QUOTES, 'UTF-8');
                 }
                 $html .= ' '.$attr.'="'.$value.'"';
