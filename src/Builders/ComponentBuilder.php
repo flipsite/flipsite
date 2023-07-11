@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -102,7 +103,7 @@ class ComponentBuilder
             unset($style['type'],$style['section']);
         }
 
-        if (isset($data['_dataSource'])) {
+        if (isset($data['_dataSource']) && is_array($data['_dataSource'])) {
             $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource');
         }
 
@@ -135,7 +136,7 @@ class ComponentBuilder
                     $component->addRequest($this->request);
                 }
                 // Handle nav stuff
-                if (in_array($data['_action'] ?? '',['page','auto']) && isset($data['_target'])) {
+                if (in_array($data['_action'] ?? '', ['page','auto']) && isset($data['_target'])) {
                     $options['nav'] = 'none';
                     if (str_starts_with($data['_target'], $this->path->getPage())) {
                         $options['nav'] = 'active';
@@ -146,7 +147,7 @@ class ComponentBuilder
                 }
 
                 $data = $component->normalize($data);
-                
+
 
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
@@ -228,25 +229,26 @@ class ComponentBuilder
         }
     }
 
-    private function handleStyleNav(array $style, string $type) : array {
-        $style = ArrayHelper::applyStringCallback($style, function($str) use ($type) {
+    private function handleStyleNav(array $style, string $type): array
+    {
+        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($type) {
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
             }
             $res = [];
-            $tmp = explode(' ',$str);
+            $tmp = explode(' ', $str);
             foreach ($tmp as $cls) {
                 $active = str_starts_with($cls, 'nav-active:');
                 $exact = str_starts_with($cls, 'nav-exact:');
                 if ('none' === $type && !$active && !$exact) {
                     $res[] = $cls;
                 } elseif ('active' === $type && $active) {
-                    $res[] = str_replace('nav-active:','',$cls);
+                    $res[] = str_replace('nav-active:', '', $cls);
                 } elseif ('exact' === $type && $exact) {
-                    $res[] = str_replace('nav-exact:','',$cls);
-                } 
+                    $res[] = str_replace('nav-exact:', '', $cls);
+                }
             }
-            return implode(' ',$res);
+            return implode(' ', $res);
 
         });
         return $style;
