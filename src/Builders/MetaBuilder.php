@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -32,15 +33,16 @@ class MetaBuilder implements BuilderInterface
         $language = $this->path->getLanguage();
         $page     = $this->path->getPage();
         $slug     = $this->reader->getSlugs()->getSlug($page, $language);
+        $trailingSlash = $this->environment->hasTrailingSlash() ? '/' : '';
 
-        $elements[] = $this->meta('canonical', $server.'/'.$slug);
+        $elements[] = $this->meta('canonical', $server.'/'.$slug.$trailingSlash);
         if (count($this->reader->getLanguages()) > 1) {
             foreach ($this->reader->getLanguages() as $l) {
                 if (!$language->isSame($l)) {
                     $el = new Element('meta', true, true);
                     $el->setAttribute('rel', 'alternate');
                     $slug = $this->reader->getSlugs()->getSlug($page, $l);
-                    $el->setAttribute('href', $server.'/'.$slug);
+                    $el->setAttribute('href', $server.'/'.$slug.$trailingSlash);
                     $el->setAttribute('hreflang', (string)$l);
                     $elements[] = $el;
                 }
@@ -74,7 +76,7 @@ class MetaBuilder implements BuilderInterface
             $elements[] = $this->og('og:image', $src);
         }
 
-        $elements[] = $this->og('og:url', trim($server . $page, '/'));
+        $elements[] = $this->og('og:url', trim($server . $page, '/').$trailingSlash);
         $elements[] = $this->og('og:site_name', $name);
         $elements[] = $this->og('og:type', 'website');
 
