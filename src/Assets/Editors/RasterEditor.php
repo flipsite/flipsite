@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Editors;
 
 use Flipsite\Assets\Options\RasterOptions;
@@ -9,7 +10,7 @@ use Intervention\Image\ImageManager;
 
 final class RasterEditor extends AbstractImageEditor
 {
-    public function create() : void
+    public function create(): void
     {
         $manager      = new ImageManager();
         $image        = $manager->make($this->file->getFilename());
@@ -27,18 +28,23 @@ final class RasterEditor extends AbstractImageEditor
         $image->save($cachedFilename);
     }
 
-    private function applyOptions(Image $image, RasterOptions $options) : Image
+    private function applyOptions(Image $image, RasterOptions $options): Image
     {
-        $width   = $options->getValue('width');
-        $height  = $options->getValue('height');
+        $width  = $options->getValue('width');
+        $height = $options->getValue('height');
         if ($width && $height) {
-            $image->fit($width, $height);
+            $position = $options->getValue('position') ?? 'center';
+            // change e.g. left-top to top-left (because different order in tailwind and intervention)
+            $tmp = explode('-', $position);
+            $tmp = array_reverse($tmp);
+            $position = implode('-', $tmp);
+            $image->fit($width, $height, null, $position);
         } elseif ($width) {
-            $image->resize($width, null, static function ($constraint) : void {
+            $image->resize($width, null, static function ($constraint): void {
                 $constraint->aspectRatio();
             });
         } elseif ($height) {
-            $image->resize(null, $height, static function ($constraint) : void {
+            $image->resize(null, $height, static function ($constraint): void {
                 $constraint->aspectRatio();
             });
         }

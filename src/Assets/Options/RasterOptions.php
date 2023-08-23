@@ -14,6 +14,17 @@ final class RasterOptions extends AbstractImageOptions
             'blur'        => new IntOption('bl'),
             'height'      => new IntOption('h', true),
             'opacity'     => new IntOption('o'),
+            'position'    => new StringOption('p', [
+                'b' => 'bottom',
+                'c' => 'center',
+                'l' => 'left',
+                'lb' => 'left-bottom',
+                'lt' => 'left-top',
+                'r' => 'right',
+                'rb' => 'right-bottom',
+                'rt' => 'right-top',
+                't' => 'top',
+            ]),
             'quality'     => new IntOption('q'),
             'width'       => new IntOption('w', true),
         ];
