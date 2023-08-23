@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 final class DataHelper
@@ -16,14 +17,16 @@ final class DataHelper
         foreach ($data as &$value) {
             if (is_array($value)) {
                 if (isset($value[$dataSourceKey.'List'])) {
-                    $dataItemAttrs     = array_keys($value[$dataSourceKey.'List'][0]);
-                    $stripedDataSource = [];
-                    foreach ($dataSource as $attr => $val) {
-                        if (!in_array($attr, $dataItemAttrs)) {
-                            $stripedDataSource[$attr] = $val;
+                    if (is_array($value[$dataSourceKey.'List'])) {
+                        $dataItemAttrs     = array_keys($value[$dataSourceKey.'List'][0]);
+                        $stripedDataSource = [];
+                        foreach ($dataSource as $attr => $val) {
+                            if (!in_array($attr, $dataItemAttrs)) {
+                                $stripedDataSource[$attr] = $val;
+                            }
                         }
+                        $value = self::applyData($value, $stripedDataSource, $dataSourceKey, false);
                     }
-                    $value = self::applyData($value, $stripedDataSource, $dataSourceKey, false);
                 } else {
                     $value = self::applyData($value, $dataSource, $dataSourceKey, $replaceIfMissing);
                 }

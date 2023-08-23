@@ -10,7 +10,7 @@ final class SocialHelper
 {
     public static array $data = [];
 
-    public static function getData(string $type, string $handle, string $name, Language $language) : ?array
+    public static function getData(string $type, string $handle): ?array
     {
         self::loadData();
         $data = self::$data[$type] ?? null;
@@ -19,25 +19,30 @@ final class SocialHelper
         }
         if (is_string($handle) || is_numeric($handle)) {
             $data['url'] = str_replace('{handle}', $handle, $data['url']);
-            $data['sr']  = $name.' '.$data['name'];
+        }
+        switch ($type) {
+            case 'phone':
+            case 'email':
+                $data['name'] = $handle;
+                break;
         }
         return $data;
     }
 
-    public static function getUrl(string $type, string $handle) : string
+    public static function getUrl(string $type, string $handle): string
     {
         self::loadData();
         $url = self::$data[$type]['url'];
         return str_replace('{handle}', $handle, $url);
     }
 
-    public static function getIcon(string $type) : string
+    public static function getIcon(string $type): string
     {
         self::loadData();
         return self::$data[$type]['icon'];
     }
 
-    public static function loadData() : void
+    public static function loadData(): void
     {
         if (count(self::$data) > 0) {
             return;
@@ -46,7 +51,7 @@ final class SocialHelper
         self::$data = Yaml::parse(file_get_contents($path));
     }
 
-    public static function getColors() : array
+    public static function getColors(): array
     {
         self::loadData();
         $colors = [];
