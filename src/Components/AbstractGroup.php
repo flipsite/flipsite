@@ -88,13 +88,14 @@ abstract class AbstractGroup extends AbstractComponent
             if (!$target) {
                 return $data;
             }
-            $page   = $this->slugs->getPage($target);
+            $target = str_replace('mailto:', '', $target);
+            $target = str_replace('tel:', '', $target);
+            $page = $this->slugs->getPage($target);
             if ($page) {
                 $action = 'page';
             } elseif (str_starts_with($target, 'http')) {
                 $action = 'url-blank';
             } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
-                $emailErr        = 'Invalid email format';
                 $action = 'mailto';
             } else {
                 $matches = [];
@@ -243,6 +244,7 @@ abstract class AbstractGroup extends AbstractComponent
         }
         return $items;
     }
+
     private function getSocial(): array
     {
         $name     = $this->reader->get('name');
