@@ -1,14 +1,13 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 final class DataHelper
 {
     public static function applyData(array $data, array $dataSource, string $dataSourceKey = '_dataSource', bool $replaceIfMissing = false): array
     {
-        if (isset($data[$dataSourceKey])) {
+        if (isset($data[$dataSourceKey]) && '_none' !== $data[$dataSourceKey]) {
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);
             unset($data[$dataSourceKey]);
         }

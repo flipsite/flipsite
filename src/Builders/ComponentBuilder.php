@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -136,7 +135,7 @@ class ComponentBuilder
                     $component->addRequest($this->request);
                 }
                 // Handle nav stuff
-                if (in_array($data['_action'] ?? '', ['page','auto']) && isset($data['_target'])) {
+                if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
                     $options['nav'] = 'none';
                     if (str_starts_with($data['_target'], $this->path->getPage())) {
                         $options['nav'] = 'active';
@@ -147,7 +146,6 @@ class ComponentBuilder
                 }
 
                 $data = $component->normalize($data);
-
 
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
@@ -239,7 +237,7 @@ class ComponentBuilder
             $tmp = explode(' ', $str);
             foreach ($tmp as $cls) {
                 $active = str_starts_with($cls, 'nav-active:');
-                $exact = str_starts_with($cls, 'nav-exact:');
+                $exact  = str_starts_with($cls, 'nav-exact:');
                 if ('none' === $type && !$active && !$exact) {
                     $res[] = $cls;
                 } elseif ('active' === $type && $active) {
@@ -249,7 +247,6 @@ class ComponentBuilder
                 }
             }
             return implode(' ', $res);
-
         });
         return $style;
     }
