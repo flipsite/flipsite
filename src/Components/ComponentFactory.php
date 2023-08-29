@@ -1,13 +1,14 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Symfony\Component\Yaml\Yaml;
 
 class ComponentFactory extends AbstractComponentFactory
 {
-    public function get(string $type) : ?AbstractComponent
+    public function get(string $type): ?AbstractComponent
     {
         switch ($type) {
             case 'plain':
@@ -36,7 +37,7 @@ class ComponentFactory extends AbstractComponentFactory
         return null;
     }
 
-    private function isTag(string $tag) : bool
+    private function isTag(string $tag): bool
     {
         return in_array($tag, [
             'label',
