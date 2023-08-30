@@ -117,8 +117,8 @@ final class ArrayHelper
         foreach ($data as &$value) {
             if (is_string($value)) {
                 $value = $callback($value);
-            } elseif (is_object($value)) {
-                $value = self::applyTypeCallback($value, $callback);
+            } elseif (is_array($value)) {
+                $value = self::applyStringCallback($value, $callback);
             }
         }
         return $data;

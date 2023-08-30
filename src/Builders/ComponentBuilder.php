@@ -136,13 +136,17 @@ class ComponentBuilder
                 }
                 // Handle nav stuff
                 if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
-                    $options['nav'] = 'none';
-                    if (str_starts_with($data['_target'], $this->path->getPage())) {
-                        $options['nav'] = 'active';
+                    $options['navState'] = [];
+                    $page                = $this->path->getPage();
+                    if (str_starts_with($page, $data['_target'])) {
+                        $options['navState']['active'] = true;
                     }
-                    $style = $this->handleStyleNav($style, $options['nav']);
-                } elseif (isset($options['nav'])) {
-                    $style = $this->handleStyleNav($style, $options['nav']);
+                    if ($data['_target'] === $page) {
+                        $options['navState']['active'] = true;
+                    }
+                }
+                if (count($options['navState'] ?? [])) {
+                    $style = $this->handleNavStyle($style, $options['navState'] ?? []);
                 }
 
                 $data = $component->normalize($data);
@@ -227,9 +231,9 @@ class ComponentBuilder
         }
     }
 
-    private function handleStyleNav(array $style, string $type): array
+    private function handleNavStyle(array $style, array $types): array
     {
-        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($type) {
+        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($types) {
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
             }
@@ -238,14 +242,17 @@ class ComponentBuilder
             foreach ($tmp as $cls) {
                 $active = str_starts_with($cls, 'nav-active:');
                 $exact  = str_starts_with($cls, 'nav-exact:');
-                if ('none' === $type && !$active && !$exact) {
+                if (count($types) === 0 && !$active && !$exact) {
                     $res[] = $cls;
-                } elseif ('active' === $type && $active) {
+                }
+                if (isset($types['active']) && $active) {
                     $res[] = str_replace('nav-active:', '', $cls);
-                } elseif ('exact' === $type && $exact) {
+                }
+                if (isset($types['exact']) && $exact) {
                     $res[] = str_replace('nav-exact:', '', $cls);
                 }
             }
+            $res = array_unique($res);
             return implode(' ', $res);
         });
         return $style;
