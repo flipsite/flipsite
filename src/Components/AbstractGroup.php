@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -76,7 +75,9 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $action = $data['_action'] ?? false;
         $target = $data['_target'] ?? false;
-        unset($data['_action'],$data['_target']);
+        $params = $data['_params'] ?? false;
+
+        unset($data['_action'],$data['_target'],$data['_params']);
 
         if (!$action) {
             return $data;
@@ -90,7 +91,7 @@ abstract class AbstractGroup extends AbstractComponent
             }
             $target = str_replace('mailto:', '', $target);
             $target = str_replace('tel:', '', $target);
-            $page = $this->slugs->getPage($target);
+            $page   = $this->slugs->getPage($target);
             if ($page) {
                 $action = 'page';
             } elseif (str_starts_with($target, 'http')) {
@@ -112,6 +113,10 @@ abstract class AbstractGroup extends AbstractComponent
                 if (!$target) {
                     return $data;
                 }
+                if ($params) {
+                    $target = $this->addTargetParams($target, $params);
+                }
+
                 $external              = false;
                 $data['_attr']['href'] = $this->url($target, $external);
                 if ($external) {
@@ -172,7 +177,7 @@ abstract class AbstractGroup extends AbstractComponent
         }
         if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
             $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)));
-        } elseif(is_string($dataSourceList) && '_social' === $dataSourceList) {
+        } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
             $dataSourceList = $this->getSocial();
         }
 
@@ -237,7 +242,7 @@ abstract class AbstractGroup extends AbstractComponent
         $items = [];
         foreach ($pages as $page) {
             $item            = [
-                'slug' => $page,
+                'slug'  => $page,
                 'name'  => $this->reader->getPageName((string)$page, $this->path->getLanguage())
             ];
             $items[] = $item;
@@ -252,10 +257,22 @@ abstract class AbstractGroup extends AbstractComponent
         $items    = [];
         $i        = 0;
         foreach ($this->reader->get('social') as $type => $handle) {
-            $item = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
+            $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
             $item['url'] = $item['url'];
-            $items[] = $item;
+            $items[]     = $item;
         }
         return $items;
+    }
+
+    private function addTargetParams(string $target, string $params) : string
+    {
+        $params = explode(',', $params);
+        $parts  = explode('/', $target);
+        foreach ($parts as &$part) {
+            if (str_starts_with($part, ':') && str_ends_with($part, ']')) {
+                $part = array_shift($params);
+            }
+        }
+        return implode('/', $parts);
     }
 }

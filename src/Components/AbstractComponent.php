@@ -65,7 +65,7 @@ abstract class AbstractComponent extends AbstractElement
                     $src = str_replace('.png', '.webp', $src);
                 }
                 $imageContext = $this->imageHandler->getContext($src, $options);
-                $srcset = $imageContext->getSrcset('url');
+                $srcset       = $imageContext->getSrcset('url');
                 if (null !== $srcset) {
                     $target->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$srcset.')');
                 } else {
@@ -80,7 +80,9 @@ abstract class AbstractComponent extends AbstractElement
         } else {
             unset($style['options'], $style['position'], $style['size'], $style['repeat']);
         }
-        $target->addStyle($style);
+        foreach ($style as $attr => $val) {
+            $target->addStyle(['bg.'.$attr => $val]);
+        }
     }
 
     private function isSvg(string $filename) : bool
