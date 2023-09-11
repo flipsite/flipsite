@@ -31,27 +31,6 @@ class ColorHelper
         return $colorString;
     }
 
-
-
-
-    // $matches = [];
-    // preg_match_all('/(primary|secondary|light|dark)-[1-9]{1}00(\/[0-9]+)?/', $gradient, $matches);
-    
-    // foreach ($matches[0] as $color) {
-    //     $tmp = explode('/', $color);
-    //     $alpha = floatVal($tmp[1] ?? 100.0) / 100.0;
-    //     if ($alpha > 1.0) $alpha = 1.0;
-    //     $colorShade = explode('-', $tmp[0]);
-    //     $shade = $colorShade[1] ?? 500;
-    //     $hex = $colors[$colorShade[0]];
-
-
-    //     echo $hex.'('.$shade.') '.$alpha.'<br>' ;
-    // }
-    
-    // return $gradient;
-
-
     public static function getColor(string|array $args, array $allColors): ?Color
     {
         if (is_string($args)) {
