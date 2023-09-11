@@ -3,9 +3,12 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ColorHelper;
+
 abstract class AbstractComponent extends AbstractElement
 {
     use Traits\ImageHandlerTrait;
+    use Traits\ReaderTrait;
 
     abstract public function build(array $data, array $style, array $options) : void;
 
@@ -21,41 +24,19 @@ abstract class AbstractComponent extends AbstractElement
 
     public function setBackground(AbstractElement $target, array $style) : void
     {
-        $src     = $style['src'] ?? false;
-        $options = $style['options'] ?? [];
+        $src      = $style['src'] ?? false;
+        $gradient = $this->parseThemeColors($style['gradient'] ?? '');
+        $options  = $style['options'] ?? [];
         $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
         $style['position'] ??= 'bg-center';
         $style['size'] ??= 'bg-cover';
         $style['repeat'] ??= 'bg-no-repeat';
-        unset($style['src'],$style['options']);
-
+        unset($style['src'],$style['gradient'],$style['options']);
         if ($src) {
-            $gradient = '';
-            foreach ($style as $key => &$val) {
-                if (null === $val) {
-                    continue;
-                }
-                $classes = explode(' ', $val);
-                $new     = [];
-                foreach ($classes as $cls) {
-                    if (strpos($cls, 'bg-gradient') !== false) {
-                        $gradient = $cls;
-                    } else {
-                        $new[] = $cls;
-                    }
-                }
-                $val = count($new) ? implode(' ', $new) : null;
+            if (strlen($gradient)) {
+                $gradient.=',';
             }
-
-            if ($gradient) {
-                // TODO can this horrible hack be fixed? if bg gradient it needs to be added to element style
-                $callback = new \Flipsite\Style\Callbacks\BgGradientCallback();
-                $tmp      = explode('-', $gradient);
-                array_shift($tmp);
-                $gradient = $callback($tmp).',';
-            }
-
             if ($this->isSvg($src)) {
                 $imageContext = $this->imageHandler->getContext($src, []);
                 $target->setAttribute('style', 'background-image:'.$gradient.'url('.$imageContext->getSrc().');');
@@ -77,16 +58,28 @@ abstract class AbstractComponent extends AbstractElement
                 $this->builder->dispatch(new Event('preload', 'background', $imageContext));
             }
             unset($style['options']);
+        } elseif ($gradient) {
+            $target->setAttribute('style', 'background-image:'.$gradient);
+            unset($style['options']);
         } else {
             unset($style['options'], $style['position'], $style['size'], $style['repeat']);
         }
         foreach ($style as $attr => $val) {
             $target->addStyle(['bg.'.$attr => $val]);
         }
-    }
+    } 
 
     private function isSvg(string $filename) : bool
     {
         return false !== mb_strpos($filename, '.svg');
+    }
+    private function parseThemeColors(string $gradient) : string {
+        if (!strlen($gradient)) {
+            return $gradient;
+        }
+        $colors = $this->reader->get('theme.colors');
+        $colors['white'] = '#ffffff';
+        $colors['black'] = '#000000';
+        return ColorHelper::parseAndReplace($gradient, $colors);
     }
 }

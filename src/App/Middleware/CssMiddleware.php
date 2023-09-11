@@ -70,7 +70,6 @@ class CssMiddleware implements MiddlewareInterface
         $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\UnitCallback());
         $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new \Flipsite\Style\Callbacks\ResponsiveSizeCallback($config['screens'], true));
-        $tailwind->addCallback('background-image', new \Flipsite\Style\Callbacks\BgGradientCallback());
 
         $css           = $tailwind->getCss($elements, $classes);
         $htmlWithStyle = str_replace('<style></style>', '<style>'.$css."\n    ".'</style>', $html);
