@@ -11,13 +11,17 @@ use SSNepenthe\ColorUtils\Transformers\Lighten;
 
 class ColorHelper
 {
-    public static function parseAndReplace(string $colorString, array $allColors) : string {
-        $pattern = '/('.implode('|',array_keys($allColors)).')-([0-9]{3}|[0-9]{2}|[1-9]{1})(\/[0-9]+)?/';
+    public static function parseAndReplace(string $colorString, array $allColors): string
+    {
+        $pattern = '/('.implode('|', array_keys($allColors)).')-([0-9]{3}|[0-9]{2}|[1-9]{1})(\/[0-9]+)?/';
         $matches = [];
         preg_match_all($pattern, $colorString, $matches);
         foreach ($matches[0] as $match) {
             $color = ColorHelper::getColor($match, $allColors);
-            $colorString = str_replace($match,(string)$color, $colorString);
+            $pos = strpos($colorString, $match);
+            if ($pos !== false) {
+                $colorString = substr_replace($colorString, (string)$color, $pos, strlen($match));
+            }
         }
 
         $pattern = '/(white|black)(\/[0-9]+)?/';
@@ -25,7 +29,10 @@ class ColorHelper
         preg_match_all($pattern, $colorString, $matches);
         foreach ($matches[0] as $match) {
             $color = ColorHelper::getColor($match, $allColors);
-            $colorString = str_replace($match,(string)$color, $colorString);
+            $pos = strpos($colorString, $match);
+            if ($pos !== false) {
+                $colorString = substr_replace($colorString, (string)$color, $pos, strlen($match));
+            }
         }
 
         return $colorString;
