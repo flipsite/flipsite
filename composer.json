@@ -22,26 +22,24 @@
     "require": {
         "php": "^8.0",
         "ext-mbstring": "*",
-        "adbario/php-dot-notation": "3.1.1",
-        "ckr/arraymerger": "3.0.0",
+        "adbario/php-dot-notation": "^3.3",
+        "ckr/arraymerger": "^3.0",
         "erusev/parsedown": "^1.7",
-        "giggsey/libphonenumber-for-php": "^8.12",
-        "intervention/image": "2.7.2",
+        "giggsey/libphonenumber-for-php": "^8.13",
+        "intervention/image": "^2.7",
         "jakeasmith/http_build_url": "^1.0",
-        "league/container": "^3.3",
-        "league/csv": "^9.6",
+        "league/container": "^4.2",
+        "league/csv": "^9.10",
         "mossadal/math-parser": "^1.3",
-        "slim/psr7": "1.5",
-        "slim/slim": "4.10",
-        "ssnepenthe/color-utils": "0.4.2",
-        "symfony/console": "6.0.8",
-        "symfony/filesystem": "6.0.7",
-        "symfony/yaml": "6.0.3",
-        "twig/twig": "3.4.1"
+        "slim/slim": "^2.6",
+        "ssnepenthe/color-utils": "^0.4.2",
+        "symfony/console": "^6.3",
+        "symfony/filesystem": "^6.3",
+        "symfony/yaml": "^6.3"
     },
     "require-dev": {
-        "phpstan/phpstan": "^0.12.25",
-        "phpunit/phpunit": "^9"
+        "phpstan/phpstan": "^1.10.34",
+        "phpunit/phpunit": "^10.3.4"
     },
     "scripts": {
         "analyse": "./vendor/bin/phpstan analyse -l 4 -c phpstan.neon src",
