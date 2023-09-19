@@ -35,14 +35,18 @@ class MetaBuilder implements BuilderInterface
         $slug     = $this->reader->getSlugs()->getSlug($page, $language);
         $trailingSlash = $this->environment->hasTrailingSlash() ? '/' : '';
 
-        $elements[] = $this->meta('canonical', $server.'/'.$slug.$trailingSlash);
+        $canonical = $server.'/';
+        $canonical.= $slug ? $slug.$trailingSlash : '';
+        $elements[] = $this->meta('canonical', $canonical);
         if (count($this->reader->getLanguages()) > 1) {
             foreach ($this->reader->getLanguages() as $l) {
                 if (!$language->isSame($l)) {
                     $el = new Element('meta', true, true);
                     $el->setAttribute('rel', 'alternate');
                     $slug = $this->reader->getSlugs()->getSlug($page, $l);
-                    $el->setAttribute('href', $server.'/'.$slug.$trailingSlash);
+                    $href = $server.'/';
+                    $href.= $slug ? $slug.$trailingSlash : '';
+                    $el->setAttribute('href', $href);
                     $el->setAttribute('hreflang', (string)$l);
                     $elements[] = $el;
                 }

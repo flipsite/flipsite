@@ -42,9 +42,9 @@ if (!getenv('APP_BASEPATH')) {
 }
 
 $container = new Container();
-$container->add('plugins', 'Flipsite\Utils\Plugins', true)->addArgument($plugins ?? []);
-$container->add('environment', 'Flipsite\Environment', true)->addArgument('plugins');
-$container->add('reader', 'Flipsite\Data\Reader', true)->addArgument('environment');
+$container->addShared('plugins', 'Flipsite\Utils\Plugins')->addArgument($plugins ?? []);
+$container->addShared('environment', 'Flipsite\Environment')->addArgument('plugins');
+$container->addShared('reader', 'Flipsite\Data\Reader')->addArgument('environment');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
