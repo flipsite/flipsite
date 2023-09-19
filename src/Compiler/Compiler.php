@@ -13,6 +13,10 @@ class Compiler
 
     public function __construct(private AbstractEnvironment $environment, string $targetDir)
     {    
+        // Create target dir if it does not already exist
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir);
+        }
         $this->targetDir = realpath($targetDir);
 
         putenv('SITE_DIR='.$this->environment->getSiteDir());
@@ -20,11 +24,6 @@ class Compiler
         putenv('IMG_DIR='.$this->environment->getImgDir());
         putenv('VIDEO_DIR='.$this->environment->getVideoDir());
         putenv('TRAILING_SLASH=1');
-
-        // Create target dir if it does not already exist
-        if (!is_dir($this->targetDir)) {
-            mkdir($this->targetDir);
-        }
     }
 
     public function compile(string $configType)
