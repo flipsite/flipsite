@@ -12,10 +12,10 @@ class Compiler
     private string $targetDir;
 
     public function __construct(private AbstractEnvironment $environment, string $targetDir)
-    {    
+    {
         // Create target dir if it does not already exist
         if (!is_dir($targetDir)) {
-            mkdir($targetDir);
+            mkdir($targetDir, 0777, true);
         }
         $this->targetDir = realpath($targetDir);
 
@@ -30,8 +30,8 @@ class Compiler
     {
         // Set remaining environment that needs reader
         putenv('APP_ENV='.$configType);
-        $reader = new Reader($this->environment);
-        $config = $reader->get('compile.'.$configType);
+        $reader   = new Reader($this->environment);
+        $config   = $reader->get('compile.'.$configType);
         $basePath = $config['basePath'] ?? '';
         putenv('APP_BASEPATH='.$basePath);
 
@@ -41,34 +41,48 @@ class Compiler
         // Create pages and parse assets after each created page
         $slugs    = $reader->getSlugs();
         $allPages = array_keys($slugs->getAll());
-        $assets = [];
+        $assets   = [];
         foreach ($allPages as $page) {
             $requestUri = $basePath.'/'.$page;
-            $html = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+            $html       = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
             $assets = array_merge($assets, AssetParser::parse($html));
         }
+
         // Get list of unique assets
-        $assets = array_values(array_filter(array_unique($assets)));
+        $assets     = array_values(array_filter(array_unique($assets)));
+
+        // Remove base path
+        foreach ($assets as &$asset) {
+            $asset = str_replace($basePath,'',$asset);
+        }
+
         $notDeleted = $this->deleteAssets($this->targetDir, $assets);
-        $assets = array_diff($assets, $notDeleted);
-        
+        $assets     = array_diff($assets, $notDeleted);
+
         // Create assets
         foreach ($assets as $asset) {
-            $requestUri = $basePath.$asset;
-            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
-            $this->writeFile($this->targetDir, $asset, $source);
+            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $asset);
+            $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
         }
 
         // Sitemap
         $requestUri = $basePath.'/sitemap.xml';
-        $sitemap = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+        $sitemap    = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/sitemap.xml', $sitemap);
 
         // Robots
         $requestUri = $basePath.'/robots.txt';
-        $robots = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+        $robots     = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/robots.txt', $robots);
+    }
+
+    public function getFiles() : array
+    {
+        $files = $this->getDirContents($this->targetDir);
+        return array_filter($files, function ($file) {
+            return !is_dir($file);
+        });
     }
 
     private function getResponse(bool $https, string $domain, string $requestUri): string
@@ -165,6 +179,9 @@ class Compiler
         $files = scandir($dir);
         foreach ($files as $key => $value) {
             $path = realpath($dir.DIRECTORY_SEPARATOR.$value);
+            if (str_ends_with($value, '.DS_Store')) {
+                continue;
+            }
             if (!is_dir($path)) {
                 $results[] = $path;
             } elseif ('.' != $value && '..' != $value) {

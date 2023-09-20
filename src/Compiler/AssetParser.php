@@ -3,8 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Compiler;
 
-
-class AssetParser {
+class AssetParser
+{
     public static function parse(string $html): array
     {
         $assets = [];
@@ -53,8 +53,7 @@ class AssetParser {
         foreach ($metaTags as $tag) {
             if ('og:image' === $tag->getAttribute('property')) {
                 $url      = $tag->getAttribute('content');
-                $tmp      = explode('/img/', $url);
-                $assets[] = '/img/'.$tmp[1];
+                $assets[] = $url;
             }
         }
         $linkTags = $doc->getElementsByTagName('link');
@@ -70,13 +69,22 @@ class AssetParser {
         }
 
         $matches = [];
-        preg_match_all('/url\(\/img\/(.*?)\)/', $html, $matches);
-        if (isset($matches[1])) {
-            foreach ($matches[1] as $asset) {
-                $assets[] = '/img/'.$asset;
+        preg_match_all('/url\([^)]*\)/', $html, $matches);
+        if (isset($matches[0])) {
+            foreach ($matches[0] as $asset) {
+                $asset = trim($asset,')');
+                $asset = str_replace('url(','',$asset);
+                $assets[] = $asset;
             }
         }
 
-        return array_values(array_unique($assets));
+        $assets = array_values(array_unique($assets));
+
+        // Remove http
+        $assets = array_filter($assets, function ($asset) {
+            return !str_starts_with($asset, 'http');
+        });
+
+        return $assets;
     }
 }
