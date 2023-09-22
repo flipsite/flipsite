@@ -273,11 +273,14 @@ final class Tailwind implements CallbackInterface
                     $word = ucfirst(mb_strtolower($word));
                 }
                 $variantId = implode('', $variantId);
+                // To extract possible group hover name
+                $tmp = explode('/',$variantId);
+                $variantId = array_shift($tmp);
                 $class     = 'Flipsite\Style\Variants\\'.$variantId.'Type';
                 if (!class_exists($class)) {
                     $class     = 'Flipsite\Style\Variants\\CustomStateType';
                 }
-                $type = new $class($variantId);
+                $type = new $class($variantId, $tmp[0] ?? null);
             }
             $variant->addType($type);
         }
