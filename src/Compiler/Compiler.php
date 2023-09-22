@@ -26,14 +26,19 @@ class Compiler
         putenv('TRAILING_SLASH=1');
     }
 
-    public function compile(string $configType)
+    public function compile(?string $domain = null)
     {
         // Set remaining environment that needs reader
-        putenv('APP_ENV='.$configType);
         $reader   = new Reader($this->environment);
-        $config   = $reader->get('compile.'.$configType);
+        $config   = $reader->get('compile');
+        if (!isset($config['domain']) && $domain) {
+            $config['domain'] = $domain;
+        }
         $basePath = $config['basePath'] ?? '';
         putenv('APP_BASEPATH='.$basePath);
+        putenv('APP_ENV='.(($config['live'] ?? false) ? 'live' : 'dev'));
+
+        $https = $config['https'] ?? false;
 
         // Remove all index.html files
         $this->deleteContent($this->targetDir);
@@ -44,9 +49,9 @@ class Compiler
         $assets   = [];
         foreach ($allPages as $page) {
             $requestUri = $basePath.'/'.$page;
-            $html       = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+            $html       = $this->getResponse($https, $config['domain'], $requestUri);
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
-            $assets = array_merge($assets, AssetParser::parse($html));
+            $assets = array_merge($assets, AssetParser::parse($html, $config['domain']));
         }
 
         // Get list of unique assets
@@ -62,19 +67,29 @@ class Compiler
 
         // Create assets
         foreach ($assets as $asset) {
-            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $asset);
+            $source = $this->getResponse($https, $config['domain'], $asset);
             $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
         }
 
         // Sitemap
         $requestUri = $basePath.'/sitemap.xml';
-        $sitemap    = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+        $sitemap    = $this->getResponse($https, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/sitemap.xml', $sitemap);
 
         // Robots
         $requestUri = $basePath.'/robots.txt';
-        $robots     = $this->getResponse($config['https'] ?? true, $config['domain'], $requestUri);
+        $robots     = $this->getResponse($https, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/robots.txt', $robots);
+
+        // Files
+        $files = $this->getDirContents($this->environment->getSiteDir().'/files');
+        $filesystem = new Filesystem();
+        $filesystem->remove($this->targetDir.'/files');
+        foreach ($files as $file) {
+            $tmp = explode('files/', $file);
+            $fileName = array_pop($tmp);
+            $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
+        }
     }
 
     public function getFiles() : array

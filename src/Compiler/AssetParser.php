@@ -5,7 +5,7 @@ namespace Flipsite\Compiler;
 
 class AssetParser
 {
-    public static function parse(string $html): array
+    public static function parse(string $html, string $host): array
     {
         $assets = [];
 
@@ -80,11 +80,19 @@ class AssetParser
 
         $assets = array_values(array_unique($assets));
 
-        // Remove http
-        $assets = array_filter($assets, function ($asset) {
-            return !str_starts_with($asset, 'http');
-        });
+        $internal = [];
+        foreach ($assets as $asset) {
+            if (str_starts_with($asset,'http')) {
 
-        return $assets;
+                $parsedUrl = parse_url($asset);
+                if ($parsedUrl['host'] === $host) {
+                    $internal[] = $parsedUrl['path'];
+                }
+            } else {
+                $internal[] = $asset;
+            }
+        }
+
+        return $internal;
     }
 }
