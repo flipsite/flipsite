@@ -26,6 +26,14 @@ final class DataHelper
                         }
                         $value = self::applyData($value, $stripedDataSource, $dataSourceKey, false);
                     }
+                    if (isset($value['_options'])) {
+                        $options['_options'] = $value['_options'];
+                        unset($value['_options']);
+                        $options = self::applyData($options, $dataSource, $dataSourceKey, false);
+                        if ($options) {
+                            $value = ArrayHelper::merge($value,$options);
+                        }
+                    }
                 } else {
                     $value = self::applyData($value, $dataSource, $dataSourceKey, $replaceIfMissing);
                 }

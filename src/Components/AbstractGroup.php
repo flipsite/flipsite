@@ -176,7 +176,8 @@ abstract class AbstractGroup extends AbstractComponent
             return $data;
         }
         if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
-            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)));
+            $parentPage = $data['_options']['parentPage'] ?? null;
+            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)),$parentPage);
         } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
             $dataSourceList = $this->getSocial();
         }
@@ -216,10 +217,13 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $data['_repeatTpl']  = $components;
         $data['_repeatData'] = $dataSourceList ?? [];
+        if (!count($dataSourceList)) {
+            $data['_isEmpty'] = true;
+        }
         return $data;
     }
 
-    private function getPages(int $level): array
+    private function getPages(int $level, ?string $parentPage = null): array
     {
         $pages      = [];
         $all        = $this->slugs->getPages();
@@ -229,7 +233,7 @@ abstract class AbstractGroup extends AbstractComponent
                 return mb_strpos((string)$value, '/') === false;
             });
         } else {
-            $parts           = explode('/', $this->path->getPage());
+            $parts           = explode('/', $parentPage ?? $this->path->getPage());
             $startsWith      = implode('/', array_splice($parts, 0, $level));
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');

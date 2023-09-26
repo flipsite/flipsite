@@ -151,6 +151,10 @@ class ComponentBuilder
 
                 $data = $component->normalize($data);
 
+                if ($data['_isEmpty'] ?? false) {
+                    return null;
+                }
+
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
                         $component->setAttribute($attr, $value);
