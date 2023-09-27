@@ -129,6 +129,15 @@ final class Slugs
         return '/'.$this->slugs[$page][(string) $language] ?? null;
     }
 
+    public function hasSubpages(string $page) : bool {
+        foreach ($this->pages as $page_) {
+            if (str_starts_with($page_,$page.'/')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function convertPathToPage(string $path) : ?string
     {
         $page = trim($path, '/');

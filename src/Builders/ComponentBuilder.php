@@ -10,6 +10,7 @@ use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
 use Flipsite\Data\Reader;
+use Flipsite\Data\Slugs;
 use Flipsite\Environment;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\DataHelper;
@@ -20,10 +21,11 @@ class ComponentBuilder
 {
     private ImageHandler $imageHandler;
     private VideoHandler $videoHandler;
-    private array $listeners                = [];
-    private array $factories                = [];
-    private array $theme                    = [];
-    private array $localization             = [];
+    private array $listeners    = [];
+    private array $factories    = [];
+    private array $theme        = [];
+    private array $localization = [];
+    private Slugs $slugs;
 
     public function __construct(private Request $request, private Environment $environment, private Reader $reader, private Path $path)
     {
@@ -38,6 +40,7 @@ class ComponentBuilder
             $environment->getVideoBasePath(),
         );
         $this->theme = $reader->get('theme') ?? [];
+        $this->slugs = $reader->getSlugs();
     }
 
     public function addFactory(AbstractComponentFactory $factory): void
@@ -68,11 +71,12 @@ class ComponentBuilder
             $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
 
-        if (isset($data['_options'],$data['_options']['isset'])) {
-            if (!$data['_options']['isset']) {
+        if (isset($data['_options']['render'])) {
+            if (!$this->handleRenderOptions($data['_options']['render'])) {
                 return null;
             }
-        };
+            unset($data['_options']['render']);
+        }
 
         if (is_array($data) && isset($data['_style'])) {
             // If string, => inherit
@@ -260,5 +264,16 @@ class ComponentBuilder
             return implode(' ', $res);
         });
         return $style;
+    }
+
+    private function handleRenderOptions(array $options) : bool
+    {
+        if (isset($options['hasSubpages'])) {
+
+            if (!$this->slugs->hasSubpages($options['hasSubpages'])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
