@@ -74,7 +74,9 @@ class AssetParser
             foreach ($matches[0] as $asset) {
                 $asset = trim($asset,')');
                 $asset = str_replace('url(','',$asset);
-                $assets[] = $asset;
+                if (!str_starts_with($asset, '#')) {
+                    $assets[] = $asset;
+                }
             }
         }
 

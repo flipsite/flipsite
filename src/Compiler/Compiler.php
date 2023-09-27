@@ -6,10 +6,11 @@ namespace Flipsite\Compiler;
 use Flipsite\AbstractEnvironment;
 use Flipsite\Data\Reader;
 use Symfony\Component\Filesystem\Filesystem;
+use Psr\Log\LoggerAwareInterface;
 
-class Compiler implements Psr\Log\LoggerAwareInterface
+class Compiler implements LoggerAwareInterface
 {
-    use Psr\Log\LoggerAwareTrait;
+    use \Psr\Log\LoggerAwareTrait;
     private string $targetDir;
 
     public function __construct(private AbstractEnvironment $environment, string $targetDir)
@@ -57,7 +58,7 @@ class Compiler implements Psr\Log\LoggerAwareInterface
         }
 
         // Get list of unique assets
-        $assets     = array_values(array_filter(array_unique($assets)));
+        $assets = array_values(array_filter(array_unique($assets)));
 
         // Remove base path
         foreach ($assets as &$asset) {
@@ -69,7 +70,7 @@ class Compiler implements Psr\Log\LoggerAwareInterface
 
         // Create assets
         foreach ($assets as $asset) {;
-            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $asset);
+            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$asset);
             $this->writeFile($this->targetDir, str_replace($basePath,'',$asset), $source);
         }
 
@@ -131,13 +132,13 @@ class Compiler implements Psr\Log\LoggerAwareInterface
         if (!file_exists(dirname($filename))) {
             mkdir(dirname($filename), 0777, true);
             if ($this->logger) {
-                $this->logger->info('Created directory '.dirname($filename));
+                //$this->logger->info('Created directory '.dirname($filename));
             }
         }
         if (!is_dir($filename)) {
             file_put_contents($filename, $html);
             if ($this->logger) {
-                $this->logger->info('Created file '.$filename);
+                //$this->logger->info('Created file '.$filename);
             }
         }
         return $filename;
@@ -166,7 +167,10 @@ class Compiler implements Psr\Log\LoggerAwareInterface
                 continue;
             }
             $asset = str_replace($targetDir, '', $image);
-            if (in_array($asset, $assets)) {
+            $mime = mime_content_type($image);
+            $pathinfo = pathinfo($asset);
+            
+            if (in_array($asset, $assets) && strpos($mime,$pathinfo['extension']) !== false) {
                 $notDeleted[] = $asset;
             } else {
                 $filesystem->remove($image);
