@@ -7,8 +7,9 @@ use Flipsite\AbstractEnvironment;
 use Flipsite\Data\Reader;
 use Symfony\Component\Filesystem\Filesystem;
 
-class Compiler
+class Compiler implements Psr\Log\LoggerAwareInterface
 {
+    use Psr\Log\LoggerAwareTrait;
     private string $targetDir;
 
     public function __construct(private AbstractEnvironment $environment, string $targetDir)
@@ -46,6 +47,7 @@ class Compiler
         // Create pages and parse assets after each created page
         $slugs    = $reader->getSlugs();
         $allPages = array_keys($slugs->getAll());
+
         $assets   = [];
         foreach ($allPages as $page) {
             $requestUri = $basePath.'/'.$page;
@@ -128,9 +130,15 @@ class Compiler
         $filename = str_replace('//', '/', $filename);
         if (!file_exists(dirname($filename))) {
             mkdir(dirname($filename), 0777, true);
+            if ($this->logger) {
+                $this->logger->info('Created directory '.dirname($filename));
+            }
         }
         if (!is_dir($filename)) {
             file_put_contents($filename, $html);
+            if ($this->logger) {
+                $this->logger->info('Created file '.$filename);
+            }
         }
         return $filename;
     }
