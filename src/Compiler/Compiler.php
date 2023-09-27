@@ -68,9 +68,9 @@ class Compiler implements Psr\Log\LoggerAwareInterface
         $assets     = array_diff($assets, $notDeleted);
 
         // Create assets
-        foreach ($assets as $asset) {
-            $source = $this->getResponse($https, $config['domain'], $asset);
-            $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
+        foreach ($assets as $asset) {;
+            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $asset);
+            $this->writeFile($this->targetDir, str_replace($basePath,'',$asset), $source);
         }
 
         // Sitemap
