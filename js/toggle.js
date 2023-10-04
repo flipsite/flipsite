@@ -1,8 +1,12 @@
 
-function toggle(self,prefix) {
-  prefix = prefix || 'open'
+function toggle(self,force, minScreenWidth) {
+  if (minScreenWidth !== undefined && minScreenWidth > window.innerWidth) return;
+  const prefix = 'open'
   
   const findParentWithAttributeOrRoot = function(node, attributeName) {
+    if (node.hasAttribute(attributeName)) {
+      return node;
+    }
     while (node) {
       if (node.parentElement.tagName === 'BODY') {
         return node;
@@ -19,11 +23,8 @@ function toggle(self,prefix) {
   if (self.hasAttribute('aria-expanded')) {
     self.setAttribute('aria-expanded','false' == self.getAttribute('aria-expanded') ? 'true' : 'false');
   }
-  
-  const target = findParentWithAttributeOrRoot(self,'data-toggle-target')
-
-  if (!target.getAttribute('data-toggle')) {
-    
+  const target = findParentWithAttributeOrRoot(self,'data-toggle-target');
+  if (target.getAttribute('data-toggle') === null) {
     let elements = [target];
     target.querySelectorAll('[class*="'+prefix+'"], [class*="!'+prefix+'"]').forEach((el)=>{
       elements.push(el);
@@ -41,9 +42,13 @@ function toggle(self,prefix) {
       }
       el.setAttribute('data-toggle-'+prefix,toggleClasses.join(' '));
     });
-    target.setAttribute('data-toggle',1);
+    target.setAttribute('data-toggle',0);
   }
 
+  if (force !== undefined) {
+    if (parseInt(target.getAttribute('data-toggle')) === 0 && !force) return;
+    if (parseInt(target.getAttribute('data-toggle')) === 1 && force) return;
+  }
   const toggleClasses = function(el,prefix) {
     let classes = el.getAttribute('data-toggle-'+prefix).split(' ');
     classes.forEach((cls)=>{
@@ -54,10 +59,11 @@ function toggle(self,prefix) {
   }
 
   toggleClasses(target,prefix);
+  target.setAttribute('data-toggle',parseInt(target.getAttribute('data-toggle')) === 1 ? 0 : 1);
   target.querySelectorAll('[data-toggle-'+prefix+']').forEach((el)=>{
     const elementTarget = findParentWithAttributeOrRoot(el,'data-toggle-target');
-    if (target === elementTarget) {
+    if (target === elementTarget || elementTarget === el) {
       toggleClasses(el,prefix);
-    }
+    } 
   });
 }

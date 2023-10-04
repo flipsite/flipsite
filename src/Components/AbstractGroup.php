@@ -63,6 +63,7 @@ abstract class AbstractGroup extends AbstractComponent
     public function normalize(string|int|bool|array $data): array
     {
         $data = $this->normalizeAction($data);
+        $data = $this->normalizeHover($data);
         $data = $this->normalizeRepeat($data);
         return $data;
     }
@@ -164,6 +165,22 @@ abstract class AbstractGroup extends AbstractComponent
         return $data;
     }
 
+    private function normalizeHover(string|int|bool|array $data): array
+    {
+        if (!isset($data['_hover'])) {
+            return $data;
+        }
+        switch ($data['_hover']) {
+            case 'toggle':
+                $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,768)');
+                $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,768)');
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+                break;
+        }
+        unset($data['_hover']);
+        return $data;
+    }
+
     private function normalizeRepeat(string|int|bool|array $data): array
     {
         if (isset($data['_dataSourceList'])) {
@@ -176,8 +193,8 @@ abstract class AbstractGroup extends AbstractComponent
             return $data;
         }
         if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
-            $parentPage = $data['_options']['parentPage'] ?? null;
-            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)),$parentPage);
+            $parentPage     = $data['_options']['parentPage'] ?? null;
+            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)), $parentPage);
         } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
             $dataSourceList = $this->getSocial();
         }
@@ -235,7 +252,7 @@ abstract class AbstractGroup extends AbstractComponent
         } else {
             $parts           = explode('/', $parentPage ?? $this->path->getPage());
             $startsWith      = implode('/', array_splice($parts, 0, $level));
-            
+
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');
                 if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level) {
