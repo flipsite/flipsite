@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -32,7 +31,7 @@ final class ArrayHelper
     {
         $keys = array_keys($array);
         if (false === $index = array_search($old, $keys, true)) {
-            throw new \Exception(sprintf('Key "%s" does not exist', $old));
+            return $array;
         }
         $keys[$index] = $new;
         return array_combine($keys, array_values($array));
@@ -102,18 +101,19 @@ final class ArrayHelper
         $new = [];
         foreach ($array as $key => $val) {
             if (is_string($val)) {
-                $val = $prefix.$val;
-                $val = str_replace(' ', ' '.$prefix, $val);
+                $val               = $prefix.$val;
+                $val               = str_replace(' ', ' '.$prefix, $val);
                 $new[$prefix.$key] = $val;
             } elseif (is_array($val)) {
-                $val = self::addPrefix($val, $prefix);
+                $val       = self::addPrefix($val, $prefix);
                 $new[$key] = $val;
             }
         }
         return $new;
     }
 
-    public static function applyStringCallback(array $data, callable $callback) : array {
+    public static function applyStringCallback(array $data, callable $callback) : array
+    {
         foreach ($data as &$value) {
             if (is_string($value)) {
                 $value = $callback($value);
