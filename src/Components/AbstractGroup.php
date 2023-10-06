@@ -200,10 +200,12 @@ abstract class AbstractGroup extends AbstractComponent
         }
 
         if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
-            $filter         = $data['_options']['filter'];
+            $filter = explode(',', $data['_options']['filter']);
+            $filter = array_map('trim', $filter);
+
             $filterBy       = $data['_options']['filterBy'];
             $dataSourceList = array_values(array_filter($dataSourceList, function ($item) use ($filter, $filterBy) {
-                return $item[$filterBy] === $filter;
+                return in_array($item[$filterBy], $filter);
             }));
         }
 
