@@ -9,7 +9,10 @@ final class PlainText extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        return ['value' => (string)$data];
+        if (!is_array($data)) {
+            return ['value' => (string)$data];
+        }
+        return $data;
     }
 
     public function build(array $data, array $style, array $options) : void
