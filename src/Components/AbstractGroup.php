@@ -236,7 +236,8 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $data['_repeatTpl']  = $components;
         $data['_repeatData'] = $dataSourceList ?? [];
-        if (!count($dataSourceList)) {
+
+        if (!is_array($dataSourceList) || !count($dataSourceList)) {
             $data['_isEmpty'] = true;
         }
         return $data;
