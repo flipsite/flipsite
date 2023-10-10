@@ -123,4 +123,21 @@ final class ArrayHelper
         }
         return $data;
     }
+
+    public static function find(string $needle, array $haystack) : bool
+    {
+        foreach ($haystack as $item) {
+            if (is_array($item)) {
+                $result = self::find($needle, $item);
+                if ($result !== false) {
+                    return $result;
+                }
+            } else {
+                if (strpos($item, $needle) !== false) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
