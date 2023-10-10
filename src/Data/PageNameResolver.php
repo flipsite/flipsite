@@ -34,7 +34,8 @@ class PageNameResolver implements PageNameResolverInterface
                 return $name;
             }
         }
-        return '['.$page.']';
+
+        return '-';
     }
 }
 

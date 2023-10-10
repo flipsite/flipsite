@@ -130,9 +130,11 @@ final class Slugs
     }
 
     public function hasSubpages(string $page) : bool {
+        // Check if has direct subpages
         foreach ($this->pages as $page_) {
             if (str_starts_with($page_,$page.'/')) {
-                return true;
+                $subpage = str_replace($page.'/','',$page_);
+                return strpos($subpage,'/') === false;
             }
         }
         return false;

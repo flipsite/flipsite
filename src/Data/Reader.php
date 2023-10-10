@@ -318,10 +318,11 @@ final class Reader
         $expandedSlugs = [];
         $expandedMeta  = [];
         foreach ($pages as $page => $sections) {
-            $path = new RawPath($page);
-            if ($path->hasParams()) {
-                foreach ($this->data['content'][$path->getContent()] as $dataItem) {
-                    $expandedPage = $path->getPage($dataItem);
+
+            if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
+                $category = $meta[$page]['content'];
+                foreach ($this->data['content'][$category] as $dataItem) {
+                    $expandedPage = str_replace(':slug', $dataItem['slug'], $page);
 
                     // Dont overwrite existing page
                     if (isset($expandedPages[$expandedPage])) {
