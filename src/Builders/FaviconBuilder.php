@@ -29,6 +29,13 @@ class FaviconBuilder implements BuilderInterface
     public function getDocument(Document $document) : Document
     {
         $favicon = $this->reader->get('favicon');
+
+        if (is_string($favicon)) {
+            if (str_ends_with($favicon, '.svg')) {
+                $favicon = ['svg' => $favicon];
+            }
+        }
+
         if (null === $favicon) {
             $el = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
