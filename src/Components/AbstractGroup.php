@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -35,7 +36,7 @@ abstract class AbstractGroup extends AbstractComponent
             foreach ($repeatData as $i => $repeatDataItem) {
                 foreach ($repeatTpl as $type => $repeatTplComponent) {
                     if (!is_array($repeatTplComponent)) {
-                        $repeatTplComponent = ['value'=>$repeatTplComponent];
+                        $repeatTplComponent = ['value' => $repeatTplComponent];
                     }
                     $repeatTplComponent['_dataSource'] = $repeatDataItem;
                     $optimizedStyle                    = $this->optimizeStyle($style[$type] ?? [], $i, $total);
@@ -130,7 +131,7 @@ abstract class AbstractGroup extends AbstractComponent
             case 'tel':
                 $phoneUtil  = \libphonenumber\PhoneNumberUtil::getInstance();
                 try {
-                    $tel         = '+'.trim($target, '+');
+                    $tel         = '+'.trim((string)$target, '+');
                     $numberProto = $phoneUtil->parse($tel, '');
                     $replace     = [
                         '{{tel}}'      => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
@@ -289,7 +290,7 @@ abstract class AbstractGroup extends AbstractComponent
         return $items;
     }
 
-    private function addTargetParams(string $target, string $params) : string
+    private function addTargetParams(string $target, string $params): string
     {
         $params = explode(',', $params);
         $parts  = explode('/', $target);
