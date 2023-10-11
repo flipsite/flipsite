@@ -195,43 +195,42 @@ final class Reader
 
     public function getMeta(string $page, Language $language): ?array
     {
-        $meta = [
-            'title'       => $this->get('name'),
-            'description' => $this->get('description', $language),
-            'share'       => $this->get('share') ?? null
-        ];
+        $pageMeta = $this->get('meta.'.$page, $language);
+        $description = $pageMeta['description'] ?? $this->get('description', $language);
+        $share = $pageMeta['share'] ?? $this->get('share') ?? null;
 
-        if ($language != $this->languages[0]) {
-            $meta['title'] .= ' ('.strtoupper((string)$language).')';
-        }
-
-        $titleSet = false;
-        if (isset($this->data['meta'][$page])) {
-            $pageMeta = $this->get('meta.'.$page, $language);
+        if ('home' === $page) {
+            $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name', $language);
+        } else {
+            $baseTitle = $this->get('title', $language);
             if (isset($pageMeta['title'])) {
-                $meta['title'] = $pageMeta['title'].' - '.$meta['title'];
-                $titleSet      = true;
-            }
-            unset($pageMeta['name'],$pageMeta['title']);
-            $meta = ArrayHelper::merge($meta, $pageMeta);
-        }
-        if ('home' !== $page && !$titleSet) {
-            $p     = explode('/', $page);
-            $title = [];
-            while (count($p) > 0) {
-                $page  = implode('/', $p);
-                $pages = array_keys($this->data['pages']);
-                if (in_array($page, $pages)) {
-                    $name    = $this->getPageName($page, $language);
-                    $title[] = $name;
+                $title = $pageMeta['title'];
+            } else {
+                
+                $p     = explode('/', $page);
+                $title = [];
+                while (count($p) > 0) {
+                    $page  = implode('/', $p);
+                    $pages = array_keys($this->data['pages']);
+                    if (in_array($page, $pages)) {
+                        $name    = $this->getPageName($page, $language);
+                        $title[] = $name;
+                    }
+                    array_pop($p);
                 }
-                array_pop($p);
-            }
-            $title[]       = $meta['title'];
-            $meta['title'] = implode(' - ', $title);
-        }
+                $title = implode(' - ', $title);
 
-        return $meta;
+            }
+            if ($baseTitle) {
+                $title.= ' - '.$baseTitle;
+            }
+
+        }
+        return [
+            'title' => $title,
+            'description' => $description,
+            'share' => $share,
+        ];
     }
 
     public function getComponentFactories(): array
