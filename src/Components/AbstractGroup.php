@@ -116,7 +116,7 @@ abstract class AbstractGroup extends AbstractComponent
                     return $data;
                 }
                 if ($params) {
-                    $target = $this->addTargetParams($target, $params);
+                    $target = str_replace(':slug', $params, $target);
                 }
 
                 $external              = false;
@@ -288,17 +288,5 @@ abstract class AbstractGroup extends AbstractComponent
             $items[]     = $item;
         }
         return $items;
-    }
-
-    private function addTargetParams(string $target, string $params): string
-    {
-        $params = explode(',', $params);
-        $parts  = explode('/', $target);
-        foreach ($parts as &$part) {
-            if (str_starts_with($part, ':') && str_ends_with($part, ']')) {
-                $part = array_shift($params);
-            }
-        }
-        return implode('/', $parts);
     }
 }
