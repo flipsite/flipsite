@@ -11,10 +11,15 @@ final class Svg extends AbstractComponent
     public function normalize(string|int|bool|array $data) : array
     {
         if (!is_array($data)) {
-            return ['src' => $data];
-        } elseif (isset($data['value'])) {
+            $data = ['src' => $data];
+        }
+        if (isset($data['value'])) {
             $data['src'] = $data['value'];
             unset($data['value']);
+        }
+        if (isset($data['fallback']) && strpos($data['src'],'.svg') === false) {
+            $data['src'] = $data['fallback'];
+            unset($data['fallback']);
         }
         return $data;
     }

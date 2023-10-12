@@ -198,6 +198,7 @@ final class Reader
         $pageMeta = $this->get('meta.'.$page, $language);
         $description = $pageMeta['description'] ?? $this->get('description', $language);
         $share = $pageMeta['share'] ?? $this->get('share') ?? null;
+        $icon = $pageMeta['icon'] ?? null;
 
         if ('home' === $page) {
             $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name', $language);
@@ -230,6 +231,7 @@ final class Reader
             'title' => $title,
             'description' => $description,
             'share' => $share,
+            'icon' => $icon
         ];
     }
 

@@ -267,9 +267,11 @@ abstract class AbstractGroup extends AbstractComponent
 
         $items = [];
         foreach ($pages as $page) {
+            $pageMeta = $this->reader->getMeta((string)$page, $this->path->getLanguage());
             $item            = [
                 'slug'  => $page,
-                'name'  => $this->reader->getPageName((string)$page, $this->path->getLanguage())
+                'name'  => $this->reader->getPageName((string)$page, $this->path->getLanguage()),
+                ...$pageMeta
             ];
             $items[] = $item;
         }
