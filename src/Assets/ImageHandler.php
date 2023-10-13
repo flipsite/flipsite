@@ -60,7 +60,7 @@ final class ImageHandler
         try {
             $file = AssetFile::fromRequest($path, $this->assetSources);
         } catch (Exception $e) {
-            return $this->notFound();
+            return $this->notFound($response);
         }
         switch ($file->getExtension()) {
             case 'svg':
@@ -75,7 +75,7 @@ final class ImageHandler
         try {
             $editor->create();
         } catch (Exception $e) {
-            return $this->notFound();
+            return $this->notFound($response);
         }
         return $this->getCached($response, $path);
     }
@@ -89,21 +89,14 @@ final class ImageHandler
     {
         $filename = $this->cacheDir . '/' . $path;
         $pathinfo = pathinfo($path);
-        if ('svg' === $pathinfo['extension']) {
-            $body = $response->getBody();
-            $body->rewind();
-            $body->write(file_get_contents($filename));
-            return $response->withHeader('Content-type', 'image/svg+xml');
-        }
-        $manager = new ImageManager();
-        $image   = $manager->make($filename);
-        return $image->psrResponse();
+        $body = $response->getBody();
+        $body->rewind();
+        $body->write(file_get_contents($filename));
+        return $response->withHeader('Content-type', mime_content_type($filename));
     }
 
-    private function notFound(): Response
+    private function notFound(Response $response): Response
     {
-        $manager = new ImageManager();
-        $image   = $manager->canvas(16, 9, '#eee');
-        return $image->psrResponse();
+        return $response->withStatus(404);
     }
 }

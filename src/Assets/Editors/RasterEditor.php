@@ -5,30 +5,42 @@ declare(strict_types=1);
 namespace Flipsite\Assets\Editors;
 
 use Flipsite\Assets\Options\RasterOptions;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Image;
 
 final class RasterEditor extends AbstractImageEditor
 {
     public function create(): void
     {
-        $manager      = new ImageManager();
-        $image        = $manager->make($this->file->getFilename());
+        $manager      = new ImageManager('gd');
+        $image = $manager->read($this->file->getFilename());
         $filePathinfo = pathinfo($this->path);
         $options      = new RasterOptions($this->path);
-        $image        = $this->applyOptions($image, $options);
-        // Requested file has different format than actual asset
-        if ($this->file->getExtension() !== $filePathinfo['extension']) {
-            $quality = $options->getValue('quality') ?? 90;
-            $image->encode($this->file->getExtension(), $quality);
-        }
+        $image = $this->applyOptions($image, $options, $filePathinfo['extension']);
+        $quality = $options->getValue('quality') ?? 90;
+        switch ($filePathinfo['extension']) {
+            case 'webp':
+                $encoded = $image->toWebp($quality);
+                break;
+            case 'png':
+                $encoded = $image->toPng();
+                break;
+            case 'jpg':
+                $encoded = $image->toJpeg($quality);
+                break;
+            case 'gif':
+                $encoded = $image->toGif($quality);
+                break;
+            default:
+                throw new \Exception('no format defined');
+        };
         $cachedFilename = $this->getCachedFilename();
         $cachedPathinfo = pathinfo($cachedFilename);
         $this->fileSystem->mkdir($cachedPathinfo['dirname'], 0777);
-        $image->save($cachedFilename);
+        $encoded->save($cachedFilename);
     }
 
-    private function applyOptions(Image $image, RasterOptions $options): Image
+    private function applyOptions(Image $image, RasterOptions $options, string $outputFormat): Image
     {
         $width  = $options->getValue('width');
         $height = $options->getValue('height');
@@ -38,7 +50,11 @@ final class RasterEditor extends AbstractImageEditor
             $tmp = explode('-', $position);
             $tmp = array_reverse($tmp);
             $position = implode('-', $tmp);
-            $image->fit($width, $height, null, $position);
+            if ('gif' === $outputFormat) {
+                $image->resize($width, $height);
+            } else {
+                $image->fit($width, $height, $position);
+            }
         } elseif ($width) {
             $image->resize($width, null, static function ($constraint): void {
                 $constraint->aspectRatio();
