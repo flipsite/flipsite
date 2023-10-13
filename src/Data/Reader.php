@@ -323,6 +323,9 @@ final class Reader
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $category = $meta[$page]['content'];
                 foreach ($this->data['content'][$category] ?? [] as $dataItem) {
+                    if (!isset($dataItem['slug'])) {
+                        continue;
+                    }
                     $expandedPage = str_replace(':slug', $dataItem['slug'], $page);
 
                     // Dont overwrite existing page
