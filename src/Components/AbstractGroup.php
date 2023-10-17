@@ -284,7 +284,9 @@ abstract class AbstractGroup extends AbstractComponent
         $language = $this->path->getLanguage();
         $items    = [];
         $i        = 0;
-        foreach ($this->reader->get('social') as $type => $handle) {
+        $social = $this->reader->get('social');
+        if (!$social) return [];
+        foreach ($social as $type => $handle) {
             $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
             $item['url'] = $item['url'];
             $items[]     = $item;
