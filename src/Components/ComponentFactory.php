@@ -17,7 +17,7 @@ class ComponentFactory extends AbstractComponentFactory
             case 'mdline':
                 return new MdLine();
             case 'markdown':
-                return new Md();
+                return new Richtext();
             case 'image':
                 return new Image();
             case 'picture':
