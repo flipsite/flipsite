@@ -6,82 +6,128 @@ namespace Flipsite\Components;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\StyleAppearanceHelper;
 
-final class Richtext extends AbstractComponent
+final class Richtext extends AbstractGroup
 {
     use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
-    protected string $tag   = 'div';
+    use Traits\UrlTrait;
+    protected string $tag       = 'div';
+
+    public function normalize(string|int|bool|array $data): array
+    {
+        if (!is_array($data)) {
+            return ['value' => (string)$data];
+        }
+        return $data;
+    }
 
     public function build(array $data, array $style, array $options) : void
     {
-        
-        $lexer = new \nadar\quill\Lexer($data['value']);
+        if (!$data['value']) {
+            return;
+        }
+        if (strpos($data['value'], '{"ops":') === false) {
+            $data['value'] = '{"ops":[{"insert":"'.(string)$data['value'].'\n"}]}';
+        }
 
-        // $heading = new \nadar\quill\listener\Heading();
-        // $heading->wrapper = '<h{heading} class="text-red">{__buffer__}</h{heading}>';
-        // $lexer->registerListener($heading);
+        $image          = new \nadar\quill\listener\Image();
+        $image->wrapper = '<img src="{src}" class="'.$this->getImgClasses($style['img'] ?? [], $options['appearance']).'" />';
+
+        $lexer         = new \nadar\quill\Lexer($data['value']);
+        $lexer->registerListener($image);
 
         $this->content = trim($lexer->render());
+        $this->content = $this->addClasses($this->content, $style, $options['appearance']);
+        $this->content = $this->addCorrectImagePaths($this->content, $style['img'] ?? [], $options['appearance']);
+        $this->content = $this->addUrls($this->content);
 
-        $this->content = str_replace('<h1', '<h1 class="text-red-500 text-40"', $this->content);
+        // remove empty lines
+        $this->content = str_replace("<p><br></p>\n", '', $this->content);
+
+        parent::build($data, $style, $options);
     }
 
-    public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
+    protected function renderContent(int $indentation, int $level, string $content) : string
     {
-        $i    = str_repeat(' ', $indentation * $level);
-        $ii   = str_repeat(' ', $indentation * ($level + 1));
-        $html = '';
-        
-            $container = new Element($this->containerStyle['tag'] ?? 'div');
-            unset($this->containerStyle['tag']);
-            $container->addStyle($this->containerStyle);
-            $rows = explode("\n", $container->render(2, 0));
-            $html .= $i.$rows[0]."\n";
-            foreach (explode("\n", $this->content) as $row) {
-                $html .= $ii.$row."\n";
-            }
-            $html .= $i.$rows[2]."\n";
-        
-        return $html;
-
-        // $i    = str_repeat(' ', $indentation * $level);
-        // if ($this->container) {
-        //     $i++;
-        // }
-        // $html = $this->content;
-        // print_r($this->content);
-        // //$html = str_replace("\n", ' ', $html);
-        // // $tags = explode('-#-#-#-', str_replace('> <', '>-#-#-#-<', $html));
-        // // $html = '';
-        // // foreach ($tags as $tag) {
-        // //     $html .= $i.wordwrap($tag, 80, "\n".$i)."\n";
-        // // }
-        // if (!$this->container) {
-        //     echo "Hsdfdfs";
-        //     return $html;
-        // } else {
-        //     $this->container->setContent($html);
-        //     return $this->container->render($indentation, $level, $oneline);
-        // }
+        $i               = str_repeat(' ', $indentation * $level);
+        $rows            = explode("\n", $content);
+        $renderedContent = '';
+        foreach ($rows as $row) {
+            $renderedContent .= $i.trim($row)."\n";
+        }
+        return $renderedContent;
     }
 
-    // private function extendStyle(array $style, string $appearance) : array
-    // {
-    //     foreach ($style as $tag => &$def) {
-    //         // if (isset($def['inherit'])) {
-    //         //     $tmp                         = explode(':', $def['inherit']);
-    //         //     $inheritedComponentStyle     = $this->builder->getComponentStyle($tmp[0]);
-    //         //     $variant                     = $tmp[1] ?? null;
-    //         //     if ($variant) {
-    //         //         $variant = $inheritedComponentStyle['variants'][$variant];
-    //         //         unset($style['variants']);
-    //         //         $inheritedComponentStyle = ArrayHelper::merge($inheritedComponentStyle, $variant);
-    //         //     }
-    //         //     $inheritedComponentStyle = StyleAppearanceHelper::apply($inheritedComponentStyle, $appearance);
-    //         //     unset($inheritedComponentStyle['dark'], $inheritedComponentStyle['markdown'], $inheritedComponentStyle['variants'], $inheritedComponentStyle['inherit']);
-    //         //     $def = ArrayHelper::merge($inheritedComponentStyle, $def);
-    //         // }
-    //     }
-    //     return $style;
-    // }
+    private function addCorrectImagePaths(string $html, array $style, string $appearance) : string {
+        libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        $doc->loadHtml($html);
+        $images = [];
+        foreach ($doc->getElementsByTagName('img') as $tag) {
+            $src = $tag->getAttribute('src');
+            if (strpos($src,'@')) {
+                $images[] = $src;
+            }
+        }
+        $images = array_unique($images);
+        foreach ($images as $src) {
+            $pathinfo = pathinfo($src);
+            $tmp = explode('@',$pathinfo['basename']);
+            $asset = $tmp[0].'.'.$pathinfo['extension'];
+            
+            $img  = $this->builder->build('image', ['src' => $asset], ['options' => $style['options'] ?? []], ['appearance' => $appearance])->render();
+            $img  = str_replace('<img', '', $img);
+            $img  = str_replace('>', '', $img);
+            $img  = str_replace('alt="" ', '', $img);
+            $img  = trim($img);
+            $html = str_replace('src="'.$src.'"', $img, $html);
+        }
+        return $html;
+    }
+
+    private function addUrls(string $html) : string
+    {
+        $matches = [];
+        preg_match_all('/[ ]{1}href="(.*?)"/', $html, $matches);
+        if (0 === count($matches[1])) {
+            return $html;
+        }
+        $hrefs = array_unique($matches[1]);
+        foreach ($hrefs as $href) {
+            $external = false;
+            $newHref  = $this->url($href, $external);
+            if ($external) {
+                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'" target="_blank" rel="noopener noreferrer"', $html);
+            } else {
+                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
+            }
+        }
+        return $html;
+    }
+
+    private function addClasses(string $html, array $style, string $appearance) : string
+    {
+        $headingStyle = $this->reader->get('theme.components.heading') ?? [];
+        $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+        foreach ($headings as $hx) {
+            $mergedStyle  = ArrayHelper::merge($headingStyle, $style[$hx] ?? []);
+            $headingStyle = StyleAppearanceHelper::apply($mergedStyle, $appearance);
+            $html         = str_replace('<'.$hx.'>', '<'.$hx.' class="'.implode(' ', $headingStyle).'">', $html);
+        }
+
+        $elements = ['a', 'strong'];
+        foreach ($elements as $el) {
+            if (isset($style[$el])) {
+                $elStyle = StyleAppearanceHelper::apply($style[$el], $appearance);
+                $html = str_replace('<'.$el, '<'.$el.' class="'.implode(' ', $elStyle).'"', $html);
+            }
+        }
+
+        return $html;
+    }
+
+    private function getImgClasses(array $style, string $appearance) : string
+    {
+        return implode(' ', StyleAppearanceHelper::apply($style, $appearance));
+    }
 }

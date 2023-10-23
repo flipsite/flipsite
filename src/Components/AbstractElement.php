@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -176,8 +175,7 @@ abstract class AbstractElement
             }
         } else {
             if (!$this->oneline && !$oneline) {
-                $ii = str_repeat(' ', $indentation * ($level + 1));
-                $html .= $ii.wordwrap($this->content, 120, "\n".$ii)."\n";
+                $html .= $this->renderContent($indentation, $level + 1, $this->content);
             } else {
                 $html .= $this->content;
             }
@@ -192,6 +190,12 @@ abstract class AbstractElement
             $html = $i.'<!-- '.$this->commentOut."\n".$html.$i.'--!>'."\n";
         }
         return $this->cache = $html;
+    }
+
+    protected function renderContent(int $indentation, int $level, string $content) : string
+    {
+        $i = str_repeat(' ', $indentation * $level);
+        return $i.wordwrap($content, 120, "\n".$i)."\n";
     }
 
     protected function renderAttributes(): string
