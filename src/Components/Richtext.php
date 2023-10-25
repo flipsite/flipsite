@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -21,13 +22,17 @@ final class Richtext extends AbstractGroup
         return $data;
     }
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(array $data, array $style, array $options): void
     {
         if (!$data['value']) {
             return;
         }
         if (strpos($data['value'], '{"ops":') === false) {
-            $data['value'] = '{"ops":[{"insert":"'.(string)$data['value'].'\n"}]}';
+            
+            $data['value'] = ['ops'=>[
+                ['insert'=>$data['value']],
+                ['insert'=>"\n"]
+            ]];
         }
 
         $image          = new \nadar\quill\listener\Image();
@@ -47,7 +52,7 @@ final class Richtext extends AbstractGroup
         parent::build($data, $style, $options);
     }
 
-    protected function renderContent(int $indentation, int $level, string $content) : string
+    protected function renderContent(int $indentation, int $level, string $content): string
     {
         $i               = str_repeat(' ', $indentation * $level);
         $rows            = explode("\n", $content);
@@ -58,23 +63,24 @@ final class Richtext extends AbstractGroup
         return $renderedContent;
     }
 
-    private function addCorrectImagePaths(string $html, array $style, string $appearance) : string {
+    private function addCorrectImagePaths(string $html, array $style, string $appearance): string
+    {
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
         $doc->loadHtml($html);
         $images = [];
         foreach ($doc->getElementsByTagName('img') as $tag) {
             $src = $tag->getAttribute('src');
-            if (strpos($src,'@')) {
+            if (strpos($src, '@')) {
                 $images[] = $src;
             }
         }
         $images = array_unique($images);
         foreach ($images as $src) {
             $pathinfo = pathinfo($src);
-            $tmp = explode('@',$pathinfo['basename']);
+            $tmp = explode('@', $pathinfo['basename']);
             $asset = $tmp[0].'.'.$pathinfo['extension'];
-            
+
             $img  = $this->builder->build('image', ['src' => $asset], ['options' => $style['options'] ?? []], ['appearance' => $appearance])->render();
             $img  = str_replace('<img', '', $img);
             $img  = str_replace('>', '', $img);
@@ -85,7 +91,7 @@ final class Richtext extends AbstractGroup
         return $html;
     }
 
-    private function addUrls(string $html) : string
+    private function addUrls(string $html): string
     {
         $matches = [];
         preg_match_all('/[ ]{1}href="(.*?)"/', $html, $matches);
@@ -105,7 +111,7 @@ final class Richtext extends AbstractGroup
         return $html;
     }
 
-    private function addClasses(string $html, array $style, string $appearance) : string
+    private function addClasses(string $html, array $style, string $appearance): string
     {
         $headingStyle = $this->reader->get('theme.components.heading') ?? [];
         $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
@@ -126,7 +132,7 @@ final class Richtext extends AbstractGroup
         return $html;
     }
 
-    private function getImgClasses(array $style, string $appearance) : string
+    private function getImgClasses(array $style, string $appearance): string
     {
         return implode(' ', StyleAppearanceHelper::apply($style, $appearance));
     }
