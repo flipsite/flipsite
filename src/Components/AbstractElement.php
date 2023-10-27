@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -64,6 +65,11 @@ abstract class AbstractElement
     public function getAttribute(string $attr)
     {
         return $this->attributes[$attr] ?? null;
+    }
+
+    public function getAttributes(): array
+    {
+        return $this->attributes;
     }
 
     public function setAttribute(string $attr, $value, bool $append = false): self
@@ -192,7 +198,7 @@ abstract class AbstractElement
         return $this->cache = $html;
     }
 
-    protected function renderContent(int $indentation, int $level, string $content) : string
+    protected function renderContent(int $indentation, int $level, string $content): string
     {
         $i = str_repeat(' ', $indentation * $level);
         return $i.wordwrap($content, 120, "\n".$i)."\n";

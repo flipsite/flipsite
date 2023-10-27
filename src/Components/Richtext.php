@@ -27,28 +27,29 @@ final class Richtext extends AbstractGroup
         if (!$data['value']) {
             return;
         }
-        if (strpos($data['value'], '{"ops":') === false) {
-            
-            $data['value'] = ['ops'=>[
-                ['insert'=>$data['value']],
-                ['insert'=>"\n"]
-            ]];
-        }
 
-        $image          = new \nadar\quill\listener\Image();
-        $image->wrapper = '<img src="{src}" class="'.$this->getImgClasses($style['img'] ?? [], $options['appearance']).'" />';
+        libxml_use_internal_errors(true);
+        $doc = new \DOMDocument();
+        $doc->loadHtml($data['value']);
+        
+        // Modify HTML
+        $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
 
-        $lexer         = new \nadar\quill\Lexer($data['value']);
-        $lexer->registerListener($image);
-
-        $this->content = trim($lexer->render());
+        // Render HTML
+        $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
         $this->content = $this->addClasses($this->content, $style, $options['appearance']);
-        $this->content = $this->addCorrectImagePaths($this->content, $style['img'] ?? [], $options['appearance']);
-        $this->content = $this->addUrls($this->content);
-
-        // remove empty lines
-        $this->content = str_replace("<p><br></p>\n", '', $this->content);
-
+        $this->content = str_replace('<body>','',$this->content);
+        $this->content = str_replace("</body>",'',$this->content);
+        $this->content = str_replace('</h1>',"</h1>\n",$this->content);
+        $this->content = str_replace('</h2>',"</h2>\n",$this->content);
+        $this->content = str_replace('</h3>',"</h3>\n",$this->content);
+        $this->content = str_replace('</h4>',"</h4>\n",$this->content);
+        $this->content = str_replace('</h5>',"</h5>\n",$this->content);
+        $this->content = str_replace('</h6>',"</h6>\n",$this->content);
+        $this->content = str_replace('</p>',"</p>\n",$this->content);
+        $this->content = str_replace('/>',"/>\n",$this->content);
+        $this->content = preg_replace('/<span class="ql-cursor">.*?<\/span>/', '', $this->content);
+        $this->content = trim($this->content);
         parent::build($data, $style, $options);
     }
 
@@ -63,32 +64,22 @@ final class Richtext extends AbstractGroup
         return $renderedContent;
     }
 
-    private function addCorrectImagePaths(string $html, array $style, string $appearance): string
+    private function modifyImages(\DOMDocument $doc, array $style, string $appearance): \DOMDocument
     {
-        libxml_use_internal_errors(true);
-        $doc = new \DOMDocument();
-        $doc->loadHtml($html);
-        $images = [];
         foreach ($doc->getElementsByTagName('img') as $tag) {
             $src = $tag->getAttribute('src');
             if (strpos($src, '@')) {
-                $images[] = $src;
+                $pathinfo = pathinfo($src);
+                $tmp = explode('@', $pathinfo['basename']);
+                $asset = $tmp[0].'.'.$pathinfo['extension'];
+                $img = $this->builder->build('image', ['src' => $asset], $style, ['appearance' => $appearance]);
+                foreach ($img->getAttributes() as $attr => $value) {
+                    $tag->setAttribute($attr, (string)$value);
+                }
             }
         }
-        $images = array_unique($images);
-        foreach ($images as $src) {
-            $pathinfo = pathinfo($src);
-            $tmp = explode('@', $pathinfo['basename']);
-            $asset = $tmp[0].'.'.$pathinfo['extension'];
 
-            $img  = $this->builder->build('image', ['src' => $asset], ['options' => $style['options'] ?? []], ['appearance' => $appearance])->render();
-            $img  = str_replace('<img', '', $img);
-            $img  = str_replace('>', '', $img);
-            $img  = str_replace('alt="" ', '', $img);
-            $img  = trim($img);
-            $html = str_replace('src="'.$src.'"', $img, $html);
-        }
-        return $html;
+        return $doc;
     }
 
     private function addUrls(string $html): string
