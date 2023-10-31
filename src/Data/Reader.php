@@ -319,10 +319,19 @@ final class Reader
         $expandedSlugs = [];
         $expandedMeta  = [];
         foreach ($pages as $page => $sections) {
-
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $category = $meta[$page]['content'];
-                foreach ($this->data['content'][$category] ?? [] as $dataItem) {
+                $schema = $this->data['contentSchemas'][$category];
+                $items = $this->data['content'][$category] ?? [];
+                if (isset($schema['published']) && 'boolean' === $schema['published']['type']) {
+                    $published = array_filter($items, function($item){
+                        return $item['published'] ?? false;
+                    });
+                    $items = count($published) ? $published : [$items[0]];
+                }
+
+
+                foreach ($items as $dataItem) {
                     if (!isset($dataItem['slug'])) {
                         continue;
                     }
@@ -357,7 +366,7 @@ final class Reader
                 }
             }
         }
-
+        //print_r(array_keys($expandedPages,true));
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
         $this->data['meta']  = $expandedMeta;

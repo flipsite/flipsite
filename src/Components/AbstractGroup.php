@@ -198,7 +198,14 @@ abstract class AbstractGroup extends AbstractComponent
             $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)), $parentPage);
         } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
             $dataSourceList = $this->getSocial();
+        } elseif (is_string($dataSourceList)) {
+            // Check if content
+            $dataSourceList = $this->getContent($dataSourceList, true);
         }
+
+        // foreach ($dataSourceList as $index => &$item) {
+            
+        // }
 
         if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
             $filter = explode(',', $data['_options']['filter']);
@@ -292,5 +299,18 @@ abstract class AbstractGroup extends AbstractComponent
             $items[]     = $item;
         }
         return $items;
+    }
+
+    private function getContent(string $category): array {
+        $content = $this->reader->get('content.'.$category) ?? [];
+
+        $schema = $this->reader->get('contentSchemas.'.$category) ?? [];
+        $onlyPublished = isset($schema['published']);
+        if ($onlyPublished) {
+            return array_filter($content, function($item){
+                return $item['published'] ?? false;
+            });
+        }
+        return $content;
     }
 }
