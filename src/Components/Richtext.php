@@ -104,11 +104,13 @@ final class Richtext extends AbstractGroup
 
     private function addClasses(string $html, array $style, string $appearance): string
     {
-        $headingStyle = $this->reader->get('theme.components.heading') ?? [];
+        $headingBaseStyle = $this->reader->get('theme.components.heading') ?? [];
         $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
         foreach ($headings as $hx) {
-            $mergedStyle  = ArrayHelper::merge($headingStyle, $style[$hx] ?? []);
+
+            $mergedStyle  = ArrayHelper::merge($headingBaseStyle, $style[$hx] ?? []);
             $headingStyle = StyleAppearanceHelper::apply($mergedStyle, $appearance);
+            $headingStyle = array_filter($headingStyle, function($item){ return is_string($item);});
             $html         = str_replace('<'.$hx.'>', '<'.$hx.' class="'.implode(' ', $headingStyle).'">', $html);
         }
 
