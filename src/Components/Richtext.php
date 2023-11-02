@@ -30,7 +30,7 @@ final class Richtext extends AbstractGroup
 
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
-        $doc->loadHtml($data['value']);
+        $doc->loadHtml(utf8_decode($data['value']));
         
         // Modify HTML
         $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
