@@ -11,6 +11,6 @@ final class Textarea extends AbstractComponent
     public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
-        $this->setContent($data['value']);
+        $this->setContent((string)($data['value'] ?? ''));
     }
 }
