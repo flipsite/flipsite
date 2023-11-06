@@ -9,7 +9,7 @@ final class VideoHandler
 {
     private array $extensions = ['ogg', 'webm', 'mp4'];
 
-    public function __construct(private string $assetDir, private string $cacheDir, private string $videoBasePath = '/videos')
+    public function __construct(private string $videoDir, private string $cacheDir, private string $videoBasePath = '/videos')
     {
     }
 
@@ -18,7 +18,7 @@ final class VideoHandler
         $sources                       = [];
         $pathinfo                      = pathinfo($video);
         $files[$pathinfo['extension']] = $pathinfo['filename'];
-        $dir                           = $this->assetDir.'/'.$pathinfo['dirname'];
+        $dir                           = $this->videoDir.'/'.$pathinfo['dirname'];
         if (is_dir($dir)) {
             foreach (scandir($dir) as $file) {
                 if (str_starts_with($file, $pathinfo['filename'])) {
@@ -54,9 +54,9 @@ final class VideoHandler
             $parts = explode('.', $parts[0]);
         }
         $filename = implode('.', $parts);
-        if (file_exists($this->assetDir.'/'.$filename)) {
+        if (file_exists($this->videoDir.'/'.$filename)) {
             $filesystem = new \Symfony\Component\Filesystem\Filesystem($this->cacheDir, 0777);
-            $filesystem->copy($this->assetDir.'/'.$filename, $this->cacheDir.'/'.$path);
+            $filesystem->copy($this->videoDir.'/'.$filename, $this->cacheDir.'/'.$path);
         }
         return $this->getCached($response, $path);
     }

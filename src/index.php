@@ -70,8 +70,9 @@ $app->get('/img[/{file:.*}]', function (Request $request, Response $response, ar
 $app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
     $handler     = new VideoHandler(
-        $environment->getSiteDir().'/assets',
+        $environment->getSiteDir().'/videos',
         $environment->getVideoDir(),
+        $environment->getImgDir(),
         $environment->getVideoBasePath(),
     );
     return $handler->getResponse($response, $args['file']);

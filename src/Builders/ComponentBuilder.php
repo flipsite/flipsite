@@ -35,7 +35,7 @@ class ComponentBuilder
             $environment->getImgBasePath(),
         );
         $this->videoHandler = new VideoHandler(
-            $environment->getSiteDir().'/assets',
+            $environment->getSiteDir().'/videos',
             $environment->getVideoDir(),
             $environment->getVideoBasePath(),
         );
