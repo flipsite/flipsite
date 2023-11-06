@@ -159,6 +159,21 @@ class ComponentBuilder
                     return null;
                 }
 
+                $data['_attr'] ??= [];
+                if (isset($data['_attr']['_data'])) {
+                    if (is_string($data['_attr']['_data'])) {
+                        $tmp = explode(',', $data['_attr']['_data']);
+                        foreach ($tmp as $pair) {
+                            $tmp2 = explode('=', $pair);
+                            if (count($tmp2) === 2) {
+                                $attr                 = 'data-'.$tmp2[0];
+                                $val                  = $tmp2[1];
+                                $data['_attr'][$attr] = $val;
+                            }
+                        }
+                    }
+                    unset($data['_attr']['_data']);
+                }
                 if (isset($data['_attr'])) {
                     foreach ($data['_attr'] as $attr => $value) {
                         $component->setAttribute($attr, $value);
@@ -269,7 +284,6 @@ class ComponentBuilder
     private function handleRenderOptions(array $options) : bool
     {
         if (isset($options['hasSubpages'])) {
-
             if (!$this->slugs->hasSubpages($options['hasSubpages'])) {
                 return false;
             }

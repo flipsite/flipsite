@@ -9,15 +9,7 @@ final class Html extends AbstractComponent
 
     public function build(array $data, array $style, array $options) : void
     {
-        if (mb_strpos($data['value'], '.html')) {
-            $filename = $this->environment->getSiteDir().'/'.$data['value'];
-            if (file_exists($filename)) {
-                $html = file_get_contents($filename);
-            }
-        } else {
-            $html = $data['value'];
-        }
-        $this->content = $html;
+        echo 'HTML';
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string

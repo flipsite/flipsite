@@ -10,14 +10,10 @@ final class Script extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (!is_array($data)) {
-            return ['src' => $data];
-        }
         return $data;
     }
 
     public function build(array $data, array $style, array $options) : void
     {
-        $this->setAttribute('src',$data['src']);
     }
 }
