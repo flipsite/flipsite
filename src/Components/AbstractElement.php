@@ -218,7 +218,7 @@ abstract class AbstractElement
                 if ($value) {
                     $html .= ' '.$attr;
                 } else {
-                    $html .= ' '.$attr.'="false"';
+                    //$html .= ' '.$attr.'="false"';
                 }
             } else {
                 if (is_bool($value) && $value) {
