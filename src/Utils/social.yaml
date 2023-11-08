@@ -84,3 +84,8 @@ youtube:
   color: "#FF0000"
   icon: simple-icons/youtube.svg
   url: https://youtube.com/{handle}
+x:
+  name: X
+  color: "#000000"
+  icon: simple-icons/x.svg
+  url: https://x.com/{handle}
