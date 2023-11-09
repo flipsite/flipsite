@@ -11,6 +11,14 @@ final class Date extends AbstractComponent
     {
         $this->addStyle($style);
         $timestamp = strtotime($data['value']);
-        $this->setContent(date($data['format'] ?? 'Y-m-d', $timestamp));
+        if (!$timestamp) {
+            $timestamp = time();
+        }
+        $date = date($data['format'] ?? 'Y-m-d', $timestamp );
+        if (isset($data['content'])) {
+            $this->setContent(str_replace('[date]',$date,$data['content']));
+        } else {
+            $this->setContent($date);
+        }
     }
 }

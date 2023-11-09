@@ -12,7 +12,7 @@ final class Richtext extends AbstractGroup
     use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
-    protected string $tag       = 'div';
+    protected string $tag = 'div';
 
     public function normalize(string|int|bool|array $data): array
     {
@@ -30,13 +30,28 @@ final class Richtext extends AbstractGroup
 
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
-        $doc->loadHtml(utf8_decode($data['value']));
-        
+        $html = mb_convert_encoding($data['value'], 'HTML-ENTITIES', 'UTF-8');
+        $html = $this->convertPreToHtml($html);
+
+        if ($data['magicLinks'] ?? false) {
+            
+            // Mailto
+            $html = preg_replace("/([A-z0-9\._-]+\@[A-z0-9_-]+\.)([A-z0-9\_\-\.]{1,}[A-z])/", '<a href="mailto:$1$2">$1$2</a>', $html);
+
+            $html = preg_replace('/(?:http|ftp)s?:\/\/(?:www\.)?([a-z0-9.-]+\.[a-z]{2,5}(?:\/\S*)?)/', '<a href="$1" rel="noopener noreferrer" target="_blank">$1</a>', $html);
+        }
+
+        $doc->loadHtml($html);
+
         // Modify HTML
         $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
 
+
+
+
         // Render HTML
         $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
+
         $this->content = $this->addClasses($this->content, $style, $options['appearance']);
         $this->content = str_replace('<body>','',$this->content);
         $this->content = str_replace("</body>",'',$this->content);
@@ -50,6 +65,10 @@ final class Richtext extends AbstractGroup
         $this->content = str_replace('/>',"/>\n",$this->content);
         $this->content = preg_replace('/<span class="ql-cursor">.*?<\/span>/', '', $this->content);
         $this->content = trim($this->content);
+        if ($data['removeEmptyLines'] ?? false) {
+            $this->content = str_replace("<p><br></p>\n", '', $this->content);
+        }
+
         parent::build($data, $style, $options);
     }
 
@@ -114,11 +133,12 @@ final class Richtext extends AbstractGroup
             $html         = str_replace('<'.$hx.'>', '<'.$hx.' class="'.implode(' ', $headingStyle).'">', $html);
         }
 
-        $elements = ['a', 'strong'];
+        $elements = ['a', 'strong','table','tbl','td','tr','th','ul','ol','li'];
         foreach ($elements as $el) {
             if (isset($style[$el])) {
+                $tag = $el === 'tbl' ? 'table' : $el;
                 $elStyle = StyleAppearanceHelper::apply($style[$el], $appearance);
-                $html = str_replace('<'.$el, '<'.$el.' class="'.implode(' ', $elStyle).'"', $html);
+                $html = str_replace('<'.$tag, '<'.$tag.' class="'.implode(' ', $elStyle).'"', $html);
             }
         }
 
@@ -128,5 +148,19 @@ final class Richtext extends AbstractGroup
     private function getImgClasses(array $style, string $appearance): string
     {
         return implode(' ', StyleAppearanceHelper::apply($style, $appearance));
+    }
+
+    private function convertPreToHtml(string $html):string {
+        $matches = [];
+        preg_match_all('/<pre class="ql-syntax" spellcheck="false">((.|\n)*?)<\/pre>/', $html, $matches);
+
+        foreach ($matches[1] as $i => $match) {
+            $match = str_replace('&nbsp;','',$match);
+            $match = str_replace('&lt;','<',$match);
+            $match = str_replace('&gt;','>',$match);
+            $html = str_replace($matches[0][$i], $match, $html);
+
+        }
+        return $html;
     }
 }

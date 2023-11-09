@@ -14,45 +14,46 @@ final class Table extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (is_string($data)) {
-            $data = ['import' => $data];
-        }
-        if (isset($data['import'])) {
-            $filename = $this->environment->getSiteDir().'/'.$data['import'];
-            unset($data['import']);
-            if (file_exists($filename)) {
-                $csv = Reader::createFromPath($filename, 'r');
-                $csv->setDelimiter(';');
-                if (!isset($data['header'])) {
-                    $csv->setHeaderOffset(0);
-                    $data['header'] = [];
-                    foreach ($csv->getHeader() as $h) {
-                        $data['header'][] = $h;
-                    }
-                }
-                $data['rows'] = [];
-                foreach ($csv->getRecords() as $i => $row) {
-                    $data['rows'][$i] = [];
-                    foreach ($row as $col) {
-                        $data['rows'][$i][] = $col;
-                    }
-                }
-            }
-        }
-        if (isset($data['header']) && is_string($data['header'])) {
-            $data['header'] = explode(',', $data['header']);
-        }
+    //     if (is_string($data)) {
+    //         $data = ['import' => $data];
+    //     }
+    //     if (isset($data['import'])) {
+    //         $filename = $this->environment->getSiteDir().'/'.$data['import'];
+    //         unset($data['import']);
+    //         if (file_exists($filename)) {
+    //             $csv = Reader::createFromPath($filename, 'r');
+    //             $csv->setDelimiter(';');
+    //             if (!isset($data['header'])) {
+    //                 $csv->setHeaderOffset(0);
+    //                 $data['header'] = [];
+    //                 foreach ($csv->getHeader() as $h) {
+    //                     $data['header'][] = $h;
+    //                 }
+    //             }
+    //             $data['rows'] = [];
+    //             foreach ($csv->getRecords() as $i => $row) {
+    //                 $data['rows'][$i] = [];
+    //                 foreach ($row as $col) {
+    //                     $data['rows'][$i][] = $col;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     if (isset($data['header']) && is_string($data['header'])) {
+    //         $data['header'] = explode(',', $data['header']);
+    //     }
         return $data;
     }
 
     public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
+        
         if ($data['header'] ?? false) {
             $tr      = new Element('tr');
             foreach ($data['header'] as $i => $col) {
                 $th = new Element('th', true);
-                $th->addStyle($this->getNth($i, count($data['header']), $style['th'] ?? [], 'th'));
+                $th->addStyle($style['th']);
                 $th->setContent($col);
                 $tr->addChild($th);
             }
@@ -66,7 +67,7 @@ final class Table extends AbstractComponent
             foreach ($row as $j => $col) {
                 $tag = $style['td'][$j]['tag'] ?? 'td';
                 $td  = new Element($tag, true);
-                $td->addStyle($this->getNth($j, $totalRows, $style['td'] ?? [], 'td'));
+                $td->addStyle($style['td']);
 
                 if (isset($data['format'])) {
                     $td->setContent($this->format($data['format'], $col, $j));
