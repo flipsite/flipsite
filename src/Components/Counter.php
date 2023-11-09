@@ -15,7 +15,7 @@ final class Counter extends AbstractComponent
         $this->builder->dispatch(new \Flipsite\Components\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/ready.counter.min.js')));
         $this->addStyle($style);
         $this->setAttribute('data-counter', true);
-        $this->setAttribute('data-to', (string)($data['to'] ?? $data['from'] ?? 0));
+        $this->setAttribute('data-to', (string)($data['to'] ?? 100));
         $this->setAttribute('data-duration', (string)($data['duration'] ?? 500));
         $value = new Element('span', true);
         $value->setContent((string)($data['from'] ?? 0));
