@@ -12,9 +12,9 @@ final class Paragraph extends AbstractComponent
 
     public function build(array $data, array $style, array $options): void
     {
-        $markdown  = $this->getMarkdownLine($data['value'] ?? [], $style['value'] ?? [], $options['appearance']);
-        $markdown  = $this->checkGlobalVars($markdown);
-        $this->setContent($markdown);
+        $markdown = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
+        $markdown = $this->checkGlobalVars($markdown);
+        $this->setContent((string)$markdown);
         $this->addStyle($style);
     }
 
