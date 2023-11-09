@@ -132,7 +132,7 @@ final class Reader
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(string $page, ?Language $language = null): array
+    public function getSections(string $page, ?Language $language = null, bool $disregardHidden = false): array
     {
         $language ??= $this->getDefaultLanguage();
         if ('offline' === $page) {
@@ -158,13 +158,15 @@ final class Reader
         }
         $all      = array_merge($before, $all, $after);
         $sections = [];
-        foreach ($all as $section) {
-            $type = $section['type'] ?? 'default';
-            if ($this->hideSection($section, $page, $language)) {
-                continue;
+        if (!$disregardHidden) {
+            foreach ($all as $section) {
+                $type = $section['type'] ?? 'default';
+                if ($this->hideSection($section, $page, $language)) {
+                    continue;
+                }
+                $sections[] = $section;
             }
-            $sections[] = $section;
-        }
+        } else $sections = $all;
         foreach ($sections as $i => &$section) {
             $parentStyle = [];
             foreach ($section as $type => $value) {
@@ -267,7 +269,7 @@ final class Reader
 
     private function hideSection(array $section, string $page, Language $language): bool
     {
-        if ($section['hidden'] ?? false) {
+        if ($section['_options']['hidden'] ?? false) {
             return true;
         }
         if (isset($section['options']['visible']['languages'])) {
