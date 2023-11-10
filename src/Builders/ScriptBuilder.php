@@ -23,16 +23,17 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
             return $document;
         }
         $script = new InlineScript();
+        if (count($this->ready)) {
+            $script->addCode("function ready(fn){if(document.readyState!='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}");
+        }
+        $document->getChild('head')->prependChild($script);
+
+        $script = new InlineScript();
         foreach ($this->global as $code) {
             $script->addCode($code);
         }
-
         if ($this->sw) {
             $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("'.$this->basePath.'/sw.'.$this->hash.'.js");}});');
-        }
-
-        if (count($this->ready)) {
-            $script->addCode("function ready(fn){if(document.readyState!='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}");
         }
         foreach ($this->ready as $code) {
             if ($code) $script->addCode($code);
