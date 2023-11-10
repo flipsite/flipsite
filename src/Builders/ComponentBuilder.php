@@ -288,6 +288,36 @@ class ComponentBuilder
                 return false;
             }
         }
+        if (isset($options['isPage'])) {
+            $pages = explode(',',trim(str_replace(' ','',$options['isPage'])));
+            $currentPage = $this->path->getPage();
+            foreach ($pages as $page) {
+                if ($currentPage === $page) return true;
+                if (str_ends_with($page,'*')) {
+                    $page = trim($page,'*');
+                    if (str_starts_with($currentPage, $page)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        if (isset($options['notPage'])) {
+            $pages = explode(',',trim(str_replace(' ','',$options['notPage'])));
+            $currentPage = $this->path->getPage();
+            foreach ($pages as $page) {
+                if ($currentPage === $page) return false;
+                if (str_ends_with($page,'*')) {
+                    $page = trim($page,'*');
+                    if (str_starts_with($currentPage, $page)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         return true;
     }
 }

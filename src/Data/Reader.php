@@ -237,36 +237,6 @@ final class Reader
         ];
     }
 
-    public function getComponentFactories(): array
-    {
-        $factories = [];
-        $import    = $this->data['theme']['import'] ?? [];
-        if (!is_array($import)) {
-            $import = explode(',', str_replace(' ', '', $import));
-        }
-        foreach ($import ?? [] as $factory) {
-            $parts   = explode('/', $factory);
-            $vendor  = str_replace(' ', '', ucwords(str_replace('-', ' ', $parts[0])));
-            $package = str_replace(' ', '', ucwords(str_replace('-', ' ', $parts[1])));
-            $class   = $vendor.'\\'.$package.'\\ComponentFactory';
-            if (class_exists($class)) {
-                $factories[] = $class;
-            }
-        }
-        return $factories;
-    }
-
-    public function getHiddenPages(): array
-    {
-        $hidden = ['404'];
-        foreach ($this->data['meta'] ?? [] as $page => $meta) {
-            if ($meta['hidden'] ?? false) {
-                $hidden[] = $page;
-            }
-        }
-        return $hidden;
-    }
-
     private function hideSection(array $section, string $page, Language $language): bool
     {
         if ($section['_options']['hidden'] ?? false) {
@@ -388,18 +358,5 @@ final class Reader
         }
         $extendedSlugs[$page] = $slugs;
         return $extendedSlugs;
-    }
-
-    private function getPermutations(int $level, int $max, array $data, array $parents = []): array
-    {
-        $permutations = [];
-        foreach ($data as $key => $val) {
-            if ($level < $max - 1 && is_array($val) && isset($val['data'])) {
-                $permutations = array_merge($permutations, $this->getPermutations($level + 1, $max, $val['data'], array_merge($parents, [$key])));
-            } else {
-                $permutations[] = array_merge($parents, [$key]);
-            }
-        }
-        return $permutations;
     }
 }

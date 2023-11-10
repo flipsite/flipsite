@@ -193,10 +193,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
     $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path);
     $componentBuilder->addFactory(new ComponentFactory());
-    foreach ($reader->getComponentFactories() as $class) {
-        $componentBuilder->addFactory(new $class());
-    }
-
+    
     $metaBuilder = new MetaBuilder($environment, $reader, $path);
 
     $faviconBuilder = new FaviconBuilder($environment, $reader);
