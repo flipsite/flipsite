@@ -132,7 +132,7 @@ final class Reader
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(string $page, ?Language $language = null, bool $disregardHidden = false): array
+    public function getSections(string $page, ?Language $language = null): array
     {
         $language ??= $this->getDefaultLanguage();
         if ('offline' === $page) {
@@ -156,17 +156,8 @@ final class Reader
         foreach ($after as &$a) {
             $a['_after'] = true;
         }
-        $all      = array_merge($before, $all, $after);
-        $sections = [];
-        if (!$disregardHidden) {
-            foreach ($all as $section) {
-                $type = $section['type'] ?? 'default';
-                if ($this->hideSection($section, $page, $language)) {
-                    continue;
-                }
-                $sections[] = $section;
-            }
-        } else $sections = $all;
+        $sections = array_merge($before, $all, $after);
+
         foreach ($sections as $i => &$section) {
             $parentStyle = [];
             foreach ($section as $type => $value) {
@@ -235,50 +226,6 @@ final class Reader
             'share' => $share,
             'icon' => $icon
         ];
-    }
-
-    private function hideSection(array $section, string $page, Language $language): bool
-    {
-        if ($section['_options']['hidden'] ?? false) {
-            return true;
-        }
-        if (isset($section['options']['visible']['languages'])) {
-            $val       = $section['options']['visible']['languages'];
-            $languages = is_string($val) ? explode(',', $val) : $val;
-            if (!in_array((string) $language, $languages)) {
-                return true;
-            }
-        }
-        if (isset($section['options']['visible']['pages'])) {
-            $pages = $section['options']['visible']['pages'];
-            if (is_string($pages)) {
-                $pages = explode(',', $pages);
-            }
-            foreach ($pages as $visiblePage) {
-                if ($visiblePage === $page) {
-                    return false;
-                }
-                if (str_ends_with($visiblePage, '*') && str_starts_with($page, str_replace('*', '', $visiblePage))) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        if (isset($section['options']['hidden']['pages'])) {
-            $pages = $section['options']['hidden']['pages'];
-            if (is_string($pages)) {
-                $pages = explode(',', $pages);
-            }
-            foreach ($pages as $hidePage) {
-                if ($hidePage === $page) {
-                    return true;
-                }
-                if (str_ends_with($hidePage, '*') && str_starts_with($page, str_replace('*', '', $hidePage))) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private function expandPagesAndSlugs(): void

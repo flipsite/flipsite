@@ -70,7 +70,9 @@ class ComponentBuilder
             $parentTypeStyle = $this->getStyle($parentType, $parentTypeflags);
             $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
-
+        if (isset($data['_options']['hidden'])) {
+            return null;
+        }
         if (isset($data['_options']['render'])) {
             if (!$this->handleRenderOptions($data['_options']['render'])) {
                 return null;
@@ -302,7 +304,6 @@ class ComponentBuilder
             }
             return false;
         }
-
         if (isset($options['notPage'])) {
             $pages = explode(',',trim(str_replace(' ','',$options['notPage'])));
             $currentPage = $this->path->getPage();
@@ -317,7 +318,6 @@ class ComponentBuilder
             }
             return true;
         }
-
         return true;
     }
 }
