@@ -263,8 +263,6 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     if (strpos($bodyHtml, 'enter:')) {
         $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
     }
-    // Add Scripts
-    $document = $scriptBuilder->getDocument($document);
 
     // Add Analytics
     $integrations = $reader->get('integrations');
@@ -277,9 +275,12 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     // Custom HTML
     $customCodeFile = $environment->getSiteDir().'/custom.html';
     if (file_exists($customCodeFile)) {
-        $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile);
+        $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile, $scriptBuilder);
         $document          = $customCodeBuilder->getDocument($document);
     }
+
+    // Add Scripts
+    $document = $scriptBuilder->getDocument($document);
 
     // If any plugins
     $document = $plugins->run('document', $document);

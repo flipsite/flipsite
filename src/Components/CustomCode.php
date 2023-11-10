@@ -20,4 +20,8 @@ final class CustomCode extends AbstractElement
         $html .= "\n";
         return $html;
     }
+
+    public function getHtml() : string {
+        return $this->html;
+    }
 }

@@ -35,7 +35,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
             $script->addCode("function ready(fn){if(document.readyState!='loading'){fn();}else{document.addEventListener('DOMContentLoaded',fn);}}");
         }
         foreach ($this->ready as $code) {
-            $script->addCode($code);
+            if ($code) $script->addCode($code);
         }
         $document->getChild('body')->addChild($script);
         return $document;
