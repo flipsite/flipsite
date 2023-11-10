@@ -83,9 +83,16 @@ class AssetParser
         $assets = array_values(array_unique($assets));
 
         $internal = [];
+        
         foreach ($assets as $asset) {
+            $pathinfo = pathinfo($asset);
+            if (!isset($pathinfo['extension'])) {
+                continue;
+            }
+            if (!in_array($pathinfo['extension'], ['webp','svg','png','jpg','gif','mp4','mov','ogg'])) {
+                continue;
+            }
             if (str_starts_with($asset,'http')) {
-
                 $parsedUrl = parse_url($asset);
                 if ($parsedUrl['host'] === $host) {
                     $internal[] = $parsedUrl['path'];

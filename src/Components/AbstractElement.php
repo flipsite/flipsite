@@ -193,7 +193,7 @@ abstract class AbstractElement
         }
 
         if ($this->commentOut) {
-            $html = $i.'<!-- '.$this->commentOut."\n".$html.$i.'--!>'."\n";
+            $html = $i.'<!-- '.$this->commentOut."\n".$html.$i.'-->'."\n";
         }
         return $this->cache = $html;
     }

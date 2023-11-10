@@ -49,11 +49,13 @@ class Compiler implements LoggerAwareInterface
         $slugs    = $reader->getSlugs();
         $allPages = array_keys($slugs->getAll());
 
+        $allFiles = [];
         $assets   = [];
         foreach ($allPages as $page) {
             $requestUri = $basePath.'/'.$page;
             $html       = $this->getResponse($https, $config['domain'], $requestUri);
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
+            $allFiles[] = $page.'/index.html';
             $assets = array_merge($assets, AssetParser::parse($html, $config['domain']));
         }
 
@@ -63,6 +65,7 @@ class Compiler implements LoggerAwareInterface
         // Remove base path
         foreach ($assets as &$asset) {
             $asset = str_replace($basePath,'',$asset);
+            $allFiles[] = $asset;
         }
 
         $notDeleted = $this->deleteAssets($this->targetDir, $assets);
@@ -78,11 +81,13 @@ class Compiler implements LoggerAwareInterface
         $requestUri = $basePath.'/sitemap.xml';
         $sitemap    = $this->getResponse($https, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/sitemap.xml', $sitemap);
+        $allFiles[] = 'sitemap.xml';
 
         // Robots
         $requestUri = $basePath.'/robots.txt';
         $robots     = $this->getResponse($https, $config['domain'], $requestUri);
         $this->writeFile($this->targetDir, '/robots.txt', $robots);
+        $allFiles[] = 'robots.txt';
 
         // Files
         $files = $this->getDirContents($this->environment->getSiteDir().'/files');
@@ -92,7 +97,63 @@ class Compiler implements LoggerAwareInterface
             $tmp = explode('files/', $file);
             $fileName = array_pop($tmp);
             $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
+            $allFiles[] = 'files/'.$fileName;
         }
+
+        // Delete files that are not needed anymore
+
+        $allFilesInCurrentCompileDir = $this->getDirContents($this->targetDir);
+        $deleteFiles = [];
+
+        foreach ($allFilesInCurrentCompileDir as $currentFile) {
+            if (is_dir($currentFile)) {
+                continue;
+            }
+            $delete = true;
+            foreach ($allFiles as $newFile) {
+                if (str_ends_with($currentFile,$newFile)) {
+                    $delete = false; 
+                }
+            }
+            if ($delete) {
+                $deleteFiles[] = $currentFile;
+            }
+        }
+
+        foreach ($deleteFiles as $deleteFile) {
+            unlink($deleteFile);
+        }
+
+        $this->removeEmptyFolders($this->targetDir);
+    }
+
+    private function removeEmptyFolders(string $dir) {
+        // Open the directory
+        $dh = opendir($dir);
+
+        // Check if the directory could be opened
+        if (!$dh) {
+            throw new \Exception("Cannot open the directory $dir");
+        }
+
+        // Loop through the directory
+        while (($file = readdir($dh)) !== false) {
+            // Skip special directories
+            if ($file != "." && $file != "..") {
+                $path = $dir . '/' . $file;
+
+                // If it's a directory, recursively call the function
+                if (is_dir($path)) {
+                    $this->removeEmptyFolders($path);
+                    // Check if the directory is empty after recursive call
+                    if (count(glob($path . '/*')) === 0) {
+                        rmdir($path); // Remove the empty directory
+                    }
+                }
+            }
+        }
+        // Close the directory handle
+        closedir($dh);
     }
 
     public function getFiles() : array
