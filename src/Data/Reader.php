@@ -228,6 +228,17 @@ final class Reader
         ];
     }
 
+    public function getHiddenPages(): array
+    {
+        $hidden = ['404'];
+        foreach ($this->data['meta'] ?? [] as $page => $meta) {
+            if ($meta['hidden'] ?? false) {
+                $hidden[] = $page;
+            }
+        }
+        return $hidden;
+    }
+
     private function expandPagesAndSlugs(): void
     {
         $pages    = $this->data['pages'] ?? [];
