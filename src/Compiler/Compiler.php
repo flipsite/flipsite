@@ -54,9 +54,12 @@ class Compiler implements LoggerAwareInterface
         foreach ($allPages as $page) {
             $requestUri = $basePath.'/'.$page;
             $html       = $this->getResponse($https, $config['domain'], $requestUri);
+            if ($this->logger) {
+                $this->logger->info('Created file for '.$requestUri);
+            }
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
             $allFiles[] = $page.'/index.html';
-            $assets = array_merge($assets, AssetParser::parse($html, $config['domain']));
+            $assets     = array_merge($assets, AssetParser::parse($html, $config['domain']));
         }
 
         // Get list of unique assets
@@ -64,7 +67,7 @@ class Compiler implements LoggerAwareInterface
 
         // Remove base path
         foreach ($assets as &$asset) {
-            $asset = str_replace($basePath,'',$asset);
+            $asset      = str_replace($basePath, '', $asset);
             $allFiles[] = $asset;
         }
 
@@ -72,9 +75,12 @@ class Compiler implements LoggerAwareInterface
         $assets     = array_diff($assets, $notDeleted);
 
         // Create assets
-        foreach ($assets as $asset) {;
+        foreach ($assets as $asset) {
             $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$asset);
-            $this->writeFile($this->targetDir, str_replace($basePath,'',$asset), $source);
+            if ($this->logger) {
+                $this->logger->info('Created image for  for '.$basePath.$asset);
+            }
+            $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
         }
 
         // Sitemap
@@ -90,11 +96,11 @@ class Compiler implements LoggerAwareInterface
         $allFiles[] = 'robots.txt';
 
         // Files
-        $files = $this->getDirContents($this->environment->getSiteDir().'/files');
+        $files      = $this->getDirContents($this->environment->getSiteDir().'/files');
         $filesystem = new Filesystem();
         $filesystem->remove($this->targetDir.'/files');
         foreach ($files as $file) {
-            $tmp = explode('files/', $file);
+            $tmp      = explode('files/', $file);
             $fileName = array_pop($tmp);
             $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
             $allFiles[] = 'files/'.$fileName;
@@ -103,7 +109,7 @@ class Compiler implements LoggerAwareInterface
         // Delete files that are not needed anymore
 
         $allFilesInCurrentCompileDir = $this->getDirContents($this->targetDir);
-        $deleteFiles = [];
+        $deleteFiles                 = [];
 
         foreach ($allFilesInCurrentCompileDir as $currentFile) {
             if (is_dir($currentFile)) {
@@ -111,8 +117,8 @@ class Compiler implements LoggerAwareInterface
             }
             $delete = true;
             foreach ($allFiles as $newFile) {
-                if (str_ends_with($currentFile,$newFile)) {
-                    $delete = false; 
+                if (str_ends_with($currentFile, $newFile)) {
+                    $delete = false;
                 }
             }
             if ($delete) {
@@ -127,7 +133,8 @@ class Compiler implements LoggerAwareInterface
         $this->removeEmptyFolders($this->targetDir);
     }
 
-    private function removeEmptyFolders(string $dir) {
+    private function removeEmptyFolders(string $dir)
+    {
         // Open the directory
         $dh = opendir($dir);
 
@@ -139,7 +146,7 @@ class Compiler implements LoggerAwareInterface
         // Loop through the directory
         while (($file = readdir($dh)) !== false) {
             // Skip special directories
-            if ($file != "." && $file != "..") {
+            if ($file != '.' && $file != '..') {
                 $path = $dir . '/' . $file;
 
                 // If it's a directory, recursively call the function
@@ -227,11 +234,11 @@ class Compiler implements LoggerAwareInterface
                 $dirs[] = $image;
                 continue;
             }
-            $asset = str_replace($targetDir, '', $image);
-            $mime = mime_content_type($image);
+            $asset    = str_replace($targetDir, '', $image);
+            $mime     = mime_content_type($image);
             $pathinfo = pathinfo($asset);
-            
-            if (in_array($asset, $assets) && strpos($mime,$pathinfo['extension']) !== false) {
+
+            if (in_array($asset, $assets) && strpos($mime, $pathinfo['extension']) !== false) {
                 $notDeleted[] = $asset;
             } else {
                 $filesystem->remove($image);
