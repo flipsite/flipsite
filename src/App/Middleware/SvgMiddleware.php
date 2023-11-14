@@ -65,6 +65,7 @@ class SvgMiddleware implements MiddlewareInterface
             $defs = str_replace('></path>', '/>', $defs);
             $svg .= $defs;
             $svg .= "      </defs>\n    </svg>";
+            $svg = preg_replace('/<title>.*?<\/title>/', '', $svg);
             $html = str_replace("<dummysvg></dummysvg>\n", $svg."\n", $html);
         }
         $streamFactory = new StreamFactory();
