@@ -17,6 +17,7 @@ class AssetParser
 
         libxml_use_internal_errors(true);
         $doc = new \DOMDocument();
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         $doc->loadHTML($html);
 
         $imgTags = $doc->getElementsByTagName('img');

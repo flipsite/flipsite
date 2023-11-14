@@ -12,6 +12,8 @@ class Compiler implements LoggerAwareInterface
 {
     use \Psr\Log\LoggerAwareTrait;
     private string $targetDir;
+    private string $imageCacheDir;
+    private string $videoCacheDir;
 
     public function __construct(private AbstractEnvironment $environment, string $targetDir)
     {
@@ -20,6 +22,8 @@ class Compiler implements LoggerAwareInterface
             mkdir($targetDir, 0777, true);
         }
         $this->targetDir = realpath($targetDir);
+        $this->imageCacheDir = realpath($this->environment->getImgDir());
+        $this->videoCacheDir = realpath($this->environment->getImgDir());
 
         putenv('SITE_DIR='.$this->environment->getSiteDir());
         putenv('VENDOR_DIR='.$this->environment->getVendorDir());
@@ -76,11 +80,25 @@ class Compiler implements LoggerAwareInterface
 
         // Create assets
         foreach ($assets as $asset) {
-            $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$asset);
-            if ($this->logger) {
-                $this->logger->info('Created image for  for '.$basePath.$asset);
+            $tmp = explode('img/',$asset);
+            $filename = array_pop($tmp);
+            if (file_exists($this->imageCacheDir.'/'.$filename)) {
+                $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $asset));
+                if (!file_exists($pathinfo['dirname'])) {
+                    mkdir($pathinfo['dirname'], 0777, true);
+                }
+                if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $asset))) {
+                    if ($this->logger) {
+                        //$this->logger->info('Copied '.$filename.' from cache');
+                    }
+                }
+            } else {
+                $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$asset);
+                if ($this->logger) {
+                    $this->logger->info('Created image for '.$basePath.$asset);
+                }
+                $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
             }
-            $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
         }
 
         // Sitemap
