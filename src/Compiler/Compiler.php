@@ -76,28 +76,28 @@ class Compiler implements LoggerAwareInterface
         }
 
         $notDeleted = $this->deleteAssets($this->targetDir, $assets);
-        $assets     = array_diff($assets, $notDeleted);
+        $assets     = json_encode(array_values(array_diff($assets, $notDeleted)));
+        
 
-        // Create assets
-        foreach ($assets as $asset) {
-            $tmp = explode('img/',$asset);
-            $filename = array_pop($tmp);
+        foreach (json_decode($assets) as $image) {
+            $pos = strpos($image, '/img/');
+            $filename = substr($image,$pos+5);
             if (file_exists($this->imageCacheDir.'/'.$filename)) {
-                $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $asset));
+                $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $image));
                 if (!file_exists($pathinfo['dirname'])) {
                     mkdir($pathinfo['dirname'], 0777, true);
                 }
-                if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $asset))) {
+                if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $image))) {
                     if ($this->logger) {
-                        //$this->logger->info('Copied '.$filename.' from cache');
+                        $this->logger->info('Copied '.$filename.' from cache');
                     }
                 }
             } else {
-                $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$asset);
+                $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$image);
                 if ($this->logger) {
-                    $this->logger->info('Created image for '.$basePath.$asset);
+                    $this->logger->info('Created image for '.$basePath.$image);
                 }
-                $this->writeFile($this->targetDir, str_replace($basePath, '', $asset), $source);
+                $this->writeFile($this->targetDir, str_replace($basePath, '', $image), $source);
             }
         }
 
