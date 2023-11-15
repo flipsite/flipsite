@@ -12,7 +12,7 @@ final class RasterEditor extends AbstractImageEditor
 {
     public function create(): void
     {
-        $manager      = new ImageManager('gd');
+        $manager      = new ImageManager(['driver' => 'gd']);
         $image = $manager->read($this->file->getFilename());
         $filePathinfo = pathinfo($this->path);
         $options      = new RasterOptions($this->path);

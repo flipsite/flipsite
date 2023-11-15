@@ -75,6 +75,7 @@ final class ImageHandler
         try {
             $editor->create();
         } catch (Exception $e) {
+            error_log($e->getMessage());
             return $this->notFound($response);
         }
         return $this->getCached($response, $path);
