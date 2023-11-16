@@ -81,6 +81,9 @@ abstract class AbstractEnvironment
     {
         return $this->videoDir;
     }
+    public function getExternalAssetDirs() : array {
+        return $this->externalAssetDirs;
+    }
 
     public function getSiteDir() : string
     {

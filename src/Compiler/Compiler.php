@@ -29,6 +29,7 @@ class Compiler implements LoggerAwareInterface
         putenv('VENDOR_DIR='.$this->environment->getVendorDir());
         putenv('IMG_DIR='.$this->environment->getImgDir());
         putenv('VIDEO_DIR='.$this->environment->getVideoDir());
+        putenv('ASSET_DIRS='.implode(',',$this->environment->getExternalAssetDirs()));
         putenv('TRAILING_SLASH=1');
     }
 
