@@ -92,8 +92,8 @@ final class Tailwind implements CallbackInterface
         });
 
         foreach ($vars as $i => $var) {
-            $addDefaultValues[$var] = '--v'.$i;
-            $css                    = str_replace($var, '--v'.$i, $css);
+            $addDefaultValues[$var] = '--'.$this->getVar($i);
+            $css                    = str_replace($var, '--'.$this->getVar($i), $css);
         }
         if (count($addDefaultValues)) {
             $css = $this->addDefaultValues($css, $addDefaultValues);
@@ -311,5 +311,17 @@ final class Tailwind implements CallbackInterface
             $css .= '}';
         }
         return $css;
+    }
+
+    private function getVar(int $index): string
+    {
+        $label = '';
+        // Convert the index to a base-26 representation
+        while ($index > 0) {
+            $remainder = ($index - 1) % 26;
+            $label = chr(65 + $remainder) . $label;
+            $index = intval(($index - $remainder) / 26);
+        }
+        return strtolower($label);
     }
 }
