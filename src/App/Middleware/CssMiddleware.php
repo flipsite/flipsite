@@ -17,7 +17,7 @@ class CssMiddleware implements MiddlewareInterface
 {
     private ?array $theme;
 
-    public function __construct(?array $theme)
+    public function __construct(private bool $isEnabled, ?array $theme)
     {
         $this->theme = $theme;
         unset($this->theme['components'], $this->theme['style']);
@@ -74,32 +74,34 @@ class CssMiddleware implements MiddlewareInterface
 
         $css           = $tailwind->getCss($elements, $classes);
         $newClasses = [];
-        // $css = $this->minmizeClasses($css, $classes, $newClasses);
-        // $html = $this->replaceClasses($html, $newClasses);
+        if ($this->isEnabled) {
+            $css = $this->minmizeClasses($css, $classes, $newClasses);
+            $html = $this->replaceClasses($html, $newClasses);
+        }
         $htmlWithStyle = str_replace('<style></style>', '<style>'.$css."\n    ".'</style>', $html);
         $streamFactory = new StreamFactory();
-        $stream        = $streamFactory->createStream($htmlWithStyle);
+        $stream        = $streamFactory->createStream(trim($htmlWithStyle));
         return $response->withBody($stream);
     }
 
     private function minmizeClasses(string $css, array $classes, array &$newClasses): string
     {
-        usort($classes, function($a, $b) {
+        usort($classes, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
         $escape = ["/",'|','.',':','%','[',']'];
         foreach ($classes as $i => $class) {
-            if (strpos($class,'open:') !== false) {
+            if (strpos($class, 'open:') !== false) {
                 continue;
             }
             $orginal = $class;
-            $tmp = explode(':',$class);
+            $tmp = explode(':', $class);
             $prefix = false;
-            if (count($tmp)>1) {
+            if (count($tmp) > 1) {
                 $class = array_pop($tmp);
-                $prefix = implode(':',$tmp);
+                $prefix = implode(':', $tmp);
             }
-            $newClassName = $this->getClassName($i+1);
+            $newClassName = $this->getClassName($i + 1);
             if ($prefix) {
                 $newClassName = $prefix.':'.$newClassName;
                 $oldInCss = $prefix.':'.$class;
@@ -111,11 +113,11 @@ class CssMiddleware implements MiddlewareInterface
             $newClasses[$oldInCss] = $newInCss;
 
             foreach ($escape as $e) {
-                $oldInCss = str_replace($e,'\\'.$e,$oldInCss);
-                $newInCss = str_replace($e,'\\'.$e,$newInCss);
+                $oldInCss = str_replace($e, '\\'.$e, $oldInCss);
+                $newInCss = str_replace($e, '\\'.$e, $newInCss);
             }
-    
-            $css = str_replace('.'.$oldInCss,'.'.$newInCss, $css);
+
+            $css = str_replace('.'.$oldInCss, '.'.$newInCss, $css);
         }
         return $css;
     }
@@ -138,19 +140,19 @@ class CssMiddleware implements MiddlewareInterface
         $pattern = '/class=["\'](.*?)["\']/';
         preg_match_all($pattern, $html, $matches);
         $classValues = $matches[1];
-        usort($classValues, function($a, $b) {
+        usort($classValues, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
         $states = ['open:','!open:'];
         foreach ($classValues as $class) {
             $new = [];
-            $tmp = explode(' ',$class);
+            $tmp = explode(' ', $class);
             foreach ($tmp as $oldClass) {
                 $prefix = '';
                 foreach ($states as $state) {
-                    if (str_starts_with($oldClass,$state)) {
+                    if (str_starts_with($oldClass, $state)) {
                         $prefix = $state;
-                        $oldClass = substr($oldClass,strlen($prefix));
+                        $oldClass = substr($oldClass, strlen($prefix));
                     }
                 }
 
@@ -160,7 +162,7 @@ class CssMiddleware implements MiddlewareInterface
                     $new[] = $oldClass;
                 }
             }
-            $html = str_replace('class="'.$class.'"','class="'.implode(' ',$new).'"', $html);
+            $html = str_replace('class="'.$class.'"', 'class="'.implode(' ', $new).'"', $html);
         }
         return $html;
     }

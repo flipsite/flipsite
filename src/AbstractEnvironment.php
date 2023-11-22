@@ -99,4 +99,12 @@ abstract class AbstractEnvironment
     {
         return $this->trailingSlash;
     }
+    
+    public function optimizeHtml(): bool {
+        return false;
+    }
+
+    public function optimizeCss(): bool {
+        return false;
+    }
 }

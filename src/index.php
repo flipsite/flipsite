@@ -8,6 +8,7 @@ use Flipsite\App\Middleware\DiagnosticsMiddleware;
 use Flipsite\App\Middleware\ExpiresMiddleware;
 use Flipsite\App\Middleware\OfflineMiddleware;
 use Flipsite\App\Middleware\SvgMiddleware;
+use Flipsite\App\Middleware\HtmlMinifierMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Builders\CustomCodeBuilder;
@@ -51,11 +52,12 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
-$cssMw         = new CssMiddleware($container->get('reader')->get('theme'));
 $diagnosticsMw = new DiagnosticsMiddleware();
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
 $offlineMw     = new OfflineMiddleware($container->get('environment'), $container->get('reader'));
 $svgMw         = new SvgMiddleware($container->get('environment'));
+$htmlMw        = new HtmlMinifierMiddleware($container->get('environment')->optimizeHtml());
+$cssMw         = new CssMiddleware($container->get('environment')->optimizeCss(),$container->get('reader')->get('theme'));
 
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
@@ -288,7 +290,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     $response->getBody()->write($document->render());
 
     return $response->withHeader('Content-type', 'text/html');
-})->add($cssMw)->add($svgMw)->add($offlineMw)->add($diagnosticsMw);
+})->add($cssMw)->add($svgMw)->add($htmlMw)->add($offlineMw)->add($diagnosticsMw);
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));
