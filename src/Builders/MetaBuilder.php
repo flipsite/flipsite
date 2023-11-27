@@ -36,7 +36,7 @@ class MetaBuilder implements BuilderInterface
         $trailingSlash = $this->environment->hasTrailingSlash() ? '/' : '';
 
         $canonical = $server.'/';
-        $canonical.= $slug ? $slug.$trailingSlash : '';
+        $canonical .= $slug ? $slug.$trailingSlash : '';
         $elements[] = $this->meta('canonical', $canonical);
         if (count($this->reader->getLanguages()) > 1) {
             foreach ($this->reader->getLanguages() as $l) {
@@ -45,7 +45,7 @@ class MetaBuilder implements BuilderInterface
                     $el->setAttribute('rel', 'alternate');
                     $slug = $this->reader->getSlugs()->getSlug($page, $l);
                     $href = $server.'/';
-                    $href.= $slug ? $slug.$trailingSlash : '';
+                    $href .= $slug ? $slug.$trailingSlash : '';
                     $el->setAttribute('href', $href);
                     $el->setAttribute('hreflang', (string)$l);
                     $elements[] = $el;
@@ -63,6 +63,9 @@ class MetaBuilder implements BuilderInterface
 
         // HTML meta tags
         $elements[] = $this->meta('description', $meta['description'] ?? null);
+
+        // Generator
+        $elements[] = $this->meta('generator', $this->environment->getGenerator());
 
         // Facebook opengraph tags
         $elements[] = $this->og('og:title', $title);
