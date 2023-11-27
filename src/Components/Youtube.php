@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Youtube extends AbstractGroup
@@ -10,28 +11,28 @@ final class Youtube extends AbstractGroup
     protected bool $oneline = true;
     protected string $tag   = 'iframe';
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         if (!is_array($data)) {
-            return ['value'=>$data];
+            return ['value' => $data];
         }
         return $data;
     }
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(array $data, array $style, array $options): void
     {
         if (isset($data['base64bg'])) {
-            $this->setAttribute('style','background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
+            $this->setAttribute('style', 'background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
-        $this->setAttribute('loading','lazy');
-        $this->setAttribute('frameborder','0');
-        $this->setAttribute('allowfullscreen',true);
-        $this->setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        $this->setAttribute('loading', 'lazy');
+        $this->setAttribute('frameborder', '0');
+        $this->setAttribute('allowfullscreen', true);
+        $this->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
 
-        $src = $data['privacy'] ?? false ? 
+        $src = $data['privacy'] ?? false ?
             'https://www.youtube-nocookie.com/embed/' :
             'https://www.youtube.com/embed/';
-        $src.= $data['value'];
+        $src .= $data['value'] ?? '';
 
         $query = [];
         if (!($data['controls'] ?? false)) {
@@ -42,7 +43,7 @@ final class Youtube extends AbstractGroup
         }
 
         if (count($query)) {
-            $src.='?'.http_build_query($query);
+            $src .= '?'.http_build_query($query);
         }
         $this->setAttribute('src', $src);
         $this->addStyle($style);
