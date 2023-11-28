@@ -115,6 +115,15 @@ class ComponentBuilder
         // Check external factories
         foreach ($this->factories as $factory) {
             $component = $factory->get($type);
+            if (isset($data['_comment'])) {
+                if (isset($data['_comment']['before'])) {
+                    $component->addCommentBefore($data['_comment']['before']);
+                }
+                if (isset($data['_comment']['after'])) {
+                    $component->addCommentAfter($data['_comment']['after']);
+                }    
+                unset($data['_comment']);
+            }
             if (null !== $component) {
                 if (method_exists($component, 'addBuilder')) {
                     $component->addBuilder($this);

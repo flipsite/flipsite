@@ -18,6 +18,8 @@ abstract class AbstractElement
     protected bool $render      = true;
     private ?string $cache      = null;
     private ?string $commentOut = null;
+    private ?string $commentBefore = null;
+    private ?string $commentAfter = null;
 
     public function addStyle(null|array|string $style): self
     {
@@ -35,6 +37,16 @@ abstract class AbstractElement
     public function commentOut(bool $commentOut, string $comment)
     {
         $this->commentOut = $commentOut ? $comment : null;
+    }
+
+    public function addCommentBefore(string $comment)
+    {
+        $this->commentBefore = $comment;
+    }
+
+    public function addCommentAfter(string $comment)
+    {
+        $this->commentAfter = $comment;
     }
 
     public function getTag(): string
@@ -163,12 +175,15 @@ abstract class AbstractElement
         $this->purgeInvalidAttributes();
         $html = '';
         $i    = str_repeat(' ', $indentation * $level);
+        if ($this->commentBefore) {
+            $html.= $i.'<!-- '.$this->commentBefore.' -->'."\n";
+        }
         if ('' === $this->tag) {
             $html .= $i.wordwrap($this->content, 80, $i."\n");
             $html .= "\n";
             return $html;
         }
-        $html = $i.'<'.$this->tag.$this->renderAttributes().'>';
+        $html.= $i.'<'.$this->tag.$this->renderAttributes().'>';
         if ($this->empty) {
             return $html."\n";
         }
@@ -190,6 +205,9 @@ abstract class AbstractElement
             $html .= $i.'</'.$this->tag.'>'."\n";
         } else {
             $html .= '</'.$this->tag.'>'."\n";
+        }
+        if ($this->commentAfter) {
+            $html.= $i.'<!-- '.$this->commentAfter.' -->'."\n";
         }
 
         if ($this->commentOut) {
