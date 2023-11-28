@@ -6,13 +6,13 @@ namespace Flipsite\Assets\Editors;
 
 use Flipsite\Assets\Options\RasterOptions;
 use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Image;
+use Intervention\Image\Image;
 
 final class RasterEditor extends AbstractImageEditor
 {
     public function create(): void
     {
-        $manager      = new ImageManager('gd');
+        $manager      = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
         $image = $manager->read($this->file->getFilename());
         $filePathinfo = pathinfo($this->path);
         $options      = new RasterOptions($this->path);
