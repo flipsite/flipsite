@@ -21,12 +21,23 @@ final class Image extends AbstractComponent
             $data['src'] = $data['value'];
             unset($data['value']);
         }
+        if (isset($data['external']) && !isset($data['src'])) {
+            $data['src'] = $data['external'];
+            unset($data['external']);
+        }
         return $data;
     }
 
     public function build(array $data, array $style, array $options): void
     {
-        $src = $data['src'];
+        if (isset($data['base64'])) {
+            $this->setAttribute('alt', (string)($data['alt'] ?? ''));
+            $this->addStyle($style);
+            $this->setAttribute('src',$data['base64']);
+            return;
+        }
+
+        $src = $data['src'] ?? false;
         if (!$src) {
             $this->render = false;
             return;
