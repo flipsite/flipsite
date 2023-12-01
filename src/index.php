@@ -21,14 +21,15 @@ use Flipsite\Builders\MetaBuilder;
 use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\PreloadBuilder;
 use Flipsite\Components\ComponentFactory;
-use Flipsite\Utils\Path;
-use Flipsite\Utils\Robots;
-use Flipsite\Utils\Sitemap;
+
 use League\Container\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Flipsite\Utils\StyleAppearanceHelper;
+
+use Flipsite\SiteData;
+use Flipsite\Flipsite;
 
 require_once getenv('VENDOR_DIR') . '/autoload.php';
 
@@ -52,9 +53,7 @@ $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
-$diagnosticsMw = new DiagnosticsMiddleware();
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
-$offlineMw     = new OfflineMiddleware($container->get('environment'), $container->get('reader'));
 $svgMw         = new SvgMiddleware($container->get('environment'));
 $htmlMw        = new HtmlMinifierMiddleware($container->get('environment')->optimizeHtml());
 $cssMw         = new CssMiddleware($container->get('environment')->optimizeCss(),$container->get('reader')->get('theme'));
@@ -80,69 +79,62 @@ $app->get('/videos[/{file:.*}]', function (Request $request, Response $response,
     return $handler->getResponse($response, $args['file']);
 })->add($expiresMw);
 
-$app->get('/sitemap.xml', function (Request $request, Response $response) {
-    $environment = $this->get('environment');
-    $reader      = $this->get('reader');
-    $sitemap     = new Sitemap($environment->getServer(), $reader->getSlugs(), $reader->getHiddenPages(), $environment->hasTrailingSlash());
-    $response->getBody()->write((string) $sitemap);
-    return $response->withHeader('Content-type', 'application/xml');
-});
 
-$app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
-    $environment = $this->get('environment');
-    $js          = file_get_contents(__DIR__.'/../js/sw.js');
-    if (preg_match('/[abcdef0-9]{6}/', $args['version'])) {
-        $js = str_replace('const OFFLINE_VERSION=1', 'const OFFLINE_VERSION="'.$args['version'].'"', $js);
-    }
-    $response->getBody()->write((string) $js);
-    return $response->withHeader('Content-type', 'text/javascript');
-})->add($expiresMw);
+// $app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
+//     $environment = $this->get('environment');
+//     $js          = file_get_contents(__DIR__.'/../js/sw.js');
+//     if (preg_match('/[abcdef0-9]{6}/', $args['version'])) {
+//         $js = str_replace('const OFFLINE_VERSION=1', 'const OFFLINE_VERSION="'.$args['version'].'"', $js);
+//     }
+//     $response->getBody()->write((string) $js);
+//     return $response->withHeader('Content-type', 'text/javascript');
+// })->add($expiresMw);
 
-$app->get('/robots.txt', function (Request $request, Response $response) {
-    $environment = $this->get('environment');
-    $robots      = new Robots($environment->isLive(), $environment->getServer());
-    $response->getBody()->write((string) $robots);
-    return $response->withHeader('Content-type', 'text/plain');
-});
+// $app->get('/robots.txt', function (Request $request, Response $response) {
+//     $environment = $this->get('environment');
+//     $robots      = new Robots($environment->isLive(), $environment->getServer());
+//     $response->getBody()->write((string) $robots);
+//     return $response->withHeader('Content-type', 'text/plain');
+// });
 
-$app->get('/manifest.json', function (Request $request, Response $response) {
-    $environment   = $this->get('environment');
-    $imageHandler  = new ImageHandler(
-        $environment->getAssetSources(),
-        $environment->getImgDir(),
-        $environment->getImgBasePath(),
-    );
+// $app->get('/manifest.json', function (Request $request, Response $response) {
+//     $environment   = $this->get('environment');
+//     $imageHandler  = new ImageHandler(
+//         $environment->getAssetSources(),
+//         $environment->getImgDir(),
+//         $environment->getImgBasePath(),
+//     );
 
-    $toHex   = function (string $color): string {
-        $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
-        return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
-    };
-    $reader                 = $this->get('reader');
-    $manifest               = [];
-    $manifest['short_name'] = $reader->get('name');
-    $manifest['name']       = $reader->get('name');
-    $manifest['icons']      = [];
+//     $toHex   = function (string $color): string {
+//         $rgb = SSNepenthe\ColorUtils\Colors\ColorFactory::fromString($color)->getRgb()->toArray();
+//         return sprintf('#%02x%02x%02x', $rgb['red'], $rgb['green'], $rgb['blue']); // #0d00ff
+//     };
+//     $reader                 = $this->get('reader');
+//     $manifest               = [];
+//     $manifest['short_name'] = $reader->get('name');
+//     $manifest['name']       = $reader->get('name');
+//     $manifest['icons']      = [];
 
-    $icons = $reader->get('favicon');
-    $image = $imageHandler->getContext($icons[512], ['width' => 512, 'height' => 512]);
-    $icon  = [
-        'src'  => $image->getSrc(),
-        'type' => 'image/png',
-        'sizes'=> '512x512'
-    ];
-    $manifest['icons'][]          = $icon;
-    $manifest['start_url']        = '/';
-    $manifest['background_color'] = $toHex($reader->get('pwa.bgColor') ?? $reader->get('theme.colors.dark') ?? '#ffffff');
-    $manifest['display']          = 'minimal-ui';
-    $manifest['scope']            = '/';
-    $manifest['theme_color']      = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
+//     $icons = $reader->get('favicon');
+//     $image = $imageHandler->getContext($icons[512], ['width' => 512, 'height' => 512]);
+//     $icon  = [
+//         'src'  => $image->getSrc(),
+//         'type' => 'image/png',
+//         'sizes'=> '512x512'
+//     ];
+//     $manifest['icons'][]          = $icon;
+//     $manifest['start_url']        = '/';
+//     $manifest['background_color'] = $toHex($reader->get('pwa.bgColor') ?? $reader->get('theme.colors.dark') ?? '#ffffff');
+//     $manifest['display']          = 'minimal-ui';
+//     $manifest['scope']            = '/';
+//     $manifest['theme_color']      = $toHex($reader->get('pwa.themeColor') ?? $reader->get('theme.colors.primary'));
 
-    // $environment = $this->get('environment');
-    // $reader = $this->get('reader');
-    // $sitemap = new Sitemap($environment->getServer(), $reader->getSlugs());
-    $response->getBody()->write(json_encode($manifest));
-    return $response->withHeader('Content-type', 'application/json');
-});
+//     // $environment = $this->get('environment');
+//     // $reader = $this->get('reader');
+//     // $sitemap = new Sitemap($environment->getServer(), $reader->getSlugs());
+//     $response->getBody()->write(json_encode($manifest));
+//     return $response->withHeader('Content-type', 'application/json');
+// });
 
 $app->get('/files/[{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
@@ -168,129 +160,156 @@ $app->get('/files/[{file:.*}]', function (Request $request, Response $response, 
 });
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
-    $reader  = $this->get('reader');
-    $plugins = $this->get('plugins');
+    $path = $args['path'];
+    $siteData = new SiteData($this->get('reader'));
+    $flipsite = new Flipsite($siteData);
+    $response->getBody()->write($flipsite->render($path));
+    $contentTypes = [
+        'sitemap.xml' => 'application/xml',
+        'robots.txt' => 'text/plain',
+    ];
+    return $response->withHeader('Content-type', $contentTypes[$path] ?? 'text/html');
 
-    // Parse request path to determine language and requested page
-    $path = new Path(
-        $args['path'] ?? '',
-        $reader->getDefaultLanguage(),
-        $reader->getLanguages(),
-        $reader->getSlugs(),
-        $reader->getRedirects()
-    );
 
-    // Check if the requested path needs to redirect
-    $redirect    = $path->getRedirect();
-    $environment = $this->get('environment');
-    if (null !== $redirect) {
-        // Check if internal url
-        $parsedUrl = parse_url($redirect);
-        if (!isset($parsedUrl['scheme'])) {
-            $redirect = trim($environment->getServer() . '/' . urlencode($redirect), '/');
-        }
-        return $response->withStatus(302)->withHeader('Location', $redirect);
-    }
+    // $pathinfo = pathinfo($args['path']);
 
-    $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
-    $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path);
-    $componentBuilder->addFactory(new ComponentFactory());
+    // switch($pathinfo['extension'] ?? '') {
+    //     case 'xml': 
+    //         $contentType = 'application/xml';
+    //         break;
+    //     case 'js': 
+    //         $contentType = 'application/xml';
+    //         break;
+    //     case 'txt':
+    //         $contentType = 'text/plain';
+    //         break;
+    // }
+    // return $response->withHeader('Content-type', $contentType);
+
+
+
+
+    // $reader  = $this->get('reader');
+    // $plugins = $this->get('plugins');
+
     
-    $metaBuilder = new MetaBuilder($environment, $reader, $path);
+    // // Parse request path to determine language and requested page
+    // $path = new Path(
+    //     $args['path'] ?? '',
+    //     $reader->getDefaultLanguage(),
+    //     $reader->getLanguages(),
+    //     $reader->getSlugs(),
+    //     $reader->getRedirects()
+    // );
 
-    $faviconBuilder = new FaviconBuilder($environment, $reader);
+    // // Check if the requested path needs to redirect
+    // $redirect    = $path->getRedirect();
+    // $environment = $this->get('environment');
+    // if (null !== $redirect) {
+    //     // Check if internal url
+    //     $parsedUrl = parse_url($redirect);
+    //     if (!isset($parsedUrl['scheme'])) {
+    //         $redirect = trim($environment->getServer() . '/' . urlencode($redirect), '/');
+    //     }
+    //     return $response->withStatus(302)->withHeader('Location', $redirect);
+    // }
 
-    $scriptBuilder = new ScriptBuilder(
-        $reader->getHash(),
-        $environment->getBasePath(),
-        (bool)$reader->get('offline')
-    );
-    $componentBuilder->addListener($scriptBuilder);
+    // $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
+    // $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path);
+    // $componentBuilder->addFactory(new ComponentFactory());
+    
+    // $metaBuilder = new MetaBuilder($environment, $reader, $path);
 
-    $perloadBuilder = new PreloadBuilder();
-    $componentBuilder->addListener($perloadBuilder);
+    // $faviconBuilder = new FaviconBuilder($environment, $reader);
 
-    $page = $path->getPage();
+    // $scriptBuilder = new ScriptBuilder(
+    //     $reader->getHash(),
+    //     $environment->getBasePath(),
+    //     (bool)$reader->get('offline')
+    // );
+    // $componentBuilder->addListener($scriptBuilder);
 
-    foreach ($reader->getSections($page, $path->getLanguage()) as $sectionId => $sectionData) {
-        $sectionData = $plugins->run('section', $sectionData);
-        $section     = $componentBuilder->build('group', $sectionData, [], ['appearance' => $reader->get('theme.appearance') ?? 'light']);
-        $documentBuilder->addSection($section);
-    }
+    // $perloadBuilder = new PreloadBuilder();
+    // $componentBuilder->addListener($perloadBuilder);
 
-    // Add body class TODO fix
-    $bodyStyle = StyleAppearanceHelper::apply(
-        \Flipsite\Utils\ArrayHelper::merge($componentBuilder->getStyle('body'), $reader->get('theme.components.body') ?? []),
-        $reader->get('theme.appearance') ?? 'light'
-    );
-    $documentBuilder->addBodyStyle($bodyStyle);
+    // $page = $path->getPage();
 
-    $document = $documentBuilder->getDocument();
+    // foreach ($reader->getSections($page, $path->getLanguage()) as $sectionId => $sectionData) {
+    //     $sectionData = $plugins->run('section', $sectionData);
+    //     $section     = $componentBuilder->build('group', $sectionData, [], ['appearance' => $reader->get('theme.appearance') ?? 'light']);
+    //     $documentBuilder->addSection($section);
+    // }
 
-    if ('offline' !== $page) {
-        // Add Meta
-        $document = $metaBuilder->getDocument($document);
+    // // Add body class TODO fix
+    // $bodyStyle = StyleAppearanceHelper::apply(
+    //     \Flipsite\Utils\ArrayHelper::merge($componentBuilder->getStyle('body'), $reader->get('theme.components.body') ?? []),
+    //     $reader->get('theme.appearance') ?? 'light'
+    // );
+    // $documentBuilder->addBodyStyle($bodyStyle);
 
-        // Add Favicon
-        $document = $faviconBuilder->getDocument($document);
+    // $document = $documentBuilder->getDocument();
 
-        // Add Preload builder
-        $document = $perloadBuilder->getDocument($document);
+    // if ('offline' !== $page) {
+    //     // Add Meta
+    //     $document = $metaBuilder->getDocument($document);
 
-        // Add Webfonts
-        $fonts = $reader->get('theme.fonts');
-        if (null !== $fonts) {
-            $fontBuilder = new FontBuilder($fonts);
-            $document    = $fontBuilder->getDocument($document);
-        }
+    //     // Add Favicon
+    //     $document = $faviconBuilder->getDocument($document);
 
-        if ($reader->get('offline')) {
-            $manifestLink = new \Flipsite\Components\Element('link', true, true);
-            $manifestLink->setAttribute('rel', 'manifest');
-            $baseUrl = $environment->getBasePath();
-            $manifestLink->setAttribute('href', $baseUrl.'/manifest.json');
-            $document->getChild('head')->addChild($manifestLink);
-        }
-    } else {
-        $document->getChild('head')->getChild('title')->setContent('OFFLINE');
-    }
+    //     // Add Preload builder
+    //     $document = $perloadBuilder->getDocument($document);
 
-    $bodyHtml = $document->getChild('body')->render(2, 1);
-    if (strpos($bodyHtml, 'scroll:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
-    }
-    if (strpos($bodyHtml, 'stuck:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.min.js')));
-    }
-    if (strpos($bodyHtml, 'enter:')) {
-        $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
-    }
+    //     // Add Webfonts
+    //     $fonts = $reader->get('theme.fonts');
+    //     if (null !== $fonts) {
+    //         $fontBuilder = new FontBuilder($fonts);
+    //         $document    = $fontBuilder->getDocument($document);
+    //     }
 
-    // Add Analytics
-    $integrations = $reader->get('integrations');
-    if (null !== $integrations) {
-        $analyticsBuilder = new IntegrationsBuilder($environment->isLive(), $integrations);
-        $document         = $analyticsBuilder->getDocument($document);
-    }
-    $document->getChild('head')->addChild(new Flipsite\Components\CustomCode('<style></style>'));
+    //     if ($reader->get('offline')) {
+    //         $manifestLink = new \Flipsite\Components\Element('link', true, true);
+    //         $manifestLink->setAttribute('rel', 'manifest');
+    //         $baseUrl = $environment->getBasePath();
+    //         $manifestLink->setAttribute('href', $baseUrl.'/manifest.json');
+    //         $document->getChild('head')->addChild($manifestLink);
+    //     }
+    // } else {
+    //     $document->getChild('head')->getChild('title')->setContent('OFFLINE');
+    // }
 
-    // Custom HTML
-    $customCodeFile = $environment->getSiteDir().'/custom.html';
-    if (file_exists($customCodeFile)) {
-        $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile, $scriptBuilder);
-        $document          = $customCodeBuilder->getDocument($document);
-    }
+    // $bodyHtml = $document->getChild('body')->render(2, 1);
+    // if (strpos($bodyHtml, 'scroll:')) {
+    //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
+    // }
+    // if (strpos($bodyHtml, 'stuck:')) {
+    //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.min.js')));
+    // }
+    // if (strpos($bodyHtml, 'enter:')) {
+    //     $componentBuilder->dispatch(new Flipsite\Components\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
+    // }
 
-    // Add Scripts
-    $document = $scriptBuilder->getDocument($document);
+    // // Add Analytics
+    // $integrations = $reader->get('integrations');
+    // if (null !== $integrations) {
+    //     $analyticsBuilder = new IntegrationsBuilder($environment->isLive(), $integrations);
+    //     $document         = $analyticsBuilder->getDocument($document);
+    // }
+    // $document->getChild('head')->addChild(new Flipsite\Components\CustomCode('<style></style>'));
 
-    // If any plugins
-    $document = $plugins->run('document', $document);
+    // // Custom HTML
+    // $customCodeFile = $environment->getSiteDir().'/custom.html';
+    // if (file_exists($customCodeFile)) {
+    //     $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile, $scriptBuilder);
+    //     $document          = $customCodeBuilder->getDocument($document);
+    // }
 
-    $response->getBody()->write($document->render());
+    // // Add Scripts
+    // $document = $scriptBuilder->getDocument($document);
 
-    return $response->withHeader('Content-type', 'text/html');
-})->add($cssMw)->add($svgMw)->add($htmlMw)->add($offlineMw)->add($diagnosticsMw);
+    // // If any plugins
+    // $document = $plugins->run('document', $document);
+
+})->add($cssMw)->add($svgMw)->add($htmlMw);
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));
