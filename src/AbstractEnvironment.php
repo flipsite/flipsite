@@ -9,44 +9,31 @@ use Flipsite\Utils\Plugins;
 
 abstract class AbstractEnvironment
 {
-    protected bool $live;
-    protected string $siteDir;
-    protected string $vendorDir;
-    protected string $imgDir;
-    protected string $videoDir;
-    protected string $basePath;
-    protected string $server;
-    protected ?string $generator = 'flipsite.io';
-    protected bool $trailingSlash = false;
-    protected array $externalAssetDirs    = [];
-    protected ?AssetSources $imageSources = null;
+    protected bool $isLive;
+    protected string $scheme;
+    protected string $host;
+    protected ?string $port;
+    protected string $basePath = '/'; //must start with /
 
-    public function __construct(protected Plugins $plugins) {}
-
-    public function getPlugins(): Plugins
-    {
-        return $this->plugins;
-    }
+    // protected ?string $generator = 'flipsite.io';
+    // protected bool $trailingSlash = false;
+    // protected array $externalAssetDirs    = [];
+    // protected ?AssetSources $imageSources = null;
 
     public function getAssetSources(): AssetSources
     {
-        if (null === $this->imageSources) {
-            $assetDirs = [$this->getSiteDir().'/assets'];
-            if (count($this->externalAssetDirs)) {
-                $assetDirs = array_merge($assetDirs, $this->externalAssetDirs);
-            }
-            $this->imageSources = new AssetSources(
-                $this->getVendorDir(),
-                $this->plugins,
-                $assetDirs,
-            );
-        }
-        return $this->imageSources;
-    }
-
-    public function getVendorDir(): string
-    {
-        return $this->vendorDir;
+        // if (null === $this->imageSources) {
+        //     $assetDirs = [$this->getSiteDir().'/assets'];
+        //     if (count($this->externalAssetDirs)) {
+        //         $assetDirs = array_merge($assetDirs, $this->externalAssetDirs);
+        //     }
+        //     $this->imageSources = new AssetSources(
+        //         $this->getVendorDir(),
+        //         $this->plugins,
+        //         $assetDirs,
+        //     );
+        // }
+        // return $this->imageSources;
     }
 
     public function getBasePath(): string
@@ -72,23 +59,10 @@ abstract class AbstractEnvironment
         return $this->server;
     }
 
-    public function getImgDir(): string
-    {
-        return $this->imgDir;
-    }
-
-    public function getVideoDir(): string
-    {
-        return $this->videoDir;
-    }
+    
     public function getExternalAssetDirs(): array
     {
         return $this->externalAssetDirs;
-    }
-
-    public function getSiteDir(): string
-    {
-        return $this->siteDir;
     }
 
     public function isLive(): bool

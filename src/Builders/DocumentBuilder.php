@@ -43,10 +43,9 @@ final class DocumentBuilder
 
         $document->addChild($head, 'head');
 
-        // <bodu>
+        // <body>
         $body = new Element('body');
         $body->addStyle($this->bodyStyle);
-        $body->addChild(new Element('svg', true));
         $document->addChild($body, 'body');
 
         return $document;

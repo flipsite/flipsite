@@ -9,7 +9,7 @@ final class Breadcrumb extends AbstractGroup
 {
     use Traits\BuilderTrait;
     use Traits\PathTrait;
-    use Traits\ReaderTrait;
+    use Traits\SiteDataTrait;
 
     protected string $tag = 'nav';
 

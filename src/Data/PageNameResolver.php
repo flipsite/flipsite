@@ -96,7 +96,7 @@ class SlugNameResolver implements PageNameResolverInterface
 
     public function getName(string $page, Language $language): ?string
     {
-        $slug = $this->slugs->getSlug($page, $language);
+        $slug = $this->siteData->getSlugs()->getSlug($page, $language);
         if (null === $slug) {
             return null;
         }

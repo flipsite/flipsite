@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\AbstractEnvironment;
@@ -11,8 +12,9 @@ use Flipsite\Utils\YamlExpander;
 use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
+use Flipsite\Utils\Path;
 
-final class Reader
+final class Reader implements SiteDataInterface
 {
     /**
      * @var array<Language>
@@ -37,12 +39,8 @@ final class Reader
 
     private Localizer $localizer;
 
-    private Plugins $plugins;
-
-    public function __construct(private AbstractEnvironment $environment)
+    public function __construct(string $siteDir, private Plugins $plugins)
     {
-        $this->plugins = $environment->getPlugins();
-        $siteDir       = $this->environment->getSiteDir();
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
             $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
@@ -52,7 +50,7 @@ final class Reader
         }
     }
 
-    public function loadSite(array $yaml)
+    private function loadSite(array $yaml)
     {
         $this->data          = $yaml;
         $this->expandPagesAndSlugs();
@@ -78,11 +76,6 @@ final class Reader
         return substr($this->hash, 0, $length);
     }
 
-    public function isOnline(): bool
-    {
-        return true;
-    }
-
     public function get(string $path, ?Language $language = null)
     {
         $data = ArrayHelper::getDot(explode('.', $path), $this->data);
@@ -90,6 +83,16 @@ final class Reader
             return $data;
         }
         return $this->localizer->localize($data, $language);
+    }
+
+    public function getHtmlStyle() : array {
+        return $this->data['theme']['components']['html'] ?? [];
+    }
+    public function getBodyStyle(string $page) : array {
+        return $this->data['theme']['components']['body'] ?? [];
+    }
+    public function getComponentStyle(string $component) : array {
+        return $this->data['theme']['components'][$component] ?? [];
     }
 
     /**
@@ -127,9 +130,11 @@ final class Reader
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(string $page, ?Language $language = null): array
+    public function getSections(Path $path): array
     {
-        $language ??= $this->getDefaultLanguage();
+        $page = $path->getPage();
+        $language = $path->getLanguage();
+        
         if ('offline' === $page) {
             return $this->localizer->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
         }
@@ -195,7 +200,7 @@ final class Reader
             if (isset($pageMeta['title'])) {
                 $title = $pageMeta['title'];
             } else {
-                
+
                 $p     = explode('/', $page);
                 $title = [];
                 while (count($p) > 0) {
@@ -211,7 +216,7 @@ final class Reader
 
             }
             if ($baseTitle) {
-                $title.= ' - '.$baseTitle;
+                $title .= ' - '.$baseTitle;
             }
 
         }
@@ -249,7 +254,7 @@ final class Reader
                 $schema = $this->data['contentSchemas'][$category];
                 $items = $this->data['content'][$category] ?? [];
                 if (isset($schema['published']) && 'boolean' === $schema['published']['type']) {
-                    $published = array_filter($items, function($item){
+                    $published = array_filter($items, function ($item) {
                         return $item['published'] ?? false;
                     });
                     $items = count($published) ? $published : [$items[0]];

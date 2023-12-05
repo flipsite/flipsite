@@ -252,7 +252,7 @@ abstract class AbstractElement
         return $html;
     }
 
-    private function getClasses(): string
+    public function getClasses(string $format = 'string'): string|array
     {
         $classes = [];
         foreach ($this->style as $attr => $class) {
@@ -266,7 +266,7 @@ abstract class AbstractElement
         }
         $classes = array_unique($classes);
         sort($classes);
-        return trim(implode(' ', $classes));
+        return 'string' === $format ? trim(implode(' ', $classes)) : $classes;
     }
 
     private function purgeInvalidAttributes(): void

@@ -5,10 +5,9 @@ namespace Flipsite\Components\Traits;
 
 trait UrlTrait
 {
-    use SlugsTrait;
     use PathTrait;
     use EnvironmentTrait;
-    use ReaderTrait;
+    use SiteDataTrait;
 
     private function url(?string $url, bool &$external) : ?string
     {
@@ -24,10 +23,6 @@ trait UrlTrait
         if (str_starts_with($url, 'files/') && file_exists($this->environment->getSiteDir().'/'.$url)) {
             $basePath = $this->environment->getBasePath();
             return $basePath.'/'.$url;
-        }
-        $redirects = $this->reader->getRedirects();
-        if (isset($redirects[$url])) {
-            $url = $redirects[$url];
         }
 
         $parsed = parse_url($url);
@@ -49,7 +44,7 @@ trait UrlTrait
             return $url;
         }
 
-        $path = $this->slugs->getPath($parsed['path'], $this->path->getLanguage(), $this->path->getPage());
+        $path = $this->siteData->getSlugs()->getPath($parsed['path'], $this->path->getLanguage(), $this->path->getPage());
 
         // Will always start with / or be null
         $parsed['path'] = $path;
@@ -70,9 +65,9 @@ trait UrlTrait
             return $url;
         } 
         $url = rtrim($url, '/');
-        if ($this->environment->hasTrailingSlash()) {
-            $url.='/';
-        }
+        // if ($this->environment->hasTrailingSlash()) { //TODO FIX
+        //     $url.='/';
+        // }
         return $url;
 
 

@@ -9,9 +9,10 @@ use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
-use Flipsite\Data\Reader;
+use Flipsite\Data\SiteDataInterface;
 use Flipsite\Data\Slugs;
 use Flipsite\Environment;
+use Flipsite\Assets\Assets;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
@@ -22,30 +23,25 @@ class ComponentBuilder
     private ImageHandler $imageHandler;
     private VideoHandler $videoHandler;
     private array $listeners    = [];
-    private array $factories    = [];
     private array $theme        = [];
     private array $localization = [];
     private Slugs $slugs;
 
-    public function __construct(private Request $request, private Environment $environment, private Reader $reader, private Path $path)
+    public function __construct(private Environment $environment, private SiteDataInterface $siteData, private Path $path)
     {
-        $this->imageHandler = new ImageHandler(
-            $environment->getAssetSources(),
-            $environment->getImgDir(),
-            $environment->getImgBasePath(),
-        );
-        $this->videoHandler = new VideoHandler(
-            $environment->getSiteDir().'/videos',
-            $environment->getVideoDir(),
-            $environment->getVideoBasePath(),
-        );
-        $this->theme = $reader->get('theme') ?? [];
-        $this->slugs = $reader->getSlugs();
-    }
-
-    public function addFactory(AbstractComponentFactory $factory): void
-    {
-        $this->factories[] = $factory;
+        $this->assets = new Assets();
+        // $this->imageHandler = new ImageHandler(
+        //     $environment->getAssetSources(),
+        //     $environment->getImgDir(),
+        //     $environment->getImgBasePath(),
+        // );
+        // $this->videoHandler = new VideoHandler(
+        //     $environment->getSiteDir().'/videos',
+        //     $environment->getVideoDir(),
+        //     $environment->getVideoBasePath(),
+        // );
+        // $this->theme = $reader->get('theme') ?? [];
+        // $this->slugs = $reader->getSlugs();
     }
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
@@ -61,13 +57,14 @@ class ComponentBuilder
             $parentType = $parentStyle['type'];
         }
 
-        $style = $this->getStyle($type, $flags);
+        $style = $this->siteData->getComponentStyle($type);
+        
         $style = ArrayHelper::merge($style, $parentStyle);
 
         if ($parentType) {
             $parentTypeflags = explode(':', $parentType);
             $parentType      = array_shift($parentTypeflags);
-            $parentTypeStyle = $this->getStyle($parentType, $parentTypeflags);
+            $parentTypeStyle = $this->siteData->getComponentStyle($parentType);
             $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
         if (isset($data['_options']['hidden'])) {
@@ -90,7 +87,7 @@ class ComponentBuilder
             while (isset($data['_style']['inherit'])) {
                 $inheritType    = $data['_style']['inherit'];
                 unset($data['_style']['inherit']);
-                $data['_style'] = ArrayHelper::merge($this->getStyle($inheritType), $data['_style']);
+                $data['_style'] = ArrayHelper::merge($this->siteData->getComponentStyle($inheritType), $data['_style']);
             }
 
             $style = ArrayHelper::merge($style, $data['_style']);
@@ -112,105 +109,95 @@ class ComponentBuilder
             $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource');
         }
 
-        // Check external factories
-        foreach ($this->factories as $factory) {
-            $component = $factory->get($type);
-            if (isset($data['_comment'])) {
-                if (isset($data['_comment']['before'])) {
-                    $component->addCommentBefore($data['_comment']['before']);
-                }
-                if (isset($data['_comment']['after'])) {
-                    $component->addCommentAfter($data['_comment']['after']);
-                }    
-                unset($data['_comment']);
+        $class = 'Flipsite\\Components\\'.ucfirst($type);
+        if (class_exists($class)) {
+            $component = new $class();
+        } else return null;
+        
+            
+        if (isset($data['_comment'])) {
+            if (isset($data['_comment']['before'])) {
+                $component->addCommentBefore($data['_comment']['before']);
             }
-            if (null !== $component) {
-                if (method_exists($component, 'addBuilder')) {
-                    $component->addBuilder($this);
-                }
-                if (method_exists($component, 'addEnvironment')) {
-                    $component->addEnvironment($this->environment);
-                }
-                if (method_exists($component, 'addImageHandler')) {
-                    $component->addImageHandler($this->imageHandler);
-                }
-                if (method_exists($component, 'addVideoHandler')) {
-                    $component->addVideoHandler($this->videoHandler);
-                }
-                if (method_exists($component, 'addPath')) {
-                    $component->addPath($this->path);
-                }
-                if (method_exists($component, 'addReader')) {
-                    $component->addReader($this->reader);
-                }
-                if (method_exists($component, 'addSlugs')) {
-                    $component->addSlugs($this->reader->getSlugs());
-                }
-                if (method_exists($component, 'addRequest')) {
-                    $component->addRequest($this->request);
-                }
-                // Handle nav stuff
-                if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
-                    $options['navState'] = [];
-                    $page                = $this->path->getPage();
-                    if (str_starts_with($page, $data['_target'])) {
-                        $options['navState']['active'] = true;
-                    }
-                    if ($data['_target'] === $page) {
-                        $options['navState']['active'] = true;
-                    }
-                }
-                if (count($options['navState'] ?? [])) {
-                    $style = $this->handleNavStyle($style, $options['navState'] ?? []);
-                }
-
-                $data = $component->normalize($data);
-
-                if ($data['_isEmpty'] ?? false) {
-                    return null;
-                }
-
-                $data['_attr'] ??= [];
-                if (isset($data['_attr']['_data'])) {
-                    if (is_string($data['_attr']['_data'])) {
-                        $tmp = explode(',', $data['_attr']['_data']);
-                        foreach ($tmp as $pair) {
-                            $tmp2 = explode('=', $pair);
-                            if (count($tmp2) === 2) {
-                                $attr                 = 'data-'.$tmp2[0];
-                                $val                  = $tmp2[1];
-                                $data['_attr'][$attr] = $val;
-                            }
-                        }
-                    }
-                    unset($data['_attr']['_data']);
-                }
-                if (isset($data['_attr'])) {
-                    foreach ($data['_attr'] as $attr => $value) {
-                        $component->setAttribute($attr, $value);
-                    }
-                    unset($data['_attr']);
-                }
-                if (isset($style['tag'])) {
-                    $component->setTag($style['tag']);
-                    unset($style['tag']);
-                }
-                unset($data['_meta'],$data['_name']);
-
-                if (isset($data['_bg'])) {
-                    $style['background'] ??= [];
-                    $style['background']['src'] = $data['_bg'];
-                    unset($data['_bg']);
-                }
-                if (isset($style['background'])) {
-                    $component->setBackground($component, $style['background']);
-                    unset($style['background']);
-                }
-                $component->build($data, $style ?? [], $options);
-                return $component;
+            if (isset($data['_comment']['after'])) {
+                $component->addCommentAfter($data['_comment']['after']);
+            }    
+            unset($data['_comment']);
+        }
+        if (method_exists($component, 'addBuilder')) {
+            $component->addBuilder($this);
+        }
+        if (method_exists($component, 'addEnvironment')) {
+            $component->addEnvironment($this->environment);
+        }
+        if (method_exists($component, 'addAssets')) {
+            $component->addAssets($this->assets);
+        }
+        if (method_exists($component, 'addPath')) {
+            $component->addPath($this->path);
+        }
+        if (method_exists($component, 'addSiteData')) {
+            $component->addSiteData($this->siteData);
+        }
+        // Handle nav stuff
+        if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
+            $options['navState'] = [];
+            $page                = $this->path->getPage();
+            if (str_starts_with($page, $data['_target'])) {
+                $options['navState']['active'] = true;
+            }
+            if ($data['_target'] === $page) {
+                $options['navState']['active'] = true;
             }
         }
-        return null;
+        if (count($options['navState'] ?? [])) {
+            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
+        }
+
+        $data = $component->normalize($data);
+
+        if ($data['_isEmpty'] ?? false) {
+            return null;
+        }
+
+        $data['_attr'] ??= [];
+        if (isset($data['_attr']['_data'])) {
+            if (is_string($data['_attr']['_data'])) {
+                $tmp = explode(',', $data['_attr']['_data']);
+                foreach ($tmp as $pair) {
+                    $tmp2 = explode('=', $pair);
+                    if (count($tmp2) === 2) {
+                        $attr                 = 'data-'.$tmp2[0];
+                        $val                  = $tmp2[1];
+                        $data['_attr'][$attr] = $val;
+                    }
+                }
+            }
+            unset($data['_attr']['_data']);
+        }
+        if (isset($data['_attr'])) {
+            foreach ($data['_attr'] as $attr => $value) {
+                $component->setAttribute($attr, $value);
+            }
+            unset($data['_attr']);
+        }
+        if (isset($style['tag'])) {
+            $component->setTag($style['tag']);
+            unset($style['tag']);
+        }
+        unset($data['_meta'],$data['_name']);
+
+        if (isset($data['_bg'])) {
+            $style['background'] ??= [];
+            $style['background']['src'] = $data['_bg'];
+            unset($data['_bg']);
+        }
+        if (isset($style['background'])) {
+            //  §$component->setBackground($component, $style['background']);
+            unset($style['background']);
+        }
+        $component->build($data, $style ?? [], $options);
+        return $component;
     }
 
     public function addListener(ComponentListenerInterface $listener): void
@@ -223,30 +210,6 @@ class ComponentBuilder
         foreach ($this->listeners as $listener) {
             $listener->handleComponentEvent($event);
         }
-    }
-
-    public function getStyle(string $type, array $flags = []): array
-    {
-        $style = $this->getComponentStyle($type, $flags);
-        foreach ($flags as $flag) {
-            if (isset($style['variants'][$flag])) {
-                $style = ArrayHelper::merge($style, $style['variants'][$flag]);
-            }
-        }
-        unset($style['variants']);
-        return $style;
-    }
-
-    private function getComponentStyle(string $type, array $flags = []): array
-    {
-        $style = $this->theme['components'][$type] ?? [];
-        if (count($flags)) {
-            $type = $type.':'.implode(':', $flags);
-            if (isset($this->theme['components'][$type])) {
-                $style = ArrayHelper::merge($style, $this->theme['components'][$type]);
-            }
-        }
-        return $style;
     }
 
     private function handleScripts(array $scripts)
@@ -295,7 +258,7 @@ class ComponentBuilder
     private function handleRenderOptions(array $options) : bool
     {
         if (isset($options['hasSubpages'])) {
-            if (!$this->slugs->hasSubpages($options['hasSubpages'])) {
+            if (!$this->siteData->getSlugs()->hasSubpages($options['hasSubpages'])) {
                 return false;
             }
         }

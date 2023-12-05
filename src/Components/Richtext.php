@@ -9,7 +9,6 @@ use Flipsite\Utils\StyleAppearanceHelper;
 
 final class Richtext extends AbstractGroup
 {
-    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     use Traits\UrlTrait;
     protected string $tag = 'div';

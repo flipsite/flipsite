@@ -9,8 +9,7 @@ abstract class AbstractGroup extends AbstractComponent
     use Traits\BuilderTrait;
     use Traits\StyleOptimizerTrait;
     use Traits\UrlTrait;
-    use Traits\SlugsTrait;
-    use Traits\ReaderTrait;
+    use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
     protected string $tag = 'div';
@@ -93,7 +92,7 @@ abstract class AbstractGroup extends AbstractComponent
             }
             $target = str_replace('mailto:', '', $target);
             $target = str_replace('tel:', '', $target);
-            $page   = $this->slugs->getPage($target);
+            $page   = $this->siteData->getSlugs()->getPage($target);
             if ($page) {
                 $action = 'page';
             } elseif (str_starts_with($target, 'http')) {
@@ -254,7 +253,7 @@ abstract class AbstractGroup extends AbstractComponent
     private function getPages(int $level, ?string $parentPage = null): array
     {
         $pages      = [];
-        $all        = $this->slugs->getPages();
+        $all        = $this->siteData->getSlugs()->getPages();
         $firstExact = false;
         if ($level === 0) {
             $pages = array_filter($all, function ($value) {

@@ -25,7 +25,7 @@ final class Sitemap
     private function urls(): string
     {
         $xml = '';
-        foreach ($this->slugs->getAll() as $loc => $alternate) {
+        foreach ($this->siteData->getSlugs()->getAll() as $loc => $alternate) {
             if (in_array($loc, $this->hidden)) {
                 continue;
             }

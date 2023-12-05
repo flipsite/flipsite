@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Flipsite;
+namespace Flipsite\Assets;
 
-final class SiteData
+final class Assets
 {
     public function __construct()
     {
-        
     }
 }

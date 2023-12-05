@@ -11,16 +11,6 @@ use Flipsite\App\Middleware\SvgMiddleware;
 use Flipsite\App\Middleware\HtmlMinifierMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
-use Flipsite\Builders\CustomCodeBuilder;
-use Flipsite\Builders\IntegrationsBuilder;
-use Flipsite\Builders\ComponentBuilder;
-use Flipsite\Builders\DocumentBuilder;
-use Flipsite\Builders\FaviconBuilder;
-use Flipsite\Builders\FontBuilder;
-use Flipsite\Builders\MetaBuilder;
-use Flipsite\Builders\ScriptBuilder;
-use Flipsite\Builders\PreloadBuilder;
-use Flipsite\Components\ComponentFactory;
 
 use League\Container\Container;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -45,8 +35,8 @@ if (!getenv('APP_BASEPATH')) {
 
 $container = new Container();
 $container->addShared('plugins', 'Flipsite\Utils\Plugins')->addArgument($plugins ?? []);
-$container->addShared('environment', 'Flipsite\Environment')->addArgument('plugins');
-$container->addShared('reader', 'Flipsite\Data\Reader')->addArgument('environment');
+$container->addShared('environment', 'Flipsite\Environment');
+$container->addShared('reader', 'Flipsite\Data\Reader')->addArgument(getenv('SITE_DIR'))->addArgument('plugins');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
@@ -56,7 +46,7 @@ $app->setBasePath(getenv('APP_BASEPATH'));
 $expiresMw     = new ExpiresMiddleware(365 * 86440);
 $svgMw         = new SvgMiddleware($container->get('environment'));
 $htmlMw        = new HtmlMinifierMiddleware($container->get('environment')->optimizeHtml());
-$cssMw         = new CssMiddleware($container->get('environment')->optimizeCss(),$container->get('reader')->get('theme'));
+$cssMw         = new CssMiddleware($container->get('environment')->optimizeCss(), $container->get('reader')->get('theme'));
 
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
@@ -160,9 +150,8 @@ $app->get('/files/[{file:.*}]', function (Request $request, Response $response, 
 });
 
 $app->get('[/{path:.*}]', function (Request $request, Response $response, array $args) {
-    $path = $args['path'];
-    $siteData = new SiteData($this->get('reader'));
-    $flipsite = new Flipsite($siteData);
+    $path = $args['path'] ?? '';
+    $flipsite = new Flipsite($this->get('environment'), $this->get('reader'));
     $response->getBody()->write($flipsite->render($path));
     $contentTypes = [
         'sitemap.xml' => 'application/xml',
@@ -171,53 +160,14 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     return $response->withHeader('Content-type', $contentTypes[$path] ?? 'text/html');
 
 
-    // $pathinfo = pathinfo($args['path']);
-
-    // switch($pathinfo['extension'] ?? '') {
-    //     case 'xml': 
-    //         $contentType = 'application/xml';
-    //         break;
-    //     case 'js': 
-    //         $contentType = 'application/xml';
-    //         break;
-    //     case 'txt':
-    //         $contentType = 'text/plain';
-    //         break;
-    // }
-    // return $response->withHeader('Content-type', $contentType);
-
-
-
 
     // $reader  = $this->get('reader');
     // $plugins = $this->get('plugins');
 
-    
-    // // Parse request path to determine language and requested page
-    // $path = new Path(
-    //     $args['path'] ?? '',
-    //     $reader->getDefaultLanguage(),
-    //     $reader->getLanguages(),
-    //     $reader->getSlugs(),
-    //     $reader->getRedirects()
-    // );
-
-    // // Check if the requested path needs to redirect
-    // $redirect    = $path->getRedirect();
-    // $environment = $this->get('environment');
-    // if (null !== $redirect) {
-    //     // Check if internal url
-    //     $parsedUrl = parse_url($redirect);
-    //     if (!isset($parsedUrl['scheme'])) {
-    //         $redirect = trim($environment->getServer() . '/' . urlencode($redirect), '/');
-    //     }
-    //     return $response->withStatus(302)->withHeader('Location', $redirect);
-    // }
-
     // $documentBuilder  = new DocumentBuilder($environment, $reader, $path);
     // $componentBuilder = new ComponentBuilder($request, $environment, $reader, $path);
     // $componentBuilder->addFactory(new ComponentFactory());
-    
+
     // $metaBuilder = new MetaBuilder($environment, $reader, $path);
 
     // $faviconBuilder = new FaviconBuilder($environment, $reader);
@@ -309,7 +259,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     // // If any plugins
     // $document = $plugins->run('document', $document);
 
-})->add($cssMw)->add($svgMw)->add($htmlMw);
+})->add($htmlMw);
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));

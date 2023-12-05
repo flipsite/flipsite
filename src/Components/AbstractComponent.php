@@ -8,7 +8,7 @@ use Flipsite\Utils\ColorHelper;
 abstract class AbstractComponent extends AbstractElement
 {
     use Traits\ImageHandlerTrait;
-    use Traits\ReaderTrait;
+    use Traits\SiteDataTrait;
 
     abstract public function build(array $data, array $style, array $options) : void;
 
