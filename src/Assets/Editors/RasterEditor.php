@@ -12,10 +12,10 @@ final class RasterEditor extends AbstractImageEditor
 {
     public function create(): void
     {
-        $manager      = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+        $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
         $image = $manager->read($this->file->getFilename());
         $filePathinfo = pathinfo($this->path);
-        $options      = new RasterOptions($this->path);
+        $options  = new RasterOptions($this->path);
         $image = $this->applyOptions($image, $options, $filePathinfo['extension']);
         $quality = $options->getValue('quality') ?? 90;
         switch ($filePathinfo['extension']) {

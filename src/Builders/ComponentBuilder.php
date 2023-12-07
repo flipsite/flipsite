@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
+use Flipsite\Components\AbstractElement;
 use Flipsite\Components\AbstractComponent;
 use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
@@ -58,7 +60,7 @@ class ComponentBuilder
         }
 
         $style = $this->siteData->getComponentStyle($type);
-        
+
         $style = ArrayHelper::merge($style, $parentStyle);
 
         if ($parentType) {
@@ -112,16 +114,18 @@ class ComponentBuilder
         $class = 'Flipsite\\Components\\'.ucfirst($type);
         if (class_exists($class)) {
             $component = new $class();
-        } else return null;
-        
-            
+        } else {
+            return null;
+        }
+
+
         if (isset($data['_comment'])) {
             if (isset($data['_comment']['before'])) {
                 $component->addCommentBefore($data['_comment']['before']);
             }
             if (isset($data['_comment']['after'])) {
                 $component->addCommentAfter($data['_comment']['after']);
-            }    
+            }
             unset($data['_comment']);
         }
         if (method_exists($component, 'addBuilder')) {
@@ -193,7 +197,7 @@ class ComponentBuilder
             unset($data['_bg']);
         }
         if (isset($style['background'])) {
-            //  §$component->setBackground($component, $style['background']);
+            $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
         $component->build($data, $style ?? [], $options);
@@ -255,7 +259,7 @@ class ComponentBuilder
         return $style;
     }
 
-    private function handleRenderOptions(array $options) : bool
+    private function handleRenderOptions(array $options): bool
     {
         if (isset($options['hasSubpages'])) {
             if (!$this->siteData->getSlugs()->hasSubpages($options['hasSubpages'])) {
@@ -263,12 +267,14 @@ class ComponentBuilder
             }
         }
         if (isset($options['isPage'])) {
-            $pages = explode(',',trim(str_replace(' ','',$options['isPage'])));
+            $pages = explode(',', trim(str_replace(' ', '', $options['isPage'])));
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
-                if ($currentPage === $page) return true;
-                if (str_ends_with($page,'*')) {
-                    $page = trim($page,'*');
+                if ($currentPage === $page) {
+                    return true;
+                }
+                if (str_ends_with($page, '*')) {
+                    $page = trim($page, '*');
                     if (str_starts_with($currentPage, $page)) {
                         return true;
                     }
@@ -277,12 +283,14 @@ class ComponentBuilder
             return false;
         }
         if (isset($options['notPage'])) {
-            $pages = explode(',',trim(str_replace(' ','',$options['notPage'])));
+            $pages = explode(',', trim(str_replace(' ', '', $options['notPage'])));
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
-                if ($currentPage === $page) return false;
-                if (str_ends_with($page,'*')) {
-                    $page = trim($page,'*');
+                if ($currentPage === $page) {
+                    return false;
+                }
+                if (str_ends_with($page, '*')) {
+                    $page = trim($page, '*');
                     if (str_starts_with($currentPage, $page)) {
                         return false;
                     }
@@ -291,5 +299,56 @@ class ComponentBuilder
             return true;
         }
         return true;
+    }
+
+    private function handleBackground(AbstractElement &$element, array $style): void
+    {
+        $src      = $style['src'] ?? false;
+        // $gradient = $this->parseThemeColors($style['gradient'] ?? '');
+        $gradient = '';
+        $options  = $style['options'] ?? [];
+        $options['width'] ??= 512;
+        $options['srcset'] ??= ['1x', '2x'];
+        $options['webp'] ??= true;
+        $style['position'] ??= 'bg-center';
+        $style['size'] ??= 'bg-cover';
+        $style['repeat'] ??= 'bg-no-repeat';
+        unset($style['src'],$style['gradient'],$style['options']);
+        if ($src) {
+            $imageAttributes = $this->assets->getImageAttributes($src, $options);
+            if (strlen($gradient)) { $gradient .= ','; }
+            // SVG
+            if (str_ends_with($src, '.svg')) {
+                $element->setAttribute('style', 'background-image:'.$gradient.'url('.$imageAttributes->getSrc().');');
+            } else {
+                $srcset = $imageAttributes->getSrcset('url');  
+                if ($srcset) {
+                    $element->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$srcset.')');
+                }
+            }
+            if (($style['options']['loading'] ?? '') === 'eager') {
+                $this->builder->dispatch(new Event('preload', 'background', $imageAttributes));
+            }
+        } elseif ($gradient) {
+            $element->setAttribute('style', 'background-image:'.$gradient);
+            unset($style['options']);
+        } else {
+            unset($style['options'], $style['position'], $style['size'], $style['repeat']);
+        }
+        foreach ($style as $attr => $val) {
+            $element->addStyle(['bg.'.$attr => $val]);
+        }
+        // private function isSvg(string $filename) : bool
+        // {
+        //     return false !== mb_strpos($filename, '.svg');
+        // }
+        // private function parseThemeColors(string $gradient) : string {
+        //     if (!strlen($gradient)) {
+        //         return $gradient;
+        //     }
+        //     $colors = $this->reader->get('theme.colors');
+        //     $colors['white'] = '#ffffff';
+        //     $colors['black'] = '#000000';
+        //     return ColorHelper::parseAndReplace($gradient, $colors);
     }
 }

@@ -112,6 +112,12 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function setTag(string $tag) : self
+    {
+        $this->tag = $tag;
+        return $this;
+    }
+
     public function appendContent(string $content): self
     {
         $this->cache = null;

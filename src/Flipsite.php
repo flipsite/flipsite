@@ -55,7 +55,7 @@ final class Flipsite
         //     $environment->getBasePath(),
         //     (bool)$reader->get('offline')
         // );
-        // $componentBuilder->addListener($scriptBuilder);
+        $componentBuilder->addListener($svgBuilder);
         // $perloadBuilder = new PreloadBuilder();
         // $componentBuilder->addListener($perloadBuilder);
 

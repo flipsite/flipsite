@@ -2,13 +2,8 @@
 
 declare(strict_types=1);
 
-use Flipsite\App\CustomErrorHandler;
 use Flipsite\App\Middleware\CssMiddleware;
-use Flipsite\App\Middleware\DiagnosticsMiddleware;
 use Flipsite\App\Middleware\ExpiresMiddleware;
-use Flipsite\App\Middleware\OfflineMiddleware;
-use Flipsite\App\Middleware\SvgMiddleware;
-use Flipsite\App\Middleware\HtmlMinifierMiddleware;
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 
@@ -16,7 +11,6 @@ use League\Container\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
-use Flipsite\Utils\StyleAppearanceHelper;
 
 use Flipsite\SiteData;
 use Flipsite\Flipsite;
@@ -37,18 +31,15 @@ $container = new Container();
 $container->addShared('plugins', 'Flipsite\Utils\Plugins')->addArgument($plugins ?? []);
 $container->addShared('environment', 'Flipsite\Environment');
 $container->addShared('reader', 'Flipsite\Data\Reader')->addArgument(getenv('SITE_DIR'))->addArgument('plugins');
+$container->addShared('assets', 'Flipsite\Assets\Assets');
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
-$expiresMw     = new ExpiresMiddleware(365 * 86440);
-$svgMw         = new SvgMiddleware($container->get('environment'));
-$htmlMw        = new HtmlMinifierMiddleware($container->get('environment')->optimizeHtml());
-$cssMw         = new CssMiddleware($container->get('environment')->optimizeCss(), $container->get('reader')->get('theme'));
-
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
+    //$assets = $this->getAssets();
     $environment = $this->get('environment');
     $handler     = new ImageHandler(
         $environment->getAssetSources(),
@@ -56,7 +47,7 @@ $app->get('/img[/{file:.*}]', function (Request $request, Response $response, ar
         $environment->getImgBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
-})->add($expiresMw);
+});
 
 $app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
@@ -67,7 +58,7 @@ $app->get('/videos[/{file:.*}]', function (Request $request, Response $response,
         $environment->getVideoBasePath(),
     );
     return $handler->getResponse($response, $args['file']);
-})->add($expiresMw);
+});
 
 
 // $app->get('/sw.{version}.js', function (Request $request, Response $response, $args) {
@@ -259,9 +250,7 @@ $app->get('[/{path:.*}]', function (Request $request, Response $response, array 
     // // If any plugins
     // $document = $plugins->run('document', $document);
 
-})->add($htmlMw);
+});
 
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
-$errorMiddleware->setDefaultErrorHandler(new CustomErrorHandler($app, $cssMw));
-
 $app->run();

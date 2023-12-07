@@ -3,22 +3,19 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
+use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Document;
-use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Element;
 use Flipsite\Components\Event;
-use Flipsite\Components\ComponentListenerInterface;
 
 class SvgBuilder implements BuilderInterface, ComponentListenerInterface
 {
-    private $data  = ['123abc' => 'asdasdasd'];
-    public function __construct()
-    {
-        
-    }
-
+    private array $data  = [];
+    
     public function getDocument(Document $document): Document
     {
+        if (!count($this->data)) return $document;
+
         $svg = new Element('svg');
         $svg->setAttribute('version','1.1');
         $svg->setAttribute('xmlns','http://www.w3.org/2000/svg');
@@ -42,6 +39,6 @@ class SvgBuilder implements BuilderInterface, ComponentListenerInterface
     public function handleComponentEvent(Event $event) : void
     {
         if ('svg' !== $event->getType()) return;
-        print_r($event);
+        $this->data[$event->getId()] = $event->getData();
     }
 }
