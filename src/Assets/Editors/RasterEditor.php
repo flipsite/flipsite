@@ -63,6 +63,14 @@ final class RasterEditor
         if ($this->options->getValue('blackWhite')) {
             $image->greyscale();
         }
+        $pixelate = $this->options->getValue('pixelate');
+        if ($this->options->getValue('pixelate')) {
+            $image->pixelate($pixelate);
+        }
+        if ($this->options->getValue('invert')) {
+            $image->invert();
+        }
+
 
         return $image;
     }
