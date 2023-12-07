@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-final class PlainText extends AbstractComponent
+final class Text extends AbstractComponent
 {
     protected string $plainText;
 

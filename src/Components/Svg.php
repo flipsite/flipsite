@@ -35,7 +35,7 @@ final class Svg extends AbstractComponent
         $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         $this->addStyle($style);
         if ($svg) {
-            $this->setAttribute('viewBox', implode(' ', $svg->getViewbox()));
+            $this->setAttribute('viewBox', $svg->getViewbox());
             $this->setContent('<use xlink:href="#'.$svg->getHash().'"></use>');
             $this->builder->dispatch(new Event('svg', $svg->getHash(), $svg->getDef()));
         } else {

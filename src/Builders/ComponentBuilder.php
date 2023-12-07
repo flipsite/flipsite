@@ -50,7 +50,7 @@ class ComponentBuilder
         }
 
         $style = $this->siteData->getComponentStyle($type);
-
+        
         $style = ArrayHelper::merge($style, $parentStyle);
 
         if ($parentType) {

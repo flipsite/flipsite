@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Assets\Attributes;
 
-class UnsplashImageAttributes extends AbstractImageAttributes
+class UnsplashAttributes extends AbstractImageAttributes
 {
     private string $srcTpl;
     

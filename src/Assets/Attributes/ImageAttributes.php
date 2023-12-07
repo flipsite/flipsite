@@ -7,13 +7,13 @@ use Flipsite\Assets\Sources\AssetSourcesInterface;
 use Flipsite\Assets\Sources\ImageInfoInterface;
 use Flipsite\Assets\Options\RasterOptions;
 
-class InternalImageAttributes extends AbstractImageAttributes
+class ImageAttributes extends AbstractImageAttributes
 {
     private string $image;
     private string $hash;
     private string $extension;
     private string $useExtension;
-    public function __construct(string $image, array $options, ImageInfoInterface $imageInfo, private AssetSourcesInterface $assetSources)
+    public function __construct(array $options, ImageInfoInterface $imageInfo, private AssetSourcesInterface $assetSources)
     {
         $this->image = $imageInfo->getFilename();
         $pathinfo = pathinfo($imageInfo->getFilename());
@@ -25,7 +25,7 @@ class InternalImageAttributes extends AbstractImageAttributes
         }
         $this->hash = $imageInfo->getHash();
         $this->setSize($options, $imageInfo->getWidth(), $imageInfo->getHeight());
-        
+
         $options['width']  = $this->width;
         $options['height'] = $this->height;
         $this->width       = intval($options['width']);

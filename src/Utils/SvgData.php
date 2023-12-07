@@ -34,7 +34,7 @@ final class SvgData implements SvgInterface
         $this->height = intval($parts[3]) - intval($parts[1]);
     }
     public function getHash() : string {
-
+        return $this->hash;
     }
     public function getViewbox() : string
     {
