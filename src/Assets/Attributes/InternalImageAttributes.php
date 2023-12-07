@@ -18,7 +18,7 @@ class InternalImageAttributes extends AbstractImageAttributes
         $pathinfo = pathinfo($imageInfo->getFilename());
         $this->extension = $pathinfo['extension'];
         $this->hash = $imageInfo->getHash();
-        $this->setSize($options, $imageInfo);
+        $this->setSize($options, $imageInfo->getWidth(), $imageInfo->getHeight());
 
         $options['width']  = $this->width;
         $options['height'] = $this->height;
@@ -59,65 +59,5 @@ class InternalImageAttributes extends AbstractImageAttributes
             return null;
         }
         return implode(', ', $srcset);
-    }
-}
-
-final class RasterContext 
-{
-    private string $hash;
-    private bool $webp;
-    private ?array $srcset;
-    private string $extension;
-
-    public function __construct(string $image, string $imgBasePath, AssetFile $file, array $options)
-    {
-        $this->image                  = $image;
-        $pathinfo                     = pathinfo($image);
-        $this->extension              = $pathinfo['extension'];
-        $this->imgBasePath            = $imgBasePath;
-        $this->hash                   = $file->getHash();
-        $this->srcset                 = $options['srcset'] ?? null;
-        $size                         = $this->getSize($options, $file->getFilename());
-        $options['width']             = $size['width'];
-        $options['height']            = $size['height'];
-        $this->width                  = intval($options['width']);
-        $this->height                 = intval($options['height']);
-        unset($options['aspectRatio'], $options['srcset']);
-        $this->options = new RasterOptions($options);
-    }
-
-    public function getSrc() : string
-    {
-        return $this->imgBasePath.'/'.$this->buildSrc();
-    }
-
-    public function getSrcset(?string $type = null) : ?string
-    {
-        if (null === $this->srcset) {
-            return null;
-        }
-        $srcset = [];
-        foreach ($this->srcset as $variant) {
-            preg_match('/[0-9\.]+[w|x]/', $variant, $matches);
-            if (0 === count($matches)) {
-                throw new \Exception('Invalid srcset variant (' . $variant . '). Should be multiplier (1x, 1.5x) or width (100w, 300w)');
-            }
-            if (false !== mb_strpos($variant, 'x')) {
-                $this->options->changeScale(floatval(trim($variant, 'x')));
-            } else {
-                $width = floatval(trim($variant, 'w'));
-                $scale = $width / floatval($this->options->getValue('width'));
-                $this->options->changeScale($scale);
-            }
-            $srcset[] = new ImageSrcset($this->imgBasePath.'/'.$this->buildSrc(), $variant, $type);
-        }
-        $this->options->changeScale();
-        return implode(', ', $srcset);
-    }
-
-    private function buildSrc() : string
-    {
-        $replace = $this->options.'.'.$this->hash. '.'.$this->extension;
-        return str_replace('.'.$this->extension, $replace, $this->image);
     }
 }

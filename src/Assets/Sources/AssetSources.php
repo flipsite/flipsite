@@ -57,7 +57,7 @@ final class AssetSources implements AssetSourcesInterface
 
     public function addImageBasePath(string $image) : string
     {
-        return '/img/'.$image;
+        return '/preview/dev.io/img/'.$image;
     }
 }
 

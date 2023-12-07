@@ -6,4 +6,5 @@ namespace Flipsite\Assets\Sources;
 interface AssetSourcesInterface
 {
     public function getImageInfo(string $image) : ?ImageInfoInterface;
+    public function addImageBasePath(string $image) : string;
 }

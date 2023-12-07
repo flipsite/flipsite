@@ -32,10 +32,10 @@ abstract class AbstractImageAttributes implements ImageAttributesInterface
         return $this->height;
     }
 
-    protected function setSize(array $options, ImageInfoInterface $imageInfo)
+    protected function setSize(array $options, int $realWidth, int $realHeight)
     {
-        $width  = $options['width'] ?? null;
-        $height = $options['height'] ?? null;
+        $width  = isset($options['width']) ? intval($options['width']) : null;
+        $height  = isset($options['height']) ? intval($options['height']) : null;
 
         if (isset($options['aspectRatio'])) {
             $tmp = explode('by', str_replace('/', 'by', $options['aspectRatio']));
@@ -51,12 +51,12 @@ abstract class AbstractImageAttributes implements ImageAttributesInterface
 
         if (null === $width || null === $height) {
             if (null === $width && null === $height) {
-                $width  = $imageInfo->getWidth();
-                $height = $imageInfo->getHeight();
+                $width  = $realWidth;
+                $height = $realHeight;
             } elseif (null === $height) {
-                $height = intval(round($width / $imageInfo->getWidth() * $imageInfo->getHeight()));
+                $height = intval(round($width / $realWidth * $realHeight));
             } elseif (null === $width) {
-                $width = intval(round($height / $imageInfo->getHeight() * $imageInfo->getWidth()));
+                $width = intval(round($height / $realHeight * $realWidth));
             }
         }
 
