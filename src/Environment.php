@@ -9,19 +9,14 @@ final class Environment extends AbstractEnvironment
 {
     public function __construct()
     {
-        $this->assetSources = new AssetSources(getenv('VENDOR_DIR'), getenv('SITE_DIR'));
+        $this->assetSources = new AssetSources(
+            getenv('VENDOR_DIR'), 
+            getenv('SITE_DIR'),
+            getenv('CACHE_DIR'),
+            getenv('APP_BASEPATH')
+        );
 
         $this->live = 'live' === getenv('APP_ENV');
-
-        if (false === getenv('IMG_DIR')) {
-            throw new \Exception('IMG_DIR not set');
-        }
-        $this->imgDir = getenv('IMG_DIR');
-
-        if (false === getenv('VIDEO_DIR')) {
-            throw new \Exception('VIDEO_DIR not set');
-        }
-        $this->videoDir = getenv('VIDEO_DIR');
 
         if (false === getenv('APP_BASEPATH')) {
             throw new \Exception('APP_BASEPATH not set');

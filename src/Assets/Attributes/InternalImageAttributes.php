@@ -12,14 +12,20 @@ class InternalImageAttributes extends AbstractImageAttributes
     private string $image;
     private string $hash;
     private string $extension;
+    private string $useExtension;
     public function __construct(string $image, array $options, ImageInfoInterface $imageInfo, private AssetSourcesInterface $assetSources)
     {
         $this->image = $imageInfo->getFilename();
         $pathinfo = pathinfo($imageInfo->getFilename());
         $this->extension = $pathinfo['extension'];
+        if (in_array($this->extension, ['png','jpg','jpeg'])) {
+            $this->useExtension = ($options['webp'] ?? true) ? 'webp' : $this->extension;
+        } else {
+            $this->useExtension = $this->extension;
+        }
         $this->hash = $imageInfo->getHash();
         $this->setSize($options, $imageInfo->getWidth(), $imageInfo->getHeight());
-
+        
         $options['width']  = $this->width;
         $options['height'] = $this->height;
         $this->width       = intval($options['width']);
@@ -32,7 +38,7 @@ class InternalImageAttributes extends AbstractImageAttributes
     }
     private function buildSrc() : string
     {
-        $replace = $this->options.'.'.$this->hash. '.'.$this->extension;
+        $replace = $this->options.'.'.$this->hash. '.'.$this->useExtension;
         $src = str_replace('.'.$this->extension, $replace, $this->image);
         return $this->assetSources->addImageBasePath($src);
     }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 use Flipsite\App\Middleware\CssMiddleware;
 use Flipsite\App\Middleware\ExpiresMiddleware;
-use Flipsite\Assets\ImageHandler;
-use Flipsite\Assets\VideoHandler;
+use Flipsite\Assets\Assets;
 
 use League\Container\Container;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -38,25 +37,15 @@ $app->addBodyParsingMiddleware();
 $app->setBasePath(getenv('APP_BASEPATH'));
 
 $app->get('/img[/{file:.*}]', function (Request $request, Response $response, array $args) {
-    //$assets = $this->getAssets();
     $environment = $this->get('environment');
-    $handler     = new ImageHandler(
-        $environment->getAssetSources(),
-        $environment->getImgDir(),
-        $environment->getImgBasePath(),
-    );
-    return $handler->getResponse($response, $args['file']);
+    $assets = new Assets($environment->getAssetSources());
+    return $assets->getResponse($response, $args['file']);
 });
 
 $app->get('/videos[/{file:.*}]', function (Request $request, Response $response, array $args) {
     $environment = $this->get('environment');
-    $handler     = new VideoHandler(
-        $environment->getSiteDir().'/videos',
-        $environment->getVideoDir(),
-        $environment->getImgDir(),
-        $environment->getVideoBasePath(),
-    );
-    return $handler->getResponse($response, $args['file']);
+    $assets = new Assets($environment->getAssetSources());
+    return $assets->getResponse($response, $args['file']);
 });
 
 

@@ -1,43 +1,35 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Sources;
 
-use Flipsite\Utils\Plugins;
+use Psr\Http\Message\ResponseInterface as Response;
 
 final class AssetSources implements AssetSourcesInterface
 {
     private array $imageDirs = [];
 
-    public function __construct(private string $vendorDir, private string $siteDir)
+    public function __construct(private string $vendorDir, private string $siteDir, private string $cacheDir, private string $basePath)
     {
         $this->imageDirs[] = $vendorDir.'/flipsite/flipsite/assets';
         $this->imageDirs[] = $siteDir.'/assets';
     }
 
-    // public function getFilename(string $src, bool $runPlugins = true): ?string
-    // {
-    //     foreach ($this->assetDirs as $assetDir) {
-    //         if (file_exists($assetDir.'/'.$src)) {
-    //             return $assetDir.'/'.$src;
-    //         }
-    //         if (mb_strpos($src, '.webp')) {
-    //             $filename = $assetDir.'/'.$src;
-    //             foreach (['jpg', 'png'] as $ext) {
-    //                 $alt = str_replace('.webp', '.'.$ext, $filename);
-    //                 if (file_exists($alt)) {
-    //                     return $alt;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if ($runPlugins && $this->plugins->has('assetNotFound')) {
-    //         $this->plugins->run('assetNotFound', $src);
-    //         return $this->getFilename($src, false);
-    //     }
-    //     throw new \Flipsite\Exceptions\AssetNotFoundException($src);
-    // }
-    public function getImageInfo(string $image) : ?ImageInfoInterface
+    public function isCached(string $asset): bool
+    {
+        return file_exists($this->cacheDir.'/'.$asset);
+    }
+    public function getResponse(Response $response, string $asset): Response
+    {
+        $filename = $this->cacheDir.'/'.$asset;
+        $body = $response->getBody();
+        $body->rewind();
+        $body->write(file_get_contents($filename));
+        return $response->withHeader('Content-type', mime_content_type($filename));
+    }
+
+    public function getImageInfo(string $image): ?ImageInfoInterface
     {
         foreach ($this->imageDirs as $imageDir) {
             if (file_exists($imageDir.'/'.$image)) {
@@ -55,9 +47,13 @@ final class AssetSources implements AssetSourcesInterface
         return null;
     }
 
-    public function addImageBasePath(string $image) : string
+    public function addImageBasePath(string $image): string
     {
-        return '/preview/dev.io/img/'.$image;
+        return $this->basePath.'/img/'.$image;
+    }
+
+    public function addToCache(string $asset, string $encoded) : bool {
+        return !!file_put_contents($this->cacheDir.'/'.$asset, $encoded);
     }
 }
 
@@ -67,32 +63,38 @@ class ImageInfo implements ImageInfoInterface
     private string $hash;
     private ?int $width;
     private ?int $height;
+    private string $filepath;
 
     public function __construct(string $dir, string $filename)
     {
         $this->filename = $filename;
-        $this->hash     = mb_substr(md5_file($dir.'/'.$filename), 0, 6);
-        $imageSize      = getimagesize($dir.'/'.$filename);
+        $this->filepath = $dir.'/'.$filename;
+        $this->hash     = mb_substr(md5_file($this->filepath), 0, 6);
+        $imageSize      = getimagesize($this->filepath);
         $this->width    = $imageSize[0];
         $this->height   = $imageSize[1];
     }
 
-    public function getFilename() : string
+    public function getContents() : string {
+        return file_get_contents($this->filepath);
+    }
+
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
-    public function getHash() : string
+    public function getHash(): string
     {
         return $this->hash;
     }
 
-    public function getWidth() : ?int
+    public function getWidth(): ?int
     {
         return $this->width;
     }
 
-    public function getHeight() : ?int
+    public function getHeight(): ?int
     {
         return $this->height;
     }
