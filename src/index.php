@@ -28,9 +28,8 @@ if (!getenv('APP_BASEPATH')) {
 }
 
 $container = new Container();
-$container->addShared('plugins', 'Flipsite\Utils\Plugins')->addArgument($plugins ?? []);
 $container->addShared('environment', 'Flipsite\Environment');
-$container->addShared('reader', 'Flipsite\Data\Reader')->addArgument(getenv('SITE_DIR'))->addArgument('plugins');
+$container->addShared('reader', 'Flipsite\Data\Reader')->addArgument(getenv('SITE_DIR'));
 $container->addShared('assets', 'Flipsite\Assets\Assets');
 
 AppFactory::setContainer($container);

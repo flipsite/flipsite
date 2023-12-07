@@ -10,7 +10,7 @@ abstract class AbstractImageOptions
     protected array $options  = [];
     protected ?float $scale   = null;
 
-    public function __construct($args = null)
+    public function __construct(string|array $args = null)
     {
         $this->options = $this->defineOptions();
         if (is_string($args)) {

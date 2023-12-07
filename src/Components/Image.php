@@ -6,8 +6,7 @@ namespace Flipsite\Components;
 
 final class Image extends AbstractComponent
 {
-    use Traits\BuilderTrait;
-    use Traits\ImageHandlerTrait;
+    use Traits\AssetsTrait;
 
     protected string $tag  = 'img';
     protected bool $empty  = true;
@@ -42,41 +41,51 @@ final class Image extends AbstractComponent
             $this->render = false;
             return;
         }
-        $options           = $this->normalizeOptions($style['options'] ?? []);
-        $sizes             = $options['sizes'] ?? null;
-        unset($options['sizes']);
-        $isEager           = false; // To later preload all eager loading images
-        if (!isset($options['loading']) || false !== $options['loading']) {
-            $this->setAttribute('loading', $options['loading'] ?? 'lazy');
-            $isEager = ($options['loading'] ?? '') === 'eager';
-            unset($options['loading']);
+
+        $isEager = false; // To later preload all eager loading images
+        if (!isset($style['options']['loading']) || false !== $style['options']['loading']) {
+            $this->setAttribute('loading', $style['options']['loading'] ?? 'lazy');
+            $isEager = ($style['options']['loading'] ?? '') === 'eager';
+            unset($style['options']['loading']);
         }
         $this->setAttribute('alt', (string)($data['alt'] ?? ''));
         $this->addStyle($style);
-        if ($this->isSvg($src)) {
-            $imageContext = $this->imageHandler->getContext($src, []);
-            if ($imageContext->getWidth()) {
-                $this->setAttribute('width', $imageContext->getWidth());
-            }
-            if ($imageContext->getHeight()) {
-                $this->setAttribute('height', $imageContext->getHeight());
-            }
-            $this->setAttribute('src', $imageContext->getSrc());
-        } else {
-            if (($options['webp'] ?? true)) {
-                $src = str_replace('.jpg', '.webp', $src);
-                $src = str_replace('.png', '.webp', $src);
-            }
-            $imageContext = $this->imageHandler->getContext($src, $options);
-            $this->setAttribute('src', $imageContext->getSrc());
-            $this->setAttribute('srcset', $imageContext->getSrcset());
-            $this->setAttribute('sizes', $sizes);
-            $this->setAttribute('width', $imageContext->getWidth());
-            $this->setAttribute('height', $imageContext->getHeight());
+
+        $imageAttributes = $this->assets->getImageAttributes($src, $style['options'] ?? []);
+        if ($imageAttributes) {
+            $this->setAttribute('src', $imageAttributes->getSrc());
+            $this->setAttribute('srcset', $imageAttributes->getSrcset());
+            $this->setAttribute('width', $imageAttributes->getWidth());
+            $this->setAttribute('height', $imageAttributes->getHeight());
         }
-        if ($isEager) {
-            $this->builder->dispatch(new Event('preload', 'image', $this));
-        }
+
+        // if ($this->isSvg($src)) {
+        //     $imageContext = $this->imageHandler->getContext($src, []);
+        //     if ($imageContext->getWidth()) {
+        //         $this->setAttribute('width', $imageContext->getWidth());
+        //     }
+        //     if ($imageContext->getHeight()) {
+        //         $this->setAttribute('height', $imageContext->getHeight());
+        //     }
+        //     $this->setAttribute('src', $imageContext->getSrc());
+        // } else {
+        //     if (($options['webp'] ?? true)) {
+        //         $src = str_replace('.jpg', '.webp', $src);
+        //         $src = str_replace('.png', '.webp', $src);
+        //     }
+        //     $imageContext = $this->imageHandler->getContext($src, $options);
+        //     $this->setAttribute('src', $imageContext->getSrc());
+        //     $this->setAttribute('srcset', $imageContext->getSrcset());
+        //     $this->setAttribute('sizes', $sizes);
+        //     $this->setAttribute('width', $imageContext->getWidth());
+        //     $this->setAttribute('height', $imageContext->getHeight());
+        // }
+
+
+
+        // if ($isEager) {
+        //     $this->builder->dispatch(new Event('preload', 'image', $this));
+        // }
     }
 
     private function isSvg(string $filename): bool
@@ -87,48 +96,5 @@ final class Image extends AbstractComponent
     private function isExternal(string $src): bool
     {
         return str_starts_with($src, 'http');
-    }
-
-    private function normalizeOptions(array $options): array
-    {
-        $screens = [
-            'xs'  => 440,
-            'sm'  => 640,
-            'md'  => 768,
-            'lg'  => 1024,
-            'xl'  => 1280,
-            '2xl' => 1536,
-        ];
-
-        if (isset($options['sizes']) && is_array($options['sizes'])) {
-            foreach ($options['sizes'] as &$size) {
-                $screen = null;
-                $size   = explode(':', $size);
-                if (count($size) === 2) {
-                    $screen = $screens[array_shift($size)];
-                }
-
-                $divideBy = 1;
-                $size     = explode('/', $size[0]);
-                if (count($size) === 2) {
-                    $divideBy = intval(array_pop($size));
-                }
-                $size = $size[0];
-                if (isset($screens[$size])) {
-                    $size = $screens[$size];
-                }
-                if ($divideBy !== 1) {
-                    $size = intval(floatVal($size) / floatVal($divideBy));
-                }
-                if (strpos((string)$size, 'vw') === false) {
-                    $size .= 'px';
-                }
-                if (null !== $screen) {
-                    $size = '(min-width:'.$screen.'px) '.$size;
-                }
-            }
-            $options['sizes'] = implode(', ', $options['sizes']);
-        }
-        return $options;
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
-use Flipsite\Utils\Plugins;
+use Flipsite\Assets\Sources\AssetSources;
 
 final class Environment extends AbstractEnvironment
 {
     public function __construct()
     {
+        $this->assetSources = new AssetSources(getenv('VENDOR_DIR'), getenv('SITE_DIR'));
 
         $this->live = 'live' === getenv('APP_ENV');
 
@@ -22,8 +22,6 @@ final class Environment extends AbstractEnvironment
             throw new \Exception('VIDEO_DIR not set');
         }
         $this->videoDir = getenv('VIDEO_DIR');
-
-
 
         if (false === getenv('APP_BASEPATH')) {
             throw new \Exception('APP_BASEPATH not set');

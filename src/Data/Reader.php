@@ -1,10 +1,8 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
-use Flipsite\AbstractEnvironment;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
@@ -39,11 +37,13 @@ final class Reader implements SiteDataInterface
 
     private Localizer $localizer;
 
-    public function __construct(string $siteDir, private Plugins $plugins)
+    public function __construct(string $siteDir, private ?Plugins $plugins = null)
     {
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
-            $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
+            if ($this->plugins) {
+                $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
+            }
             $this->loadSite($siteYaml);
         } else {
             throw new NoSiteFileFoundException($siteDir);
@@ -85,13 +85,18 @@ final class Reader implements SiteDataInterface
         return $this->localizer->localize($data, $language);
     }
 
-    public function getHtmlStyle() : array {
+    public function getHtmlStyle() : array
+    {
         return $this->data['theme']['components']['html'] ?? [];
     }
-    public function getBodyStyle(string $page) : array {
+
+    public function getBodyStyle(string $page) : array
+    {
         return $this->data['theme']['components']['body'] ?? [];
     }
-    public function getComponentStyle(string $component) : array {
+
+    public function getComponentStyle(string $component) : array
+    {
         return $this->data['theme']['components'][$component] ?? [];
     }
 
@@ -132,9 +137,9 @@ final class Reader implements SiteDataInterface
 
     public function getSections(Path $path): array
     {
-        $page = $path->getPage();
+        $page     = $path->getPage();
         $language = $path->getLanguage();
-        
+
         if ('offline' === $page) {
             return $this->localizer->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
         }
@@ -188,10 +193,10 @@ final class Reader implements SiteDataInterface
 
     public function getMeta(string $page, Language $language): ?array
     {
-        $pageMeta = $this->get('meta.'.$page, $language);
+        $pageMeta    = $this->get('meta.'.$page, $language);
         $description = $pageMeta['description'] ?? $this->get('description', $language);
-        $share = $pageMeta['share'] ?? $this->get('share') ?? null;
-        $icon = $pageMeta['icon'] ?? null;
+        $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
+        $icon        = $pageMeta['icon'] ?? null;
 
         if ('home' === $page) {
             $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name', $language);
@@ -200,7 +205,6 @@ final class Reader implements SiteDataInterface
             if (isset($pageMeta['title'])) {
                 $title = $pageMeta['title'];
             } else {
-
                 $p     = explode('/', $page);
                 $title = [];
                 while (count($p) > 0) {
@@ -213,18 +217,16 @@ final class Reader implements SiteDataInterface
                     array_pop($p);
                 }
                 $title = implode(' - ', $title);
-
             }
             if ($baseTitle) {
                 $title .= ' - '.$baseTitle;
             }
-
         }
         return [
-            'title' => $title,
+            'title'       => $title,
             'description' => $description,
-            'share' => $share,
-            'icon' => $icon
+            'share'       => $share,
+            'icon'        => $icon
         ];
     }
 
@@ -251,15 +253,14 @@ final class Reader implements SiteDataInterface
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $category = $meta[$page]['content'];
-                $schema = $this->data['contentSchemas'][$category];
-                $items = $this->data['content'][$category] ?? [];
+                $schema   = $this->data['contentSchemas'][$category];
+                $items    = $this->data['content'][$category] ?? [];
                 if (isset($schema['published']) && 'boolean' === $schema['published']['type']) {
                     $published = array_filter($items, function ($item) {
                         return $item['published'] ?? false;
                     });
                     $items = count($published) ? $published : [$items[0]];
                 }
-
 
                 foreach ($items as $dataItem) {
                     if (!isset($dataItem['slug'])) {

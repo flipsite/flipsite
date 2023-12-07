@@ -4,38 +4,22 @@ declare(strict_types=1);
 
 namespace Flipsite;
 
-use Flipsite\Assets\Sources\AssetSources;
+use Flipsite\Assets\Sources\AssetSourcesInterface;
 use Flipsite\Utils\Plugins;
 
 abstract class AbstractEnvironment
 {
+    protected AssetSourcesInterface $assetSources;
     protected bool $isLive;
     protected string $scheme;
     protected string $host;
     protected ?string $port;
     protected string $basePath = '/'; //must start with /
 
-    // protected ?string $generator = 'flipsite.io';
-    // protected bool $trailingSlash = false;
-    // protected array $externalAssetDirs    = [];
-    // protected ?AssetSources $imageSources = null;
-
-    public function getAssetSources(): AssetSources
-    {
-        // if (null === $this->imageSources) {
-        //     $assetDirs = [$this->getSiteDir().'/assets'];
-        //     if (count($this->externalAssetDirs)) {
-        //         $assetDirs = array_merge($assetDirs, $this->externalAssetDirs);
-        //     }
-        //     $this->imageSources = new AssetSources(
-        //         $this->getVendorDir(),
-        //         $this->plugins,
-        //         $assetDirs,
-        //     );
-        // }
-        // return $this->imageSources;
+    public function getAssetSources(): AssetSourcesInterface {
+        return $this->assetSources;
     }
-
+    
     public function getBasePath(): string
     {
         return $this->basePath;

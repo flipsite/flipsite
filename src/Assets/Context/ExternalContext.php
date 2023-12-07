@@ -6,13 +6,5 @@ namespace Flipsite\Assets\Context;
 
 final class ExternalContext extends AbstractImageContext
 {
-    public function getSrc(): string
-    {
-        return $this->image;
-    }
-
-    public function getSources(): ?array
-    {
-        return null;
-    }
+    public return $this->image;
 }

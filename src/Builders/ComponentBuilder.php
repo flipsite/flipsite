@@ -31,17 +31,7 @@ class ComponentBuilder
 
     public function __construct(private Environment $environment, private SiteDataInterface $siteData, private Path $path)
     {
-        $this->assets = new Assets();
-        // $this->imageHandler = new ImageHandler(
-        //     $environment->getAssetSources(),
-        //     $environment->getImgDir(),
-        //     $environment->getImgBasePath(),
-        // );
-        // $this->videoHandler = new VideoHandler(
-        //     $environment->getSiteDir().'/videos',
-        //     $environment->getVideoDir(),
-        //     $environment->getVideoBasePath(),
-        // );
+        $this->assets = new Assets($environment->getAssetSources());
         // $this->theme = $reader->get('theme') ?? [];
         // $this->slugs = $reader->getSlugs();
     }

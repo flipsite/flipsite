@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace Flipsite\Assets\Context;
+namespace Flipsite\Assets\Attributes;
 
 final class ImageSrcset
 {

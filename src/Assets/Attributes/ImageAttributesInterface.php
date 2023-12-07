@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flipsite\Assets;
+namespace Flipsite\Assets\Attributes;
 
 interface ImageAttributesInterface
 {
