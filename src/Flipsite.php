@@ -7,7 +7,7 @@ namespace Flipsite;
 use Flipsite\Builders\DocumentBuilder;
 use Flipsite\Data\SiteDataInterface;
 // use Flipsite\Builders\CustomCodeBuilder;
-// use Flipsite\Builders\IntegrationsBuilder;
+use Flipsite\Builders\IntegrationsBuilder;
 use Flipsite\Builders\ComponentBuilder;
 use Flipsite\Builders\FaviconBuilder;
 use Flipsite\Builders\FontBuilder;
@@ -87,7 +87,7 @@ final class Flipsite
         // Integrations
         $integrations = $this->siteData->getIntegrations();
         if (null !== $integrations) {
-            $analyticsBuilder = new IntegrationsBuilder($environment->isLive(), $integrations);
+            $analyticsBuilder = new IntegrationsBuilder($this->environment->isProduction(), $integrations);
             $document         = $analyticsBuilder->getDocument($document);
         }
     // $document->getChild('head')->addChild(new Flipsite\Components\CustomCode('<style></style>'));

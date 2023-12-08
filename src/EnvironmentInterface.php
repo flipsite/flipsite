@@ -12,5 +12,6 @@ interface EnvironmentInterface {
     public function getGenerator() : ?string;
     public function getAbsoluteUrl(string $url) : string;
     public function getAbsoluteSrc(string $src) : string;
+    public function isProduction() : bool;
     public function minimizeHtml() : bool;
 }
