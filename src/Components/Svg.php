@@ -5,7 +5,7 @@ namespace Flipsite\Components;
 
 use Flipsite\Components\Event;
 
-final class Svg extends AbstractComponent
+class Svg extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\AssetsTrait;

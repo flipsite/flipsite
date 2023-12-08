@@ -6,6 +6,7 @@ namespace Flipsite\Builders;
 use Flipsite\Components\Document;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Element;
+use Flipsite\Utils\ArrayHelper;
 use Symfony\Component\Yaml\Yaml;
 use Flipsite\Style\Tailwind;
 use Flipsite\Style\Callbacks\UnitCallback;
@@ -14,7 +15,7 @@ use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
 
 class StyleBuilder implements BuilderInterface
 {
-    public function __construct()
+    public function __construct(private array $colors, private array $fonts = [])
     {
         
     }
@@ -37,27 +38,28 @@ class StyleBuilder implements BuilderInterface
         // }
 
 
-        // $config = ArrayHelper::merge($config, $this->theme ?? []);
-        // $fonts  = $config['fonts'] ?? [];
+        $config = ArrayHelper::merge($config, ['colors' => $this->colors, 'fonts' => $this->fonts]);
+        $fonts  = $config['fonts'] ?? [];
 
-        // unset($config['fonts']);
-        // if (!isset($config['fontFamily'])) {
-        //     $config['fontFamily'] = [];
-        // }
 
-        // foreach ($fonts as $type => $options) {
-        //     if (!is_array($options)) {
-        //         continue;
-        //     }
-        //     $font = $options['family'];
-        //     if (false !== mb_strpos($font, ' ')) {
-        //         $font = "'".$font."'";
-        //     }
-        //     $font                        = [$font];
-        //     $fallback                    = $options['fallback'] ?? 'sans';
-        //     $font                        = array_merge($font, $config['fontFamily'][$fallback] ?? []);
-        //     $config['fontFamily'][$type] = $font;
-        // }
+        unset($config['fonts']);
+        if (!isset($config['fontFamily'])) {
+            $config['fontFamily'] = [];
+        }
+
+        foreach ($fonts as $type => $options) {
+            if (!is_array($options)) {
+                continue;
+            }
+            $font = $options['family'];
+            if (false !== mb_strpos($font, ' ')) {
+                $font = "'".$font."'";
+            }
+            $font                        = [$font];
+            $fallback                    = $options['fallback'] ?? 'sans';
+            $font                        = array_merge($font, $config['fontFamily'][$fallback] ?? []);
+            $config['fontFamily'][$type] = $font;
+        }
 
         $tailwind = new Tailwind($config);
         $tailwind->addCallback('size', new UnitCallback());

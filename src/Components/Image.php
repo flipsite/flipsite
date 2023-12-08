@@ -7,6 +7,7 @@ namespace Flipsite\Components;
 final class Image extends AbstractComponent
 {
     use Traits\AssetsTrait;
+    use Traits\BuilderTrait;
 
     protected string $tag  = 'img';
     protected bool $empty  = true;
@@ -83,9 +84,9 @@ final class Image extends AbstractComponent
 
 
 
-        // if ($isEager) {
-        //     $this->builder->dispatch(new Event('preload', 'image', $this));
-        // }
+        if ($isEager) {
+            $this->builder->dispatch(new Event('preload', 'image', $imageAttributes));
+        }
     }
 
     private function isSvg(string $filename): bool

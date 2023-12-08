@@ -273,10 +273,10 @@ abstract class AbstractGroup extends AbstractComponent
 
         $items = [];
         foreach ($pages as $page) {
-            $pageMeta = $this->reader->getMeta((string)$page, $this->path->getLanguage());
+            $pageMeta = $this->siteData->getMeta((string)$page, $this->path->getLanguage());
             $item            = [
                 'slug'  => $page,
-                'name'  => $this->reader->getPageName((string)$page, $this->path->getLanguage()),
+                'name'  => $this->siteData->getPageName((string)$page, $this->path->getLanguage()),
                 ...$pageMeta
             ];
             $items[] = $item;
@@ -286,11 +286,11 @@ abstract class AbstractGroup extends AbstractComponent
 
     private function getSocial(): array
     {
-        $name     = $this->reader->get('name');
+        $name     = $this->siteData->getName();
         $language = $this->path->getLanguage();
         $items    = [];
         $i        = 0;
-        $social = $this->reader->get('social');
+        $social = $this->siteData->getSocial();
         if (!$social) return [];
         foreach ($social as $type => $handle) {
             $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);

@@ -1,24 +1,22 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\AbstractComponent;
-use Flipsite\Components\AbstractComponentFactory;
 use Flipsite\Components\ComponentListenerInterface;
 use Flipsite\Components\Event;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\Data\Slugs;
-use Flipsite\Environment;
+use Flipsite\EnvironmentInterface;
 use Flipsite\Assets\Assets;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Flipsite\Utils\ColorHelper;
 
 class ComponentBuilder
 {
@@ -29,10 +27,9 @@ class ComponentBuilder
     private array $localization = [];
     private Slugs $slugs;
 
-    public function __construct(private Environment $environment, private SiteDataInterface $siteData, private Path $path)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path)
     {
         $this->assets = new Assets($environment->getAssetSources());
-        // $this->theme = $reader->get('theme') ?? [];
         // $this->slugs = $reader->getSlugs();
     }
 
@@ -50,7 +47,7 @@ class ComponentBuilder
         }
 
         $style = $this->siteData->getComponentStyle($type);
-        
+
         $style = ArrayHelper::merge($style, $parentStyle);
 
         if ($parentType) {
@@ -107,7 +104,6 @@ class ComponentBuilder
         } else {
             return null;
         }
-
 
         if (isset($data['_comment'])) {
             if (isset($data['_comment']['before'])) {
@@ -257,7 +253,7 @@ class ComponentBuilder
             }
         }
         if (isset($options['isPage'])) {
-            $pages = explode(',', trim(str_replace(' ', '', $options['isPage'])));
+            $pages       = explode(',', trim(str_replace(' ', '', $options['isPage'])));
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
                 if ($currentPage === $page) {
@@ -273,7 +269,7 @@ class ComponentBuilder
             return false;
         }
         if (isset($options['notPage'])) {
-            $pages = explode(',', trim(str_replace(' ', '', $options['notPage'])));
+            $pages       = explode(',', trim(str_replace(' ', '', $options['notPage'])));
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
                 if ($currentPage === $page) {
@@ -294,8 +290,7 @@ class ComponentBuilder
     private function handleBackground(AbstractElement &$element, array $style): void
     {
         $src      = $style['src'] ?? false;
-        // $gradient = $this->parseThemeColors($style['gradient'] ?? '');
-        $gradient = '';
+        $gradient = $this->parseThemeColors($style['gradient'] ?? '');
         $options  = $style['options'] ?? [];
         $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
@@ -306,12 +301,14 @@ class ComponentBuilder
         unset($style['src'],$style['gradient'],$style['options']);
         if ($src) {
             $imageAttributes = $this->assets->getImageAttributes($src, $options);
-            if (strlen($gradient)) { $gradient .= ','; }
+            if (strlen($gradient)) {
+                $gradient .= ',';
+            }
             // SVG
             if (str_ends_with($src, '.svg')) {
                 $element->setAttribute('style', 'background-image:'.$gradient.'url('.$imageAttributes->getSrc().');');
             } else {
-                $srcset = $imageAttributes->getSrcset('url');  
+                $srcset = $imageAttributes->getSrcset('url');
                 if ($srcset) {
                     $element->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$srcset.')');
                 }
@@ -328,17 +325,16 @@ class ComponentBuilder
         foreach ($style as $attr => $val) {
             $element->addStyle(['bg.'.$attr => $val]);
         }
-        // private function isSvg(string $filename) : bool
-        // {
-        //     return false !== mb_strpos($filename, '.svg');
-        // }
-        // private function parseThemeColors(string $gradient) : string {
-        //     if (!strlen($gradient)) {
-        //         return $gradient;
-        //     }
-        //     $colors = $this->reader->get('theme.colors');
-        //     $colors['white'] = '#ffffff';
-        //     $colors['black'] = '#000000';
-        //     return ColorHelper::parseAndReplace($gradient, $colors);
+    }
+
+    private function parseThemeColors(string $gradient) : string
+    {
+        if (!strlen($gradient)) {
+            return $gradient;
+        }
+        $colors          = $this->siteData->getColors();
+        $colors['white'] = '#ffffff';
+        $colors['black'] = '#000000';
+        return ColorHelper::parseAndReplace($gradient, $colors);
     }
 }

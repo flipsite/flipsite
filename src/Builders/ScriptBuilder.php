@@ -13,10 +13,6 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
     private array $global = [];
     private array $ready  = [];
 
-    public function __construct(private string $hash, private string $basePath, private bool $sw = false)
-    {
-    }
-
     public function getDocument(Document $document) : Document
     {
         if (0 === count($this->global) && 0 === count($this->ready)) {
@@ -31,9 +27,6 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         $script = new InlineScript();
         foreach ($this->global as $code) {
             $script->addCode($code);
-        }
-        if ($this->sw) {
-            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("'.$this->basePath.'/sw.'.$this->hash.'.js");}});');
         }
         foreach ($this->ready as $code) {
             if ($code) $script->addCode($code);

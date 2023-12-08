@@ -3,13 +3,13 @@
 declare(strict_types=1);
 namespace Flipsite\Components\Traits;
 
-use Flipsite\Environment;
+use Flipsite\EnvironmentInterface;
 
 trait EnvironmentTrait
 {
-    protected Environment $environment;
+    protected EnvironmentInterface $environment;
 
-    public function addEnvironment(Environment $environment) : void
+    public function addEnvironment(EnvironmentInterface $environment) : void
     {
         $this->environment = $environment;
     }

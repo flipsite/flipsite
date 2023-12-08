@@ -84,6 +84,26 @@ final class Reader implements SiteDataInterface
         }
         return $this->localizer->localize($data, $language);
     }
+    public function getName() : string {
+        return $this->get('name');
+    }
+    public function getSocial() : array {
+        return $this->get('social');
+    }
+    public function getFavicon() : null|string|array {
+        return $this->get('favicon') ?? null;
+    }
+    public function getIntegrations() : ?array {
+        return $this->get('integrations') ?? null;
+    }
+
+    public function getColors() : array {
+        return $this->data['theme']['colors'] ?? [];
+    }
+
+    public function getFonts() : array {
+        return $this->data['theme']['fonts'] ?? [];
+    }
 
     public function getHtmlStyle() : array
     {

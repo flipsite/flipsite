@@ -25,23 +25,21 @@ class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
         switch ($event->getType()) {
             case 'preload':
                 if ($event->getId() === 'image') {
-                    $img  = $event->getData();
+                    $imageAttributes  = $event->getData();
                     $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
                     $link->setAttribute('as', 'image');
-                    $link->setAttribute('href', $img->getAttribute('src'));
-                    $link->setAttribute('imagesrcset', $img->getAttribute('srcset'));
-                    $link->setAttribute('imagesizes', $img->getAttribute('sizes'));
+                    $link->setAttribute('href', $imageAttributes->getSrc());
+                    $link->setAttribute('imagesrcset', $imageAttributes->getSrcset());
                     $this->links[] = $link;
                 }
                 if ($event->getId() === 'background') {
-                    $imageContext  = $event->getData();
-                    $link          = new Element('link', true, true);
+                    $imageAttributes  = $event->getData();
+                    $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
                     $link->setAttribute('as', 'image');
-                    $link->setAttribute('href', $imageContext->getSrc());
-                    $link->setAttribute('imagesrcset', $imageContext->getSrcset('srcset'));
-                    //$link->setAttribute('imagesizes', $imageContext->getAttribute('sizes'));
+                    $link->setAttribute('href', $imageAttributes->getSrc());
+                    $link->setAttribute('imagesrcset', $imageAttributes->getSrcset());
                     $this->links[] = $link;
                 }
                 break;
