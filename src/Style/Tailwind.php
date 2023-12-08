@@ -91,7 +91,7 @@ final class Tailwind implements CallbackInterface
             return strlen($b) - strlen($a);
         });
 
-        foreach ($vars as $i => $var) {
+        foreach ($vars as $i => $var) {   
             $addDefaultValues[$var] = '--'.$this->getVar($i);
             $css                    = str_replace($var, '--'.$this->getVar($i), $css);
         }
@@ -102,7 +102,7 @@ final class Tailwind implements CallbackInterface
         return $css;
     }
 
-    private function addDefaultValues(string $css, $addDefaultValues)
+    private function addDefaultValues(string $css, array $addDefaultValues)
     {
         $default       = '';
         $defaultValues = [
@@ -315,6 +315,7 @@ final class Tailwind implements CallbackInterface
 
     private function getVar(int $index): string
     {
+        $index+=1;
         $label = '';
         // Convert the index to a base-26 representation
         while ($index > 0) {
