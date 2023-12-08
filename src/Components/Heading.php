@@ -47,7 +47,7 @@ final class Heading extends AbstractComponent
             $highlightData = $data['highlight'] ?? [];
             $highlightData['value'] = $highlightString;
             $style['tag'] = 'span';
-            $span = $this->builder->build('div', $highlightData, $style, ['appearance' => $appearance]);
+            $span = $this->builder->build('span', $highlightData, $style, ['appearance' => $appearance]);
             $span->oneline = true;
             $data['value'] = str_replace('['.$highlightString.']', trim($span->render()), $data['value']);
         }

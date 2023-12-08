@@ -3,15 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-final class Tag extends AbstractComponent
+abstract class AbstractTag extends AbstractComponent
 {
-    use Traits\MarkdownTrait;
-
-    public function __construct(string $tag = 'div')
-    {
-        $this->tag = $tag;
-    }
-
     public function build(array $data, array $style, array $options) : void
     {
         if (!$data['value'] && !$this->empty) {
