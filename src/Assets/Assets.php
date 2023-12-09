@@ -10,6 +10,9 @@ use Flipsite\Assets\Attributes\UnsplashAttributes;
 use Flipsite\Assets\Attributes\ExternalAttributes;
 use Flipsite\Assets\Attributes\ImageAttributes;
 use Flipsite\Assets\Attributes\SvgAttributes;
+use Flipsite\Assets\Attributes\VideoAttributesInterface;
+use Flipsite\Assets\Attributes\VideoAttributes;
+use Flipsite\Assets\Attributes\ExternalVideoAttributes;
 use Flipsite\Assets\Options\RasterOptions;
 use Flipsite\Assets\Editors\RasterEditor;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -47,6 +50,14 @@ class Assets
                     $this->assetSources->addToCache($asset, $imageInfo->getContents());
                 }
                 break;
+            case 'mp4':
+            case 'mov':
+            case 'webm':
+            case 'mov':
+                $withoutHash = preg_replace('/\.[a-f0-9]{6}\./', '.', $asset);
+                $videoInfo = $this->assetSources->getVideoInfo($withoutHash);
+                $this->assetSources->addToCache($asset, $videoInfo->getContents($pathinfo['extension']));
+                break;
         }
         return $this->assetSources->getResponse($response, $asset);
     }
@@ -60,9 +71,8 @@ class Assets
         return null;
     }
 
-    public function getImageAttributes(string $image, array $options): ?ImageAttributesInterface
+    public function getImageAttributes(string $image, array $options = []): ?ImageAttributesInterface
     {
-
         if (0 === mb_strpos($image, 'http')) {
             if (str_starts_with($image, 'https://images.unsplash.com')) {
                 return new UnsplashAttributes($image, $options);
@@ -76,6 +86,18 @@ class Assets
             } else {
                 return new ImageAttributes($options, $imageInfo, $this->assetSources);
             }
+        }
+        return null;
+    }
+
+    public function getVideoAttributes(string $video): ?VideoAttributesInterface
+    {
+        if (0 === mb_strpos($video, 'http')) {
+            return new ExternalVideoAttributes($video);
+        }
+        $videoInfo = $this->assetSources->getVideoInfo($video);
+        if ($videoInfo) {
+            return new VideoAttributes($videoInfo, $this->assetSources);
         }
         return null;
     }

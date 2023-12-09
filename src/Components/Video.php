@@ -5,8 +5,7 @@ namespace Flipsite\Components;
 
 final class Video extends AbstractComponent
 {
-    use Traits\VideoHandlerTrait;
-    use Traits\BuilderTrait;
+    use Traits\AssetsTrait;
     
     protected string $tag = 'video';
 
@@ -24,18 +23,19 @@ final class Video extends AbstractComponent
             $this->setAttribute('style','background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
         if (isset($data['poster'])) {
-            $img = $this->builder->build('image', ['src' => $data['poster']], $style['poster'] ?? [], ['appearance' => $options['appearance']]);
-            $this->setAttribute('poster', $img->getAttribute('src'));
+            $imageAttributes = $this->assets->getImageAttributes($data['poster'], $style['poster']['options'] ?? []);
+            $this->setAttribute('poster', $imageAttributes->getSrc());
             unset($style['poster']);
         }
         $this->addStyle($style);
         if (isset($data['value'])) {
-            $sources = $this->videoHandler->getSources($data['value']);
-            foreach ($sources as $type => $src) {
-                $s = new Element('source', true);
-                $s->setAttribute('src', $src);
-                $s->setAttribute('type', $type);
-                $this->addChild($s);
+            $videoAttributes = $this->assets->getVideoAttributes($data['value']);
+            foreach ($videoAttributes->getSources() as $sourceAttributes) {
+                $source = new Element('source', true);
+                $source->setAttribute('src', $sourceAttributes->getSrc());
+                $source->setAttribute('type', $sourceAttributes->getType());
+                $source->setAttribute('media', $sourceAttributes->getMedia());
+                $this->addChild($source);
             }
         }
     }
