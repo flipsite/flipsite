@@ -21,4 +21,5 @@ interface SiteDataInterface {
     public function getComponentStyle(string $component) : array;
     public function getMeta(string $page, Language $language);
     public function getPageName(string $page, Language $language);
+    public function getCode(string $position, string $page, bool $fallback) : ?string;
 }

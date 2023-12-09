@@ -11,6 +11,7 @@ use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
+use Flipsite\Utils\CustomHtmlParser;
 
 final class Reader implements SiteDataInterface
 {
@@ -37,6 +38,8 @@ final class Reader implements SiteDataInterface
 
     private Localizer $localizer;
 
+    private ?CustomHtmlParser $customParser = null;
+
     public function __construct(string $siteDir, private ?Plugins $plugins = null)
     {
         if (file_exists($siteDir.'/site.yaml')) {
@@ -48,6 +51,18 @@ final class Reader implements SiteDataInterface
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
+        if (file_exists($siteDir.'/custom.html')) {
+            $customHtml         = file_get_contents($siteDir.'/custom.html');
+            $this->customParser = new CustomHtmlParser($customHtml);
+        }
+    }
+
+    public function getCode(string $position, string $page, bool $fallback) : ?string
+    {
+        if (!$this->customParser) {
+            return null;
+        }
+        return $this->customParser->get($position, $page, $fallback);
     }
 
     private function loadSite(array $yaml)
@@ -84,24 +99,34 @@ final class Reader implements SiteDataInterface
         }
         return $this->localizer->localize($data, $language);
     }
-    public function getName() : string {
+
+    public function getName() : string
+    {
         return $this->get('name');
     }
-    public function getSocial() : array {
+
+    public function getSocial() : array
+    {
         return $this->get('social');
     }
-    public function getFavicon() : null|string|array {
+
+    public function getFavicon() : null|string|array
+    {
         return $this->get('favicon') ?? null;
     }
-    public function getIntegrations() : ?array {
+
+    public function getIntegrations() : ?array
+    {
         return $this->get('integrations') ?? null;
     }
 
-    public function getColors() : array {
+    public function getColors() : array
+    {
         return $this->data['theme']['colors'] ?? [];
     }
 
-    public function getFonts() : array {
+    public function getFonts() : array
+    {
         return $this->data['theme']['fonts'] ?? [];
     }
 

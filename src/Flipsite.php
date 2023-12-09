@@ -6,7 +6,7 @@ namespace Flipsite;
 
 use Flipsite\Builders\DocumentBuilder;
 use Flipsite\Data\SiteDataInterface;
-// use Flipsite\Builders\CustomCodeBuilder;
+use Flipsite\Builders\CustomCodeBuilder;
 use Flipsite\Builders\IntegrationsBuilder;
 use Flipsite\Builders\ComponentBuilder;
 use Flipsite\Builders\FaviconBuilder;
@@ -90,14 +90,10 @@ final class Flipsite
             $analyticsBuilder = new IntegrationsBuilder($this->environment->isProduction(), $integrations);
             $document         = $analyticsBuilder->getDocument($document);
         }
-    // $document->getChild('head')->addChild(new Flipsite\Components\CustomCode('<style></style>'));
-
-    // // Custom HTML
-    // $customCodeFile = $environment->getSiteDir().'/custom.html';
-    // if (file_exists($customCodeFile)) {
-    //     $customCodeBuilder = new CustomCodeBuilder($environment->isLive(), $page, $customCodeFile, $scriptBuilder);
-    //     $document          = $customCodeBuilder->getDocument($document);
-    // }
+    
+        // Custom HTML
+        $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
+        $document          = $customCodeBuilder->getDocument($document);
 
         $document = $scriptBuilder->getDocument($document);
 
