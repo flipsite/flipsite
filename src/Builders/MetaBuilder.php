@@ -28,7 +28,6 @@ class MetaBuilder implements BuilderInterface
         $page     = $this->path->getPage();
         $slug     = $this->siteData->getSlugs()->getSlug($page, $language);
         
-        
         $canonical = $this->environment->getAbsoluteUrl($slug);
 
         $elements[] = $this->meta('canonical', $canonical);

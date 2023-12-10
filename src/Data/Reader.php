@@ -40,7 +40,7 @@ final class Reader implements SiteDataInterface
 
     private ?CustomHtmlParser $customParser = null;
 
-    public function __construct(string $siteDir, private ?Plugins $plugins = null)
+    public function __construct(private string $siteDir, private ?Plugins $plugins = null)
     {
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
@@ -103,6 +103,15 @@ final class Reader implements SiteDataInterface
     public function getName() : string
     {
         return $this->get('name');
+    }
+    public function getTitle(Language $language) : ?string {
+        return $this->get('title', $language);
+    }
+    public function getDescription(Language $language) : ?string {
+        return $this->get('description', $language);
+    }
+    public function getShare() : ?string {
+        return $this->get('share');
     }
 
     public function getSocial() : array

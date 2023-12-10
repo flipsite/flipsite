@@ -21,6 +21,10 @@ class Assets
 {
     public function __construct(protected AssetSourcesInterface $assetSources) {}
 
+    public function getAssetSources(): AssetSourcesInterface
+    {
+        return $this->assetSources;
+    }
     public function getResponse(Response $response, string $asset): Response
     {
         if ($this->assetSources->isCached($asset)) {
@@ -34,6 +38,7 @@ class Assets
             case 'jpg':
             case 'jpeg':
             case 'svg':
+                // SHOW ORGINAL TODOs
                 $withoutHash = preg_replace('/\.[a-f0-9]{6}\./', '.', $asset);
                 if ('svg' !== $pathinfo['extension']) {
                     $tmp = explode('@', $withoutHash);
@@ -71,7 +76,7 @@ class Assets
         return null;
     }
 
-    public function getImageAttributes(string $image, array $options = []): ?ImageAttributesInterface
+    public function getImageAttributes(string $image, array $options = [], ?ImageInfoInterface $imageInfo = null): ?ImageAttributesInterface
     {
         if (0 === mb_strpos($image, 'http')) {
             if (str_starts_with($image, 'https://images.unsplash.com')) {
@@ -79,9 +84,11 @@ class Assets
             }
             return new ExternalImageAttributes($image);
         }
-        $imageInfo = $this->assetSources->getImageInfo($image);
+        if (!$imageInfo) {
+            $imageInfo = $this->assetSources->getImageInfo($image);
+        }
         if ($imageInfo) {
-            if (str_ends_with($image,'.svg')) {
+            if (str_ends_with($image, '.svg')) {
                 return new SvgAttributes($imageInfo, $this->assetSources);
             } else {
                 return new ImageAttributes($options, $imageInfo, $this->assetSources);
@@ -90,12 +97,14 @@ class Assets
         return null;
     }
 
-    public function getVideoAttributes(string $video): ?VideoAttributesInterface
+    public function getVideoAttributes(string $video, ?VideoInfoInterface $videoInfo = null): ?VideoAttributesInterface
     {
         if (0 === mb_strpos($video, 'http')) {
             return new ExternalVideoAttributes($video);
         }
-        $videoInfo = $this->assetSources->getVideoInfo($video);
+        if (!$videoInfo) {
+            $videoInfo = $this->assetSources->getVideoInfo($video);
+        }
         if ($videoInfo) {
             return new VideoAttributes($videoInfo, $this->assetSources);
         }
