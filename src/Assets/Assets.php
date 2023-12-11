@@ -27,6 +27,9 @@ class Assets
     }
     public function getResponse(Response $response, string $asset): Response
     {
+        if ($this->assetSources->isOrginal($asset)) {
+            return $this->assetSources->getResponse($response, $asset);
+        }
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
@@ -38,7 +41,6 @@ class Assets
             case 'jpg':
             case 'jpeg':
             case 'svg':
-                // SHOW ORGINAL TODOs
                 $withoutHash = preg_replace('/\.[a-f0-9]{6}\./', '.', $asset);
                 if ('svg' !== $pathinfo['extension']) {
                     $tmp = explode('@', $withoutHash);
@@ -64,7 +66,10 @@ class Assets
                 $this->assetSources->addToCache($asset, $videoInfo->getContents($pathinfo['extension']));
                 break;
         }
-        return $this->assetSources->getResponse($response, $asset);
+        if ($this->assetSources->isCached($asset)) {
+            return $this->assetSources->getResponse($response, $asset);
+        }
+        return $response->withStatus(404);
     }
 
     public function getSvg(string $svg): ?SvgInterface

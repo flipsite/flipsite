@@ -16,6 +16,7 @@ use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\PreloadBuilder;
 use Flipsite\Builders\StyleBuilder;
 use Flipsite\Builders\SvgBuilder;
+use Flipsite\Components\Document;
 use Flipsite\Utils\Path;
 use voku\helper\HtmlMin;
 
@@ -23,12 +24,7 @@ final class Flipsite
 {
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData) {}
 
-    public function render(string $rawPath): string
-    {
-        switch ($rawPath) {
-            case 'robots.txt': return $this->renderRobots();
-            case 'sitemap.xml': return $this->renderSitemap();
-        }
+    public function getDocument(string $rawPath) : Document {
         $path = new Path(
             $rawPath,
             $this->siteData->getDefaultLanguage(),
@@ -97,6 +93,15 @@ final class Flipsite
 
         $document = $scriptBuilder->getDocument($document);
 
+        return $document;
+    }
+    public function render(string $rawPath): string
+    {
+        switch ($rawPath) {
+            case 'robots.txt': return $this->renderRobots();
+            case 'sitemap.xml': return $this->renderSitemap();
+        }
+        $document = $this->getDocument($rawPath);
         $html = $document->render();
         if ($this->environment->minimizeHtml()) {
             $html = $this->minimizeHtml($html);
