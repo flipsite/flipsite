@@ -42,7 +42,7 @@ final class Reader implements SiteDataInterface
 
     private ?CustomHtmlParser $customParser = null;
 
-    public function __construct(private string $siteDir, private ?Plugins $plugins = null)
+    public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
     {
         if (file_exists($siteDir.'/site.yaml')) {
             $siteYaml          = Yaml::parseFile($siteDir.'/site.yaml');
@@ -51,7 +51,7 @@ final class Reader implements SiteDataInterface
             if ($this->plugins) {
                 $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
             }
-            $this->loadSite($siteYaml);
+            $this->loadSite($siteYaml, $expand);
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
@@ -92,10 +92,12 @@ final class Reader implements SiteDataInterface
         return $this->customParser->get($position, $page, $fallback);
     }
 
-    private function loadSite(array $yaml)
+    private function loadSite(array $yaml, bool $expand)
     {
         $this->data          = $yaml;
-        $this->expandPagesAndSlugs();
+        if ($expand) {
+            $this->expandPagesAndSlugs();
+        }
         foreach (explode(',', $this->data['languages']) as $language) {
             $this->languages[] = new Language($language);
         }
@@ -226,14 +228,8 @@ final class Reader implements SiteDataInterface
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(Path $path): array
+    public function getSections(string $page, Language $language): array
     {
-        $page     = $path->getPage();
-        $language = $path->getLanguage();
-
-        if ('offline' === $page) {
-            return $this->localizer->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
-        }
         $before = $this->data['before'] ?? [];
         if (ArrayHelper::isAssociative($before)) {
             $before = [$before];
@@ -254,31 +250,6 @@ final class Reader implements SiteDataInterface
         }
         $sections = array_merge($before, $all, $after);
 
-        foreach ($sections as $i => &$section) {
-            $parentStyle = [];
-            foreach ($section as $type => $value) {
-                if ($parentStyle) {
-                    continue;
-                }
-                $tmp    = explode(':', $type);
-                $styles = [];
-                while (count($tmp)) {
-                    $t           = implode(':', $tmp);
-                    $parentStyle = $this->get('theme.components.'.$t.'.section');
-                    if (is_array($parentStyle)) {
-                        $styles[$t] = $parentStyle;
-                    }
-                    array_pop($tmp);
-                }
-                $parentStyle = ArrayHelper::merge(...array_reverse($styles));
-            }
-            if (count($parentStyle)) {
-                $section['parentStyle'] = $parentStyle;
-                if (!isset($section['parentStyle']['type'])) {
-                    $section['parentStyle']['type'] = 'group';
-                }
-            }
-        }
         return $this->localizer->localize($sections ?? [], $language) ?? [];
     }
 

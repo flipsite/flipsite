@@ -301,6 +301,7 @@ abstract class AbstractGroup extends AbstractComponent
     }
 
     private function getContent(string $category): array {
+        return [];
         $content = $this->reader->get('content.'.$category) ?? [];
 
         $schema = $this->reader->get('contentSchemas.'.$category) ?? [];

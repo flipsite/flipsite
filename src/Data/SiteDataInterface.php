@@ -19,6 +19,7 @@ interface SiteDataInterface
     public function getSlugs(): Slugs;
     public function getFavicon(): null|string|array;
     public function getIntegrations(): ?array;
+    public function getSections(string $page, Language $language): array;
     public function getColors(): array;
     public function getFonts(): array;
     public function getHtmlStyle(): array;

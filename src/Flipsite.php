@@ -65,7 +65,7 @@ final class Flipsite
         $componentBuilder->addListener($perloadBuilder);
 
         $document = $documentBuilder->getDocument();
-        foreach ($this->siteData->getSections($path) as $sectionId => $sectionData) {
+        foreach ($this->siteData->getSections($path->getPage(), $path->getLanguage()) as $sectionId => $sectionData) {
             if ($this->plugins) {
                 $sectionData = $this->plugins->run('section', $sectionData);
             }
