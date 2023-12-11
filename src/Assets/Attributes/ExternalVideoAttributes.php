@@ -7,7 +7,10 @@ class ExternalVideoAttributes extends VideoAttributesInterface
 {
     public function __construct(private string $src)
     {
-        public function getSources() : array
+    }
+    public function getSources() : array {
+        $sources[] = new SourceAttributes($this->src);
+        return $sources;
     }
     
 }

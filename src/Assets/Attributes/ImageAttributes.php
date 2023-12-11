@@ -46,6 +46,7 @@ class ImageAttributes extends AbstractImageAttributes
     public function getSrcset(?string $type = null): ?string
     {
         $srcset = [];
+        if (!$this->srcset) return null;
         foreach ($this->srcset as $variant) {
             preg_match('/[0-9\.]+[w|x]/', $variant, $matches);
             if (0 === count($matches)) {

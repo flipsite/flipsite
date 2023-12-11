@@ -6,7 +6,7 @@ namespace Flipsite\Data;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
-use Flipsite\Utils\YamlExpander;
+use Symfony\Component\Yaml\Yaml;
 use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
@@ -45,7 +45,9 @@ final class Reader implements SiteDataInterface
     public function __construct(private string $siteDir, private ?Plugins $plugins = null)
     {
         if (file_exists($siteDir.'/site.yaml')) {
-            $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
+            $siteYaml          = Yaml::parseFile($siteDir.'/site.yaml');
+            $themeYaml         = Yaml::parseFile($siteDir.'/theme.yaml');
+            $siteYaml['theme'] = $themeYaml;
             if ($this->plugins) {
                 $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
             }
