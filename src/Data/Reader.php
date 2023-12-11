@@ -12,6 +12,8 @@ use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\CustomHtmlParser;
+use Flipsite\Content\ContentSchema;
+use Flipsite\Content\ContentItem;
 
 final class Reader implements SiteDataInterface
 {
@@ -55,6 +57,29 @@ final class Reader implements SiteDataInterface
             $customHtml         = file_get_contents($siteDir.'/custom.html');
             $this->customParser = new CustomHtmlParser($customHtml);
         }
+    }
+
+    public function getContentSchemas(): array
+    {
+        $schemas = [];
+        foreach ($this->get('contentSchemas') as $category => $schema) {
+            $schemas[] = new ContentSchema($category, $schema);
+        }
+        return $schemas;
+    }
+
+    public function getContentItems(ContentSchema $schema): array
+    {
+        $items = [];
+        foreach ($this->get('content.'.$schema->getId()) as $index => $item) {
+            $items[] = new ContentItem($schema, $item, $index);
+        }
+        return $items;
+    }
+
+    public function getModifiedTimestamp() : int
+    {
+        return filemtime($this->siteDir);
     }
 
     public function getCode(string $position, string $page, bool $fallback) : ?string
@@ -104,13 +129,19 @@ final class Reader implements SiteDataInterface
     {
         return $this->get('name');
     }
-    public function getTitle(Language $language) : ?string {
+
+    public function getTitle(Language $language) : ?string
+    {
         return $this->get('title', $language);
     }
-    public function getDescription(Language $language) : ?string {
+
+    public function getDescription(Language $language) : ?string
+    {
         return $this->get('description', $language);
     }
-    public function getShare() : ?string {
+
+    public function getShare() : ?string
+    {
         return $this->get('share');
     }
 
@@ -121,7 +152,11 @@ final class Reader implements SiteDataInterface
 
     public function getFavicon() : null|string|array
     {
-        return $this->get('favicon') ?? null;
+        $favicon = $this->get('favicon') ?? null;
+        if (is_array($favicon)) {
+            return array_shift($favicon);
+        }
+        return $favicon;
     }
 
     public function getIntegrations() : ?array

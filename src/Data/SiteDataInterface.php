@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
+use Flipsite\Content\ContentSchema;
 
 interface SiteDataInterface
 {
@@ -26,4 +27,7 @@ interface SiteDataInterface
     public function getMeta(string $page, Language $language);
     public function getPageName(string $page, Language $language);
     public function getCode(string $position, string $page, bool $fallback): ?string;
+    public function getContentSchemas(): array;
+    public function getContentItems(ContentSchema $schema): array;
+    public function getModifiedTimestamp() : int;
 }
