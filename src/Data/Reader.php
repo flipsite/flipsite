@@ -10,10 +10,8 @@ use Symfony\Component\Yaml\Yaml;
 use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
-use Flipsite\Utils\Path;
 use Flipsite\Utils\CustomHtmlParser;
-use Flipsite\Content\ContentSchema;
-use Flipsite\Content\ContentItem;
+use Flipsite\Content\Collection;
 
 final class Reader implements SiteDataInterface
 {
@@ -61,22 +59,20 @@ final class Reader implements SiteDataInterface
         }
     }
 
-    public function getContentSchemas(): array
+    public function getCollectionIds(): array
     {
-        $schemas = [];
-        foreach ($this->get('contentSchemas') as $category => $schema) {
-            $schemas[] = new ContentSchema($category, $schema);
-        }
-        return $schemas;
+        $collectionIds = array_keys($this->get('contentSchemas'));
+        sort($collectionIds);
+        return $collectionIds;
     }
 
-    public function getContentItems(ContentSchema $schema): array
+    public function getCollection(string $collectionId): ?Collection
     {
-        $items = [];
-        foreach ($this->get('content.'.$schema->getId()) as $index => $item) {
-            $items[] = new ContentItem($schema, $item, $index);
+        $schema = $this->get('contentSchemas.'.$collectionId);
+        if (!$schema) {
+            return null;
         }
-        return $items;
+        return new Collection($collectionId, $schema, $this->get('content.'.$collectionId));
     }
 
     public function getModifiedTimestamp() : int

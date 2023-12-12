@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -203,7 +202,7 @@ abstract class AbstractGroup extends AbstractComponent
         }
 
         // foreach ($dataSourceList as $index => &$item) {
-            
+
         // }
 
         if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
@@ -273,7 +272,7 @@ abstract class AbstractGroup extends AbstractComponent
 
         $items = [];
         foreach ($pages as $page) {
-            $pageMeta = $this->siteData->getMeta((string)$page, $this->path->getLanguage());
+            $pageMeta        = $this->siteData->getMeta((string)$page, $this->path->getLanguage());
             $item            = [
                 'slug'  => $page,
                 'name'  => $this->siteData->getPageName((string)$page, $this->path->getLanguage()),
@@ -290,8 +289,10 @@ abstract class AbstractGroup extends AbstractComponent
         $language = $this->path->getLanguage();
         $items    = [];
         $i        = 0;
-        $social = $this->siteData->getSocial();
-        if (!$social) return [];
+        $social   = $this->siteData->getSocial();
+        if (!$social) {
+            return [];
+        }
         foreach ($social as $type => $handle) {
             $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
             $item['url'] = $item['url'];
@@ -300,17 +301,16 @@ abstract class AbstractGroup extends AbstractComponent
         return $items;
     }
 
-    private function getContent(string $category): array {
-        return [];
-        $content = $this->reader->get('content.'.$category) ?? [];
-
-        $schema = $this->reader->get('contentSchemas.'.$category) ?? [];
-        $onlyPublished = isset($schema['published']);
-        if ($onlyPublished) {
-            return array_filter($content, function($item){
-                return $item['published'] ?? false;
-            });
+    private function getContent(string $collectionId): array
+    {
+        // Old YAML style reference
+        if (str_starts_with($collectionId, '${content.')) {
+            $collectionId = substr($collectionId, 10, strlen($collectionId) - 11);
         }
-        return $content;
+        $collection = $this->siteData->getCollection($collectionId);
+        if (!$collection) {
+            return [];
+        }
+        return $collection->getContent(true);
     }
 }

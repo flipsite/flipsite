@@ -96,6 +96,10 @@ class ComponentBuilder
 
         if (isset($data['_dataSource']) && is_array($data['_dataSource'])) {
             $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource');
+        } elseif (isset($data['_dataSource']) && is_string($data['_dataSource'])) {
+            $dataSource          = $this->getDataSource($data['_dataSource']);
+            $data['_dataSource'] = [];
+            $data                = DataHelper::applyData($data, $dataSource, '_dataSource');
         }
 
         $class = 'Flipsite\\Components\\'.ucfirst($type);
@@ -336,5 +340,25 @@ class ComponentBuilder
         $colors['white'] = '#ffffff';
         $colors['black'] = '#000000';
         return ColorHelper::parseAndReplace($gradient, $colors);
+    }
+
+    private function getDataSource(string $dataSourceString) : array
+    {
+        if (str_starts_with($dataSourceString, '${content.')) {
+            $dataSourceString = substr($dataSourceString, 10, strlen($dataSourceString) - 11);
+        }
+        $tmp          = explode('.', $dataSourceString);
+        $collectionId = $tmp[0];
+        $itemId       = intval($tmp[1]);
+
+        $collection = $this->siteData->getCollection($collectionId);
+        if (!$collection) {
+            return null;
+        }
+        $item = $collection->getItem($itemId);
+        if ($item) {
+            return $item->jsonSerialize();
+        }
+        return [];
     }
 }

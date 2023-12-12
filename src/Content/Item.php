@@ -3,9 +3,9 @@
 declare(strict_types=1);
 namespace Flipsite\Content;
  
-class ContentItem implements \JsonSerializable
+class Item implements \JsonSerializable
 {
-    public function __construct(ContentSchema $schema, private array $data, ?int $index = null) {
+    public function __construct(private int $id, private array $data) {
     }
     public function jsonSerialize(): mixed
     {
