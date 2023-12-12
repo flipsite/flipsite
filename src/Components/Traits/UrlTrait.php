@@ -20,10 +20,10 @@ trait UrlTrait
             return '#';
         }
 
-        if (str_starts_with($url, 'files/') && file_exists($this->environment->getSiteDir().'/'.$url)) {
-            $basePath = $this->environment->getBasePath();
-            return $basePath.'/'.$url;
-        }
+        // if (str_starts_with($url, 'files/') && file_exists($this->environment->getSiteDir().'/'.$url)) {
+        //     $basePath = $this->environment->getBasePath();
+        //     return $basePath.'/'.$url;
+        // }
 
         $parsed = parse_url($url);
 

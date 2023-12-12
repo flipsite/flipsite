@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Flipsite\Utils;
 
-use Flipsite\Data\Slugs;
+use Flipsite\EnvironmentInterface;
+use Flipsite\Data\SiteDataInterface;
 
 final class Sitemap
 {
-    public function __construct(private string $baseUrl, private Slugs $slugs, private array $hidden, protected bool $trailingSlash)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData)
     {
+        $this->hidden = $siteData->getHiddenPages();
     }
 
     public function __toString(): string
@@ -39,11 +41,7 @@ final class Sitemap
 
     private function getUrl(string $url): string
     {
-        $url = trim($this->baseUrl.'/'.$url, '/');
-        if ($this->trailingSlash) {
-            $url.= '/';
-        }
-        return $url;
+        return $this->environment->getAbsoluteUrl($url);
     }
 
     /**

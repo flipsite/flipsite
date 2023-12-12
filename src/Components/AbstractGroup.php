@@ -159,6 +159,7 @@ abstract class AbstractGroup extends AbstractComponent
                 $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
                 break;
             default:
+                
                 $data['_attr']['href'] = '#';
         }
         return $data;

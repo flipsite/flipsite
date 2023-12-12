@@ -19,6 +19,8 @@ use Flipsite\Components\Document;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\Plugins;
+use Flipsite\Utils\Robots;
+use Flipsite\Utils\Sitemap;
 use voku\helper\HtmlMin;
 
 final class Flipsite
@@ -114,18 +116,13 @@ final class Flipsite
     }
     public function renderRobots(): string
     {
-        //     $environment = $this->get('environment');
-        //     $robots      = new Robots($environment->isLive(), $environment->getServer());
-        //     $response->getBody()->write((string) $robots);
-        return '';
+        $robots = new Robots($this->environment);
+        return (string)$robots;
     }
     public function renderSitemap(): string
     {
-        //     $environment = $this->get('environment');
-        // $reader      = $this->get('reader');
-        // $sitemap     = new Sitemap($environment->getServer(), $reader->getSlugs(), $reader->getHiddenPages(), $environment->hasTrailingSlash());
-        // $response->getBody()->write((string) $sitemap);
-        // return $response->withHeader('Content-type', 'application/xml');
+        $sitemap = new Sitemap($this->environment, $this->siteData);
+        return (string)$sitemap;
     }
     private function minimizeHtml(string $html): string
     {
