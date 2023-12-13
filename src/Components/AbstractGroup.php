@@ -86,7 +86,7 @@ abstract class AbstractGroup extends AbstractComponent
     private function normalizeAction(string|int|bool|array $data): array
     {
         if (isset($data['_page'])) {
-            $data['_action'] = 'url';
+            $data['_action'] = 'page';
             $data['_target'] = $data['_page'];
             unset($data['_page']);
         }
