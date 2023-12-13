@@ -22,12 +22,12 @@ trait ActionTrait
             case 'tel':
                 return [
                     'tag' => 'a',
-                    'href' =>'tel:+'.str_replace('+','',$data['_target'])
+                    'href' => isset($data['_target']) ? 'tel:+'.str_replace('+','',$data['_target']) : '#'
                 ];
             case 'mailto':
                 return [
                     'tag' => 'a',
-                    'href' =>'mailto:'.str_replace('+','',$data['_target'])
+                    'href' => isset($data['_target']) ? 'mailto:'.str_replace('+','',$data['_target']) : '#'
                 ];
             case 'page':
                 if ('home' === $data['_target']) {
@@ -41,13 +41,13 @@ trait ActionTrait
             case 'url':
                 return [
                     'tag' => 'a',
-                    'href' => $data['_target'],
+                    'href' => $data['_target'] ?? '#',
                     'rel' => 'noopener noreferrer',
                 ];
             case 'url-blank':
                 return [
                     'tag' => 'a',
-                    'href' => $data['_target'],
+                    'href' => $data['_target'] ?? '#',
                     'rel' => 'noopener noreferrer',
                     'target' => '_blank'
                 ];
@@ -55,13 +55,13 @@ trait ActionTrait
                 $file = $this->environment->getAssetSources()->addFileBasePath($data['_target']);
                 return [
                     'tag' => 'a',
-                    'href' => $this->environment->getAbsoluteUrl($file),
+                    'href' => $this->environment->getAbsoluteUrl($file)  ?? '#' ,
                     'download' => true
                 ];
             case 'scroll':
                 return [
                     'tag' => 'a',
-                    'href' => '#'.trim($data['_target'], '#'),
+                    'href' => isset($data['_target']) ? '#'.trim($data['_target'], '#') : '#',
                 ];
             case 'submit':
                 return [

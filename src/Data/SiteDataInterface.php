@@ -42,6 +42,8 @@ interface SiteDataInterface
 
     public function getMeta(string $page, Language $language);
 
+    public function getPageMeta(string $page, Language $language);
+
     public function getHiddenPages() : array;
 
     public function getPageName(string $page, Language $language);

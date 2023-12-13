@@ -251,7 +251,7 @@ final class Reader implements SiteDataInterface
 
     public function getMeta(string $page, Language $language): ?array
     {
-        $pageMeta    = $this->get('meta.'.$page, $language);
+        $pageMeta    = $this->getPageMeta($page, $language) ?? [];
         $description = $pageMeta['description'] ?? $this->get('description', $language);
         $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
         $icon        = $pageMeta['icon'] ?? null;
@@ -286,6 +286,11 @@ final class Reader implements SiteDataInterface
             'share'       => $share,
             'icon'        => $icon
         ];
+    }
+
+    public function getPageMeta(string $page, Language $language) : ?array
+    {
+        return $this->get('meta.'.$page, $language);
     }
 
     public function getHiddenPages(): array
