@@ -7,7 +7,7 @@ use Flipsite\Utils\ArrayHelper;
 
 trait MarkdownTrait
 {
-    use UrlTrait;
+    use ActionTrait;
     use BuilderTrait;
 
     private function getMarkdownLine(string $text, array $style, string $appearance) : string

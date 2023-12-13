@@ -7,7 +7,7 @@ abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\StyleOptimizerTrait;
-    use Traits\UrlTrait;
+    use Traits\ActionTrait;
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
@@ -15,12 +15,28 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function build(array $data, array $style, array $options): void
     {
-        foreach ($data['_attr'] ?? [] as $attr => $val) {
-            $this->setAttribute($attr, $val);
-        }
-        unset($data['_attr']);
         $this->tag ??= $style['tag'];
         unset($style['tag']);
+
+        if (isset($data['_action'])) {
+            if ('tel' === $data['_action']) {
+                // handle tel replace
+            }
+            if ('mailto' === $data['_action']) {
+                // handle tel replace
+            }
+            if ('toggle' === $data['_action']) {
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+            }
+            $actionAttributes = $this->getActionAttributes($data);
+            if (isset($actionAttributes['tag'])) {
+                $this->tag = $actionAttributes['tag'];
+                unset($actionAttributes['tag']);
+            }
+            foreach ($actionAttributes as $attr => $val) {
+                $this->setAttribute($attr, $val);
+            }
+        }
 
         $this->addStyle($style);
 
@@ -70,98 +86,18 @@ abstract class AbstractGroup extends AbstractComponent
     private function normalizeAction(string|int|bool|array $data): array
     {
         if (isset($data['_page'])) {
+            $data['_action'] = 'url';
             $data['_target'] = $data['_page'];
             unset($data['_page']);
         }
-        $action = $data['_action'] ?? false;
-        $target = $data['_target'] ?? false;
-        $params = $data['_params'] ?? false;
-
-        unset($data['_action'],$data['_target'],$data['_params']);
-
-        if (!$action) {
-            return $data;
+        if (isset($data['_params'])) {
+            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
+            unset($data['_params']);
         }
-        $replace   = [];
-        $this->tag = 'a';
-
-        if ('auto' === $action) {
-            if (!$target) {
-                return $data;
-            }
-            $target = str_replace('mailto:', '', $target);
-            $target = str_replace('tel:', '', $target);
-            $page   = $this->siteData->getSlugs()->getPage($target);
-            if ($page) {
-                $action = 'page';
-            } elseif (str_starts_with($target, 'http')) {
-                $action = 'url-blank';
-            } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
-                $action = 'mailto';
-            } else {
-                $matches = [];
-                preg_match('/\+[0-9]{9,20}/', $target, $matches);
-                if (count($matches)) {
-                    $action = 'tel';
-                }
-            }
-        }
-        switch ($action) {
-            case 'page':
-            case 'url':
-            case 'url-blank':
-                if (!$target) {
-                    return $data;
-                }
-                if ($params) {
-                    $target = str_replace(':slug', $params, $target);
-                }
-
-                $external              = false;
-                $data['_attr']['href'] = $this->url($target, $external);
-                if ($external) {
-                    $data['_attr']['rel'] = 'noopener noreferrer';
-                    if ('url-blank' === $action) {
-                        $data['_attr']['target'] = '_blank';
-                    }
-                }
-                break;
-            case 'tel':
-                $phoneUtil  = \libphonenumber\PhoneNumberUtil::getInstance();
-                try {
-                    $tel         = '+'.trim((string)$target, '+');
-                    $numberProto = $phoneUtil->parse($tel, '');
-                    $replace     = [
-                        '{{tel}}'      => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
-                        '{{tel.int}}'  => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                        '{{tel.e164}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::E164),
-                    ];
-                } catch (\libphonenumber\NumberParseException $e) {
-                }
-                $data['_attr']['href'] = 'tel:'.$tel;
-                break;
-            case 'mailto':
-                $data['_attr']['href'] = 'mailto:'.$target;
-                $replace               = [
-                    '{{email}}' => $target
-                ];
-                break;
-            case 'scroll':
-                $data['_attr']['href'] = '#'.trim($target, '#');
-                break;
-            case 'submit':
-                $this->tag             = 'button';
-                $data['_attr']['type'] = 'submit';
-                break;
-            case 'toggle':
-                $this->tag             = 'button';
-                $this->setAttribute('onclick', 'javascript:toggle(this)');
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
-                break;
-            default:
-                
-                $data['_attr']['href'] = '#';
-        }
+        if (isset($data['_params'])) {
+            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
+            unset($data['_params']);
+        }    
         return $data;
     }
 

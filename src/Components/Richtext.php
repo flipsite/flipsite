@@ -10,7 +10,7 @@ use Flipsite\Utils\StyleAppearanceHelper;
 final class Richtext extends AbstractGroup
 {
     use Traits\BuilderTrait;
-    use Traits\UrlTrait;
+    use Traits\ActionTrait;
     protected string $tag = 'div';
 
     public function normalize(string|int|bool|array $data): array
@@ -36,7 +36,6 @@ final class Richtext extends AbstractGroup
             
             // Mailto
             $html = preg_replace("/([A-z0-9\._-]+\@[A-z0-9_-]+\.)([A-z0-9\_\-\.]{1,}[A-z])/", '<a href="mailto:$1$2">$1$2</a>', $html);
-
             $html = preg_replace('/(?:http|ftp)s?:\/\/(?:www\.)?([a-z0-9.-]+\.[a-z]{2,5}(?:\/\S*)?)/', '<a href="$1" rel="noopener noreferrer" target="_blank">$1</a>', $html);
         }
 
@@ -109,13 +108,18 @@ final class Richtext extends AbstractGroup
         }
         $hrefs = array_unique($matches[1]);
         foreach ($hrefs as $href) {
-            $external = false;
-            $newHref  = $this->url($href, $external);
-            if ($external) {
-                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'" target="_blank" rel="noopener noreferrer"', $html);
-            } else {
-                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
-            }
+            $actionAttributes = $this->getActionAttribtes([
+                '_action' => 'auto',
+                '_target' => $href
+            ]);
+            print_r($actionAttributes);
+            // $external = false;
+            // $newHref  = $this->url($href, $external);
+            // if ($external) {
+            //     $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'" target="_blank" rel="noopener noreferrer"', $html);
+            // } else {
+            //     $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
+            // }
         }
         return $html;
     }
