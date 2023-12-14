@@ -30,14 +30,21 @@ trait ActionTrait
                     'href' => isset($data['_target']) ? 'mailto:'.str_replace('+','',$data['_target']) : '#'
                 ];
             case 'page':
-                if ('home' === $data['_target']) {
+                if ('home' === ($data['_target'] ?? '')) {
                     $data['_target'] = '';
                 }
-                $path = $this->siteData->getSlugs()->getPath($data['_target'], $this->path->getLanguage(), $this->path->getPage());
-                return [
-                    'tag' => 'a',
-                    'href' => $this->environment->getUrl($path ?? '')
-                ];
+                if (isset($data['_target'])) {
+                    $path = $this->siteData->getSlugs()->getPath($data['_target'], $this->path->getLanguage(), $this->path->getPage());
+                    return [
+                        'tag' => 'a',
+                        'href' => $this->environment->getUrl($path ?? '')
+                    ];
+                } else {
+                    return [
+                        'tag' => 'a',
+                        'href' => '#'
+                    ];
+                }
             case 'url':
                 return [
                     'tag' => 'a',
