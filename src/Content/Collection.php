@@ -5,7 +5,7 @@ namespace Flipsite\Content;
 
 class Collection implements \JsonSerializable
 {
-    public function __construct(private string $id, private array $schema, private array $items)
+    public function __construct(private string $id, private array $schema, private ?array $items)
     {
     }
 
@@ -16,7 +16,7 @@ class Collection implements \JsonSerializable
 
     public function getContent(bool $onlyPublished = false) : array
     {
-        $items = $this->items;
+        $items = $this->items ?? [];
         if ($onlyPublished && isset($this->schema['published'])) {
             $items = array_filter($items, function ($item) {
                 return $item['published'] ?? false;
@@ -28,7 +28,7 @@ class Collection implements \JsonSerializable
     public function getItem(?int $itemId = null) : ?Item
     {
         if (null === $itemId) {
-            return new Item(0, $this->items[0]);    
+            return new Item(0, $this->items[0]);
         }
         return new Item($itemId, $this->items[$itemId]);
     }
