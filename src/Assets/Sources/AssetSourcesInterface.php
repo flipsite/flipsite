@@ -16,4 +16,7 @@ interface AssetSourcesInterface
     public function isCached(string $asset) : bool;
     public function addToCache(string $asset, string $encoded) : bool;
     public function getResponse(Response $response, string $asset) : Response;
+    public function upload(string $type, string $filename, string $filepath) : bool|string;
+    public function rename(string $type, string $filename, string $newFilename) : bool|string;
+    public function delete(string $type, string $filename) : bool;
 }
