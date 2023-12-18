@@ -133,7 +133,7 @@ final class Richtext extends AbstractGroup
             $html         = str_replace('<'.$hx.'>', '<'.$hx.' class="'.implode(' ', $headingStyle).'">', $html);
         }
 
-        $elements = ['a', 'strong','table','tbl','td','tr','th','ul','ol','li'];
+        $elements = ['a', 'img', 'strong','table','tbl','td','tr','th','ul','ol','li'];
         foreach ($elements as $el) {
             if (isset($style[$el])) {
                 $tag = $el === 'tbl' ? 'table' : $el;
