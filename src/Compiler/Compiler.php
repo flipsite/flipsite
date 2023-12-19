@@ -3,8 +3,9 @@
 declare(strict_types=1);
 namespace Flipsite\Compiler;
 
-use Flipsite\AbstractEnvironment;
-use Flipsite\Data\Reader;
+use Flipsite\EnvironmentInterface;
+use Flipsite\Flipsite;
+use Flipsite\Data\SiteDataInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Psr\Log\LoggerAwareInterface;
 
@@ -12,59 +13,35 @@ class Compiler implements LoggerAwareInterface
 {
     use \Psr\Log\LoggerAwareTrait;
     private string $targetDir;
-    private string $imageCacheDir;
-    private string $videoCacheDir;
 
-    public function __construct(private AbstractEnvironment $environment, string $targetDir)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, string $targetDir)
     {
         // Create target dir if it does not already exist
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
         $this->targetDir = realpath($targetDir);
-        $this->imageCacheDir = realpath($this->environment->getImgDir());
-        $this->videoCacheDir = realpath($this->environment->getImgDir());
-
-        putenv('SITE_DIR='.$this->environment->getSiteDir());
-        putenv('VENDOR_DIR='.$this->environment->getVendorDir());
-        putenv('IMG_DIR='.$this->environment->getImgDir());
-        putenv('VIDEO_DIR='.$this->environment->getVideoDir());
-        putenv('ASSET_DIRS='.implode(',',$this->environment->getExternalAssetDirs()));
-        putenv('TRAILING_SLASH=1');
     }
 
     public function compile(?string $domain = null)
     {
-        // Set remaining environment that needs reader
-        $reader   = new Reader($this->environment);
-        $config   = $reader->get('compile');
-        if (!isset($config['domain']) && $domain) {
-            $config['domain'] = $domain;
-        }
-        $basePath = $config['basePath'] ?? '';
-        putenv('APP_BASEPATH='.$basePath);
-        putenv('APP_ENV='.(($config['live'] ?? false) ? 'live' : 'dev'));
-
-        $https = $config['https'] ?? false;
-
+        $flipsite = new Flipsite($this->environment, $this->siteData);
         // Remove all index.html files
         $this->deleteContent($this->targetDir);
 
         // Create pages and parse assets after each created page
-        $slugs    = $reader->getSlugs();
-        $allPages = array_keys($slugs->getAll());
+        $allPages = array_keys($this->siteData->getSlugs()->getAll());
 
         $allFiles = [];
         $assets   = [];
         foreach ($allPages as $page) {
-            $requestUri = $basePath.'/'.$page;
-            $html       = $this->getResponse($https, $config['domain'], $requestUri);
+            $html = $flipsite->render($page);
             if ($this->logger) {
-                $this->logger->info('Created file for '.$requestUri);
+                $this->logger->info('Created file for page '.$page);
             }
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
             $allFiles[] = $page.'/index.html';
-            $assets     = array_merge($assets, AssetParser::parse($html, $config['domain']));
+            //$assets     = array_merge($assets, AssetParser::parse($html, $config['domain']));
         }
 
         // Get list of unique assets
@@ -80,50 +57,46 @@ class Compiler implements LoggerAwareInterface
         $assets     = json_encode(array_values(array_diff($assets, $notDeleted)));
         
 
-        foreach (json_decode($assets) as $image) {
-            $pos = strpos($image, '/img/');
-            $filename = substr($image,$pos+5);
-            if (file_exists($this->imageCacheDir.'/'.$filename)) {
-                $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $image));
-                if (!file_exists($pathinfo['dirname'])) {
-                    mkdir($pathinfo['dirname'], 0777, true);
-                }
-                if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $image))) {
-                    if ($this->logger) {
-                        $this->logger->info('Copied '.$filename.' from cache');
-                    }
-                }
-            } else {
-                $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$image);
-                if ($this->logger) {
-                    $this->logger->info('Created image for '.$basePath.$image);
-                }
-                $this->writeFile($this->targetDir, str_replace($basePath, '', $image), $source);
-            }
-        }
+        // foreach (json_decode($assets) as $image) {
+        //     $pos = strpos($image, '/img/');
+        //     $filename = substr($image,$pos+5);
+        //     if (file_exists($this->imageCacheDir.'/'.$filename)) {
+        //         $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $image));
+        //         if (!file_exists($pathinfo['dirname'])) {
+        //             mkdir($pathinfo['dirname'], 0777, true);
+        //         }
+        //         if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $image))) {
+        //             if ($this->logger) {
+        //                 $this->logger->info('Copied '.$filename.' from cache');
+        //             }
+        //         }
+        //     } else {
+        //         $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$image);
+        //         if ($this->logger) {
+        //             $this->logger->info('Created image for '.$basePath.$image);
+        //         }
+        //         $this->writeFile($this->targetDir, str_replace($basePath, '', $image), $source);
+        //     }
+        // }
 
         // Sitemap
-        $requestUri = $basePath.'/sitemap.xml';
-        $sitemap    = $this->getResponse($https, $config['domain'], $requestUri);
-        $this->writeFile($this->targetDir, '/sitemap.xml', $sitemap);
+        $this->writeFile($this->targetDir, '/sitemap.xml', $flipsite->render('sitemap.xml'));
         $allFiles[] = 'sitemap.xml';
 
         // Robots
-        $requestUri = $basePath.'/robots.txt';
-        $robots     = $this->getResponse($https, $config['domain'], $requestUri);
-        $this->writeFile($this->targetDir, '/robots.txt', $robots);
+        $this->writeFile($this->targetDir, '/robots.txt', $flipsite->render('robots.txt'));
         $allFiles[] = 'robots.txt';
 
-        // Files
-        $files      = $this->getDirContents($this->environment->getSiteDir().'/files');
-        $filesystem = new Filesystem();
-        $filesystem->remove($this->targetDir.'/files');
-        foreach ($files as $file) {
-            $tmp      = explode('files/', $file);
-            $fileName = array_pop($tmp);
-            $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
-            $allFiles[] = 'files/'.$fileName;
-        }
+        // // Files
+        // $files      = $this->getDirContents($this->environment->getSiteDir().'/files');
+        // $filesystem = new Filesystem();
+        // $filesystem->remove($this->targetDir.'/files');
+        // foreach ($files as $file) {
+        //     $tmp      = explode('files/', $file);
+        //     $fileName = array_pop($tmp);
+        //     $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
+        //     $allFiles[] = 'files/'.$fileName;
+        // }
 
         // Delete files that are not needed anymore
 
@@ -188,28 +161,6 @@ class Compiler implements LoggerAwareInterface
         return array_filter($files, function ($file) {
             return !is_dir($file);
         });
-    }
-
-    private function getResponse(bool $https, string $domain, string $requestUri): string
-    {
-        ob_start();
-        $_SERVER['REQUEST_URI']    = $requestUri;
-
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['SCRIPT_NAME']    = '/index.php';
-        if ($https) {
-            $_SERVER['SERVER_PORT'] = 443;
-            $_SERVER['HTTPS']       = 'on';
-        } else {
-            $_SERVER['SERVER_PORT'] = 80;
-            unset($_SERVER['HTTPS']);
-        }
-        $_SERVER['HTTP_HOST']       = $domain;
-        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36';
-        include $this->environment->getVendorDir().'/flipsite/flipsite/src/index.php';
-        $html = ob_get_contents();
-        ob_end_clean();
-        return $html;
     }
 
     private function writeFile(string $targetDir, string $page, string $html): string

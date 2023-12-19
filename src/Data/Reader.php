@@ -61,7 +61,7 @@ final class Reader implements SiteDataInterface
 
     public function getCollectionIds(): array
     {
-        $collectionIds = array_keys($this->get('contentSchemas'));
+        $collectionIds = array_keys($this->get('contentSchemas') ?? []);
         sort($collectionIds);
         return $collectionIds;
     }

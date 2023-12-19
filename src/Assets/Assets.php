@@ -36,6 +36,15 @@ class Assets
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
+        $this->addToCache($asset);
+        
+        if ($this->assetSources->isCached($asset)) {
+            return $this->assetSources->getResponse($response, $asset);
+        }
+        return $response->withStatus(404);
+    }
+
+    private function addToCache(string $asset) {
         $pathinfo = pathinfo($asset);
         $withoutHash = preg_replace('/\.[a-f0-9]{6}/', '', $pathinfo['filename']);
         $tmp = explode('@', $withoutHash);
@@ -62,11 +71,6 @@ class Assets
                 break;
         }
 
-
-        if ($this->assetSources->isCached($asset)) {
-            return $this->assetSources->getResponse($response, $asset);
-        }
-        return $response->withStatus(404);
     }
 
     public function getSvg(string $svg): ?SvgInterface
