@@ -88,6 +88,14 @@ final class Reader implements SiteDataInterface
         return $this->customParser->get($position, $page, $fallback);
     }
 
+    public function getCompile(): ?array {
+        return $this->get('compile');
+    }
+
+    public function getPublish(): ?array {
+        return $this->get('publish');
+    }
+
     private function loadSite(array $yaml, bool $expand)
     {
         $this->data          = $yaml;

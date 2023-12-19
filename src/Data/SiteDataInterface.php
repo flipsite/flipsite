@@ -28,6 +28,10 @@ interface SiteDataInterface
 
     public function getIntegrations(): ?array;
 
+    public function getCompile(): ?array;
+
+    public function getPublish(): ?array;
+
     public function getSections(string $page, Language $language): array;
 
     public function getColors(): array;
