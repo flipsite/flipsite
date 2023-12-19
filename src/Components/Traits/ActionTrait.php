@@ -89,7 +89,7 @@ trait ActionTrait
         $target = str_replace('mailto:', '', $target);
         $target = str_replace('tel:', '', $target);
         $page   = $this->siteData->getSlugs()->getPage($target);
-        $file = $this->environment->getAssetSources()->getFileInfo($target);
+        $file = $this->environment->getAssetSources()->getInfo($target);
 
         if ($file) {
             $action = 'download';

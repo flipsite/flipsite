@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Flipsite\Assets;
 
 use Flipsite\Assets\Sources\AssetSourcesInterface;
+use Flipsite\Assets\Sources\AbstractAssetInfo;
+use Flipsite\Assets\Sources\AssetType;
 use Flipsite\Assets\Attributes\ImageAttributesInterface;
 use Flipsite\Assets\Attributes\UnsplashAttributes;
 use Flipsite\Assets\Attributes\ImageAttributes;
@@ -17,29 +19,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class Assets
 {
-    private array $imageTypes = [
-        'webp' => 'image/webp',
-        'gif'  => 'image/gif',
-        'png'  => 'image/png',
-        'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'svg'  => 'image/svg+xml',
-    ];
-
-    private array $videoTypes = [
-        'mp4'  => 'video/mp4',
-        'mov'  => 'video/mov',
-        'webm' => 'video/webm',
-        'mov'  => 'video/mov',
-    ];
-
-    private array $fileTypes = [
-        'csv'  => 'text/csv',
-        'txt'  => 'text/plain',
-        'pdf'  => 'application/pdf',
-        'doc'  => 'application/msword',
-    ];
-
     public function __construct(protected AssetSourcesInterface $assetSources)
     {
     }
@@ -58,65 +37,48 @@ class Assets
             return $this->assetSources->getResponse($response, $asset);
         }
         $pathinfo = pathinfo($asset);
-        switch ($this->getType($pathinfo['extension'])) {
-            case 'image':
-                $withoutHash = preg_replace('/\.[a-f0-9]{6}\./', '.', $asset);
+        $withoutHash = preg_replace('/\.[a-f0-9]{6}/', '', $pathinfo['filename']);
+        $tmp = explode('@', $withoutHash);
+        $filename = $tmp[0];
+
+        $assetInfo = $this->assetSources->getInfo($filename.'.'.$pathinfo['extension']);
+        
+        switch ($assetInfo->getType()) {
+            case AssetType::IMAGE:
                 if ('svg' !== $pathinfo['extension']) {
-                    $tmp       = explode('@', $withoutHash);
-                    $imageInfo = $this->assetSources->getImageInfo($tmp[0].'.'.$pathinfo['extension']);
                     $options   = new RasterOptions($asset);
-                    if (!$imageInfo) {
+                    if (!$assetInfo) {
                         throw new \Exception('No source found '.$asset);
                     }
-                    $editor  = new RasterEditor($options, $imageInfo, $pathinfo['extension']);
+                    $editor  = new RasterEditor($options, $assetInfo, $pathinfo['extension']);
                     $encoded = $editor->getImage();
                     $this->assetSources->addToCache($asset, (string)$encoded);
                 } else {
-                    $imageInfo = $this->assetSources->getImageInfo($withoutHash);
-                    $this->assetSources->addToCache($asset, $imageInfo->getContents());
+                    $this->assetSources->addToCache($asset, $assetInfo->getContents());
                 }
                 break;
-            case 'video':
-                $withoutHash = preg_replace('/\.[a-f0-9]{6}\./', '.', $asset);
-                $videoInfo   = $this->assetSources->getVideoInfo($withoutHash);
-                $this->assetSources->addToCache($asset, $videoInfo->getContents($pathinfo['extension']));
+            case AssetType::VIDEO:
+                $this->assetSources->addToCache($asset, $assetInfo->getContents());
                 break;
         }
+
+
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
         return $response->withStatus(404);
     }
 
-    public function getType(string $extension) : ?string
-    {
-        if (isset($this->imageTypes[$extension])) {
-            return 'image';
-        }
-        if (isset($this->videoTypes[$extension])) {
-            return 'video';
-        }
-        if (isset($this->fileTypes[$extension])) {
-            return 'file';
-        }
-        return null;
-    }
-
-    public function getMimetype(string $extension) : ?string
-    {
-        return $this->imageTypes[$extension] ?? $this->videoTypes[$extension] ?? $this->fileTypes[$extension] ?? null;
-    }
-
     public function getSvg(string $svg): ?SvgInterface
     {
-        $imageInfo = $this->assetSources->getImageInfo($svg);
-        if ($imageInfo) {
-            return new \Flipsite\Utils\SvgData($imageInfo->getContents());
+        $assetInfo = $this->assetSources->getInfo($svg);
+        if ($assetInfo) {
+            return new \Flipsite\Utils\SvgData($assetInfo->getContents());
         }
         return null;
     }
 
-    public function getImageAttributes(string $image, array $options = [], ?ImageInfoInterface $imageInfo = null): ?ImageAttributesInterface
+    public function getImageAttributes(string $image, array $options = [], ?AbstractAssetInfo $assetInfo = null): ?ImageAttributesInterface
     {
         if (0 === mb_strpos($image, 'http')) {
             if (str_starts_with($image, 'https://images.unsplash.com')) {
@@ -124,103 +86,96 @@ class Assets
             }
             return new ExternalImageAttributes($image);
         }
-        if (!$imageInfo) {
-            $imageInfo = $this->assetSources->getImageInfo($image);
+        if (!$assetInfo) {
+            $assetInfo = $this->assetSources->getInfo($image);
         }
-        if ($imageInfo) {
+        if ($assetInfo) {
             if (str_ends_with($image, '.svg')) {
-                return new SvgAttributes($imageInfo, $this->assetSources);
+                return new SvgAttributes($assetInfo, $this->assetSources);
             } else {
-                return new ImageAttributes($options, $imageInfo, $this->assetSources);
+                return new ImageAttributes($options, $assetInfo, $this->assetSources);
             }
         }
         return null;
     }
 
-    public function getVideoAttributes(string $video, ?VideoInfoInterface $videoInfo = null): ?VideoAttributesInterface
+    public function getVideoAttributes(string $video, ?AbstractAssetInfo $assetInfo = null): ?VideoAttributesInterface
     {
         if (0 === mb_strpos($video, 'http')) {
             return new ExternalVideoAttributes($video);
         }
-        if (!$videoInfo) {
-            $videoInfo = $this->assetSources->getVideoInfo($video);
+        if (!$assetInfo) {
+            $assetInfo = $this->assetSources->getInfo($video);
         }
-        if ($videoInfo) {
-            return new VideoAttributes($videoInfo, $this->assetSources);
+        if ($assetInfo) {
+            return new VideoAttributes($assetInfo, $this->assetSources);
         }
         return null;
     }
 
-    public function upload(string $filename, string $filepath) : string|bool
+    public function upload(string $asset, string $filepath) : string|bool
     {
-        $pathinfo = pathinfo($filename);
-        $type     = $this->getType($pathinfo['extension']);
-        if (!$type) {
+        $assetInfo = $this->assetSources->getInfo($asset);
+        if ($assetInfo) {
             return false;
         }
-        $mimetype = $this->getMimetype($pathinfo['extension']);
-        if ($mimetype !== mime_content_type($filepath)) {
+        
+        $asset = $this->cleanupAssetFilename($asset);
+        
+        if ($this->assetExists($asset)) {
             return false;
         }
-        $filename = $this->cleanUpFilename($filename);
-        if ($this->fileExists($filename)) {
-            return false;
-        }
-        return $this->assetSources->upload($type, $filename, $filepath) ? $filename : null;
+        
+        return $this->assetSources->upload(AssetType::fromMimetype(mime_content_type($filepath)), $asset, $filepath) ? $asset : null;
     }
 
-    public function rename(string $filename, string $newFilename) : string|bool
+    public function rename(string $asset, string $newFilename) : string|bool
     {
-        if (!$this->fileExists($filename)) {
+        $assetInfo = $this->assetSources->getInfo($asset);
+        if (!$assetInfo) {
             return false;
         }
-        $newFilename = $this->cleanupFilename($newFilename);
-        if ($this->fileExists($newFilename)) {
+        $newAssetInfo = $this->assetSources->getInfo($newFilename);
+        if ($newAssetInfo) {
             return false;
         }
-        $pathinfo = pathinfo($filename);
-        $type     = $this->getType($pathinfo['extension']);
-        if (!$type) {
-            return false;
-        }
+
+        $pathinfo = pathinfo($asset);
         $pathinfoNew = pathinfo($newFilename);
         if (!isset($pathinfoNew['extension']) || $pathinfoNew['extension'] !== $pathinfo['extension']) {
             return false;
         }
-        return $this->assetSources->rename($type, $filename, $newFilename) ? $newFilename : false;
+
+        return $this->assetSources->rename($assetInfo->getType(), $asset, $newFilename) ? $newFilename : false;
     }
 
-    public function delete(string $filename) : bool
+    public function delete(string $asset) : bool
     {
-        $pathinfo = pathinfo($filename);
-        $type = $this->getType($pathinfo['extension']);
-        if (!$type) {
+        $assetInfo = $this->assetSources->getInfo($asset);
+        if (!$assetInfo) {
             return false;
         }
-        if (!$this->fileExists($filename)) {
-            return false;
-        }
-        return $this->assetSources->delete($type, $filename);
+        return $this->assetSources->delete($assetInfo->getType(), $asset);
     }
 
-    private function cleanupFilename(string $filename): string
+    private function cleanupAssetFilename(string $asset): string
     {
-        $tmp      = explode('@', $filename);
-        $filename = $tmp[0];
+        $tmp      = explode('@', $asset);
+        $asset = $tmp[0];
 
         // Replace spaces with underscores
-        $filename = str_replace(' ', '_', $filename);
+        $asset = str_replace(' ', '_', $asset);
 
         // Remove all characters except letters, numbers, hyphens, underscores, and periods
-        $filename = preg_replace('/[^A-Za-z0-9\-_.]/', '', $filename);
+        $asset = preg_replace('/[^A-Za-z0-9\-_.]/', '', $asset);
 
-        $filename = str_replace('.jpeg', '.jpg', $filename);
+        $asset = str_replace('.jpeg', '.jpg', $asset);
 
-        return $filename;
+        return $asset;
     }
 
-    private function fileExists(string $filename) : bool
+    private function assetExists(string $asset) : bool
     {
-        return !!($this->assetSources->getImageInfo($filename) ?? $this->assetSources->getVideoInfo($filename) ?? $this->assetSources->getFileInfo($filename));
+        return !!($this->assetSources->getInfo($asset));
     }
 }

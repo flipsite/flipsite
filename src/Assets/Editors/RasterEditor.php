@@ -8,17 +8,17 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Image;
 use Flipsite\Assets\Options\RasterOptions;
 use Intervention\Image\EncodedImage;
-use Flipsite\Assets\Sources\ImageInfoInterface;
+use Flipsite\Assets\Sources\AbstractAssetInfo;
 
 final class RasterEditor
 {
-    public function __construct(private RasterOptions $options, private ImageInfoInterface $imageInfo, private string $outputFormat) {
+    public function __construct(private RasterOptions $options, private AbstractAssetInfo $assetInfo, private string $outputFormat) {
 
     }
     public function getImage(): EncodedImage
     {
         $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-        $image = $manager->read($this->imageInfo->getContents());
+        $image = $manager->read($this->assetInfo->getContents());
         $image = $this->applyOptions($image);
 
         $quality = $this->options->getValue('quality') ?? 90;
