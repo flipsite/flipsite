@@ -15,4 +15,5 @@ interface EnvironmentInterface {
     public function getAbsoluteSrc(string $src) : string;
     public function isProduction() : bool;
     public function minimizeHtml() : bool;
+    public function minimizeCss() : bool;
 }

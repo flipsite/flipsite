@@ -57,6 +57,18 @@ class AssetParser
                 $assets[] = $url;
             }
         }
+
+        $aTags = $doc->getElementsByTagName('a');
+        foreach ($aTags as $tag) {
+            $href = $tag->getAttribute('href');
+            if ($href) {
+                $tmp = explode('/files/',$href);
+                if (count($tmp) === 2) {
+                    $assets[] = '/files/'.$tmp[1];
+                }
+            }
+        }
+
         $linkTags = $doc->getElementsByTagName('link');
         foreach ($linkTags as $tag) {
             if ('icon' === $tag->getAttribute('rel')) {
@@ -90,7 +102,7 @@ class AssetParser
             if (!isset($pathinfo['extension'])) {
                 continue;
             }
-            if (!in_array($pathinfo['extension'], ['webp','svg','png','jpg','gif','mp4','mov','ogg'])) {
+            if (!in_array($pathinfo['extension'], ['webp','svg','png','jpg','jpeg','gif','mp4','mov','ogg','pdf','txt','csv','xls'])) {
                 continue;
             }
             if (str_starts_with($asset,'http')) {

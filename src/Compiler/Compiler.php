@@ -5,6 +5,7 @@ namespace Flipsite\Compiler;
 
 use Flipsite\EnvironmentInterface;
 use Flipsite\Flipsite;
+use Flipsite\Assets\Assets;
 use Flipsite\Data\SiteDataInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Psr\Log\LoggerAwareInterface;
@@ -23,8 +24,12 @@ class Compiler implements LoggerAwareInterface
         $this->targetDir = realpath($targetDir);
     }
 
-    public function compile(?string $domain = null)
+    public function compile()
     {
+        $compileOptions = $this->siteData->getCompile();
+        $compileOptions['domain'] ??= 'flipsite.io';
+        $basePath = $compileOptions['basePath'] ?? '/';
+
         $flipsite = new Flipsite($this->environment, $this->siteData);
         // Remove all index.html files
         $this->deleteContent($this->targetDir);
@@ -33,7 +38,7 @@ class Compiler implements LoggerAwareInterface
         $allPages = array_keys($this->siteData->getSlugs()->getAll());
 
         $allFiles = [];
-        $assets   = [];
+        $assetList = [];
         foreach ($allPages as $page) {
             $html = $flipsite->render($page);
             if ($this->logger) {
@@ -41,43 +46,41 @@ class Compiler implements LoggerAwareInterface
             }
             $this->writeFile($this->targetDir, $page.'/index.html', $html);
             $allFiles[] = $page.'/index.html';
-            //$assets     = array_merge($assets, AssetParser::parse($html, $config['domain']));
+            $assetList = array_merge($assetList, AssetParser::parse($html, $compileOptions['domain']));
         }
 
         // Get list of unique assets
-        $assets = array_values(array_filter(array_unique($assets)));
+        $assetList = array_values(array_filter(array_unique($assetList)));
 
         // Remove base path
-        foreach ($assets as &$asset) {
+        foreach ($assetList as &$asset) {
             $asset      = str_replace($basePath, '', $asset);
             $allFiles[] = $asset;
         }
 
-        $notDeleted = $this->deleteAssets($this->targetDir, $assets);
-        $assets     = json_encode(array_values(array_diff($assets, $notDeleted)));
+        $notDeleted = $this->deleteAssets($this->targetDir, $assetList);
+        $assetList = array_values(array_diff($assetList, $notDeleted));
+        $assetList = json_decode(json_encode($assetList));
         
-
-        // foreach (json_decode($assets) as $image) {
-        //     $pos = strpos($image, '/img/');
-        //     $filename = substr($image,$pos+5);
-        //     if (file_exists($this->imageCacheDir.'/'.$filename)) {
-        //         $pathinfo = pathinfo($this->targetDir.str_replace($basePath, '', $image));
-        //         if (!file_exists($pathinfo['dirname'])) {
-        //             mkdir($pathinfo['dirname'], 0777, true);
-        //         }
-        //         if (copy($this->imageCacheDir.'/'.$filename, $this->targetDir.str_replace($basePath, '', $image))) {
-        //             if ($this->logger) {
-        //                 $this->logger->info('Copied '.$filename.' from cache');
-        //             }
-        //         }
-        //     } else {
-        //         $source = $this->getResponse($config['https'] ?? true, $config['domain'], $basePath.$image);
-        //         if ($this->logger) {
-        //             $this->logger->info('Created image for '.$basePath.$image);
-        //         }
-        //         $this->writeFile($this->targetDir, str_replace($basePath, '', $image), $source);
-        //     }
-        // }
+        $assets = new Assets($this->environment->getAssetSources());
+        foreach ($assetList as $asset) {
+            $filename = false;
+            if (str_starts_with($asset, '/img/')) {
+                $filename = substr($asset,5);
+            } else if (str_starts_with($asset, '/videos/')) {
+                $filename = substr($asset,8);
+            } else if (str_starts_with($asset, '/files/')) {
+                $filename = substr($asset,7);
+            }
+            if ($filename) {
+                $target = $this->targetDir.$asset;
+                $pathinfo = pathinfo($target);
+                if (!file_exists($pathinfo['dirname'])) {
+                    mkdir($pathinfo['dirname'], 0777, true);
+                }
+                file_put_contents($target, $assets->getContents($filename));
+            }
+        }
 
         // Sitemap
         $this->writeFile($this->targetDir, '/sitemap.xml', $flipsite->render('sitemap.xml'));
@@ -86,17 +89,6 @@ class Compiler implements LoggerAwareInterface
         // Robots
         $this->writeFile($this->targetDir, '/robots.txt', $flipsite->render('robots.txt'));
         $allFiles[] = 'robots.txt';
-
-        // // Files
-        // $files      = $this->getDirContents($this->environment->getSiteDir().'/files');
-        // $filesystem = new Filesystem();
-        // $filesystem->remove($this->targetDir.'/files');
-        // foreach ($files as $file) {
-        //     $tmp      = explode('files/', $file);
-        //     $fileName = array_pop($tmp);
-        //     $this->writeFile($this->targetDir, 'files/'.$fileName, file_get_contents($file));
-        //     $allFiles[] = 'files/'.$fileName;
-        // }
 
         // Delete files that are not needed anymore
 
@@ -193,7 +185,7 @@ class Compiler implements LoggerAwareInterface
         }
     }
 
-    private function deleteAssets(string $targetDir, array $assets): array
+    private function deleteAssets(string $targetDir, array $assetList): array
     {
         $notDeleted = [];
         $filesystem = new Filesystem();
@@ -208,7 +200,7 @@ class Compiler implements LoggerAwareInterface
             $mime     = mime_content_type($image);
             $pathinfo = pathinfo($asset);
 
-            if (in_array($asset, $assets) && strpos($mime, $pathinfo['extension']) !== false) {
+            if (in_array($asset, $assetList) && strpos($mime, $pathinfo['extension']) !== false) {
                 $notDeleted[] = $asset;
             } else {
                 $filesystem->remove($image);
@@ -222,7 +214,27 @@ class Compiler implements LoggerAwareInterface
                 continue;
             }
             $asset = str_replace($targetDir, '', $video);
-            if (in_array($asset, $assets)) {
+            if (in_array($asset, $assetList)) {
+                $notDeleted[] = $asset;
+            } else {
+                $filesystem->remove($video);
+            }
+        }
+        foreach ($dirs as $dir) {
+            if (count(scandir($dir)) == 2) {
+                $filesystem->remove($dir);
+            }
+        }
+
+        $files = $this->getDirContents($targetDir.'/files');
+
+        foreach ($files as $video) {
+            if (is_dir($video)) {
+                $dirs[] = $video;
+                continue;
+            }
+            $asset = str_replace($targetDir, '', $video);
+            if (in_array($asset, $assetList)) {
                 $notDeleted[] = $asset;
             } else {
                 $filesystem->remove($video);

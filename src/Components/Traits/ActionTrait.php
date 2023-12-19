@@ -59,10 +59,17 @@ trait ActionTrait
                     'target' => '_blank'
                 ];
             case 'download':
-                $file = $this->environment->getAssetSources()->addFileBasePath($data['_target']);
+                if (!isset($data['_target'])) {
+                    return [
+                        'tag' => 'a',
+                        'href' => '#' ,
+                        'download' => true
+                    ];
+                }
+                $file = $this->environment->getAssetSources()->addBasePath(\Flipsite\Assets\Sources\AssetType::FILE, $data['_target']);
                 return [
                     'tag' => 'a',
-                    'href' => $this->environment->getAbsoluteUrl($file)  ?? '#' ,
+                    'href' => $file ?? '#' ,
                     'download' => true
                 ];
             case 'scroll':

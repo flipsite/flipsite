@@ -28,6 +28,22 @@ class Assets
         return $this->assetSources;
     }
 
+    public function getContents(string $asset): string|bool {
+        $assetInfo = $this->assetSources->getInfo($asset);
+        if ($assetInfo) {
+            return $assetInfo->getContents();
+        }
+
+        if ($this->assetSources->isCached($asset)) {
+            return $this->assetSources->getCached($asset);
+        }
+        $this->addToCache($asset);
+        if ($this->assetSources->isCached($asset)) {
+            return $this->assetSources->getCached($asset);
+        }
+        return false;
+    }
+
     public function getResponse(Response $response, string $asset): Response
     {
         if ($this->assetSources->isOrginal($asset)) {
