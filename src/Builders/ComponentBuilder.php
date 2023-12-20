@@ -348,6 +348,9 @@ class ComponentBuilder
             $dataSourceString = substr($dataSourceString, 10, strlen($dataSourceString) - 11);
         }
         $tmp          = explode('.', $dataSourceString);
+        if (count($tmp) !== 2) {
+            return [];
+        }
         $collectionId = $tmp[0];
         $itemId       = intval($tmp[1]);
 
