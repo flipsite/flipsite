@@ -17,16 +17,16 @@ class StyleBuilder implements BuilderInterface
 {
     public function __construct(private array $colors, private array $fonts = [])
     {
-        
     }
 
     public function getDocument(Document $document): Document
     {
         $elements = [];
-        $classes = [];
+        $classes  = [];
         $this->getElementsAndClasses($document, $elements, $classes);
         $elements = array_unique($elements);
-        $classes = array_unique($classes);
+        $classes  = array_unique($classes);
+        
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
         // Overwrite keyframe definitions instead of merge
@@ -37,10 +37,8 @@ class StyleBuilder implements BuilderInterface
         //     }
         // }
 
-
         $config = ArrayHelper::merge($config, ['colors' => $this->colors, 'fonts' => $this->fonts]);
         $fonts  = $config['fonts'] ?? [];
-
 
         unset($config['fonts']);
         if (!isset($config['fontFamily'])) {
@@ -73,15 +71,31 @@ class StyleBuilder implements BuilderInterface
         //     $html = $this->replaceClasses($html, $newClasses);
         // }
 
-        $style = new Element('style',true);
+        $style = new Element('style', true);
         $style->setContent($css);
         $document->getChild('head')->addChild($style);
-        
+
         return $document;
     }
-    private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes) {
+
+    private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)
+    {
+        $tag = $element->getTag();
+        if ('svg' === $tag) {
+            return;
+        }
         $elements[] = $element->getTag();
-        $classes = array_merge($classes, $element->getClasses('array'));
+        $classes    = array_merge($classes, $element->getClasses('array'));
+        $content    = $element->getContent();
+        if ($content) {
+            $pattern = '/class="([^"]+)"/';
+            if (preg_match_all($pattern, $content, $matches)) {
+                $contentClasses = array_unique($matches[1]);
+                foreach ($contentClasses as $cls) {
+                    $classes = array_merge($classes, explode(' ',$cls));
+                }
+            }
+        }
         foreach ($element->getChildren() as $name => $child) {
             $this->getElementsAndClasses($child, $elements, $classes);
         }

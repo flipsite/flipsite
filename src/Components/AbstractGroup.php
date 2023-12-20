@@ -135,7 +135,7 @@ abstract class AbstractGroup extends AbstractComponent
             $dataSourceList = $this->getSocial();
         } elseif (is_string($dataSourceList)) {
             // Check if content
-            $dataSourceList = $this->getContent($dataSourceList, true);
+            $dataSourceList = $this->getCollection($dataSourceList, true);
         }
 
         // foreach ($dataSourceList as $index => &$item) {
@@ -238,7 +238,7 @@ abstract class AbstractGroup extends AbstractComponent
         return $items;
     }
 
-    private function getContent(string $collectionId): array
+    private function getCollection(string $collectionId): array
     {
         // Old YAML style reference
         if (str_starts_with($collectionId, '${content.')) {
@@ -248,6 +248,6 @@ abstract class AbstractGroup extends AbstractComponent
         if (!$collection) {
             return [];
         }
-        return $collection->getContent(true);
+        return $collection->getCollection(true);
     }
 }

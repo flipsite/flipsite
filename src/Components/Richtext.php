@@ -44,9 +44,6 @@ final class Richtext extends AbstractGroup
         // Modify HTML
         $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
 
-
-
-
         // Render HTML
         $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
 
@@ -66,7 +63,6 @@ final class Richtext extends AbstractGroup
         if ($data['removeEmptyLines'] ?? false) {
             $this->content = str_replace("<p><br></p>\n", '', $this->content);
         }
-
         parent::build($data, $style, $options);
     }
 
@@ -129,7 +125,6 @@ final class Richtext extends AbstractGroup
         $headingBaseStyle = $this->siteData->getComponentStyle('heading') ?? [];
         $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
         foreach ($headings as $hx) {
-
             $mergedStyle  = ArrayHelper::merge($headingBaseStyle, $style[$hx] ?? []);
             $headingStyle = StyleAppearanceHelper::apply($mergedStyle, $appearance);
             $headingStyle = array_filter($headingStyle, function($item){ return is_string($item);});
