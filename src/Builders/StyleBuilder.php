@@ -26,7 +26,7 @@ class StyleBuilder implements BuilderInterface
         $this->getElementsAndClasses($document, $elements, $classes);
         $elements = array_unique($elements);
         $classes  = array_unique($classes);
-        
+
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
         // Overwrite keyframe definitions instead of merge
@@ -81,9 +81,6 @@ class StyleBuilder implements BuilderInterface
     private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)
     {
         $tag = $element->getTag();
-        if ('svg' === $tag) {
-            return;
-        }
         $elements[] = $element->getTag();
         $classes    = array_merge($classes, $element->getClasses('array'));
         $content    = $element->getContent();
@@ -94,6 +91,12 @@ class StyleBuilder implements BuilderInterface
                 foreach ($contentClasses as $cls) {
                     $classes = array_merge($classes, explode(' ',$cls));
                 }
+            }
+            
+            $pattern = '/<([a-zA-Z][^\s>]*)/';
+            // Perform the regular expression match all
+            if (preg_match_all($pattern, $content, $matches)) {
+                $elements = array_merge($elements, $matches[1]);
             }
         }
         foreach ($element->getChildren() as $name => $child) {

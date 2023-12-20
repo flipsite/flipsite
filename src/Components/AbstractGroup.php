@@ -248,6 +248,6 @@ abstract class AbstractGroup extends AbstractComponent
         if (!$collection) {
             return [];
         }
-        return $collection->getCollection(true);
+        return $collection->getContent(true);
     }
 }
