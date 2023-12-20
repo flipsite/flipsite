@@ -40,7 +40,7 @@ final class Flipsite
         $documentBuilder = new DocumentBuilder(
             $path->getLanguage(),
             $this->siteData->getHtmlStyle(),
-            $this->siteData->getBodyStyle($path->getPage()),
+            $this->siteData->getBodyStyle($path->getPage() ?? ''),
         );
         $metaBuilder = new MetaBuilder(
             $this->environment,

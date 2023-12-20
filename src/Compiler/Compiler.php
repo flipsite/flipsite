@@ -54,13 +54,15 @@ class Compiler implements LoggerAwareInterface
 
         // Remove base path
         foreach ($assetList as &$asset) {
-            $asset      = str_replace($basePath, '', $asset);
+            $asset      = str_replace($basePath, '/', $asset);
             $allFiles[] = $asset;
         }
 
         $notDeleted = $this->deleteAssets($this->targetDir, $assetList);
         $assetList = array_values(array_diff($assetList, $notDeleted));
+
         $assetList = json_decode(json_encode($assetList));
+
         
         $assets = new Assets($this->environment->getAssetSources());
         foreach ($assetList as $asset) {
