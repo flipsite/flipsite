@@ -356,7 +356,7 @@ class ComponentBuilder
 
         $collection = $this->siteData->getCollection($collectionId);
         if (!$collection) {
-            return null;
+            return [];
         }
         $item = $collection->getItem($itemId);
         if ($item) {

@@ -209,7 +209,7 @@ abstract class AbstractGroup extends AbstractComponent
 
         $items = [];
         foreach ($pages as $page) {
-            $pageMeta        = $this->siteData->getMeta((string)$page, $this->path->getLanguage());
+            $pageMeta        = $this->siteData->getMeta((string)$page, $this->path->getLanguage()) ?? [];
             $item            = [
                 'slug'  => $page,
                 'name'  => $this->siteData->getPageName((string)$page, $this->path->getLanguage()),

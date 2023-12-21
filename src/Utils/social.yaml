@@ -38,7 +38,7 @@ messenger:
   name: Messenger
   color: "#00B2FF"
   icon: simple-icons/messenger.svg
-  url: https://m.me/{handle}
+  url: https://www.messenger.com/t/{handle}
 phone:
   name: Phone
   color: "#5ec640"

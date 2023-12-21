@@ -44,9 +44,9 @@ interface SiteDataInterface
 
     public function getComponentStyle(string $component): array;
 
-    public function getMeta(string $page, Language $language);
+    public function getMeta(string $page, Language $language): ?array;
 
-    public function getPageMeta(string $page, Language $language);
+    public function getPageMeta(string $page, Language $language) : ?array;
 
     public function getHiddenPages() : array;
 

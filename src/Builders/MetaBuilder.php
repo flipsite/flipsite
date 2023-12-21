@@ -44,10 +44,10 @@ class MetaBuilder implements BuilderInterface
             }
         }
 
-        $name  = $this->siteData->get('name', $language);
+        $name  = $this->siteData->getName();
         $meta  = $this->siteData->getMeta($this->path->getPage(), $language);
 
-        $title = $meta['title'];
+        $title = $meta['title'] ?? 'Flipsite';
 
         $document->setAttribute('prefix', 'og: https://ogp.me/ns#', true);
         $document->getChild('head')->getChild('title')->setContent($title);
@@ -62,7 +62,7 @@ class MetaBuilder implements BuilderInterface
         $elements[] = $this->og('og:title', $title);
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
 
-        if ($meta['share']) {
+        if (isset($meta['share'])) {
             $imageAttributes = $this->assets->getImageAttributes($meta['share'], ['width' => 1200, 'height' => 630, 'webp' => false]);
             $src = $imageAttributes->getSrc();
             $elements[] = $this->og('og:image', $this->environment->getAbsoluteSrc($src, true));

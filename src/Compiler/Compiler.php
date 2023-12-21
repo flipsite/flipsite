@@ -49,12 +49,15 @@ class Compiler implements LoggerAwareInterface
             $assetList = array_merge($assetList, AssetParser::parse($html, $compileOptions['domain']));
         }
 
+
         // Get list of unique assets
         $assetList = array_values(array_filter(array_unique($assetList)));
 
         // Remove base path
         foreach ($assetList as &$asset) {
-            $asset      = str_replace($basePath, '/', $asset);
+            if ($basePath && $basePath !== '/') { 
+                $asset      = str_replace($basePath, '', $asset);
+            }
             $allFiles[] = $asset;
         }
 
@@ -62,6 +65,8 @@ class Compiler implements LoggerAwareInterface
         $assetList = array_values(array_diff($assetList, $notDeleted));
 
         $assetList = json_decode(json_encode($assetList));
+
+        error_log(print_r($assetList,true));
 
         
         $assets = new Assets($this->environment->getAssetSources());
