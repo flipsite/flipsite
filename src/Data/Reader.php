@@ -12,6 +12,7 @@ use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\CustomHtmlParser;
 use Flipsite\Content\Collection;
+use Adbar\Dot;
 
 final class Reader implements SiteDataInterface
 {
@@ -88,11 +89,13 @@ final class Reader implements SiteDataInterface
         return $this->customParser->get($position, $page, $fallback);
     }
 
-    public function getCompile(): ?array {
+    public function getCompile(): ?array
+    {
         return $this->get('compile');
     }
 
-    public function getPublish(): ?array {
+    public function getPublish(): ?array
+    {
         return $this->get('publish');
     }
 
@@ -194,6 +197,13 @@ final class Reader implements SiteDataInterface
 
     public function getComponentStyle(string $component) : array
     {
+        if (strpos($component, '.') !== false) {
+            $tmp   = explode('.', $component);
+            $style = $this->data['theme']['components'][array_shift($tmp)] ?? [];
+            $dot   = new Dot($style);
+            return $dot->get(implode('.', $tmp)) ?? [];  
+            
+        }
         return $this->data['theme']['components'][$component] ?? [];
     }
 
