@@ -28,8 +28,7 @@ final class Video extends AbstractComponent
             unset($style['poster']);
         }
         $this->addStyle($style);
-        if (isset($data['value'])) {
-            $videoAttributes = $this->assets->getVideoAttributes($data['value']);
+        if (isset($data['value']) && $videoAttributes = $this->assets->getVideoAttributes($data['value'])) {
             foreach ($videoAttributes->getSources() as $sourceAttributes) {
                 $source = new Element('source', true);
                 $source->setAttribute('src', $sourceAttributes->getSrc());
