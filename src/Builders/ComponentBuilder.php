@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -102,7 +103,7 @@ class ComponentBuilder
             $data                = DataHelper::applyData($data, $dataSource, '_dataSource');
         }
 
-        $class = 'Flipsite\\Components\\'.ucfirst($type);
+        $class = 'Flipsite\\Components\\' . ucfirst($type);
         if (class_exists($class)) {
             $component = new $class();
         } else {
@@ -161,7 +162,7 @@ class ComponentBuilder
                 foreach ($tmp as $pair) {
                     $tmp2 = explode('=', $pair);
                     if (count($tmp2) === 2) {
-                        $attr                 = 'data-'.$tmp2[0];
+                        $attr                 = 'data-' . $tmp2[0];
                         $val                  = $tmp2[1];
                         $data['_attr'][$attr] = $val;
                     }
@@ -209,13 +210,13 @@ class ComponentBuilder
     private function handleScripts(array $scripts)
     {
         foreach ($scripts['global'] ?? [] as $id => $script) {
-            $filepath = $this->environment->getSiteDir().'/'.$script;
+            $filepath = $this->environment->getSiteDir() . '/' . $script;
             if (file_exists($filepath)) {
                 $this->dispatch(new Event('global-script', $id, file_get_contents($filepath)));
             }
         }
         foreach ($scripts['ready'] ?? [] as $id => $script) {
-            $filepath = $this->environment->getSiteDir().'/'.$script;
+            $filepath = $this->environment->getSiteDir() . '/' . $script;
             if (file_exists($filepath)) {
                 $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
             }
@@ -310,28 +311,36 @@ class ComponentBuilder
             }
             // SVG
             if (str_ends_with($src, '.svg')) {
-                $element->setAttribute('style', 'background-image:'.$gradient.'url('.$imageAttributes->getSrc().');');
+                $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
             } else {
                 $srcset = $imageAttributes->getSrcset('url');
                 if ($srcset) {
-                    $element->setAttribute('style', 'background-image:'.$gradient.'-webkit-image-set('.$srcset.')');
+                    $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
                 }
             }
             if (($style['options']['loading'] ?? '') === 'eager') {
                 $this->builder->dispatch(new Event('preload', 'background', $imageAttributes));
             }
         } elseif ($gradient) {
-            $element->setAttribute('style', 'background-image:'.$gradient);
+            $element->setAttribute('style', 'background-image:' . $gradient);
             unset($style['options']);
         } else {
             unset($style['options'], $style['position'], $style['size'], $style['repeat']);
         }
         foreach ($style as $attr => $val) {
-            $element->addStyle(['bg.'.$attr => $val]);
+            $element->addStyle(['bg.' . $attr => $val]);
         }
     }
 
-    private function parseThemeColors(string $gradient) : string
+    private function handleGlobalVars(array $data): array
+    {
+        error_log('handleGlobalVars');
+        return $data;
+    }
+
+
+
+    private function parseThemeColors(string $gradient): string
     {
         if (!strlen($gradient)) {
             return $gradient;
@@ -342,7 +351,7 @@ class ComponentBuilder
         return ColorHelper::parseAndReplace($gradient, $colors);
     }
 
-    private function getDataSource(string $dataSourceString) : array
+    private function getDataSource(string $dataSourceString): array
     {
         if (str_starts_with($dataSourceString, '${content.')) {
             $dataSourceString = substr($dataSourceString, 10, strlen($dataSourceString) - 11);

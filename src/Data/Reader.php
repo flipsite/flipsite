@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -43,9 +44,9 @@ final class Reader implements SiteDataInterface
 
     public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
     {
-        if (file_exists($siteDir.'/site.yaml')) {
-            $siteYaml          = Yaml::parseFile($siteDir.'/site.yaml');
-            $themeYaml         = Yaml::parseFile($siteDir.'/theme.yaml');
+        if (file_exists($siteDir . '/site.yaml')) {
+            $siteYaml          = Yaml::parseFile($siteDir . '/site.yaml');
+            $themeYaml         = Yaml::parseFile($siteDir . '/theme.yaml');
             $siteYaml['theme'] = $themeYaml;
             if ($this->plugins) {
                 $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
@@ -54,8 +55,8 @@ final class Reader implements SiteDataInterface
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
-        if (file_exists($siteDir.'/custom.html')) {
-            $customHtml         = file_get_contents($siteDir.'/custom.html');
+        if (file_exists($siteDir . '/custom.html')) {
+            $customHtml         = file_get_contents($siteDir . '/custom.html');
             $this->customParser = new CustomHtmlParser($customHtml);
         }
     }
@@ -69,19 +70,19 @@ final class Reader implements SiteDataInterface
 
     public function getCollection(string $collectionId): ?Collection
     {
-        $schema = $this->get('contentSchemas.'.$collectionId);
+        $schema = $this->get('contentSchemas.' . $collectionId);
         if (!$schema) {
             return null;
         }
-        return new Collection($collectionId, $schema, $this->get('content.'.$collectionId));
+        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId));
     }
 
-    public function getModifiedTimestamp() : int
+    public function getModifiedTimestamp(): int
     {
         return filemtime($this->siteDir);
     }
 
-    public function getCode(string $position, string $page, bool $fallback) : ?string
+    public function getCode(string $position, string $page, bool $fallback): ?string
     {
         if (!$this->customParser) {
             return null;
@@ -136,32 +137,32 @@ final class Reader implements SiteDataInterface
         return $this->localizer->localize($data, $language);
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->get('name');
     }
 
-    public function getTitle(Language $language) : ?string
+    public function getTitle(Language $language): ?string
     {
         return $this->get('title', $language);
     }
 
-    public function getDescription(Language $language) : ?string
+    public function getDescription(Language $language): ?string
     {
         return $this->get('description', $language);
     }
 
-    public function getShare() : ?string
+    public function getShare(): ?string
     {
         return $this->get('share');
     }
 
-    public function getSocial() : array
+    public function getSocial(): array
     {
         return $this->get('social');
     }
 
-    public function getFavicon() : null|string|array
+    public function getFavicon(): null|string|array
     {
         $favicon = $this->get('favicon') ?? null;
         if (is_array($favicon)) {
@@ -170,39 +171,39 @@ final class Reader implements SiteDataInterface
         return $favicon;
     }
 
-    public function getIntegrations() : ?array
+    public function getIntegrations(): ?array
     {
         return $this->get('integrations') ?? null;
     }
 
-    public function getColors() : array
+    public function getColors(): array
     {
         return $this->data['theme']['colors'] ?? [];
     }
 
-    public function getFonts() : array
+    public function getFonts(): array
     {
         return $this->data['theme']['fonts'] ?? [];
     }
 
-    public function getHtmlStyle() : array
+    public function getHtmlStyle(): array
     {
         return $this->data['theme']['components']['html'] ?? [];
     }
 
-    public function getBodyStyle(string $page) : array
+    public function getBodyStyle(string $page): array
     {
         return $this->data['theme']['components']['body'] ?? [];
     }
 
-    public function getComponentStyle(string $component) : array
+    public function getComponentStyle(string $component): array
     {
         if (strpos($component, '.') !== false) {
             $tmp   = explode('.', $component);
             $style = $this->data['theme']['components'][array_shift($tmp)] ?? [];
             $dot   = new Dot($style);
-            return $dot->get(implode('.', $tmp)) ?? [];  
-            
+            return $dot->get(implode('.', $tmp)) ?? [];
+
         }
         return $this->data['theme']['components'][$component] ?? [];
     }
@@ -264,7 +265,10 @@ final class Reader implements SiteDataInterface
         }
         $sections = array_merge($before, $all, $after);
 
-        return $this->localizer->localize($sections ?? [], $language) ?? [];
+        $sections = $this->localizer->localize($sections ?? [], $language) ?? [];
+
+        $sections = $this->normalize($sections);
+        return $sections;
     }
 
     public function getMeta(string $page, Language $language): ?array
@@ -295,7 +299,7 @@ final class Reader implements SiteDataInterface
                 $title = implode(' - ', $title);
             }
             if ($baseTitle) {
-                $title .= ' - '.$baseTitle;
+                $title .= ' - ' . $baseTitle;
             }
         }
         return [
@@ -306,9 +310,9 @@ final class Reader implements SiteDataInterface
         ];
     }
 
-    public function getPageMeta(string $page, Language $language) : ?array
+    public function getPageMeta(string $page, Language $language): ?array
     {
-        return $this->get('meta.'.$page, $language);
+        return $this->get('meta.' . $page, $language);
     }
 
     public function getHiddenPages(): array
@@ -356,7 +360,7 @@ final class Reader implements SiteDataInterface
                     // Add page. prefix to data item attributes
                     $pageDataItem = [];
                     foreach ($dataItem as $attr => $val) {
-                        $pageDataItem['page.'.$attr] = $val;
+                        $pageDataItem['page.' . $attr] = $val;
                     }
                     $pageSections = $sections ?? [];
                     foreach ($pageSections as &$pageSection) {
@@ -398,5 +402,21 @@ final class Reader implements SiteDataInterface
         }
         $extendedSlugs[$page] = $slugs;
         return $extendedSlugs;
+    }
+
+    private function normalize(array $data): array
+    {
+        $normalized = [];
+        foreach ($data as $attr => $value) {
+            if ($attr === '_dataSourceList') {
+                $attr = '_repeat';
+                if (is_string($value) && str_starts_with($value, '${content.')) {
+                    $value = str_replace('${content.', '', $value);
+                    $value = substr($value, 0, strlen($value) - 1);
+                }
+            }
+            $normalized[$attr] = is_array($value) ? $this->normalize($value) : $value;
+        }
+        return $normalized;
     }
 }

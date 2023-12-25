@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -26,7 +27,7 @@ abstract class AbstractGroup extends AbstractComponent
                 // handle tel replace
             }
             if ('toggle' === $data['_action']) {
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
             }
             $actionAttributes = $this->getActionAttributes($data);
             if (isset($actionAttributes['tag'])) {
@@ -79,7 +80,15 @@ abstract class AbstractGroup extends AbstractComponent
     {
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
-        $data = $this->normalizeRepeat($data);
+
+        if (isset($data['_repeat'])) {
+            $repeat = $data['_repeat'];
+            unset($data['_repeat']);
+            if (is_string($repeat)) {
+                $repeat = $this->getCollection($repeat, true);
+            }
+            $data = $this->normalizeRepeat($data, $repeat);
+        }
         return $data;
     }
 
@@ -97,7 +106,7 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_params'])) {
             $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
             unset($data['_params']);
-        }    
+        }
         return $data;
     }
 
@@ -110,44 +119,21 @@ abstract class AbstractGroup extends AbstractComponent
             case 'toggle':
                 $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,768)');
                 $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,768)');
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
                 break;
         }
         unset($data['_hover']);
         return $data;
     }
 
-    private function normalizeRepeat(string|int|bool|array $data): array
+    protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
     {
-        if (isset($data['_dataSourceList'])) {
-            $dataSourceList = $data['_dataSourceList'];
-            unset($data['_dataSourceList']);
-            if ('_none' === $dataSourceList) {
-                return $data;
-            }
-        } else {
-            return $data;
-        }
-        if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
-            $parentPage     = $data['_options']['parentPage'] ?? null;
-            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)), $parentPage);
-        } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
-            $dataSourceList = $this->getSocial();
-        } elseif (is_string($dataSourceList)) {
-            // Check if content
-            $dataSourceList = $this->getCollection($dataSourceList, true);
-        }
-
-        // foreach ($dataSourceList as $index => &$item) {
-
-        // }
-
         if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
             $filter = explode(',', $data['_options']['filter']);
             $filter = array_map('trim', $filter);
 
             $filterBy       = $data['_options']['filterBy'];
-            $dataSourceList = array_values(array_filter($dataSourceList, function ($item) use ($filter, $filterBy) {
+            $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterBy) {
                 return in_array($item[$filterBy], $filter);
             }));
         }
@@ -155,12 +141,12 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
             $offset         = intval($data['_options']['offset'] ?? 0);
             $length         = intval($data['_options']['length'] ?? 999999);
-            $dataSourceList = array_splice($dataSourceList, $offset, $length);
+            $repeat = array_splice($repeat, $offset, $length);
         }
 
         if (isset($data['_options']['sortBy'])) {
             $sortField = $data['_options']['sortBy'];
-            uasort($dataSourceList, function ($a, $b) use ($sortField) {
+            uasort($repeat, function ($a, $b) use ($sortField) {
                 if (isset($a[$sortField],$b[$sortField])) {
                     return $a[$sortField] <=> $b[$sortField];
                 }
@@ -168,7 +154,7 @@ abstract class AbstractGroup extends AbstractComponent
             });
         }
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
-            $dataSourceList = array_reverse($dataSourceList);
+            $repeat = array_reverse($repeat);
         }
 
         $components = array_filter($data, function ($key): bool {
@@ -178,64 +164,12 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data[$key]);
         }
         $data['_repeatTpl']  = $components;
-        $data['_repeatData'] = $dataSourceList ?? [];
+        $data['_repeatData'] = $repeat ?? [];
 
-        if (!is_array($dataSourceList) || !count($dataSourceList)) {
+        if (!is_array($repeat) || !count($repeat)) {
             $data['_isEmpty'] = true;
         }
         return $data;
-    }
-
-    private function getPages(int $level, ?string $parentPage = null): array
-    {
-        $pages      = [];
-        $all        = $this->siteData->getSlugs()->getPages();
-        $firstExact = false;
-        if ($level === 0) {
-            $pages = array_filter($all, function ($value) {
-                return mb_strpos((string)$value, '/') === false;
-            });
-        } else {
-            $parts           = explode('/', $parentPage ?? $this->path->getPage());
-            $startsWith      = implode('/', array_splice($parts, 0, $level));
-
-            foreach ($all as $page) {
-                $count = substr_count((string)$page, '/');
-                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level) {
-                    $pages[] = $page;
-                }
-            }
-        }
-
-        $items = [];
-        foreach ($pages as $page) {
-            $pageMeta        = $this->siteData->getMeta((string)$page, $this->path->getLanguage()) ?? [];
-            $item            = [
-                'slug'  => $page,
-                'name'  => $this->siteData->getPageName((string)$page, $this->path->getLanguage()),
-                ...$pageMeta
-            ];
-            $items[] = $item;
-        }
-        return $items;
-    }
-
-    private function getSocial(): array
-    {
-        $name     = $this->siteData->getName();
-        $language = $this->path->getLanguage();
-        $items    = [];
-        $i        = 0;
-        $social   = $this->siteData->getSocial();
-        if (!$social) {
-            return [];
-        }
-        foreach ($social as $type => $handle) {
-            $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
-            $item['url'] = $item['url'];
-            $items[]     = $item;
-        }
-        return $items;
     }
 
     private function getCollection(string $collectionId): array

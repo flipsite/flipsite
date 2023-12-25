@@ -13,9 +13,7 @@ final class Heading extends AbstractComponent
 
     public function build(array $data, array $style, array $options): void
     {
-        $data['value']  = $this->checkGlobalVars($data['value']);
         if (isset($style['highlight'])) {
-
             $data = $this->handleHighlight($data, $style['highlight'], $options['appearance']);
         }
         $this->addStyle($style);
@@ -49,7 +47,7 @@ final class Heading extends AbstractComponent
             $style['tag'] = 'span';
             $span = $this->builder->build('span', $highlightData, $style, ['appearance' => $appearance]);
             $span->oneline = true;
-            $data['value'] = str_replace('['.$highlightString.']', trim($span->render()), $data['value']);
+            $data['value'] = str_replace('[' . $highlightString . ']', trim($span->render()), $data['value']);
         }
         unset($data['highlight']);
         return $data;
