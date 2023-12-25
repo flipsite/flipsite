@@ -337,40 +337,35 @@ final class Reader implements SiteDataInterface
         $expandedMeta  = [];
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
-                $category = $meta[$page]['content'];
-                $schema   = $this->data['contentSchemas'][$category];
-                $items    = $this->data['content'][$category] ?? [];
-                if (isset($schema['published']) && 'boolean' === $schema['published']['type']) {
-                    $published = array_filter($items, function ($item) {
-                        return $item['published'] ?? false;
-                    });
-                    $items = count($published) ? $published : [$items[0]];
-                }
+                $collection = $this->getCollection($meta[$page]['content']);
+                $slugField = $collection->getSlugField();
+                $items = $collection->getContent();
+                if ($slugField && $items) {
+                    foreach ($items as $dataItem) {
+                        if (!isset($dataItem[$slugField]) || !$dataItem[$slugField]) {
+                            continue;
+                        }
+                        $expandedPage = str_replace(':slug', $dataItem[$slugField], $page);
 
-                foreach ($items as $dataItem) {
-                    if (!isset($dataItem['slug'])) {
-                        continue;
+                        // Dont overwrite existing page
+                        if (isset($expandedPages[$expandedPage])) {
+                            continue;
+                        }
+                        // Add page. prefix to data item attributes
+                        $pageDataItem = [];
+                        foreach ($dataItem as $attr => $val) {
+                            $pageDataItem['page.' . $attr] = $val;
+                        }
+                        $pageSections = $sections ?? [];
+                        foreach ($pageSections as &$pageSection) {
+                            $pageSection['_dataSource'] = $pageDataItem;
+                        }
+                        $expandedPages[$expandedPage] = $pageSections;
+                        if (isset($meta[$page])) {
+                            $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
+                        }
+                        // TODO localized slugs
                     }
-                    $expandedPage = str_replace(':slug', $dataItem['slug'], $page);
-
-                    // Dont overwrite existing page
-                    if (isset($expandedPages[$expandedPage])) {
-                        continue;
-                    }
-                    // Add page. prefix to data item attributes
-                    $pageDataItem = [];
-                    foreach ($dataItem as $attr => $val) {
-                        $pageDataItem['page.' . $attr] = $val;
-                    }
-                    $pageSections = $sections ?? [];
-                    foreach ($pageSections as &$pageSection) {
-                        $pageSection['_dataSource'] = $pageDataItem;
-                    }
-                    $expandedPages[$expandedPage] = $pageSections;
-                    if (isset($meta[$page])) {
-                        $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
-                    }
-                    // TODO localized slugs
                 }
             } else {
                 $expandedPages[$page] = $sections;

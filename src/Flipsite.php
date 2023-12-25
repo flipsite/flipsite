@@ -67,7 +67,13 @@ final class Flipsite
         $componentBuilder->addListener($perloadBuilder);
 
         $document = $documentBuilder->getDocument();
-        $sections = $this->siteData->getSections($path->getPage(), $path->getLanguage());
+
+        $page = $path->getPage();
+        if (null === $page) {
+            return $document;
+        } else {
+            $sections = $this->siteData->getSections($path->getPage(), $path->getLanguage());
+        }
 
         $sections = $this->addGlobalVars($sections, $scriptBuilder);
 

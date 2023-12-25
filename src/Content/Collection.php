@@ -24,13 +24,14 @@ class Collection implements \JsonSerializable
         }
         return $items;
     }
-
-    public function getItem(?int $itemId = null) : ?Item
-    {
-        if (null === $itemId) {
-            return new Item(0, $this->items[0]);
+    
+    public function getSlugField() : ?string {
+        foreach ($this->schema as $field => $val) {
+            if (is_array($val) && 'slug' === ($val['format'] ?? '')) {
+                return $field;
+            }
         }
-        return new Item($itemId, $this->items[$itemId]);
+        return null;
     }
 
     public function jsonSerialize(): mixed
