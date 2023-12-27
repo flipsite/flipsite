@@ -15,9 +15,9 @@ final class DataHelper
         $dataSourceDot = new \Adbar\Dot($dataSource);
         foreach ($data as &$value) {
             if (is_array($value)) {
-                if (isset($value[$dataSourceKey.'List'])) {
-                    if (is_array($value[$dataSourceKey.'List'])) {
-                        $dataItemAttrs     = array_keys($value[$dataSourceKey.'List'][0]);
+                if (isset($value['_repeat'])) {
+                    if (is_array($value['_repeat'])) {
+                        $dataItemAttrs     = array_keys($value['_repeat'][0]);
                         $stripedDataSource = [];
                         foreach ($dataSource as $attr => $val) {
                             if (!in_array($attr, $dataItemAttrs)) {
