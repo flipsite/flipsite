@@ -95,7 +95,8 @@ trait ActionTrait
         $action = 'none';
         $target = str_replace('mailto:', '', $target);
         $target = str_replace('tel:', '', $target);
-        $page   = $this->siteData->getSlugs()->getPage($target);
+
+        $page = $this->siteData->getSlugs()->getPage($target);
         $file = $this->environment->getAssetSources()->getInfo($target);
 
         if ($file) {
@@ -117,5 +118,29 @@ trait ActionTrait
             '_action' => $action,
             '_target' => $target,
         ];
+    }
+    private function fixUrlsInHtml(string $html): string
+    {
+        $html = str_replace(' rel="noopener noreferrer" target="_blank"', '', $html);
+        $matches = [];
+        preg_match_all('/[ ]{1}href="(.*?)"/', $html, $matches);
+        if (0 === count($matches[1])) {
+            return $html;
+        }
+        $hrefs = array_unique($matches[1]);
+        foreach ($hrefs as $href) {
+            $actionAttributes = $this->getActionAttributes([
+                '_action' => 'auto',
+                '_target' => trim($href,'/')
+            ]);
+            unset($actionAttributes['tag']);
+            $new = 'href="'.$actionAttributes['href'].'"';
+            unset($actionAttributes['href']);
+            foreach ($actionAttributes as $attr => $val) {
+                $new.=' '.$attr.'="'.$val.'"';
+            }
+            $html = str_replace('href="'.$href.'"', $new, $html);
+        }
+        return $html;
     }
 }

@@ -205,7 +205,11 @@ final class Reader implements SiteDataInterface
             return $dot->get(implode('.', $tmp)) ?? [];
 
         }
-        return $this->data['theme']['components'][$component] ?? [];
+        $style = $this->data['theme']['components'][$component] ?? [];
+        if (in_array($component,['social','nav'])) {
+            unset($style['type']);
+        }
+        return $style;
     }
 
     /**

@@ -37,7 +37,7 @@ final class Richtext extends AbstractGroup
             $html = preg_replace("/([A-z0-9\._-]+\@[A-z0-9_-]+\.)([A-z0-9\_\-\.]{1,}[A-z])/", '<a href="mailto:$1$2">$1$2</a>', $html);
             $html = preg_replace('/(?:http|ftp)s?:\/\/(?:www\.)?([a-z0-9.-]+\.[a-z]{2,5}(?:\/\S*)?)/', '<a href="$1" rel="noopener noreferrer" target="_blank">$1</a>', $html);
         } else {
-            $html = $this->addUrls($html);
+            $html = $this->fixUrlsInHtml($html);
         }
 
         $doc->loadHtml($html);
@@ -94,31 +94,6 @@ final class Richtext extends AbstractGroup
         }
 
         return $doc;
-    }
-
-    private function addUrls(string $html): string
-    {
-        $html = str_replace(' rel="noopener noreferrer" target="_blank"', '', $html);
-        $matches = [];
-        preg_match_all('/[ ]{1}href="(.*?)"/', $html, $matches);
-        if (0 === count($matches[1])) {
-            return $html;
-        }
-        $hrefs = array_unique($matches[1]);
-        foreach ($hrefs as $href) {
-            $actionAttributes = $this->getActionAttributes([
-                '_action' => 'auto',
-                '_target' => $href
-            ]);
-            unset($actionAttributes['tag']);
-            $new = 'href="'.$actionAttributes['href'].'"';
-            unset($actionAttributes['href']);
-            foreach ($actionAttributes as $attr => $val) {
-                $new.=' '.$attr.'="'.$val.'"';
-            }
-            $html = str_replace('href="'.$href.'"', $new, $html);
-        }
-        return $html;
     }
 
     private function addClasses(string $html, array $style, string $appearance): string
