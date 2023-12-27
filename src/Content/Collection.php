@@ -25,6 +25,14 @@ class Collection implements \JsonSerializable
         return $items;
     }
     
+    public function getItem(?int $itemId = null) : ?Item
+    {
+        if (null === $itemId) {
+            return isset($this->items[0]) ? new Item(0, $this->items[0]) : null;
+        }
+        return isset($this->items[$itemId]) ? new Item($itemId, $this->items[$itemId]) : null;
+    }
+
     public function getSlugField() : ?string {
         foreach ($this->schema as $field => $val) {
             if (is_array($val) && 'slug' === ($val['format'] ?? '')) {
