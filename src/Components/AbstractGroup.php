@@ -167,6 +167,8 @@ abstract class AbstractGroup extends AbstractComponent
         $data['_repeatData'] = $repeat ?? [];
 
         if (!is_array($repeat) || !count($repeat)) {
+            unset($data['_repeatTpl']);
+            unset($data['_repeatData']);
             $data['_isEmpty'] = true;
         }
         return $data;

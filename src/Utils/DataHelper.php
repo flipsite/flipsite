@@ -11,7 +11,6 @@ final class DataHelper
             $dataSource = ArrayHelper::merge($dataSource, $data[$dataSourceKey]);
             unset($data[$dataSourceKey]);
         }
-
         $dataSourceDot = new \Adbar\Dot($dataSource);
         foreach ($data as &$value) {
             if (is_array($value)) {

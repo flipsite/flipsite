@@ -312,11 +312,8 @@ class ComponentBuilder
             // SVG
             if (str_ends_with($src, '.svg')) {
                 $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
-            } else {
-                $srcset = $imageAttributes->getSrcset('url');
-                if ($srcset) {
-                    $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
-                }
+            } elseif ($imageAttributes && $srcset = $imageAttributes->getSrcset('url')) {
+                $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
             }
             if (($style['options']['loading'] ?? '') === 'eager') {
                 $this->builder->dispatch(new Event('preload', 'background', $imageAttributes));
