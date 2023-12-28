@@ -137,6 +137,13 @@ abstract class AbstractGroup extends AbstractComponent
                 return in_array($item[$filterBy], $filter);
             }));
         }
+        if (isset($data['_options']['filterBy'], $data['_options']['filterPattern'])) {
+            $filterBy       = $data['_options']['filterBy'];
+            $filterPattern = $data['_options']['filterPattern'];
+            $repeat = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterBy) {
+                return !preg_match('/'.$filterPattern.'/', $item[$filterBy]);
+            }));
+        }
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
             $offset         = intval($data['_options']['offset'] ?? 0);
