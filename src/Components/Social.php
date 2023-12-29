@@ -8,7 +8,6 @@ final class Social extends AbstractGroup
 {
     public function normalize(string|int|bool|array $data): array
     {
-        unset($data['dataSourceList']);
         $dataSourceList = $this->getSocial();
         $data = $this->normalizeRepeat($data, $dataSourceList);
         return $data;
