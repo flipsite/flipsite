@@ -62,8 +62,7 @@ class MetaBuilder implements BuilderInterface
         $elements[] = $this->og('og:title', $title);
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
 
-        if (isset($meta['share'])) {
-            $imageAttributes = $this->assets->getImageAttributes($meta['share'], ['width' => 1200, 'height' => 630, 'webp' => false]);
+        if (isset($meta['share']) && $imageAttributes = $this->assets->getImageAttributes($meta['share'], ['width' => 1200, 'height' => 630, 'webp' => false])) {
             $src = $imageAttributes->getSrc();
             $elements[] = $this->og('og:image', $this->environment->getAbsoluteSrc($src, true));
         }
