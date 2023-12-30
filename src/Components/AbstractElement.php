@@ -21,6 +21,9 @@ abstract class AbstractElement
     private ?string $commentBefore = null;
     private ?string $commentAfter = null;
 
+    public function getStyle(): array {
+        return $this->style;
+    }
     public function addStyle(null|array|string $style): self
     {
         if (null === $style) {
@@ -32,6 +35,9 @@ abstract class AbstractElement
         $this->cache = null;
         $this->style = ArrayHelper::merge($this->style, $style);
         return $this;
+    }
+    public function replaceStyle(array $style) {
+        return $this->style = $style;
     }
 
     public function commentOut(bool $commentOut, string $comment)
