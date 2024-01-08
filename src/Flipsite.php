@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Builders\ComponentBuilder;
@@ -25,7 +24,9 @@ use voku\helper\HtmlMin;
 
 final class Flipsite
 {
-    public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null) {}
+    public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
+    {
+    }
 
     public function getDocument(string $rawPath): Document
     {
@@ -47,10 +48,10 @@ final class Flipsite
             $this->siteData,
             $path
         );
-        $scriptBuilder = new ScriptBuilder();
+        $scriptBuilder  = new ScriptBuilder();
         $faviconBuilder = new FaviconBuilder($this->environment, $this->siteData);
         $perloadBuilder = new PreloadBuilder();
-        $styleBuilder = new StyleBuilder(
+        $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts()
         );
@@ -75,7 +76,7 @@ final class Flipsite
             $sections = $this->siteData->getSections($path->getPage(), $path->getLanguage());
         }
 
-        $sections = $this->addGlobalVars($sections, $scriptBuilder);
+        $sections = $this->addGlobalVars($sections, $scriptBuilder, $this->siteData->getSocial());
 
         foreach ($sections as $sectionId => $sectionData) {
             if ($this->plugins) {
@@ -89,7 +90,7 @@ final class Flipsite
         $document = $metaBuilder->getDocument($document);
         $document = $faviconBuilder->getDocument($document);
         $document = $perloadBuilder->getDocument($document);
-        $fonts = $this->siteData->getFonts();
+        $fonts    = $this->siteData->getFonts();
         if ($fonts) {
             $fontBuilder = new FontBuilder($fonts);
             $document    = $fontBuilder->getDocument($document);
@@ -111,6 +112,7 @@ final class Flipsite
 
         return $document;
     }
+
     public function render(string $rawPath): string
     {
         switch ($rawPath) {
@@ -118,22 +120,25 @@ final class Flipsite
             case 'sitemap.xml': return $this->renderSitemap();
         }
         $document = $this->getDocument($rawPath);
-        $html = $document->render();
+        $html     = $document->render();
         if ($this->environment->minimizeHtml()) {
             $html = $this->minimizeHtml($html);
         }
         return $html;
     }
+
     public function renderRobots(): string
     {
         $robots = new Robots($this->environment);
         return (string)$robots;
     }
+
     public function renderSitemap(): string
     {
         $sitemap = new Sitemap($this->environment, $this->siteData);
         return (string)$sitemap;
     }
+
     private function minimizeHtml(string $html): string
     {
         $htmlMin = new HtmlMin();
@@ -162,14 +167,22 @@ final class Flipsite
         return $htmlMin->minify($html);
     }
 
-    private function addGlobalVars(array $sections, ScriptBuilder $scriptBuilder): array
+    private function addGlobalVars(array $sections, ScriptBuilder $scriptBuilder, ?array $social): array
     {
         foreach ($sections as $attr => &$value) {
             if (is_array($value)) {
-                $value = $this->addGlobalVars($value, $scriptBuilder);
+                $value = $this->addGlobalVars($value, $scriptBuilder, $social);
             } elseif (is_string($value)) {
                 if (strpos($value, '{site.name}') !== false) {
                     $value = str_replace('{site.name}', $this->siteData->getName(), $value);
+                }
+                if (strpos($value, '{social.') !== false) {
+                    foreach ($social as $type => $handle) {
+                        $needle = '{social.'.$type.'}';
+                        if (strpos($value, $needle) !== false) {
+                            $value = str_replace($needle, $handle, $value);
+                        }
+                    }
                 }
                 if (strpos($value, '{copyright.year}') !== false) {
                     $scriptBuilder->handleComponentEvent(new \Flipsite\Components\Event('ready-script', 'copyright', file_get_contents(__DIR__ . '/../js/ready.copyright.min.js')));

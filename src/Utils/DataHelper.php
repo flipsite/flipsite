@@ -24,13 +24,21 @@ final class DataHelper
                             }
                         }
                         $value = self::applyData($value, $stripedDataSource, $dataSourceKey, false);
+                    } elseif (is_string($value['_repeat'])) {
+                        preg_match_all('/\{([^\{\}]+)\}/', (string)$value['_repeat'], $matches);
+                        foreach ($matches[1] as $match) {
+                            $replaceWith = $dataSourceDot->get($match);
+                            if (!!$replaceWith || $replaceIfMissing) {
+                                $value['_repeat'] = str_replace('{'.$match.'}', (string)$replaceWith, (string)$value['_repeat']);
+                            }
+                        }
                     }
                     if (isset($value['_options'])) {
                         $options['_options'] = $value['_options'];
                         unset($value['_options']);
                         $options = self::applyData($options, $dataSource, $dataSourceKey, false);
                         if ($options) {
-                            $value = ArrayHelper::merge($value,$options);
+                            $value = ArrayHelper::merge($value, $options);
                         }
                     }
                 } else {
