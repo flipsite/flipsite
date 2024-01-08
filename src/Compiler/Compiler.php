@@ -248,7 +248,7 @@ class Compiler implements LoggerAwareInterface
             }
         }
         foreach ($dirs as $dir) {
-            if (count(scandir($dir)) == 2) {
+            if (file_exists($dir) && count(scandir($dir)) == 2) {
                 $filesystem->remove($dir);
             }
         }
