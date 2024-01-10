@@ -57,7 +57,7 @@ class ComponentBuilder
             $parentTypeStyle = $this->siteData->getComponentStyle($parentType);
             $style           = ArrayHelper::merge($parentTypeStyle, $style);
         }
-        if (isset($data['_options']['hidden'])) {
+        if ($data['_options']['hidden'] ?? false) {
             return null;
         }
         if (isset($data['_options']['render'])) {
