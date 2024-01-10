@@ -7,7 +7,7 @@ use Flipsite\Utils\ArrayHelper;
 
 final class Breadcrumb extends AbstractGroup
 {
-    use Traits\BuilderTrait;
+    //use Traits\BuilderTrait;
     use Traits\PathTrait;
     use Traits\SiteDataTrait;
 
@@ -15,74 +15,88 @@ final class Breadcrumb extends AbstractGroup
 
     public function normalize(string|int|bool|array $data) : array
     {
-        if (!is_array($data)) {
-            $data = ['items' => $data];
-        }
-        if (!isset($data['items']) || is_bool($data['items'])) {
-            $data['items'] = 'self';
-        }
-
-        if (is_string($data['items'])) {
-            $page = 'self' === $data['items'] ? $this->path->getPage() : $data['items'];
-            if ('home' === $page) {
-                $data['items'] = [$data['home'] ?? [
-                    'url'  => 'home',
-                    'text' => $this->reader->getPageName('home', $this->path->getLanguage())
-                ]];
-                unset($data['home']);
-            } else {
-                $data['items']   = [];
-                $path            = explode('/', $page);
-                while (count($path) > 0) {
-                    $page            = implode('/', $path);
-                    if ($this->reader->getSlugs()->isPage($page)) {
-                        $data['items'][] = [
-                            'url'  => $page,
-                            'text' => $this->reader->getPageName($page, $this->path->getLanguage())
-                        ];
-                    }
-                    array_pop($path);
-                }
-                $data['items'][] = $data['home'] ?? [
-                    'url'  => 'home',
-                    'text' => $this->reader->getPageName('home', $this->path->getLanguage())
-                ];
-                unset($data['home']);
-                $data['items'] = array_reverse($data['items']);
-            }
-        }
-        $data['items'][array_key_last($data['items'])]['active'] = true;
         return $data;
     }
 
     public function build(array $data, array $style, array $options) : void
     {
-        $this->addStyle($style);
-        $items = $data['items'] ?? [];
-        unset($data['items']);
+        $page    = $this->path->getPage();
+        $current = $this->siteData->getPageName($page, $this->path->getLanguage());
+        $links   = $this->getLinks($page);
 
-        $separator = ['text' => '/'];
-        if (isset($data['separator'])) {
-            $separator = $data['separator'];
-            unset($data['separator']);
-        }
+        foreach ($links as $i => $link) {
+            $link['_style']         = $style['links'] ?? [];
+            $link['_style']['type'] = 'group';
+            $data['group:'.$i]      = $link;
 
-        foreach ($items as $i => $item) {
-            $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
-            if (isset($item['active']) && $item['active'] && isset($style['active'])) {
-                unset($item['active']);
-                if (!isset($item['style'])) {
-                    $item['style'] = [];
-                }
-                $item['style'] = ArrayHelper::merge($item['style'], $style['active'] ?? null);
-            }
-            $data['a:'.$i] = $item;
-            if ($i !== count($items) - 1) {
-                $data['separator:'.$i] = $separator;
-            }
+            $data['svg:'.$i] = [
+                'value'  => $data['separator'] ?? [],
+                '_style' => $style['separator'] ?? []
+            ];
         }
-        unset($style['items'], $style['active']);
+        unset($data['separator'], $style['links'], $style['separator']);
 
         parent::build($data, $style, $options);
+
+        $span = new Element('span');
+        $span->setContent($current);
+        $this->addChild($span);
     }
+
+    private function getLinks(string $page) : array
+    {
+        if ($page === 'home') {
+            return [];
+        }
+        $links   = [];
+        $parts   = explode('/', $page);
+        array_pop($parts);
+        while (count($parts)) {
+            $linkPage = implode(',', $parts);
+            if ($this->siteData->getSlugs()->isPage($linkPage)) {
+                $links[]  = [
+                    '_target'  => $linkPage,
+                    '_action'  => 'page',
+                    'text'     => $this->siteData->getPageName($linkPage, $this->path->getLanguage())
+                ];
+            }
+            array_pop($parts);
+        }
+        $links[] = [
+            '_target'  => 'home',
+            '_action'  => 'page',
+            'text'     => $this->siteData->getPageName('home', $this->path->getLanguage())
+        ];
+        return array_reverse($links);
+    }
+
+    // {
+    //     $this->addStyle($style);
+    //     $items = $data['items'] ?? [];
+    //     unset($data['items']);
+
+    //     $separator = ['text' => '/'];
+    //     if (isset($data['separator'])) {
+    //         $separator = $data['separator'];
+    //         unset($data['separator']);
+    //     }
+
+    //     foreach ($items as $i => $item) {
+    //         $item['style'] = ArrayHelper::merge($style['items'] ?? [], $item['style'] ?? []);
+    //         if (isset($item['active']) && $item['active'] && isset($style['active'])) {
+    //             unset($item['active']);
+    //             if (!isset($item['style'])) {
+    //                 $item['style'] = [];
+    //             }
+    //             $item['style'] = ArrayHelper::merge($item['style'], $style['active'] ?? null);
+    //         }
+    //         $data['a:'.$i] = $item;
+    //         if ($i !== count($items) - 1) {
+    //             $data['separator:'.$i] = $separator;
+    //         }
+    //     }
+    //     unset($style['items'], $style['active']);
+
+    //     parent::build($data, $style, $options);
+    // }
 }

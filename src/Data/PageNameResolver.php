@@ -1,10 +1,8 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
-use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
 
 interface PageNameResolverInterface
