@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Social extends AbstractGroup
@@ -10,9 +9,28 @@ final class Social extends AbstractGroup
     {
         $dataSourceList = $this->getSocial($data['phoneFormat'] ?? null);
         unset($data['phoneFormat']);
+        $types = false;
+        if (isset($data['types'])) {
+            $types = explode(',', $data['types']);
+            unset($data['types']);
+        }
+
         $data = $this->normalizeRepeat($data, $dataSourceList);
+        if ($types) {
+            $repeatData = [];
+            foreach ($data['_repeatData'] as $item) {
+                $repeatData[$item['type']] = $item;
+            }
+            $data['_repeatData'] = [];
+            foreach ($types as $type) {
+                if (isset($repeatData[$type])) {
+                    $data['_repeatData'][] = $repeatData[$type];
+                }
+            }
+        }
         return $data;
     }
+
     private function getSocial(?string $phoneFormat = null): array
     {
         $name     = $this->siteData->getName();
@@ -23,9 +41,10 @@ final class Social extends AbstractGroup
         if (!$social) {
             return [];
         }
-        
+
         foreach ($social as $type => $handle) {
             $item           = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
+            $item['type']   = $type;
             $item['handle'] = $handle;
             $item['url']    = $item['url'];
             if ($phoneFormat && 'phone' === $type) {
@@ -34,10 +53,11 @@ final class Social extends AbstractGroup
             $items[] = $item;
         }
 
-
         return $items;
     }
-    private function getFormattedPhoneNumber(string $value, string $format) : string {
+
+    private function getFormattedPhoneNumber(string $value, string $format) : string
+    {
         $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
         try {
             $phoneNumber = $phoneUtil->parse($value, '');
