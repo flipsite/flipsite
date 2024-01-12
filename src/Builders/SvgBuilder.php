@@ -11,25 +11,27 @@ use Flipsite\Components\Event;
 class SvgBuilder implements BuilderInterface, ComponentListenerInterface
 {
     private array $data  = [];
-    
+
     public function getDocument(Document $document): Document
     {
-        if (!count($this->data)) return $document;
+        if (!count($this->data)) {
+            return $document;
+        }
 
         $svg = new Element('svg');
-        $svg->setAttribute('version','1.1');
-        $svg->setAttribute('xmlns','http://www.w3.org/2000/svg');
-        $svg->setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
-        $svg->setAttribute('style','display:none;');
-        
+        $svg->setAttribute('version', '1.1');
+        $svg->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        $svg->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+        $svg->setAttribute('style', 'display:none;');
+
         $defs = new Element('defs');
         foreach ($this->data as $id => $data) {
             $g = new Element('g', true);
             $g->setAttribute('id', $id);
-            $g->setContent(trim($data));
+            $g->setContent($data);
             $defs->addChild($g);
         }
-        
+
         $svg->addChild($defs);
         $document->getChild('body')->prependChild($svg);
 
@@ -38,7 +40,9 @@ class SvgBuilder implements BuilderInterface, ComponentListenerInterface
 
     public function handleComponentEvent(Event $event) : void
     {
-        if ('svg' !== $event->getType()) return;
+        if ('svg' !== $event->getType()) {
+            return;
+        }
         $this->data[$event->getId()] = $event->getData();
     }
 }
