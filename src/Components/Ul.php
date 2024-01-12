@@ -10,8 +10,10 @@ final class Ul extends AbstractGroup
     public function normalize(string|int|bool|array $data): array
     {
         $repeat = [];
-        foreach (explode(',', $data['_repeat']) as $item) {
-            $repeat[] = ['item' => trim($item)];
+        if (isset($data['_repeat'])) {
+            foreach (explode(',', $data['_repeat']) as $item) {
+                $repeat[] = ['item' => trim($item)];
+            }
         }
         unset($data['_repeat']);
         $data = $this->normalizeRepeat($data, $repeat);

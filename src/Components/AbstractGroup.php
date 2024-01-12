@@ -127,20 +127,26 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
     {
-        if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
+        if (isset($data['_options']['filter'], $data['_options']['filterField'])) {
             $filter = explode(',', $data['_options']['filter']);
             $filter = array_map('trim', $filter);
 
-            $filterBy       = $data['_options']['filterBy'];
-            $repeat         = array_values(array_filter($repeat, function ($item) use ($filter, $filterBy) {
-                return in_array($item[$filterBy], $filter);
+            $filterField = $data['_options']['filterField'];
+            $repeat      = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
+                if (!isset($item[$filterField])) {
+                    return false;
+                }
+                $fieldFieldValues = explode(',', $item[$filterField]);
+                $fieldFieldValues = array_map('trim', $fieldFieldValues);
+
+                return count(array_intersect($fieldFieldValues,$filter)) > 0;
             }));
         }
-        if (isset($data['_options']['filterBy'], $data['_options']['filterPattern'])) {
-            $filterBy       = $data['_options']['filterBy'];
+        if (isset($data['_options']['filterField'], $data['_options']['filterPattern'])) {
+            $filterField       = $data['_options']['filterField'];
             $filterPattern  = $data['_options']['filterPattern'];
-            $repeat         = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterBy) {
-                return !preg_match('/'.$filterPattern.'/', $item[$filterBy]);
+            $repeat         = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterField) {
+                return !preg_match('/'.$filterPattern.'/', $item[$filterField]);
             }));
         }
 

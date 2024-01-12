@@ -149,11 +149,9 @@ class ComponentBuilder
         }
 
         $data = $component->normalize($data);
-        if (isset($data['default'])) {
-            if (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value'])) {
-                $data['value'] = $data['default'];
-                unset($data['default']);
-            }
+        if (isset($data['default']) && (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value']))) {
+            $data['value'] = $data['default'];
+            unset($data['default']);
         }
 
         if ($data['_isEmpty'] ?? false) {
