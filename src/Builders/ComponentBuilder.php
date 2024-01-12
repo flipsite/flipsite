@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -150,6 +149,12 @@ class ComponentBuilder
         }
 
         $data = $component->normalize($data);
+        if (isset($data['default'])) {
+            if (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value'])) {
+                $data['value'] = $data['default'];
+                unset($data['default']);
+            }
+        }
 
         if ($data['_isEmpty'] ?? false) {
             return null;
@@ -252,6 +257,12 @@ class ComponentBuilder
 
     private function handleRenderOptions(array $options): bool
     {
+        if (isset($options['hasValue'])) {
+            if (!$options['hasValue']) {
+                return false;
+            }
+            return !preg_match('/^\{[a-zA-Z]+\}$/', $options['hasValue']);
+        }
         if (isset($options['hasSubpages'])) {
             if (!$this->siteData->getSlugs()->hasSubpages($options['hasSubpages'])) {
                 return false;
@@ -334,8 +345,6 @@ class ComponentBuilder
         error_log('handleGlobalVars');
         return $data;
     }
-
-
 
     private function parseThemeColors(string $gradient): string
     {

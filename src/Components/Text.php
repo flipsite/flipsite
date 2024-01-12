@@ -10,7 +10,7 @@ final class Text extends AbstractComponent
     public function normalize(string|int|bool|array $data) : array
     {
         if (!is_array($data)) {
-            return ['value' => (string)$data];
+            $data = ['value' => (string)$data];
         }
         return $data;
     }
