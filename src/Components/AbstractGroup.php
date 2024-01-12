@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 abstract class AbstractGroup extends AbstractComponent
@@ -133,21 +132,21 @@ abstract class AbstractGroup extends AbstractComponent
             $filter = array_map('trim', $filter);
 
             $filterBy       = $data['_options']['filterBy'];
-            $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterBy) {
+            $repeat         = array_values(array_filter($repeat, function ($item) use ($filter, $filterBy) {
                 return in_array($item[$filterBy], $filter);
             }));
         }
         if (isset($data['_options']['filterBy'], $data['_options']['filterPattern'])) {
             $filterBy       = $data['_options']['filterBy'];
-            $filterPattern = $data['_options']['filterPattern'];
-            $repeat = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterBy) {
+            $filterPattern  = $data['_options']['filterPattern'];
+            $repeat         = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterBy) {
                 return !preg_match('/'.$filterPattern.'/', $item[$filterBy]);
             }));
         }
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
-            $offset         = intval($data['_options']['offset'] ?? 0);
-            $length         = intval($data['_options']['length'] ?? 999999);
+            $offset = intval($data['_options']['offset'] ?? 0);
+            $length = intval($data['_options']['length'] ?? 999999);
             $repeat = array_splice($repeat, $offset, $length);
         }
 
@@ -174,9 +173,13 @@ abstract class AbstractGroup extends AbstractComponent
         $data['_repeatData'] = $repeat ?? [];
 
         if (!is_array($repeat) || !count($repeat)) {
-            unset($data['_repeatTpl']);
-            unset($data['_repeatData']);
+            unset($data['_repeatTpl'], $data['_repeatData']);
+
             $data['_isEmpty'] = true;
+        } else {
+            foreach ($data['_repeatData'] as $index0 => &$item) {
+                $item['index'] = $index0 + 1;
+            }
         }
         return $data;
     }

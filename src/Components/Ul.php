@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Ul extends AbstractGroup
@@ -11,10 +10,10 @@ final class Ul extends AbstractGroup
     public function normalize(string|int|bool|array $data): array
     {
         $repeat = [];
-        foreach(explode(',', $data['value']) as $item) {
+        foreach (explode(',', $data['_repeat']) as $item) {
             $repeat[] = ['item' => trim($item)];
         }
-        unset($data['value']);
+        unset($data['_repeat']);
         $data = $this->normalizeRepeat($data, $repeat);
         return $data;
     }
