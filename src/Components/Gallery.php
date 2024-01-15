@@ -10,10 +10,13 @@ final class Gallery extends AbstractGroup
     public function normalize(string|int|bool|array $data): array
     {
         $repeat = [];
-        foreach (explode(',', $data['_repeat'] ?? '') as $image) {
-            $repeat[] = ['image' => trim($image)];
+        if (isset($data['_repeat'])) {
+            $list = json_decode($data['_repeat'], true) ?? [];
+            foreach ($list as $item) {
+                $repeat[] = ['image' => trim($item)];
+            }
         }
-        unset($data['value']);
+        unset($data['_repeat']);
         $data = $this->normalizeRepeat($data, $repeat);
         return $data;
     }

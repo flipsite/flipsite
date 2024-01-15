@@ -17,7 +17,7 @@ class UnsplashAttributes extends AbstractImageAttributes
         $src = str_replace('&w='.$matchesW[1],'', $src);
         $src = str_replace('&h='.$matchesH[1],'', $src);
 
-        $this->srcset = $options['srcset'] ?? null;
+        $this->srcset = $options['srcset'] ?? [];
 
         $this->srcTpl = $src;
         if (isset($options['aspectRatio'])) {
