@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Flipsite\Components;
+use Flipsite\Builders\Event;
 
 final class Timer extends AbstractGroup
 {

@@ -12,7 +12,7 @@ final class Counter extends AbstractComponent
     public function build(array $data, array $style, array $options): void
     {
         $this->addStyle($style);
-        $this->builder->dispatch(new \Flipsite\Components\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/ready.counter.min.js')));
+        $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/ready.counter.min.js')));
         $this->addStyle($style);
         $this->setAttribute('data-counter', true);
         $this->setAttribute('data-to', (string)($data['to'] ?? 100));

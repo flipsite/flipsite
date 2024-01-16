@@ -21,6 +21,9 @@ abstract class AbstractElement
     private ?string $commentBefore = null;
     private ?string $commentAfter = null;
 
+    public function getStyle(): array {
+        return $this->style;
+    }
     public function addStyle(null|array|string $style): self
     {
         if (null === $style) {
@@ -32,6 +35,9 @@ abstract class AbstractElement
         $this->cache = null;
         $this->style = ArrayHelper::merge($this->style, $style);
         return $this;
+    }
+    public function replaceStyle(array $style) {
+        return $this->style = $style;
     }
 
     public function commentOut(bool $commentOut, string $comment)
@@ -105,10 +111,21 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
     public function setContent(string $content): self
     {
         $this->cache   = null;
         $this->content = $content;
+        return $this;
+    }
+
+    public function setTag(string $tag) : self
+    {
+        $this->tag = $tag;
         return $this;
     }
 
@@ -252,7 +269,7 @@ abstract class AbstractElement
         return $html;
     }
 
-    private function getClasses(): string
+    public function getClasses(string $format = 'string'): string|array
     {
         $classes = [];
         foreach ($this->style as $attr => $class) {
@@ -266,7 +283,7 @@ abstract class AbstractElement
         }
         $classes = array_unique($classes);
         sort($classes);
-        return trim(implode(' ', $classes));
+        return 'string' === $format ? trim(implode(' ', $classes)) : $classes;
     }
 
     private function purgeInvalidAttributes(): void

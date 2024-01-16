@@ -7,9 +7,8 @@ use Flipsite\Utils\ArrayHelper;
 
 final class Sitemap extends AbstractComponent
 {
-    use Traits\SlugsTrait;
     use Traits\BuilderTrait;
-    use Traits\ReaderTrait;
+    use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
     protected string $tag   = 'ul';
@@ -17,7 +16,7 @@ final class Sitemap extends AbstractComponent
     public function build(array $data, array $style, string $appearance) : void
     {
         $pages = new \Adbar\Dot();
-        foreach ($this->slugs->getPages() as $page) {
+        foreach ($this->siteData->getSlugs()->getPages() as $page) {
             $pages->add(str_replace('/', '.', $page), $page);
         }
         $level = 0;

@@ -1,28 +1,42 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
-
+use Flipsite\Builders\Event;
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
     use Traits\StyleOptimizerTrait;
-    use Traits\UrlTrait;
-    use Traits\SlugsTrait;
-    use Traits\ReaderTrait;
+    use Traits\ActionTrait;
+    use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
     protected string $tag = 'div';
 
     public function build(array $data, array $style, array $options): void
     {
-        foreach ($data['_attr'] ?? [] as $attr => $val) {
-            $this->setAttribute($attr, $val);
-        }
-        unset($data['_attr']);
         $this->tag ??= $style['tag'];
         unset($style['tag']);
+
+        if (isset($data['_action'])) {
+            if ('tel' === $data['_action']) {
+                // handle tel replace
+            }
+            if ('mailto' === $data['_action']) {
+                // handle tel replace
+            }
+            if ('toggle' === $data['_action']) {
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
+            }
+            $actionAttributes = $this->getActionAttributes($data);
+            if (isset($actionAttributes['tag'])) {
+                $this->tag = $actionAttributes['tag'];
+                unset($actionAttributes['tag']);
+            }
+            foreach ($actionAttributes as $attr => $val) {
+                $this->setAttribute($attr, $val);
+            }
+        }
 
         $this->addStyle($style);
 
@@ -65,103 +79,32 @@ abstract class AbstractGroup extends AbstractComponent
     {
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
-        $data = $this->normalizeRepeat($data);
+
+        if (isset($data['_repeat'])) {
+            $repeat = $data['_repeat'];
+            unset($data['_repeat']);
+            if (is_string($repeat)) {
+                $repeat = $this->getCollection($repeat, true);
+            }
+            $data = $this->normalizeRepeat($data, $repeat);
+        }
         return $data;
     }
 
     private function normalizeAction(string|int|bool|array $data): array
     {
         if (isset($data['_page'])) {
+            $data['_action'] = 'page';
             $data['_target'] = $data['_page'];
             unset($data['_page']);
         }
-        $action = $data['_action'] ?? false;
-        $target = $data['_target'] ?? false;
-        $params = $data['_params'] ?? false;
-
-        unset($data['_action'],$data['_target'],$data['_params']);
-
-        if (!$action) {
-            return $data;
+        if (isset($data['_params'])) {
+            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
+            unset($data['_params']);
         }
-        $replace   = [];
-        $this->tag = 'a';
-
-        if ('auto' === $action) {
-            if (!$target) {
-                return $data;
-            }
-            $target = str_replace('mailto:', '', $target);
-            $target = str_replace('tel:', '', $target);
-            $page   = $this->slugs->getPage($target);
-            if ($page) {
-                $action = 'page';
-            } elseif (str_starts_with($target, 'http')) {
-                $action = 'url-blank';
-            } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
-                $action = 'mailto';
-            } else {
-                $matches = [];
-                preg_match('/\+[0-9]{9,20}/', $target, $matches);
-                if (count($matches)) {
-                    $action = 'tel';
-                }
-            }
-        }
-        switch ($action) {
-            case 'page':
-            case 'url':
-            case 'url-blank':
-                if (!$target) {
-                    return $data;
-                }
-                if ($params) {
-                    $target = str_replace(':slug', $params, $target);
-                }
-
-                $external              = false;
-                $data['_attr']['href'] = $this->url($target, $external);
-                if ($external) {
-                    $data['_attr']['rel'] = 'noopener noreferrer';
-                    if ('url-blank' === $action) {
-                        $data['_attr']['target'] = '_blank';
-                    }
-                }
-                break;
-            case 'tel':
-                $phoneUtil  = \libphonenumber\PhoneNumberUtil::getInstance();
-                try {
-                    $tel         = '+'.trim((string)$target, '+');
-                    $numberProto = $phoneUtil->parse($tel, '');
-                    $replace     = [
-                        '{{tel}}'      => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::NATIONAL),
-                        '{{tel.int}}'  => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::INTERNATIONAL),
-                        '{{tel.e164}}' => $phoneUtil->format($numberProto, \libphonenumber\PhoneNumberFormat::E164),
-                    ];
-                } catch (\libphonenumber\NumberParseException $e) {
-                }
-                $data['_attr']['href'] = 'tel:'.$tel;
-                break;
-            case 'mailto':
-                $data['_attr']['href'] = 'mailto:'.$target;
-                $replace               = [
-                    '{{email}}' => $target
-                ];
-                break;
-            case 'scroll':
-                $data['_attr']['href'] = '#'.trim($target, '#');
-                break;
-            case 'submit':
-                $this->tag             = 'button';
-                $data['_attr']['type'] = 'submit';
-                break;
-            case 'toggle':
-                $this->tag             = 'button';
-                $this->setAttribute('onclick', 'javascript:toggle(this)');
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
-                break;
-            default:
-                $data['_attr']['href'] = '#';
+        if (isset($data['_params'])) {
+            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
+            unset($data['_params']);
         }
         return $data;
     }
@@ -175,57 +118,47 @@ abstract class AbstractGroup extends AbstractComponent
             case 'toggle':
                 $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,768)');
                 $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,768)');
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__.'/../../js/toggle.min.js')));
+                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
                 break;
         }
         unset($data['_hover']);
         return $data;
     }
 
-    private function normalizeRepeat(string|int|bool|array $data): array
+    protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
     {
-        if (isset($data['_dataSourceList'])) {
-            $dataSourceList = $data['_dataSourceList'];
-            unset($data['_dataSourceList']);
-            if ('_none' === $dataSourceList) {
-                return $data;
-            }
-        } else {
-            return $data;
-        }
-        if (is_string($dataSourceList) && str_starts_with($dataSourceList, '_pages')) {
-            $parentPage     = $data['_options']['parentPage'] ?? null;
-            $dataSourceList = $this->getPages(intval(str_replace('_pages-', '', $dataSourceList)), $parentPage);
-        } elseif (is_string($dataSourceList) && '_social' === $dataSourceList) {
-            $dataSourceList = $this->getSocial();
-        } elseif (is_string($dataSourceList)) {
-            // Check if content
-            $dataSourceList = $this->getContent($dataSourceList, true);
-        }
-
-        // foreach ($dataSourceList as $index => &$item) {
-            
-        // }
-
-        if (isset($data['_options']['filter'], $data['_options']['filterBy'])) {
+        if (isset($data['_options']['filter'], $data['_options']['filterField'])) {
             $filter = explode(',', $data['_options']['filter']);
             $filter = array_map('trim', $filter);
 
-            $filterBy       = $data['_options']['filterBy'];
-            $dataSourceList = array_values(array_filter($dataSourceList, function ($item) use ($filter, $filterBy) {
-                return in_array($item[$filterBy], $filter);
+            $filterField = $data['_options']['filterField'];
+            $repeat      = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
+                if (!isset($item[$filterField])) {
+                    return false;
+                }
+                $fieldFieldValues = explode(',', $item[$filterField]);
+                $fieldFieldValues = array_map('trim', $fieldFieldValues);
+
+                return count(array_intersect($fieldFieldValues,$filter)) > 0;
+            }));
+        }
+        if (isset($data['_options']['filterField'], $data['_options']['filterPattern'])) {
+            $filterField       = $data['_options']['filterField'];
+            $filterPattern  = $data['_options']['filterPattern'];
+            $repeat         = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterField) {
+                return !preg_match('/'.$filterPattern.'/', $item[$filterField]);
             }));
         }
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
-            $offset         = intval($data['_options']['offset'] ?? 0);
-            $length         = intval($data['_options']['length'] ?? 999999);
-            $dataSourceList = array_splice($dataSourceList, $offset, $length);
+            $offset = intval($data['_options']['offset'] ?? 0);
+            $length = intval($data['_options']['length'] ?? 999999);
+            $repeat = array_splice($repeat, $offset, $length);
         }
 
         if (isset($data['_options']['sortBy'])) {
             $sortField = $data['_options']['sortBy'];
-            uasort($dataSourceList, function ($a, $b) use ($sortField) {
+            uasort($repeat, function ($a, $b) use ($sortField) {
                 if (isset($a[$sortField],$b[$sortField])) {
                     return $a[$sortField] <=> $b[$sortField];
                 }
@@ -233,7 +166,7 @@ abstract class AbstractGroup extends AbstractComponent
             });
         }
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
-            $dataSourceList = array_reverse($dataSourceList);
+            $repeat = array_reverse($repeat);
         }
 
         $components = array_filter($data, function ($key): bool {
@@ -243,74 +176,30 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data[$key]);
         }
         $data['_repeatTpl']  = $components;
-        $data['_repeatData'] = $dataSourceList ?? [];
+        $data['_repeatData'] = $repeat ?? [];
 
-        if (!is_array($dataSourceList) || !count($dataSourceList)) {
+        if (!is_array($repeat) || !count($repeat)) {
+            unset($data['_repeatTpl'], $data['_repeatData']);
+
             $data['_isEmpty'] = true;
+        } else {
+            foreach ($data['_repeatData'] as $index0 => &$item) {
+                $item['index'] = $index0 + 1;
+            }
         }
         return $data;
     }
 
-    private function getPages(int $level, ?string $parentPage = null): array
+    private function getCollection(string $collectionId): array
     {
-        $pages      = [];
-        $all        = $this->slugs->getPages();
-        $firstExact = false;
-        if ($level === 0) {
-            $pages = array_filter($all, function ($value) {
-                return mb_strpos((string)$value, '/') === false;
-            });
-        } else {
-            $parts           = explode('/', $parentPage ?? $this->path->getPage());
-            $startsWith      = implode('/', array_splice($parts, 0, $level));
-
-            foreach ($all as $page) {
-                $count = substr_count((string)$page, '/');
-                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level) {
-                    $pages[] = $page;
-                }
-            }
+        // Old YAML style reference
+        if (str_starts_with($collectionId, '${content.')) {
+            $collectionId = substr($collectionId, 10, strlen($collectionId) - 11);
         }
-
-        $items = [];
-        foreach ($pages as $page) {
-            $pageMeta = $this->reader->getMeta((string)$page, $this->path->getLanguage());
-            $item            = [
-                'slug'  => $page,
-                'name'  => $this->reader->getPageName((string)$page, $this->path->getLanguage()),
-                ...$pageMeta
-            ];
-            $items[] = $item;
+        $collection = $this->siteData->getCollection($collectionId);
+        if (!$collection) {
+            return [];
         }
-        return $items;
-    }
-
-    private function getSocial(): array
-    {
-        $name     = $this->reader->get('name');
-        $language = $this->path->getLanguage();
-        $items    = [];
-        $i        = 0;
-        $social = $this->reader->get('social');
-        if (!$social) return [];
-        foreach ($social as $type => $handle) {
-            $item        = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
-            $item['url'] = $item['url'];
-            $items[]     = $item;
-        }
-        return $items;
-    }
-
-    private function getContent(string $category): array {
-        $content = $this->reader->get('content.'.$category) ?? [];
-
-        $schema = $this->reader->get('contentSchemas.'.$category) ?? [];
-        $onlyPublished = isset($schema['published']);
-        if ($onlyPublished) {
-            return array_filter($content, function($item){
-                return $item['published'] ?? false;
-            });
-        }
-        return $content;
+        return $collection->getContent(true);
     }
 }

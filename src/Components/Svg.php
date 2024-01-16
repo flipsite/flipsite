@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 namespace Flipsite\Components;
+use Flipsite\Builders\Event;
 
-final class Svg extends AbstractComponent
+class Svg extends AbstractComponent
 {
+    use Traits\BuilderTrait;
+    use Traits\AssetsTrait;
+
     protected string $tag   = 'svg';
     protected bool $oneline = true;
 
@@ -17,7 +21,7 @@ final class Svg extends AbstractComponent
             $data['src'] = $data['value'];
             unset($data['value']);
         }
-        if (isset($data['fallback']) && strpos($data['src'],'.svg') === false) {
+        if (isset($data['fallback']) && strpos($data['src'], '.svg') === false) {
             $data['src'] = $data['fallback'];
             unset($data['fallback']);
         }
@@ -26,23 +30,17 @@ final class Svg extends AbstractComponent
 
     public function build(array $data, array $style, array $options) : void
     {
-        if (isset($style['wrapper'])) {
-            $this->addStyle($style['wrapper']);
-            unset($style['wrapper']);
-            $this->tag = 'div';
-            $svg       = new Element('svg', true);
-            $svg->setAttribute('src', $data['src']);
-            $svg->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            $svg->setAttribute('viewBox', '');
-            $svg->addStyle($style);
-            $svg->setContent('<use xlink:href=""></use>');
-            $this->addChild($svg);
+        $svg = $this->assets->getSvg($data['src']);
+        $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        $this->addStyle($style);
+        if ($svg) {
+            $this->setAttribute('viewBox', $svg->getViewbox());
+            $this->setContent('<use xlink:href="#'.$svg->getHash().'"></use>');
+            $this->builder->dispatch(new Event('svg', $svg->getHash(), $svg->getDef()));
         } else {
-            $this->setAttribute('src', $data['src']);
-            $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            $this->setAttribute('viewBox', '');
-            $this->addStyle($style);
-            $this->setContent('<use xlink:href=""></use>');
+            $this->setAttribute('viewBox', '0 0 100 100');
+            $this->setContent('<use xlink:href="#empty"></use>');
+            $this->builder->dispatch(new Event('svg', 'empty', '<rect width="100%" height="100%" fill="#eee" />'));
         }
     }
 }

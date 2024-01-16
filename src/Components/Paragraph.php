@@ -7,14 +7,15 @@ namespace Flipsite\Components;
 final class Paragraph extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\GlobalVarsTrait;
+    use Traits\ClassesTrait;
+
     protected string $tag = 'p';
 
     public function build(array $data, array $style, array $options): void
     {
-        $markdown = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $markdown = $this->checkGlobalVars($markdown);
-        $this->setContent((string)$markdown);
+        $html = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
+        $html = $this->addClassesToHtml($html, ['a', 'strong'], $style, $options['appearance']);
+        $this->setContent((string)$html);
         $this->addStyle($style);
     }
 

@@ -79,6 +79,26 @@ final class Tailwind implements CallbackInterface
             $css .= $this->addKeyframes($matches[1]);
         }
 
+        // Fix tranform vars
+        $transform = [
+            'perspective' => 'perspective',
+            'translateX' => 'translate-x',
+            'translateY' => 'translate-y',
+            'rotate' => 'rotate',
+            'rotateX' => 'rotate-x',
+            'rotateY' => 'rotate-y',
+            'skewX' => 'skew-x',
+            'skewY' => 'skew-y',
+            'scaleX' => 'scale-x',
+            'scaleY' => 'scale-y',
+        ];
+        foreach ($transform as $func => $var) {
+            if (strpos($css, '-tw-'.$var.':') === false) {
+                $css = str_replace($func.'(var(--tw-'.$var.'))', '', $css);
+            }
+        }
+        $css = preg_replace('/\s+/', ' ', $css);
+
         // Optimize vars
         $matches = [];
         preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
@@ -91,8 +111,7 @@ final class Tailwind implements CallbackInterface
             return strlen($b) - strlen($a);
         });
 
-
-        foreach ($vars as $i => $var) {
+        foreach ($vars as $i => $var) {   
             $addDefaultValues[$var] = '--'.$this->getVar($i);
             $css                    = str_replace($var, '--'.$this->getVar($i), $css);
         }
@@ -103,7 +122,7 @@ final class Tailwind implements CallbackInterface
         return $css;
     }
 
-    private function addDefaultValues(string $css, $addDefaultValues)
+    private function addDefaultValues(string $css, array $addDefaultValues)
     {
         $default       = '';
         $defaultValues = [

@@ -5,10 +5,10 @@ namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Components\Event;
-use Flipsite\Components\ComponentListenerInterface;
+use Flipsite\Builders\Event;
+use Flipsite\Builders\EventListenerInterface;
 
-class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
+class PreloadBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $links = [];
 
@@ -20,28 +20,26 @@ class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
+    public function handleEvent(Event $event) : void
     {
         switch ($event->getType()) {
             case 'preload':
                 if ($event->getId() === 'image') {
-                    $img  = $event->getData();
+                    $imageAttributes  = $event->getData();
                     $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
                     $link->setAttribute('as', 'image');
-                    $link->setAttribute('href', $img->getAttribute('src'));
-                    $link->setAttribute('imagesrcset', $img->getAttribute('srcset'));
-                    $link->setAttribute('imagesizes', $img->getAttribute('sizes'));
+                    $link->setAttribute('href', $imageAttributes->getSrc());
+                    $link->setAttribute('imagesrcset', $imageAttributes->getSrcset());
                     $this->links[] = $link;
                 }
                 if ($event->getId() === 'background') {
-                    $imageContext  = $event->getData();
-                    $link          = new Element('link', true, true);
+                    $imageAttributes  = $event->getData();
+                    $link = new Element('link', true, true);
                     $link->setAttribute('rel', 'preload');
                     $link->setAttribute('as', 'image');
-                    $link->setAttribute('href', $imageContext->getSrc());
-                    $link->setAttribute('imagesrcset', $imageContext->getSrcset('srcset'));
-                    //$link->setAttribute('imagesizes', $imageContext->getAttribute('sizes'));
+                    $link->setAttribute('href', $imageAttributes->getSrc());
+                    $link->setAttribute('imagesrcset', $imageAttributes->getSrcset());
                     $this->links[] = $link;
                 }
                 break;

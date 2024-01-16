@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 use Flipsite\Data\Slugs;
@@ -18,13 +19,8 @@ final class Path
     /**
      * @param array<Language> $languages
      * */
-    public function __construct(string $path, Language $default, array $languages, Slugs $slugs, array $redirects = null)
+    public function __construct(string $path, Language $default, array $languages, Slugs $slugs)
     {
-        if ('offline.html' === $path) {
-            $this->language = $default;
-            $this->page     = 'offline';
-            return;
-        }
         $this->languages = $languages;
         $parts           = explode('/', $path);
         $pathLanguage    = $this->parsePathLanguage(array_shift($parts));
@@ -34,52 +30,21 @@ final class Path
             $pathWithoutLanguage = $path;
         }
 
-        if ('404' === $pathWithoutLanguage) {
-            $this->language = $pathLanguage ?? $default;
-            $this->page = '404';
-            return;
-        }
-
         $this->page = $slugs->getPage($pathWithoutLanguage);
-
-        $similar    = false;
-        if (null === $this->page) {
-            $this->page = $slugs->getSimilarPage($pathWithoutLanguage, 70.0);
-            if (null !== $this->page) {
-                $similar = true;
-            }
-        }
         $this->language = $pathLanguage ?? $slugs->getLanguage($pathWithoutLanguage) ?? $default;
-        if (!$this->page) {
-            if (is_array($redirects) && isset($redirects[$pathWithoutLanguage])) {
-                $this->redirect = $redirects[$pathWithoutLanguage];
-            } else {
-                $this->page = '404';
-            }
-            return;
-        }
-        $slug = $slugs->getSlug($this->page, $this->language);
-        if ($path !== $slug || $similar) {
-            $this->redirect = $slug;
-        }
     }
 
-    public function getLanguage() : Language
+    public function getLanguage(): Language
     {
         return $this->language;
     }
 
-    public function getRedirect() : ?string
-    {
-        return $this->redirect;
-    }
-
-    public function getPage() : ?string
+    public function getPage(): ?string
     {
         return $this->page;
     }
 
-    private function parsePathLanguage(string $path) : ?Language
+    private function parsePathLanguage(string $path): ?Language
     {
         if (2 !== mb_strlen($path)) {
             return null;

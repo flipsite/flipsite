@@ -76,6 +76,7 @@ final class Slugs
 
     public function getPage(string $slug) : ?string
     {
+        if ($slug === 'home') return 'home';
         foreach ($this->slugs as $page => $slugs) {
             foreach ($slugs as $langauge => $localizedSlug) {
                 if ($localizedSlug === $slug) {

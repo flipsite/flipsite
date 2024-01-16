@@ -4,77 +4,73 @@ declare(strict_types=1);
 
 namespace Flipsite\Assets\Editors;
 
-use Flipsite\Assets\Options\RasterOptions;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Image;
+use Flipsite\Assets\Options\RasterOptions;
+use Intervention\Image\EncodedImage;
+use Flipsite\Assets\Sources\AbstractAssetInfo;
 
-final class RasterEditor extends AbstractImageEditor
+final class RasterEditor
 {
-    public function create(): void
+    public function __construct(private RasterOptions $options, private AbstractAssetInfo $assetInfo, private string $outputFormat) {
+
+    }
+    public function getImage(): EncodedImage
     {
-        $manager      = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-        $image = $manager->read($this->file->getFilename());
-        $filePathinfo = pathinfo($this->path);
-        $options      = new RasterOptions($this->path);
-        $image = $this->applyOptions($image, $options, $filePathinfo['extension']);
-        $quality = $options->getValue('quality') ?? 90;
-        switch ($filePathinfo['extension']) {
+        $manager = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+        $image = $manager->read($this->assetInfo->getContents());
+        $image = $this->applyOptions($image);
+
+        $quality = $this->options->getValue('quality') ?? 90;
+        switch ($this->outputFormat) {
             case 'webp':
-                $encoded = $image->toWebp($quality);
-                break;
+                return $image->toWebp($quality);
             case 'png':
-                $encoded = $image->toPng();
-                break;
+                return $image->toPng();
             case 'jpg':
-                $encoded = $image->toJpeg($quality);
-                break;
+                return $image->toJpeg($quality);
             case 'gif':
-                $encoded = $image->toGif($quality);
-                break;
-            default:
-                throw new \Exception('no format defined');
+                return $image->toGif($quality);        
         };
-        $cachedFilename = $this->getCachedFilename();
-        $cachedPathinfo = pathinfo($cachedFilename);
-        $this->fileSystem->mkdir($cachedPathinfo['dirname'], 0777);
-        $encoded->save($cachedFilename);
+        throw new \Exception('no output format defined');
     }
 
-    private function applyOptions(Image $image, RasterOptions $options, string $outputFormat): Image
+    private function applyOptions(Image $image): Image
     {
-        $width  = $options->getValue('width');
-        $height = $options->getValue('height');
+        $width  = $this->options->getValue('width');
+        $height = $this->options->getValue('height');
+
         if ($width && $height) {
-            $position = $options->getValue('position') ?? 'center';
-            // change e.g. left-top to top-left (because different order in tailwind and intervention)
-            $tmp = explode('-', $position);
-            $tmp = array_reverse($tmp);
-            $position = implode('-', $tmp);
-            if ('gif' === $outputFormat) {
-                $image->resize($width, $height);
-            } else {
-                $image->fit($width, $height, $position);
-            }
+            // $position = $this->options->getValue('position') ?? 'center';
+            // // change e.g. left-top to top-left (because different order in tailwind and intervention)
+            // $tmp = explode('-', $position);
+            // $tmp = array_reverse($tmp);
+            // $position = implode('-', $tmp);
+            $image->fit($width, $height);
         } elseif ($width) {
-            $image->resize($width, null, static function ($constraint): void {
-                $constraint->aspectRatio();
-            });
+            $image->scale(width: $width);
         } elseif ($height) {
-            $image->resize(null, $height, static function ($constraint): void {
-                $constraint->aspectRatio();
-            });
+            $image->scale(height: $height);
         }
-        $blur = $options->getValue('blur');
+        $blur = $this->options->getValue('blur');
         if ($blur) {
             $image->blur($blur);
         }
-        $opacity = $options->getValue('opacity');
+        $opacity = $this->options->getValue('opacity');
         if ($opacity) {
             $image->opacity($opacity);
         }
-        if ($options->getValue('blackWhite')) {
+        if ($this->options->getValue('blackWhite')) {
             $image->greyscale();
         }
+        $pixelate = $this->options->getValue('pixelate');
+        if ($this->options->getValue('pixelate')) {
+            $image->pixelate($pixelate);
+        }
+        if ($this->options->getValue('invert')) {
+            $image->invert();
+        }
+
 
         return $image;
     }

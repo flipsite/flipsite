@@ -16,25 +16,6 @@
 
 Create a new site with [Composer](https://getcomposer.org/) and define [flipsite/flipsite](https://packagist.org/packages/flipsite/flipsite) as a dependency. You can do it during the init or when it's complete using `composer require flipsite/flipsite`
 
-```
-composer init
-composer require flipsite/flipsite
-```
-
-Then run the create example site command using the command line interface.
-```
-./vendor/bin/flipsite site:example
-```
-
-Start the server. The site will usually run at [127.0.0.1:8001](http://127.0.0.1:8001). Otherwise check the console log for the local IP.
-```
-./vendor/bin/flipsite server:run
-```
-
-## Documentation
-
-We work daily on making our [documentation](https://docs.flipsite.io/) even better. If something is unclear or missing, please open an issue in the [documentation repo](https://github.com/docs.flipsite.io).
-
 ## Contributing
 
 Thank you for considering contributing to Flipsite! Contact us, submit an issue or go ahead and make a pull request.
@@ -42,14 +23,6 @@ Thank you for considering contributing to Flipsite! Contact us, submit an issue 
 ## Important Links
 
 - [Flipsite Website](https://flipsite.io)
-- [Flipsite Documentation](https://docs.flipsite.io/)
-
-Example websites built with Flipsite:
-- [https://emathstudio.com](https://emathstudio.com)
-- [https://wecke.fi](https://wecke.fi)
-- [https://knegarn.ax](https://knegarn.ax)
-- [https://getabetong.ax](https://getabetong.ax)
-- [https://hogmansmaleri.ax/](https://hogmansmaleri.ax/)
 
 ## License
 

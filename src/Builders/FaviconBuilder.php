@@ -3,32 +3,24 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Assets\ImageHandler;
+use Flipsite\Assets\Assets;
+use Flipsite\Data\SiteDataInterface;
+use Flipsite\EnvironmentInterface;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Data\Reader;
-use Flipsite\Environment;
 
 class FaviconBuilder implements BuilderInterface
 {
-    private Environment $environment;
-    private Reader $reader;
-    private ImageHandler $imageHandler;
+    private Assets $assets;
 
-    public function __construct(Environment $environment, Reader $reader)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData)
     {
-        $this->environment   = $environment;
-        $this->reader        = $reader;
-        $this->imageHandler  = new ImageHandler(
-            $environment->getAssetSources(),
-            $environment->getImgDir(),
-            $environment->getImgBasePath(),
-        );
+        $this->assets = new Assets($environment->getAssetSources());
     }
 
     public function getDocument(Document $document) : Document
     {
-        $favicon = $this->reader->get('favicon');
+        $favicon = $this->siteData->getFavicon();
 
         if (is_string($favicon)) {
             if (str_ends_with($favicon, '.svg')) {
@@ -44,16 +36,16 @@ class FaviconBuilder implements BuilderInterface
             return $document;
         }
 
-        if (isset($favicon['ico'])) {
-            $image = $this->imageHandler->getContext($favicon['ico']);
-            $el    = new Element('link', true, true);
-            $el->setAttribute('rel', 'icon');
-            $el->setAttribute('href', $image->getSrc());
-            $document->getChild('head')->addChild($el);
-        }
+        // if (isset($favicon['ico'])) {
+        //     $image = $this->assets->get($favicon['ico']);
+        //     $el    = new Element('link', true, true);
+        //     $el->setAttribute('rel', 'icon');
+        //     $el->setAttribute('href', $image->getSrc());
+        //     $document->getChild('head')->addChild($el);
+        // }
 
         if (isset($favicon['svg'])) {
-            $image = $this->imageHandler->getContext($favicon['svg']);
+            $image = $this->assets->getImageAttributes($favicon['svg']);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
             $el->setAttribute('href', $image->getSrc());
@@ -62,7 +54,7 @@ class FaviconBuilder implements BuilderInterface
         }
 
         if (isset($favicon['apple'])) {
-            $image = $this->imageHandler->getContext($favicon['apple'], ['width' => 192, 'height' => 192]);
+            $image = $this->assets->getImageAttributes($favicon['apple'], ['width' => 192, 'height' => 192]);
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'apple-touch-icon');
             $el->setAttribute('href', $image->getSrc());

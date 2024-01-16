@@ -3,19 +3,15 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Components\ComponentListenerInterface;
+use Flipsite\Builders\EventListenerInterface;
 use Flipsite\Components\Document;
-use Flipsite\Components\Event;
+use Flipsite\Builders\Event;
 use Flipsite\Components\InlineScript;
 
-class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
+class ScriptBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $global = [];
     private array $ready  = [];
-
-    public function __construct(private string $hash, private string $basePath, private bool $sw = false)
-    {
-    }
 
     public function getDocument(Document $document) : Document
     {
@@ -32,9 +28,6 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         foreach ($this->global as $code) {
             $script->addCode($code);
         }
-        if ($this->sw) {
-            $script->addCode('window.addEventListener("load",()=>{if ("serviceWorker" in navigator){navigator.serviceWorker.register("'.$this->basePath.'/sw.'.$this->hash.'.js");}});');
-        }
         foreach ($this->ready as $code) {
             if ($code) $script->addCode($code);
         }
@@ -42,7 +35,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
+    public function handleEvent(Event $event) : void
     {
         switch ($event->getType()) {
             case 'global-script':

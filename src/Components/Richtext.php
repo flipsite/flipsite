@@ -9,9 +9,8 @@ use Flipsite\Utils\StyleAppearanceHelper;
 
 final class Richtext extends AbstractGroup
 {
-    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
-    use Traits\UrlTrait;
+    use Traits\ActionTrait;
     protected string $tag = 'div';
 
     public function normalize(string|int|bool|array $data): array
@@ -34,20 +33,17 @@ final class Richtext extends AbstractGroup
         $html = $this->convertPreToHtml($html);
 
         if ($data['magicLinks'] ?? false) {
-            
             // Mailto
             $html = preg_replace("/([A-z0-9\._-]+\@[A-z0-9_-]+\.)([A-z0-9\_\-\.]{1,}[A-z])/", '<a href="mailto:$1$2">$1$2</a>', $html);
-
             $html = preg_replace('/(?:http|ftp)s?:\/\/(?:www\.)?([a-z0-9.-]+\.[a-z]{2,5}(?:\/\S*)?)/', '<a href="$1" rel="noopener noreferrer" target="_blank">$1</a>', $html);
+        } else {
+            $html = $this->fixUrlsInHtml($html);
         }
 
         $doc->loadHtml($html);
 
         // Modify HTML
         $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
-
-
-
 
         // Render HTML
         $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
@@ -68,7 +64,6 @@ final class Richtext extends AbstractGroup
         if ($data['removeEmptyLines'] ?? false) {
             $this->content = str_replace("<p><br></p>\n", '', $this->content);
         }
-
         parent::build($data, $style, $options);
     }
 
@@ -101,32 +96,11 @@ final class Richtext extends AbstractGroup
         return $doc;
     }
 
-    private function addUrls(string $html): string
-    {
-        $matches = [];
-        preg_match_all('/[ ]{1}href="(.*?)"/', $html, $matches);
-        if (0 === count($matches[1])) {
-            return $html;
-        }
-        $hrefs = array_unique($matches[1]);
-        foreach ($hrefs as $href) {
-            $external = false;
-            $newHref  = $this->url($href, $external);
-            if ($external) {
-                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'" target="_blank" rel="noopener noreferrer"', $html);
-            } else {
-                $html = str_replace('href="'.$href.'"', 'href="'.$newHref.'"', $html);
-            }
-        }
-        return $html;
-    }
-
     private function addClasses(string $html, array $style, string $appearance): string
     {
-        $headingBaseStyle = $this->reader->get('theme.components.heading') ?? [];
+        $headingBaseStyle = $this->siteData->getComponentStyle('heading') ?? [];
         $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
         foreach ($headings as $hx) {
-
             $mergedStyle  = ArrayHelper::merge($headingBaseStyle, $style[$hx] ?? []);
             $headingStyle = StyleAppearanceHelper::apply($mergedStyle, $appearance);
             $headingStyle = array_filter($headingStyle, function($item){ return is_string($item);});

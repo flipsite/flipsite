@@ -9,7 +9,6 @@ use Flipsite\Utils\StyleAppearanceHelper;
 final class Md extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     protected string $type = 'div';
 

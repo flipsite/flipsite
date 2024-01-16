@@ -1,18 +1,21 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
-use Flipsite\AbstractEnvironment;
 use Flipsite\Exceptions\NoSiteFileFoundException;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
-use Flipsite\Utils\YamlExpander;
+use Symfony\Component\Yaml\Yaml;
 use Flipsite\Utils\Localizer;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
+use Flipsite\Utils\CustomHtmlParser;
+use Flipsite\Content\Collection;
+use Adbar\Dot;
 
-final class Reader
+final class Reader implements SiteDataInterface
 {
     /**
      * @var array<Language>
@@ -37,25 +40,72 @@ final class Reader
 
     private Localizer $localizer;
 
-    private Plugins $plugins;
+    private ?CustomHtmlParser $customParser = null;
 
-    public function __construct(private AbstractEnvironment $environment)
+    public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
     {
-        $this->plugins = $environment->getPlugins();
-        $siteDir       = $this->environment->getSiteDir();
-        if (file_exists($siteDir.'/site.yaml')) {
-            $siteYaml = YamlExpander::parseFile($siteDir.'/site.yaml');
-            $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
-            $this->loadSite($siteYaml);
+        if (file_exists($siteDir . '/site.yaml')) {
+            $siteYaml          = Yaml::parseFile($siteDir . '/site.yaml');
+            $themeYaml         = Yaml::parseFile($siteDir . '/theme.yaml');
+            $siteYaml['theme'] = $themeYaml;
+            if ($this->plugins) {
+                $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
+            }
+            $this->loadSite($siteYaml, $expand);
         } else {
             throw new NoSiteFileFoundException($siteDir);
         }
+        if (file_exists($siteDir . '/custom.html')) {
+            $customHtml         = file_get_contents($siteDir . '/custom.html');
+            $this->customParser = new CustomHtmlParser($customHtml);
+        }
     }
 
-    public function loadSite(array $yaml)
+    public function getCollectionIds(): array
+    {
+        $collectionIds = array_keys($this->get('contentSchemas') ?? []);
+        sort($collectionIds);
+        return $collectionIds;
+    }
+
+    public function getCollection(string $collectionId): ?Collection
+    {
+        $schema = $this->get('contentSchemas.' . $collectionId);
+        if (!$schema) {
+            return null;
+        }
+        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId));
+    }
+
+    public function getModifiedTimestamp(): int
+    {
+        return filemtime($this->siteDir);
+    }
+
+    public function getCode(string $position, string $page, bool $fallback): ?string
+    {
+        if (!$this->customParser) {
+            return null;
+        }
+        return $this->customParser->get($position, $page, $fallback);
+    }
+
+    public function getCompile(): ?array
+    {
+        return $this->get('compile');
+    }
+
+    public function getPublish(): ?array
+    {
+        return $this->get('publish');
+    }
+
+    private function loadSite(array $yaml, bool $expand)
     {
         $this->data          = $yaml;
-        $this->expandPagesAndSlugs();
+        if ($expand) {
+            $this->expandPagesAndSlugs();
+        }
         foreach (explode(',', $this->data['languages']) as $language) {
             $this->languages[] = new Language($language);
         }
@@ -78,11 +128,6 @@ final class Reader
         return substr($this->hash, 0, $length);
     }
 
-    public function isOnline(): bool
-    {
-        return true;
-    }
-
     public function get(string $path, ?Language $language = null)
     {
         $data = ArrayHelper::getDot(explode('.', $path), $this->data);
@@ -90,6 +135,81 @@ final class Reader
             return $data;
         }
         return $this->localizer->localize($data, $language);
+    }
+
+    public function getName(): string
+    {
+        return $this->get('name');
+    }
+
+    public function getTitle(Language $language): ?string
+    {
+        return $this->get('title', $language);
+    }
+
+    public function getDescription(Language $language): ?string
+    {
+        return $this->get('description', $language);
+    }
+
+    public function getShare(): ?string
+    {
+        return $this->get('share');
+    }
+
+    public function getSocial(): array
+    {
+        return $this->get('social');
+    }
+
+    public function getFavicon(): null|string|array
+    {
+        $favicon = $this->get('favicon') ?? null;
+        if (is_array($favicon)) {
+            return array_shift($favicon);
+        }
+        return $favicon;
+    }
+
+    public function getIntegrations(): ?array
+    {
+        return $this->get('integrations') ?? null;
+    }
+
+    public function getColors(): array
+    {
+        return $this->data['theme']['colors'] ?? [];
+    }
+
+    public function getFonts(): array
+    {
+        return $this->data['theme']['fonts'] ?? [];
+    }
+
+    public function getHtmlStyle(): array
+    {
+        return $this->data['theme']['components']['html'] ?? [];
+    }
+
+    public function getBodyStyle(string $page): array
+    {
+        return $this->data['theme']['components']['body'] ?? [];
+    }
+
+    public function getComponentStyle(string $component): array
+    {
+        if (strpos($component, '.') !== false) {
+            $tmp   = explode('.', $component);
+            $style = $this->data['theme']['components'][array_shift($tmp)] ?? [];
+            $dot   = new Dot($style);
+            return $dot->get(implode('.', $tmp)) ?? [];
+
+        }
+        $style = $this->data['theme']['components'][$component] ?? [];
+        if (in_array($component,['social','nav'])) {
+            unset($style['type']);
+        }
+        return $style;
     }
 
     /**
@@ -115,11 +235,6 @@ final class Reader
         return $this->slugs;
     }
 
-    public function getRedirects(): ?array
-    {
-        return $this->data['redirects'] ?? [];
-    }
-
     public function getPageName(string $page, ?Language $language = null, array $exclude = []): string
     {
         $language ??= $this->getDefaultLanguage();
@@ -132,12 +247,8 @@ final class Reader
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(string $page, ?Language $language = null): array
+    public function getSections(string $page, Language $language): array
     {
-        $language ??= $this->getDefaultLanguage();
-        if ('offline' === $page) {
-            return $this->localizer->localize($this->data['offline'] ?? [['text' => 'offline']], $language) ?? [];
-        }
         $before = $this->data['before'] ?? [];
         if (ArrayHelper::isAssociative($before)) {
             $before = [$before];
@@ -158,40 +269,18 @@ final class Reader
         }
         $sections = array_merge($before, $all, $after);
 
-        foreach ($sections as $i => &$section) {
-            $parentStyle = [];
-            foreach ($section as $type => $value) {
-                if ($parentStyle) {
-                    continue;
-                }
-                $tmp    = explode(':', $type);
-                $styles = [];
-                while (count($tmp)) {
-                    $t           = implode(':', $tmp);
-                    $parentStyle = $this->get('theme.components.'.$t.'.section');
-                    if (is_array($parentStyle)) {
-                        $styles[$t] = $parentStyle;
-                    }
-                    array_pop($tmp);
-                }
-                $parentStyle = ArrayHelper::merge(...array_reverse($styles));
-            }
-            if (count($parentStyle)) {
-                $section['parentStyle'] = $parentStyle;
-                if (!isset($section['parentStyle']['type'])) {
-                    $section['parentStyle']['type'] = 'group';
-                }
-            }
-        }
-        return $this->localizer->localize($sections ?? [], $language) ?? [];
+        $sections = $this->localizer->localize($sections ?? [], $language) ?? [];
+
+        $sections = $this->normalize($sections);
+        return $sections;
     }
 
     public function getMeta(string $page, Language $language): ?array
     {
-        $pageMeta = $this->get('meta.'.$page, $language);
+        $pageMeta    = $this->getPageMeta($page, $language) ?? [];
         $description = $pageMeta['description'] ?? $this->get('description', $language);
-        $share = $pageMeta['share'] ?? $this->get('share') ?? null;
-        $icon = $pageMeta['icon'] ?? null;
+        $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
+        $icon        = $pageMeta['icon'] ?? null;
 
         if ('home' === $page) {
             $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name', $language);
@@ -200,7 +289,6 @@ final class Reader
             if (isset($pageMeta['title'])) {
                 $title = $pageMeta['title'];
             } else {
-                
                 $p     = explode('/', $page);
                 $title = [];
                 while (count($p) > 0) {
@@ -213,19 +301,22 @@ final class Reader
                     array_pop($p);
                 }
                 $title = implode(' - ', $title);
-
             }
             if ($baseTitle) {
-                $title.= ' - '.$baseTitle;
+                $title .= ' - ' . $baseTitle;
             }
-
         }
         return [
-            'title' => $title,
+            'title'       => $title,
             'description' => $description,
-            'share' => $share,
-            'icon' => $icon
+            'share'       => $share,
+            'icon'        => $icon
         ];
+    }
+
+    public function getPageMeta(string $page, Language $language): ?array
+    {
+        return $this->get('meta.' . $page, $language);
     }
 
     public function getHiddenPages(): array
@@ -250,41 +341,35 @@ final class Reader
         $expandedMeta  = [];
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
-                $category = $meta[$page]['content'];
-                $schema = $this->data['contentSchemas'][$category];
-                $items = $this->data['content'][$category] ?? [];
-                if (isset($schema['published']) && 'boolean' === $schema['published']['type']) {
-                    $published = array_filter($items, function($item){
-                        return $item['published'] ?? false;
-                    });
-                    $items = count($published) ? $published : [$items[0]];
-                }
+                $collection = $this->getCollection($meta[$page]['content']);
+                $slugField = $collection->getSlugField();
+                $items = $collection->getContent();
+                if ($slugField && $items) {
+                    foreach ($items as $dataItem) {
+                        if (!isset($dataItem[$slugField]) || !$dataItem[$slugField]) {
+                            continue;
+                        }
+                        $expandedPage = str_replace(':slug', $dataItem[$slugField], $page);
 
-
-                foreach ($items as $dataItem) {
-                    if (!isset($dataItem['slug'])) {
-                        continue;
+                        // Dont overwrite existing page
+                        if (isset($expandedPages[$expandedPage])) {
+                            continue;
+                        }
+                        // Add page. prefix to data item attributes
+                        $pageDataItem = [];
+                        foreach ($dataItem as $attr => $val) {
+                            $pageDataItem['page.' . $attr] = $val;
+                        }
+                        $pageSections = $sections ?? [];
+                        foreach ($pageSections as &$pageSection) {
+                            $pageSection['_dataSource'] = $pageDataItem;
+                        }
+                        $expandedPages[$expandedPage] = $pageSections;
+                        if (isset($meta[$page])) {
+                            $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
+                        }
+                        // TODO localized slugs
                     }
-                    $expandedPage = str_replace(':slug', $dataItem['slug'], $page);
-
-                    // Dont overwrite existing page
-                    if (isset($expandedPages[$expandedPage])) {
-                        continue;
-                    }
-                    // Add page. prefix to data item attributes
-                    $pageDataItem = [];
-                    foreach ($dataItem as $attr => $val) {
-                        $pageDataItem['page.'.$attr] = $val;
-                    }
-                    $pageSections = $sections ?? [];
-                    foreach ($pageSections as &$pageSection) {
-                        $pageSection['_dataSource'] = $pageDataItem;
-                    }
-                    $expandedPages[$expandedPage] = $pageSections;
-                    if (isset($meta[$page])) {
-                        $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
-                    }
-                    // TODO localized slugs
                 }
             } else {
                 $expandedPages[$page] = $sections;
@@ -316,5 +401,21 @@ final class Reader
         }
         $extendedSlugs[$page] = $slugs;
         return $extendedSlugs;
+    }
+
+    private function normalize(array $data): array
+    {
+        $normalized = [];
+        foreach ($data as $attr => $value) {
+            if ($attr === '_dataSourceList') {
+                $attr = '_repeat';
+                if (is_string($value) && str_starts_with($value, '${content.')) {
+                    $value = str_replace('${content.', '', $value);
+                    $value = substr($value, 0, strlen($value) - 1);
+                }
+            }
+            $normalized[$attr] = is_array($value) ? $this->normalize($value) : $value;
+        }
+        return $normalized;
     }
 }

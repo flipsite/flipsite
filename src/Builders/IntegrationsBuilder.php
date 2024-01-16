@@ -76,8 +76,7 @@ class IntegrationsBuilder implements BuilderInterface
             $inlineScript->setContent($jsCode);
             $inlineScript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->addChild($inlineScript);
-            $noScript = new Script();
-            $noScript->setTag('noscript');
+            $noScript = new Element('noscript');
             $noScript->setContent('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='.$this->metaPixel.'&ev=PageView&noscript=1"/>');
             $noScript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->addChild($noScript);

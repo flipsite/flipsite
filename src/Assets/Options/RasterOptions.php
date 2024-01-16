@@ -13,7 +13,9 @@ final class RasterOptions extends AbstractImageOptions
             'blackWhite'  => new BoolOption('bw'),
             'blur'        => new IntOption('bl'),
             'height'      => new IntOption('h', true),
+            'invert'      => new BoolOption('in'),
             'opacity'     => new IntOption('o'),
+            'pixelate'    => new IntOption('px'),
             'position'    => new StringOption('p', [
                 'b' => 'bottom',
                 'c' => 'center',
