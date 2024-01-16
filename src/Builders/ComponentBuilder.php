@@ -7,8 +7,8 @@ use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\AbstractComponent;
-use Flipsite\Components\ComponentListenerInterface;
-use Flipsite\Components\Event;
+use Flipsite\Builders\EventListenerInterface;
+use Flipsite\Builders\Event;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\Data\Slugs;
 use Flipsite\EnvironmentInterface;
@@ -198,7 +198,7 @@ class ComponentBuilder
         return $component;
     }
 
-    public function addListener(ComponentListenerInterface $listener): void
+    public function addListener(EventListenerInterface $listener): void
     {
         $this->listeners[] = $listener;
     }
@@ -206,7 +206,7 @@ class ComponentBuilder
     public function dispatch(Event $event): void
     {
         foreach ($this->listeners as $listener) {
-            $listener->handleComponentEvent($event);
+            $listener->handleEvent($event);
         }
     }
 

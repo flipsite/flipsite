@@ -66,6 +66,7 @@ final class Flipsite
         $componentBuilder->addListener($svgBuilder);
         $componentBuilder->addListener($scriptBuilder);
         $componentBuilder->addListener($perloadBuilder);
+        $styleBuilder->addListener($scriptBuilder);
 
         $document = $documentBuilder->getDocument();
 
@@ -185,7 +186,7 @@ final class Flipsite
                     }
                 }
                 if (strpos($value, '{copyright.year}') !== false) {
-                    $scriptBuilder->handleComponentEvent(new \Flipsite\Components\Event('ready-script', 'copyright', file_get_contents(__DIR__ . '/../js/ready.copyright.min.js')));
+                    $scriptBuilder->handleEvent(new \Flipsite\Builders\Event('ready-script', 'copyright', file_get_contents(__DIR__ . '/../js/ready.copyright.min.js')));
                     $value = str_replace('{copyright.year}', '<span data-copyright>' . date('Y') . '</span>', $value);
                 }
             }

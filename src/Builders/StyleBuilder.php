@@ -12,6 +12,7 @@ use Flipsite\Style\Tailwind;
 use Flipsite\Style\Callbacks\UnitCallback;
 use Flipsite\Style\Callbacks\ScreenWidthCallback;
 use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
+use Flipsite\Builders\EventListenerInterface;
 
 class StyleBuilder implements BuilderInterface
 {
@@ -24,8 +25,35 @@ class StyleBuilder implements BuilderInterface
         $elements = [];
         $classes  = [];
         $this->getElementsAndClasses($document, $elements, $classes);
-        $elements = array_unique($elements);
-        $classes  = array_unique($classes);
+        $elements = array_values(array_unique($elements));
+        $classes  = array_values(array_unique($classes));
+
+        
+        $prefixNeedingScript = ['scroll','stuck','enter'];
+        foreach ($classes as $class) {
+            if (strpos($class,':') === false) {
+                continue;
+            }
+            $tmp = explode(':',$class);
+            $prefix = $tmp[0];
+            if (in_array($prefix,$prefixNeedingScript)) {
+                $keyToRemove = array_search($prefix, $prefixNeedingScript);
+                unset($prefixNeedingScript[$keyToRemove]);
+                $this->dispatch(new Event('ready-script', $prefix, file_get_contents(__DIR__.'/../../js/ready.'.$prefix.'.min.js')));
+            }
+        }
+        
+        // $bodyHtml = $document->getChild('body')->render(2, 1);
+        // if (strpos($bodyHtml, 'scroll:')) {
+        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
+        // }
+        // if (strpos($bodyHtml, 'stuck:')) {
+        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.min.js')));
+        // }
+        // if (strpos($bodyHtml, 'enter:')) {
+        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
+        // }
+    
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
@@ -75,6 +103,18 @@ class StyleBuilder implements BuilderInterface
         $document->getChild('head')->addChild($style);
 
         return $document;
+    }
+
+    public function addListener(EventListenerInterface $listener): void
+    {
+        $this->listeners[] = $listener;
+    }
+
+    private function dispatch(Event $event): void
+    {
+        foreach ($this->listeners as $listener) {
+            $listener->handleEvent($event);
+        }
     }
 
     private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)

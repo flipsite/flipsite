@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 namespace Flipsite\Components;
-
+use Flipsite\Builders\Event;
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;

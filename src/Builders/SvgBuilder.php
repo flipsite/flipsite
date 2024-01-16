@@ -3,12 +3,12 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Components\ComponentListenerInterface;
+use Flipsite\Builders\EventListenerInterface;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Components\Event;
+use Flipsite\Builders\Event;
 
-class SvgBuilder implements BuilderInterface, ComponentListenerInterface
+class SvgBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $data  = [];
 
@@ -38,7 +38,7 @@ class SvgBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
+    public function handleEvent(Event $event) : void
     {
         if ('svg' !== $event->getType()) {
             return;

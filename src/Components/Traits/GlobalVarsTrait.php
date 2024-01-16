@@ -14,7 +14,7 @@ trait GlobalVarsTrait
         }
 
         if (strpos($content, '{copyright.year}') !== false) {
-            $this->builder->dispatch(new \Flipsite\Components\Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../../js/ready.copyright.min.js')));
+            $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../../js/ready.copyright.min.js')));
             $content = str_replace('{copyright.year}', '<span data-copyright>'.date('Y').'</span>', $content);
         }
 

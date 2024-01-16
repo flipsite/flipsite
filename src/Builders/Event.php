@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flipsite\Components;
+namespace Flipsite\Builders;
 
 class Event
 {

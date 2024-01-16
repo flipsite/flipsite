@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 namespace Flipsite\Components;
+use Flipsite\Builders\Event;
 
 class Svg extends AbstractComponent
 {

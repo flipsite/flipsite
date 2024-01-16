@@ -3,12 +3,12 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Components\ComponentListenerInterface;
+use Flipsite\Builders\EventListenerInterface;
 use Flipsite\Components\Document;
-use Flipsite\Components\Event;
+use Flipsite\Builders\Event;
 use Flipsite\Components\InlineScript;
 
-class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
+class ScriptBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $global = [];
     private array $ready  = [];
@@ -35,7 +35,7 @@ class ScriptBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
+    public function handleEvent(Event $event) : void
     {
         switch ($event->getType()) {
             case 'global-script':

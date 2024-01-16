@@ -5,10 +5,10 @@ namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Components\Event;
-use Flipsite\Components\ComponentListenerInterface;
+use Flipsite\Builders\Event;
+use Flipsite\Builders\EventListenerInterface;
 
-class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
+class PreloadBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $links = [];
 
@@ -20,7 +20,7 @@ class PreloadBuilder implements BuilderInterface, ComponentListenerInterface
         return $document;
     }
 
-    public function handleComponentEvent(Event $event) : void
+    public function handleEvent(Event $event) : void
     {
         switch ($event->getType()) {
             case 'preload':
