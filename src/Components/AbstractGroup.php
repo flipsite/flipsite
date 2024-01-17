@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 namespace Flipsite\Components;
+
 use Flipsite\Builders\Event;
+
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
@@ -139,14 +141,14 @@ abstract class AbstractGroup extends AbstractComponent
                 $fieldFieldValues = explode(',', $item[$filterField]);
                 $fieldFieldValues = array_map('trim', $fieldFieldValues);
 
-                return count(array_intersect($fieldFieldValues,$filter)) > 0;
+                return count(array_intersect($fieldFieldValues, $filter)) > 0;
             }));
         }
         if (isset($data['_options']['filterField'], $data['_options']['filterPattern'])) {
             $filterField       = $data['_options']['filterField'];
-            $filterPattern  = $data['_options']['filterPattern'];
-            $repeat         = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterField) {
-                return !preg_match('/'.$filterPattern.'/', $item[$filterField]);
+            $filterPattern     = $data['_options']['filterPattern'];
+            $repeat            = array_values(array_filter($repeat, function ($item) use ($filterPattern, $filterField) {
+                return preg_match('/'.$filterPattern.'/', $item[$filterField]);
             }));
         }
 
