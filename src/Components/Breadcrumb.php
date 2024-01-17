@@ -20,9 +20,9 @@ final class Breadcrumb extends AbstractGroup
 
     public function build(array $data, array $style, array $options) : void
     {
-        $page    = $this->path->getPage();
-        $current = $this->siteData->getPageName($page, $this->path->getLanguage());
-        $links   = $this->getLinks($page);
+        $page         = $this->path->getPage();
+        $current      = $this->siteData->getPageName($page, $this->path->getLanguage());
+        $links        = $this->getLinks($page);
 
         foreach ($links as $i => $link) {
             $link['_style']         = $style['links'] ?? [];
@@ -52,7 +52,7 @@ final class Breadcrumb extends AbstractGroup
         $parts   = explode('/', $page);
         array_pop($parts);
         while (count($parts)) {
-            $linkPage = implode(',', $parts);
+            $linkPage = implode('/', $parts);
             if ($this->siteData->getSlugs()->isPage($linkPage)) {
                 $links[]  = [
                     '_target'  => $linkPage,
