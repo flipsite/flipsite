@@ -130,17 +130,22 @@ abstract class AbstractGroup extends AbstractComponent
     protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
     {
         if (isset($data['_options']['filter'], $data['_options']['filterField'])) {
-            $filter = explode(',', $data['_options']['filter']);
-            $filter = array_map('trim', $filter);
-
+            $filter = json_decode($data['_options']['filter'], true);
+            if (null === $filter && $data['_options']['filter']) {
+                $filter = explode(',', $data['_options']['filter']);
+            }
+            $filter      = array_map('trim', $filter ?? []);
             $filterField = $data['_options']['filterField'];
-            $repeat      = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
+
+            $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
                 if (!isset($item[$filterField])) {
                     return false;
                 }
-                $fieldFieldValues = explode(',', $item[$filterField]);
+                $fieldFieldValues = json_decode($item[$filterField]);
+                if (null === $fieldFieldValues && $item[$filterField]) {
+                    $fieldFieldValues = explode(',', $item[$filterField]);
+                }
                 $fieldFieldValues = array_map('trim', $fieldFieldValues);
-
                 return count(array_intersect($fieldFieldValues, $filter)) > 0;
             }));
         }
