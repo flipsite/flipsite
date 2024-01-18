@@ -48,6 +48,11 @@ final class Richtext extends AbstractGroup
         // Render HTML
         $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
 
+        $pattern = '/ style\s*=\s*["\'][^"\']*?["\']/i';
+
+        // Remove the style attribute using preg_replace
+        $this->content = preg_replace($pattern, '', $this->content);
+
         $this->content = $this->addClasses($this->content, $style, $options['appearance']);
         $this->content = str_replace('<body>','',$this->content);
         $this->content = str_replace("</body>",'',$this->content);
