@@ -3,14 +3,16 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 final class Social extends AbstractGroup
 {
     public function normalize(string|int|bool|array $data): array
     {
         $dataSourceList = $this->getSocial($data['phoneFormat'] ?? null);
         unset($data['phoneFormat']);
-        $filter     = isset($data['filter']) ? json_decode($data['filter'], true) : false;
-        $sort       = isset($data['sort']) ? json_decode($data['sort'], true) : false;
+        $filter     = ArrayHelper::decodeJsonOrCsv($data['filter'] ?? null);
+        $sort       = ArrayHelper::decodeJsonOrCsv($data['sort'] ?? null);
         $phoneIcon  = $data['phoneIcon'] ?? false;
         $emailIcon  = $data['emailIcon'] ?? false;
         unset($data['filter'],$data['phoneIcon'],$data['emailIcon']);

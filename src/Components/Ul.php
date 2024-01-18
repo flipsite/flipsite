@@ -11,7 +11,7 @@ final class Ul extends AbstractGroup
     {
         $repeat = [];
         if (isset($data['_repeat'])) {
-            $list = json_decode($data['_repeat'], true) ?? [];
+            $list = ArrayHelper::decodeJsonOrCsv($data['_repeat']);
             foreach ($list as $item) {
                 $repeat[] = ['item' => trim($item)];
             }

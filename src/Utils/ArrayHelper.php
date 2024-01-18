@@ -140,4 +140,16 @@ final class ArrayHelper
         }
         return false;
     }
+
+    public static function decodeJsonOrCsv(mixed $string) : array {
+        if (!is_string($string)) {
+            return [];
+        }
+        try {
+            $list = json_decode($string, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $list = explode(',', $string);
+        }
+        return array_map('trim', $list);
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
+use Flipsite\Utils\ArrayHelper;
 
 abstract class AbstractGroup extends AbstractComponent
 {
@@ -129,23 +130,29 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
     {
+        // TODO remove at some point, backwards compability
+        if (isset($data['_options']['filterBy']) && !isset($data['_options']['filterField'])) {
+            $data['_options']['filterField'] = $data['_options']['filterBy'];
+            unset($data['_options']['filterBy']);
+        }
         if (isset($data['_options']['filter'], $data['_options']['filterField'])) {
-            $filter = json_decode($data['_options']['filter'], true);
-            if (null === $filter && $data['_options']['filter']) {
-                $filter = explode(',', $data['_options']['filter']);
+            if ('true' === $data['_options']['filter']) {
+                $filter = true;
+            } else if ('false' === $data['_options']['filter']) {
+                $filter = false;
+            } else {
+                $filter = ArrayHelper::decodeJsonOrCsv($data['_options']['filter']);
             }
-            $filter      = array_map('trim', $filter ?? []);
             $filterField = $data['_options']['filterField'];
-
             $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
+                if (is_bool($filter)) {
+                    $value = $item[$filterField] ?? false;
+                    return $filter === $value;
+                }
                 if (!isset($item[$filterField])) {
                     return false;
                 }
-                $fieldFieldValues = json_decode($item[$filterField]);
-                if (null === $fieldFieldValues && $item[$filterField]) {
-                    $fieldFieldValues = explode(',', $item[$filterField]);
-                }
-                $fieldFieldValues = array_map('trim', $fieldFieldValues);
+                $fieldFieldValues = ArrayHelper::decodeJsonOrCsv($item[$filterField]);
                 return count(array_intersect($fieldFieldValues, $filter)) > 0;
             }));
         }

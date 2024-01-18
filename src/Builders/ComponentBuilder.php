@@ -161,7 +161,7 @@ class ComponentBuilder
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
             if (is_string($data['_attr']['_data'])) {
-                $tmp = explode(',', $data['_attr']['_data']);
+                $tmp = ArrayHelper::decodeJsonOrCsv($data['_attr']['_data']);
                 foreach ($tmp as $pair) {
                     $tmp2 = explode('=', $pair);
                     if (count($tmp2) === 2) {
@@ -267,7 +267,7 @@ class ComponentBuilder
             }
         }
         if (isset($options['isPage'])) {
-            $pages       = explode(',', trim(str_replace(' ', '', $options['isPage'])));
+            $pages       = ArrayHelper::decodeJsonOrCsv($options['isPage']);
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
                 if ($currentPage === $page) {
@@ -283,7 +283,7 @@ class ComponentBuilder
             return false;
         }
         if (isset($options['notPage'])) {
-            $pages       = explode(',', trim(str_replace(' ', '', $options['notPage'])));
+            $pages       = ArrayHelper::decodeJsonOrCsv($options['notPage']);
             $currentPage = $this->path->getPage();
             foreach ($pages as $page) {
                 if ($currentPage === $page) {
