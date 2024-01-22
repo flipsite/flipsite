@@ -216,6 +216,7 @@ final class Tailwind implements CallbackInterface
         if (strpos($className,'[-') !== false) {
             $className = '-'.str_replace('[-','[',$className);
         }
+
         $args     = explode('-', $className);
         if ('' === $args[0]) { //negative
             array_shift($args);
