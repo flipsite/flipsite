@@ -14,7 +14,9 @@ final class RuleScrollbars extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $this->setDeclaration('display', 'none');
+        if (isset($args[0]) && $args[0] === 'hidden') {
+            $this->setDeclaration('display', 'none');
+        }
         return;
     }
 }

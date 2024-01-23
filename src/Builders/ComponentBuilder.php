@@ -147,6 +147,8 @@ class ComponentBuilder
         if (count($options['navState'] ?? [])) {
             $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
+        
+        $style = $this->handleStyleStates($style, ['open','selected']);
 
         $data = $component->normalize($data);
         if (isset($data['default']) && (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value']))) {
@@ -226,6 +228,22 @@ class ComponentBuilder
         }
     }
 
+    private function handleStyleStates(array $style, array $states) {
+        foreach ($style as $attr => &$value) {
+            if (is_string($value)) {
+                foreach ($states as $state) {
+                    if (strpos($value, $state.':') !== false) {
+                        $tmp = explode(' ',$value);
+                        $add = [];
+                        foreach ($tmp as $cls) {
+                            // TODO CONTINUE
+                        }
+                    }
+                }
+            }
+        }
+        return $style;
+    }
     private function handleNavStyle(array $style, array $types): array
     {
         $style = ArrayHelper::applyStringCallback($style, function ($str) use ($types) {

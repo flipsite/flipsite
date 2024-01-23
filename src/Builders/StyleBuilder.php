@@ -201,7 +201,7 @@ class StyleBuilder implements BuilderInterface
         }
     }
     private function replaceClasses(array $style, array $newClasses) : array {
-        $states = ['open:','!open:'];
+        $states = ['open:','!open:','selected','!selected'];
         $replaced = [];
         foreach ($style as $attr => $oldClasses) {
             if (is_array($oldClasses)) {

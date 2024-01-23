@@ -7,12 +7,14 @@ abstract class AbstractTag extends AbstractComponent
 {
     public function build(array $data, array $style, array $options) : void
     {
-        if (!$data['value'] && !$this->empty) {
+        if (!isset($data['value']) && !$this->empty && !$this->oneline) {
             $this->render = false;
             return;
         }
         $this->tag = $data['tag'] ?? $this->tag;
-        $this->setContent($data['value']);
+        if (isset($data['value'])) {
+            $this->setContent($data['value']);
+        }
         $this->addStyle($style);
     }
 
@@ -20,6 +22,9 @@ abstract class AbstractTag extends AbstractComponent
     {
         if (is_string($data)) {
             return ['value' => $data];
+        }
+        if (isset($data['_noContent'])) {
+            $this->oneline = true;
         }
         return $data;
     }
