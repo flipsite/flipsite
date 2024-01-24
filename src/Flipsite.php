@@ -22,6 +22,7 @@ use Flipsite\Utils\Robots;
 use Flipsite\Utils\Sitemap;
 use voku\helper\HtmlMin;
 
+
 final class Flipsite
 {
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
