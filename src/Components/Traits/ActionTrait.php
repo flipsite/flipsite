@@ -76,6 +76,12 @@ trait ActionTrait
                     'tag'  => 'a',
                     'href' => isset($data['_target']) ? '#'.trim($data['_target'], '#') : '#',
                 ];
+            case 'scrollLeft':
+            case 'scrollRight':
+                return [
+                    'tag'     => 'button',
+                    'onclick' => "javascript:scrollX('".trim($data['_target'])."','".($data['_action'] === 'scrollLeft' ? 'left' : 'right')."')",
+                ];
             case 'submit':
                 return [
                     'tag'  => 'button',

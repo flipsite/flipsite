@@ -31,6 +31,9 @@ abstract class AbstractGroup extends AbstractComponent
             if ('toggle' === $data['_action']) {
                 $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
             }
+            if ('scrollLeft' === $data['_action'] || 'scrollRight' === $data['_action']) {
+                $this->builder->dispatch(new Event('global-script', 'scrollX', file_get_contents(__DIR__ . '/../../js/scrollX.min.js')));
+            }
             $actionAttributes = $this->getActionAttributes($data);
             if (isset($actionAttributes['tag'])) {
                 $this->tag = $actionAttributes['tag'];

@@ -1,8 +1,9 @@
 ready(() => {
   document.querySelectorAll('[data-dots]').forEach((dots) => {
+    dots.removeAttribute('data-dots');
     const targetId = dots.getAttribute('data-target');
     const scrollDots = new ScrollDots(dots, document.getElementById(targetId));
-    window.addEventListener('resize', function(){
+    window.addEventListener('resize', function() {
       scrollDots.handleResize();
     });
   });
