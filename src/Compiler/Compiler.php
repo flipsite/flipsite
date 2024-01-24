@@ -63,12 +63,8 @@ class Compiler implements LoggerAwareInterface
 
         $notDeleted = $this->deleteAssets($this->targetDir, $assetList);
         $assetList = array_values(array_diff($assetList, $notDeleted));
-
         $assetList = json_decode(json_encode($assetList));
 
-        error_log(print_r($assetList,true));
-
-        
         $assets = new Assets($this->environment->getAssetSources());
         foreach ($assetList as $asset) {
             $filename = false;
@@ -207,6 +203,9 @@ class Compiler implements LoggerAwareInterface
             $mime     = mime_content_type($image);
             $pathinfo = pathinfo($asset);
 
+            if ($mime === 'image/jpeg') {
+                $mime = 'image/jpg';
+            }
             if (in_array($asset, $assetList) && strpos($mime, $pathinfo['extension']) !== false) {
                 $notDeleted[] = $asset;
             } else {
