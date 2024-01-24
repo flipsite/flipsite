@@ -146,6 +146,11 @@ abstract class AbstractGroup extends AbstractComponent
             } else {
                 $filter = ArrayHelper::decodeJsonOrCsv($data['_options']['filter']);
             }
+            foreach ($filter as &$f) {
+                if ('{this.slug}' === $f) {
+                    $f = $this->path->getPage();
+                }
+            }
             $filterField = $data['_options']['filterField'];
             $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
                 if (is_bool($filter)) {
