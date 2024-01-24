@@ -13,6 +13,7 @@ class ImageAttributes extends AbstractImageAttributes
     private string $hash;
     private string $extension;
     private string $useExtension;
+    private ?RasterOptions $options = null;
 
     public function __construct(array $options, private AbstractAssetInfo $assetInfo, private AssetSourcesInterface $assetSources)
     {
@@ -32,10 +33,12 @@ class ImageAttributes extends AbstractImageAttributes
         $this->width       = intval($options['width']);
         $this->height      = intval($options['height']);
 
-        $this->srcset = $options['srcset'] ?? null;
-        unset($options['aspectRatio'], $options['srcset']);
-        $this->options = new RasterOptions($options);
-        $this->src     = $this->buildSrc();
+        if ('gif' !== $this->extension) {
+            $this->srcset = $options['srcset'] ?? null;
+            unset($options['aspectRatio'], $options['srcset']);
+            $this->options = new RasterOptions($options);
+        }
+        $this->src = $this->buildSrc();
     }
 
     private function buildSrc() : string
