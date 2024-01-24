@@ -234,10 +234,13 @@ class ComponentBuilder
                 foreach ($states as $state) {
                     if (strpos($value, $state.':') !== false) {
                         $tmp = explode(' ',$value);
-                        $add = [];
+                        $noPrefix = null;
                         foreach ($tmp as $cls) {
-                            // TODO CONTINUE
+                            if (strpos($cls,':') === false) {
+                                $noPrefix = $cls;
+                            }
                         }
+                        $value.= ' !'.$state.':'.$noPrefix;
                     }
                 }
             }
