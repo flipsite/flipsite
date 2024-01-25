@@ -13,7 +13,7 @@ final class Dots extends AbstractGroup
     {
         $this->setAttribute('role','list');
         $this->setAttribute('data-dots', true);
-        $this->setAttribute('data-target', 'contacts');
+        $this->setAttribute('data-target', $data['target'] ?? null);
         $this->addStyle($style);
 
         $style['dot']['tag'] = 'li';
