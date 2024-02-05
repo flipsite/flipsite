@@ -40,6 +40,10 @@ class Compiler implements LoggerAwareInterface
         $allFiles = [];
         $assetList = [];
         foreach ($allPages as $page) {
+            $meta = $this->siteData->getPageMeta($page, $this->siteData->getDefaultLanguage());
+            if ($meta['unpublished'] ?? false) {
+                continue;
+            }
             $html = $flipsite->render($page);
             if ($this->logger) {
                 $this->logger->info('Created file for page '.$page);
