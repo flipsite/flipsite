@@ -326,6 +326,9 @@ final class Reader implements SiteDataInterface
             if ($meta['hidden'] ?? false) {
                 $hidden[] = $page;
             }
+            if ($meta['unpublished'] ?? false) {
+                $hidden[] = $page;
+            }
         }
         return $hidden;
     }

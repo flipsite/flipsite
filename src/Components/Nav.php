@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 final class Nav extends AbstractGroup
 {
     use Traits\SiteDataTrait;
@@ -20,6 +22,16 @@ final class Nav extends AbstractGroup
             }
             $repeat = $this->getPages($level, $parentPage);
             $data = $this->normalizeRepeat($data, $repeat);
+        } else {
+            $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
+            $repeat = [];
+            foreach ($pages as $page) {
+                $pageItemData = $this->getPageItemData($page);
+                if ($pageItemData){
+                    $repeat[] = $pageItemData;
+                }
+            }
+            $data = $this->normalizeRepeat($data, $repeat);
         }
         return $data;
     }
@@ -30,31 +42,49 @@ final class Nav extends AbstractGroup
         $all        = $this->siteData->getSlugs()->getPages();
         $firstExact = false;
         if ($level === 0) {
-            $pages = array_filter($all, function ($value) {
-                return mb_strpos((string)$value, '/') === false;
-            });
+            foreach ($all as $page) {
+                if (strpos($page,'/') === false && $pageItemData = $this->getPageItemData($page)) {
+                    $pages[] = $pageItemData;
+                }
+            }
         } else {
             $parts           = explode('/', $parentPage ?? $this->path->getPage());
             $startsWith      = implode('/', array_splice($parts, 0, $level));
-
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');
-                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level) {
-                    $pages[] = $page;
+                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level && $pageItemData = $this->getPageItemData($page)) {
+                    $pages[] = $pageItemData;
                 }
             }
         }
+        return $pages;
+    }
 
-        $items = [];
-        foreach ($pages as $page) {
-            $pageMeta        = $this->siteData->getMeta((string)$page, $this->path->getLanguage()) ?? [];
-            $item            = [
-                'slug'  => $page,
-                'name'  => $this->siteData->getPageName((string)$page, $this->path->getLanguage()),
-                ...$pageMeta
-            ];
-            $items[] = $item;
+    private function getPageItemData(string $page) : ?array {
+        if (!$this->siteData->getSlugs()->isPage($page)) {
+            $pattern = '/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/';
+            preg_match($pattern, $page, $matches);
+            if (count($matches) === 3) {
+                return [
+                    'slug'  => $matches[2],
+                    'name'  => $matches[1]
+                ];
+            } else return null;
+            return null;
         }
-        return $items;
+        $pageMeta = $this->siteData->getPageMeta($page, $this->path->getLanguage()) ?? [];
+        
+        if (isset($pageMeta['hidden']) && $pageMeta['hidden']) {
+            return null;
+        }
+
+        if (isset($pageMeta['unpublished']) && $pageMeta['unpublished']) {
+            return null;
+        }
+        return [
+            'slug'  => $page,
+            'name'  => $this->siteData->getPageName($page, $this->path->getLanguage()),
+            ...$pageMeta
+        ];
     }
 }
