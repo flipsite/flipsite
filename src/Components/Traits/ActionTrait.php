@@ -16,47 +16,52 @@ trait ActionTrait
             $data['_action'] = $auto['_action'];
             $data['_target'] = $auto['_target'] ?? null;
         }
+        $attributes = [];
         switch ($data['_action']) {
             case 'tel':
-                return [
+                $attributes = [
                     'tag'  => 'a',
                     'href' => isset($data['_target']) ? 'tel:+'.str_replace('+', '', $data['_target']) : '#'
                 ];
+                break;
             case 'mailto':
-                return [
+                $attributes = [
                     'tag'  => 'a',
                     'href' => isset($data['_target']) ? 'mailto:'.str_replace('+', '', $data['_target']) : '#'
                 ];
+                break;
             case 'page':
                 if ('home' === ($data['_target'] ?? '')) {
                     $data['_target'] = '';
                 }
                 if (isset($data['_target'])) {
                     $path = $this->siteData->getSlugs()->getPath($data['_target'], $this->path->getLanguage(), $this->path->getPage());
-                    return [
+                    $attributes = [
                         'tag'  => 'a',
                         'href' => $this->environment->getUrl($path ?? '')
                     ];
                 } else {
-                    return [
+                    $attributes = [
                         'tag'  => 'a',
                         'href' => '#'
                     ];
                 }
-                // no break
+                break;
             case 'url':
-                return [
+                $attributes = [
                     'tag'  => 'a',
                     'href' => $data['_target'] ?? '#',
                     'rel'  => 'noopener noreferrer',
                 ];
+                break;
             case 'url-blank':
-                return [
+                $attributes = [
                     'tag'    => 'a',
                     'href'   => $data['_target'] ?? '#',
                     'rel'    => 'noopener noreferrer',
                     'target' => '_blank'
                 ];
+                break;
             case 'download':
                 if (!isset($data['_target'])) {
                     return [
@@ -66,16 +71,18 @@ trait ActionTrait
                     ];
                 }
                 $file = $this->environment->getAssetSources()->addBasePath(\Flipsite\Assets\Sources\AssetType::FILE, $data['_target']);
-                return [
+                $attributes = [
                     'tag'      => 'a',
                     'href'     => $file ?? '#',
                     'download' => true
                 ];
+                break;
             case 'scroll':
-                return [
+                $attributes = [
                     'tag'  => 'a',
                     'href' => isset($data['_target']) ? '#'.trim($data['_target'], '#') : '#',
                 ];
+                break;
             case 'scrollLeft':
             case 'scrollRight':
                 return [
@@ -93,7 +100,14 @@ trait ActionTrait
                     'onclick' => 'javascript:toggle(this)',
                 ];
         }
-        return [];
+        if (isset($attributes['href']) && isset($data['_fragment'])) {
+            if (str_contains($attributes['href'], '#')) {
+                $attributes['href'] .= '#'.$data['_fragment'];
+            } else {
+                $attributes['href'] .= '#'.$data['_fragment'];
+            }
+        }
+        return $attributes;
     }
 
     private function handleAuto(string $target) : array
