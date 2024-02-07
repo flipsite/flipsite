@@ -59,34 +59,9 @@ final class Image extends AbstractComponent
             $this->setAttribute('srcset', $imageAttributes->getSrcset());
             $this->setAttribute('width', $imageAttributes->getWidth());
             $this->setAttribute('height', $imageAttributes->getHeight());
-        }
-
-        // if ($this->isSvg($src)) {
-        //     $imageContext = $this->imageHandler->getContext($src, []);
-        //     if ($imageContext->getWidth()) {
-        //         $this->setAttribute('width', $imageContext->getWidth());
-        //     }
-        //     if ($imageContext->getHeight()) {
-        //         $this->setAttribute('height', $imageContext->getHeight());
-        //     }
-        //     $this->setAttribute('src', $imageContext->getSrc());
-        // } else {
-        //     if (($options['webp'] ?? true)) {
-        //         $src = str_replace('.jpg', '.webp', $src);
-        //         $src = str_replace('.png', '.webp', $src);
-        //     }
-        //     $imageContext = $this->imageHandler->getContext($src, $options);
-        //     $this->setAttribute('src', $imageContext->getSrc());
-        //     $this->setAttribute('srcset', $imageContext->getSrcset());
-        //     $this->setAttribute('sizes', $sizes);
-        //     $this->setAttribute('width', $imageContext->getWidth());
-        //     $this->setAttribute('height', $imageContext->getHeight());
-        // }
-
-
-
-        if ($isEager) {
-            $this->builder->dispatch(new Event('preload', 'image', $imageAttributes));
+            if ($isEager) {
+                $this->builder->dispatch(new Event('preload', 'image', $imageAttributes));
+            }
         }
     }
 
