@@ -10,7 +10,7 @@ class Item implements \JsonSerializable
 
     public function __construct(private Schema $schema, private array $rawData)
     {
-        $this->id   = intval($rawData['id']);
+        $this->id   = intval($rawData['_id']);
         $this->data = $schema->validate($rawData);
     }
 

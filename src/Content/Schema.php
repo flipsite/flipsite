@@ -30,7 +30,7 @@ class Schema implements \JsonSerializable
         foreach ($this->fields as $field => $schemaField) {
             if (!array_key_exists($field, $rawData)) {
                 $data[$field] = $schemaField->getDefault();
-            } else {
+            } elseif ($rawData[$field] !== null) {
                 $data[$field] = $schemaField->validate($rawData[$field]);
             }
         }

@@ -17,7 +17,7 @@ class Collection implements \JsonSerializable
 
         $this->schema = new Schema($rawSchema);
         foreach ($this->rawItems as $index => $rawItem) {
-            $rawItem['id'] ??= $index+1;
+            $rawItem['_id'] ??= $index+1;
             $this->addItem($rawItem);
         }
     }
@@ -59,13 +59,13 @@ class Collection implements \JsonSerializable
 
     public function addItem(array $rawItem) : Item
     {
-        if (!isset($rawItem['id'])) {
-            $nextId = 1;
+        if (!isset($rawItem['_id'])) {
+            $nextId = 0;
             foreach ($this->items as $item) {
                 $nextId = max($nextId, $item->getId());
             }
             $nextId++;
-            $rawItem['id'] = $nextId;
+            $rawItem['_id'] = $nextId;
         }
         $item = new Item($this->schema, $rawItem);
         $this->items[$item->getId()] = $item;
@@ -80,6 +80,16 @@ class Collection implements \JsonSerializable
             }
         }
     }
+
+    public function sortItemsByField(string $field, string $direction)
+    {
+        uasort($this->items, function ($a, $b) use ($field, $direction) {
+            $a = $a->get($field);
+            $b = $b->get($field);
+            return 'asc' === $direction ? $a <=> $b : $b <=> $a;
+        });
+    }
+
     public function jsonSerialize(): mixed
     {
         return [

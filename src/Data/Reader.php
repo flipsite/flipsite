@@ -74,7 +74,7 @@ final class Reader implements SiteDataInterface
         if (!$schema) {
             return null;
         }
-        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId));
+        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId) ?? []);
     }
 
     public function getModifiedTimestamp(): int
