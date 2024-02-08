@@ -5,8 +5,21 @@ namespace Flipsite\Content;
 
 class Collection implements \JsonSerializable
 {
-    public function __construct(private string $id, private array $schema, private ?array $items)
+    private string $name;
+    private string $icon;
+    private Schema $schema;
+    private array $items = [];
+    public function __construct(private string $id, private array $rawSchema, private ?array $rawItems)
     {
+        $this->name = $rawSchema['_name'] ?? $id;
+        $this->icon = $rawSchema['_icon'] ?? null;
+        unset($rawSchema['_name'], $rawSchema['_icon']);
+
+        $this->schema = new Schema($rawSchema);
+        foreach ($this->rawItems as $index => $rawItem) {
+            $rawItem['id'] ??= $index+1;
+            $this->addItem($rawItem);
+        }
     }
 
     public function getId() : string
@@ -14,36 +27,61 @@ class Collection implements \JsonSerializable
         return $this->id;
     }
 
-    public function getContent(bool $onlyPublished = false) : array
+    public function getItems(bool $onlyPublished = false) : array
     {
-        $items = $this->items ?? [];
-        if ($onlyPublished && isset($this->schema['published'])) {
-            $items = array_filter($items, function ($item) {
-                return $item['published'] ?? false;
+        if ($onlyPublished && $this->schema->hasPublishedField()) {
+            return array_filter($items, function ($item) {
+                return $item->isPublished();
             });
         }
-        return $items;
+        return $this->items;
     }
     
     public function getItem(?int $itemId = null) : ?Item
     {
-        if (null === $itemId) {
-            return isset($this->items[0]) ? new Item(0, $this->items[0]) : null;
-        }
-        return isset($this->items[$itemId]) ? new Item($itemId, $this->items[$itemId]) : null;
+        return $this->items[$itemId ?? -1] ?? null;
     }
 
     public function getSlugField() : ?string {
         foreach ($this->schema as $field => $val) {
-            if (is_array($val) && 'slug' === ($val['format'] ?? '')) {
+            if (is_array($val) && 'slug' === ($val['type'] ?? '')) {
                 return $field;
             }
         }
         return null;
     }
 
+    public function addItem(array $rawItem) : Item
+    {
+        if (!isset($rawItem['id'])) {
+            $nextId = 1;
+            foreach ($this->items as $item) {
+                $nextId = max($nextId, $item->getId());
+            }
+            $nextId++;
+            $rawItem['id'] = $nextId;
+        }
+        $item = new Item($this->schema, $rawItem);
+        $this->items[$item->getId()] = $item;
+        return $item;
+    }
+    public function deleteItem(int $itemId) : void
+    {
+        foreach ($this->items as $index => $item) {
+            if ($item->getId() === $itemId) {
+                unset($this->items[$index]);
+                break;
+            }
+        }
+    }
     public function jsonSerialize(): mixed
     {
-        return $this->schema;
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'icon' => $this->icon,
+            'schema' => $this->schema,
+            'items' => array_values($this->items)
+        ];
     }
 }
