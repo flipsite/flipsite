@@ -222,6 +222,6 @@ abstract class AbstractGroup extends AbstractComponent
         if (!$collection) {
             return [];
         }
-        return $collection->getContent(true);
+        return $collection->getItemsArray(true);
     }
 }

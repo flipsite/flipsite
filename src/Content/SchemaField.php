@@ -33,8 +33,18 @@ class SchemaField implements \JsonSerializable
         $type       = $rawField['type'];
         $format     = $rawField['format'] ?? null;
         $this->type = $format ? $format : $type;
+        // Backward compatibility
         if ('boolean' === $this->type) {
             $this->type = 'published';
+        }
+        if ('markdown' === $this->type) {
+            $this->type = 'richtext';
+        }
+        if ('url' === $this->type) {
+            $this->type = 'slug';
+        }
+        if ('tel' === $this->type) {
+            $this->type = 'phone';
         }
         if (!in_array($this->type, self::TYPES)) {
             throw new \Exception('Invalid field type '.$this->type);
@@ -42,7 +52,9 @@ class SchemaField implements \JsonSerializable
         $this->default = $rawField['default'] ?? null;
         $this->required = $rawField['required'] ?? null;
         if ('enum' === $this->type) {
-            $this->options = $rawField['options'] ?? null;
+            if ($rawField['options']) {
+                $this->options = is_array($rawField['options']) ? json_encode($rawField['options']) : $rawField['options'];
+            }
             if (!$this->default) {
                 $options = ArrayHelper::decodeJsonOrCsv($this->options);
                 $this->default = $options[0] ?? null;
@@ -51,6 +63,9 @@ class SchemaField implements \JsonSerializable
         if (in_array($this->type, ['enum', 'published'])) {
             $this->required = true;
         }
+    }
+    public function getType() : string {
+        return $this->type;
     }
     public function getDefault() : null|string|bool {
         if (null === $this->default && 'enum' === $this->type) {    
