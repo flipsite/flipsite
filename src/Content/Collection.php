@@ -57,7 +57,7 @@ class Collection implements \JsonSerializable
         return null;
     }
 
-    public function addItem(array $rawItem) : Item
+    public function addItem(array $rawItem, ?int $index = null) : Item
     {
         if (!isset($rawItem['_id'])) {
             $nextId = 0;
@@ -69,6 +69,17 @@ class Collection implements \JsonSerializable
         }
         $item = new Item($this->schema, $rawItem);
         $this->items[$item->getId()] = $item;
+
+        if ($index !== null) {
+            $items = $this->items;
+            $lastItem = array_pop($items);
+            array_splice($items, $index, 0, [$lastItem]);
+            $this->items = [];
+            foreach ($items as $itm) {
+                $this->items[$itm->getId()] = $itm;
+            }
+        }
+        
         return $item;
     }
     public function deleteItem(int $itemId) : void
