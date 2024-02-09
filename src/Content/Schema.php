@@ -14,6 +14,28 @@ class Schema implements \JsonSerializable
         }
     }
 
+    public function hasField(string $fieldId) : bool
+    {
+        return array_key_exists($fieldId, $this->fields);
+    }
+
+    public function addField(array $rawField) {
+        $field = $rawField['name'];
+        unset($rawField['name']);
+        $this->fields[$field] = new SchemaField($field, $rawField);
+    }
+
+    public function editField(string $fieldId, array $delta) : ?string {
+        $newName = $delta['name'] ?? [];
+        unset($delta['name']);
+        $this->fields[$fieldId]->appendDelta($delta);
+        if ($newName) {
+            $this->fields[$newName] = $this->fields[$fieldId];
+            unset($this->fields[$fieldId]);
+        }
+        return $newName;
+    }
+
     public function getField(string $field) : ?SchemaField
     {
         return $this->fields[$field] ?? null;

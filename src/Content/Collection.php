@@ -17,9 +17,11 @@ class Collection implements \JsonSerializable
         unset($rawSchema['_name'], $rawSchema['_icon']);
 
         $this->schema = new Schema($rawSchema);
-        foreach ($this->rawItems as $index => $rawItem) {
-            $rawItem['_id'] ??= $index + 1;
-            $this->addItem($rawItem);
+        if ($this->rawItems) {
+            foreach ($this->rawItems as $index => $rawItem) {
+                $rawItem['_id'] ??= $index + 1;
+                $this->addItem($rawItem);
+            }
         }
     }
 
@@ -60,13 +62,33 @@ class Collection implements \JsonSerializable
     }
 
     
-
-    public function updateField(string $field, array $delta)
+    public function addField(array $rawField) : bool
     {
-        $this->schema->updateField($field, $delta);
-        foreach ($this->items as &$item) {
-            $item->updateField($field, $delta);
+        if (!$rawField['name'] || $this->schema->hasField($rawField['name'])) {
+            return false;
         }
+        $this->schema->addField($rawField);
+        foreach ($this->items as &$item) {
+            $item->setSchema($this->schema);
+            $item->applyDelta([]);
+        }
+        return true;
+    }
+
+    public function editField(string $fieldId, array $delta) : bool
+    {
+        if ($delta['name'] && $this->schema->hasField($delta['name'])) {
+            return false;
+        }
+        $newFieldName = $this->schema->editField($fieldId, $delta);
+        foreach ($this->items as &$item) {
+            if ($newFieldName) {
+                $item->renameField($fieldId, $newFieldName);
+            }
+            $item->setSchema($this->schema);
+            $item->applyDelta([]);
+        }
+        return true;
     }
 
     public function addItem(array $rawItem, ?int $index = null) : Item
@@ -93,16 +115,6 @@ class Collection implements \JsonSerializable
         }
 
         return $item;
-    }
-
-    public function deleteItem(int $itemId) : void
-    {
-        foreach ($this->items as $index => $item) {
-            if ($item->getId() === $itemId) {
-                unset($this->items[$index]);
-                break;
-            }
-        }
     }
 
     public function sortItemsByField(string $field, string $direction)

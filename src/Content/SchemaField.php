@@ -67,6 +67,24 @@ class SchemaField implements \JsonSerializable
     public function getType() : string {
         return $this->type;
     }
+
+    public function appendDelta(array $delta) {
+        if (array_key_exists('type', $delta)) {
+            $this->type = $delta['type'];
+            if (!in_array($this->type, self::TYPES)) {
+                throw new \Exception('Invalid field type '.$this->type);
+            }
+        }
+        if (array_key_exists('default', $delta)) {
+            $this->default = $delta['default'];
+        }
+        if (array_key_exists('required', $delta)) {
+            $this->required = $delta['required'];
+        }
+        if (array_key_exists('options', $delta)) {
+            $this->options = $delta['options'];
+        }
+    }
     public function getDefault() : null|string|bool {
         if (null === $this->default && 'enum' === $this->type) {    
             $options = ArrayHelper::decodeJsonOrCsv($this->options);
