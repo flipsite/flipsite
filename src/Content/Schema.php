@@ -14,6 +14,11 @@ class Schema implements \JsonSerializable
         }
     }
 
+    public function getField(string $field) : ?SchemaField
+    {
+        return $this->fields[$field] ?? null;
+    }
+
     public function hasPublishedField() : bool
     {
         foreach ($this->fields as $field) {

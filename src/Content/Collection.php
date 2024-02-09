@@ -9,6 +9,7 @@ class Collection implements \JsonSerializable
     private ?string $icon;
     private Schema $schema;
     private array $items = [];
+
     public function __construct(private string $id, private array $rawSchema, private ?array $rawItems)
     {
         $this->name = $rawSchema['_name'] ?? $id;
@@ -17,7 +18,7 @@ class Collection implements \JsonSerializable
 
         $this->schema = new Schema($rawSchema);
         foreach ($this->rawItems as $index => $rawItem) {
-            $rawItem['_id'] ??= $index+1;
+            $rawItem['_id'] ??= $index + 1;
             $this->addItem($rawItem);
         }
     }
@@ -48,13 +49,24 @@ class Collection implements \JsonSerializable
         return $this->items[$itemId ?? -1] ?? null;
     }
 
-    public function getSlugField() : ?string {
+    public function getSlugField() : ?string
+    {
         foreach ($this->schema as $field => $val) {
             if (is_array($val) && 'slug' === ($val['type'] ?? '')) {
                 return $field;
             }
         }
         return null;
+    }
+
+    
+
+    public function updateField(string $field, array $delta)
+    {
+        $this->schema->updateField($field, $delta);
+        foreach ($this->items as &$item) {
+            $item->updateField($field, $delta);
+        }
     }
 
     public function addItem(array $rawItem, ?int $index = null) : Item
@@ -67,11 +79,11 @@ class Collection implements \JsonSerializable
             $nextId++;
             $rawItem['_id'] = $nextId;
         }
-        $item = new Item($this->schema, $rawItem);
+        $item                        = new Item($this->schema, $rawItem);
         $this->items[$item->getId()] = $item;
 
         if ($index !== null) {
-            $items = $this->items;
+            $items    = $this->items;
             $lastItem = array_pop($items);
             array_splice($items, $index, 0, [$lastItem]);
             $this->items = [];
@@ -79,9 +91,10 @@ class Collection implements \JsonSerializable
                 $this->items[$itm->getId()] = $itm;
             }
         }
-        
+
         return $item;
     }
+
     public function deleteItem(int $itemId) : void
     {
         foreach ($this->items as $index => $item) {
@@ -104,11 +117,11 @@ class Collection implements \JsonSerializable
     public function jsonSerialize(): mixed
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'icon' => $this->icon,
+            'id'     => $this->id,
+            'name'   => $this->name,
+            'icon'   => $this->icon,
             'schema' => $this->schema,
-            'items' => array_values($this->items)
+            'items'  => array_values($this->items)
         ];
     }
 }

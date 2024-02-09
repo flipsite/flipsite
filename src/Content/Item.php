@@ -24,6 +24,19 @@ class Item implements \JsonSerializable
         return true;
     }
 
+    public function renameField(string $oldName, string $newName)
+    {
+        if (array_key_exists($oldName, $this->data)) {
+            $this->data[$newName] = $this->data[$oldName];
+            unset($this->data[$oldName]);
+        }
+    }
+
+    public function setSchema(Schema $schema)
+    {
+        $this->schema = $schema;
+    }
+
     public function applyDelta(array $delta)
     {
         $this->data = $this->schema->validate(array_merge($this->data, $delta));
