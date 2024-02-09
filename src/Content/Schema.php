@@ -26,7 +26,7 @@ class Schema implements \JsonSerializable
     }
 
     public function editField(string $fieldId, array $delta) : ?string {
-        $newName = $delta['name'] ?? [];
+        $newName = $delta['name'] ?? null;
         unset($delta['name']);
         $this->fields[$fieldId]->appendDelta($delta);
         if ($newName) {
