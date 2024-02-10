@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -19,7 +20,7 @@ final class ArrayHelper
         return null;
     }
 
-    public static function isAssociative(array $array) : bool
+    public static function isAssociative(array $array): bool
     {
         if ([] === $array) {
             return false;
@@ -27,17 +28,25 @@ final class ArrayHelper
         return array_keys($array) !== range(0, count($array) - 1);
     }
 
-    public static function renameKey(array $array, string $old, string $new) : array
+    public static function renameKey(array $array, string $old, string $new, bool $recursive = false): array
     {
-        $keys = array_keys($array);
-        if (false === $index = array_search($old, $keys, true)) {
-            return $array;
+        foreach ($array as $key => $value) {
+            // If the key matches the old key, rename it
+            if ($key === $old) {
+                $array[$new] = $value;
+                unset($array[$key]);
+            }
+
+            // If recursion is enabled and the value is an array, recursively call renameKey
+            if ($recursive && is_array($value)) {
+                $array[$key] = self::renameKey($value, $old, $new, true);
+            }
         }
-        $keys[$index] = $new;
-        return array_combine($keys, array_values($array));
+
+        return $array;
     }
 
-    public static function merge(array ...$arrays) : array
+    public static function merge(array ...$arrays): array
     {
         $merged = [];
         while (count($arrays)) {
@@ -46,7 +55,7 @@ final class ArrayHelper
         return $merged;
     }
 
-    public static function unDot(array $array, string $delimiter = '.') : array
+    public static function unDot(array $array, string $delimiter = '.'): array
     {
         $exploded       = [];
         $renameAndEmpty = [];
@@ -84,7 +93,7 @@ final class ArrayHelper
         return $array;
     }
 
-    public static function strReplace(string $search, string $replace, array $array) : array
+    public static function strReplace(string $search, string $replace, array $array): array
     {
         foreach ($array as $key => &$value) {
             if (is_array($value)) {
@@ -96,14 +105,14 @@ final class ArrayHelper
         return $array;
     }
 
-    public static function addPrefix(array $array, string $prefix) : array
+    public static function addPrefix(array $array, string $prefix): array
     {
         $new = [];
         foreach ($array as $key => $val) {
             if (is_string($val)) {
-                $val               = $prefix.$val;
-                $val               = str_replace(' ', ' '.$prefix, $val);
-                $new[$prefix.$key] = $val;
+                $val               = $prefix . $val;
+                $val               = str_replace(' ', ' ' . $prefix, $val);
+                $new[$prefix . $key] = $val;
             } elseif (is_array($val)) {
                 $val       = self::addPrefix($val, $prefix);
                 $new[$key] = $val;
@@ -112,11 +121,11 @@ final class ArrayHelper
         return $new;
     }
 
-    public static function applyStringCallback(array $data, callable $callback) : array
+    public static function applyStringCallback(array $data, callable $callback): array
     {
-        foreach ($data as &$value) {
+        foreach ($data as $key => &$value) {
             if (is_string($value)) {
-                $value = $callback($value);
+                $value = $callback($value, $key);
             } elseif (is_array($value)) {
                 $value = self::applyStringCallback($value, $callback);
             }
@@ -124,7 +133,7 @@ final class ArrayHelper
         return $data;
     }
 
-    public static function find(string $needle, array $haystack) : bool
+    public static function find(string $needle, array $haystack): bool
     {
         foreach ($haystack as $item) {
             if (is_array($item)) {
@@ -141,7 +150,8 @@ final class ArrayHelper
         return false;
     }
 
-    public static function decodeJsonOrCsv(mixed $string) : array {
+    public static function decodeJsonOrCsv(mixed $string): array
+    {
         if (!is_string($string)) {
             return [];
         }

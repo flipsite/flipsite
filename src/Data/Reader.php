@@ -45,8 +45,11 @@ final class Reader implements SiteDataInterface
     public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
     {
         if (file_exists($siteDir . '/site.yaml')) {
-            $siteYaml          = Yaml::parseFile($siteDir . '/site.yaml');
-            $themeYaml         = Yaml::parseFile($siteDir . '/theme.yaml');
+            $siteYaml  = Yaml::parseFile($siteDir . '/site.yaml');
+            $themeYaml = Yaml::parseFile($siteDir . '/theme.yaml');
+            $siteYaml  = $this->repairSite($siteYaml, $siteDir . '/site.yaml');
+            $themeYaml = $this->repairTheme($themeYaml, $siteDir . '/theme.yaml');
+
             $siteYaml['theme'] = $themeYaml;
             if ($this->plugins) {
                 $siteYaml = $this->plugins->run('beforeSiteLoad', $siteYaml);
@@ -206,7 +209,7 @@ final class Reader implements SiteDataInterface
 
         }
         $style = $this->data['theme']['components'][$component] ?? [];
-        if (in_array($component,['social','nav'])) {
+        if (in_array($component, ['social','nav'])) {
             unset($style['type']);
         }
         return $style;
@@ -423,5 +426,70 @@ final class Reader implements SiteDataInterface
             $normalized[$attr] = is_array($value) ? $this->normalize($value) : $value;
         }
         return $normalized;
+    }
+
+    private function repairSite(array $site, string $sourcePath) : array {
+        if ($site['_version'] ?? 0 < 1) {
+
+            $site = ArrayHelper::renameKey($site, '_dataSourceList', '_repeat', true);
+
+            $site = ArrayHelper::applyStringCallback($site, function($value, $attribute) :string {
+                if ('_repeat' === $attribute) {
+                    if (str_starts_with($value, '${content.')) {
+                        $value = str_replace('${content.', '', $value);
+                        $value = substr($value, 0, strlen($value) - 1);
+                    }
+                    return $value;
+                }
+                if ('_dataSource' === $attribute) {
+                    if (str_starts_with($value, '${content.')) {
+                        $value = str_replace('${content.', '', $value);
+                        $value = substr($value, 0, strlen($value) - 1);
+                        $tmp = explode('.',$value);
+                        $tmp[1] = intval($tmp[1])+1;
+                        $value = implode('.',$tmp);
+                    }
+                    return $value;
+                }
+                return $value;
+            });
+            if (isset($site['content'])) {
+                foreach ($site['content'] as $collectionId => &$items) {
+                    foreach ($items as $index => &$item) {
+                        if (!isset($item['_id'])) {
+                            $item['_id'] = $index+1;
+                            error_log($collectionId.' '.$index.' => ID '.$item['_id']);
+                        }
+                    }
+                }
+            }
+            
+            $site['_version'] = 1;
+            error_log('Repaired site.yaml');
+            $this->dumpYaml($site, $sourcePath);
+        }
+
+        
+
+        // $yamlFixer = new YamlFixer($site);
+        // $yamlFixer->renameKeys('_dataSourceList', '_repeat');
+
+
+        // $yaml = Yaml::dump($this->raw, 16, 2);
+            // $yaml = str_replace("''", "", $yaml);
+            // //$yaml = Yaml::dump($this->raw, 8, 2);
+            // file_put_contents($this->dir.'/'.$this->file, $yaml);
+
+        return $site;
+    }
+
+    private function repairTheme(array $theme, string $sourcePath) : array {
+        return $theme;
+    }
+
+    private function dumpYaml(array $yaml, string $path) {
+        $yaml = Yaml::dump($yaml, 16, 2);
+        $yaml = str_replace("''", "", $yaml);
+        file_put_contents($path, $yaml);
     }
 }

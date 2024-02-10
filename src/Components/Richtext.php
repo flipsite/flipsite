@@ -65,7 +65,14 @@ final class Richtext extends AbstractGroup
         $this->content = str_replace('</p>',"</p>\n",$this->content);
         $this->content = str_replace('/>',"/>\n",$this->content);
         $this->content = preg_replace('/<span class="ql-cursor">.*?<\/span>/', '', $this->content);
+        $this->content = preg_replace('/<span[^>]*>(.*?)<\/span>/', '$1', $this->content);
+
         $this->content = trim($this->content);
+        
+
+        // Normalize HTML
+        
+
         if ($data['removeEmptyLines'] ?? false) {
             $this->content = str_replace("<p><br></p>\n", '', $this->content);
         }
