@@ -441,15 +441,14 @@ final class Reader implements SiteDataInterface
 
     private function repairSite(array $site, string $sourcePath): array
     {
-        if ($site['_version'] ?? 0 < 1) {
-
+        if (($site['_version'] ?? 0) < 1) {
             $site = ArrayHelper::renameKey($site, '_dataSourceList', '_repeat', true);
-
             $site = ArrayHelper::applyStringCallback($site, function ($value, $attribute): string {
                 if ('_repeat' === $attribute) {
                     if (str_starts_with($value, '${content.')) {
                         $value = str_replace('${content.', '', $value);
                         $value = substr($value, 0, strlen($value) - 1);
+                        error_log('Updated _repeat '.$value);
                     }
                     return $value;
                 }
@@ -457,10 +456,11 @@ final class Reader implements SiteDataInterface
                     if (str_starts_with($value, '${content.')) {
                         $value = str_replace('${content.', '', $value);
                         $value = substr($value, 0, strlen($value) - 1);
-                        $tmp = explode('.', $value);
-                        $tmp[1] = intval($tmp[1]) + 1;
-                        $value = implode('.', $tmp);
                     }
+                    $tmp = explode('.', $value);
+                    $tmp[1] = intval($tmp[1]) + 1;
+                    $value = implode('.', $tmp);
+                    error_log('Updated datasource to '.$value);
                     return $value;
                 }
                 return $value;
@@ -475,22 +475,10 @@ final class Reader implements SiteDataInterface
                     }
                 }
             }
-
             $site['_version'] = 1;
             error_log('Repaired site.yaml');
             $this->dumpYaml($site, $sourcePath);
         }
-
-
-
-        // $yamlFixer = new YamlFixer($site);
-        // $yamlFixer->renameKeys('_dataSourceList', '_repeat');
-
-
-        // $yaml = Yaml::dump($this->raw, 16, 2);
-        // $yaml = str_replace("''", "", $yaml);
-        // //$yaml = Yaml::dump($this->raw, 8, 2);
-        // file_put_contents($this->dir.'/'.$this->file, $yaml);
 
         return $site;
     }
