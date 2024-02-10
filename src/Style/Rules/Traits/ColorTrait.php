@@ -10,11 +10,11 @@ trait ColorTrait
 {
     protected function setColor(array $args, string $property): bool
     {
-        $color = $this->getColor($args);
+        $color = ColorHelper::getColorString($args, $this->getConfig('colors'));
         if (null === $color) {
             return false;
         }
-        $this->setDeclaration($property, (string) $color);
+        $this->setDeclaration($property, $color);
         return true;
     }
 

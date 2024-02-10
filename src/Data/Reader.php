@@ -160,6 +160,17 @@ final class Reader implements SiteDataInterface
         return $this->get('share');
     }
 
+    public function getThemeColor(): ?string
+    {
+        return $this->get('themeColor');
+    }
+
+    public function getAppleAppId(): ?string
+    {
+        $appId = $this->get('appleAppId');
+        return $appId ? (string)$appId : null;
+    }
+
     public function getSocial(): array
     {
         return $this->get('social');
@@ -428,12 +439,13 @@ final class Reader implements SiteDataInterface
         return $normalized;
     }
 
-    private function repairSite(array $site, string $sourcePath) : array {
+    private function repairSite(array $site, string $sourcePath): array
+    {
         if ($site['_version'] ?? 0 < 1) {
 
             $site = ArrayHelper::renameKey($site, '_dataSourceList', '_repeat', true);
 
-            $site = ArrayHelper::applyStringCallback($site, function($value, $attribute) :string {
+            $site = ArrayHelper::applyStringCallback($site, function ($value, $attribute): string {
                 if ('_repeat' === $attribute) {
                     if (str_starts_with($value, '${content.')) {
                         $value = str_replace('${content.', '', $value);
@@ -445,9 +457,9 @@ final class Reader implements SiteDataInterface
                     if (str_starts_with($value, '${content.')) {
                         $value = str_replace('${content.', '', $value);
                         $value = substr($value, 0, strlen($value) - 1);
-                        $tmp = explode('.',$value);
-                        $tmp[1] = intval($tmp[1])+1;
-                        $value = implode('.',$tmp);
+                        $tmp = explode('.', $value);
+                        $tmp[1] = intval($tmp[1]) + 1;
+                        $value = implode('.', $tmp);
                     }
                     return $value;
                 }
@@ -457,37 +469,39 @@ final class Reader implements SiteDataInterface
                 foreach ($site['content'] as $collectionId => &$items) {
                     foreach ($items as $index => &$item) {
                         if (!isset($item['_id'])) {
-                            $item['_id'] = $index+1;
-                            error_log($collectionId.' '.$index.' => ID '.$item['_id']);
+                            $item['_id'] = $index + 1;
+                            error_log($collectionId . ' ' . $index . ' => ID ' . $item['_id']);
                         }
                     }
                 }
             }
-            
+
             $site['_version'] = 1;
             error_log('Repaired site.yaml');
             $this->dumpYaml($site, $sourcePath);
         }
 
-        
+
 
         // $yamlFixer = new YamlFixer($site);
         // $yamlFixer->renameKeys('_dataSourceList', '_repeat');
 
 
         // $yaml = Yaml::dump($this->raw, 16, 2);
-            // $yaml = str_replace("''", "", $yaml);
-            // //$yaml = Yaml::dump($this->raw, 8, 2);
-            // file_put_contents($this->dir.'/'.$this->file, $yaml);
+        // $yaml = str_replace("''", "", $yaml);
+        // //$yaml = Yaml::dump($this->raw, 8, 2);
+        // file_put_contents($this->dir.'/'.$this->file, $yaml);
 
         return $site;
     }
 
-    private function repairTheme(array $theme, string $sourcePath) : array {
+    private function repairTheme(array $theme, string $sourcePath): array
+    {
         return $theme;
     }
 
-    private function dumpYaml(array $yaml, string $path) {
+    private function dumpYaml(array $yaml, string $path)
+    {
         $yaml = Yaml::dump($yaml, 16, 2);
         $yaml = str_replace("''", "", $yaml);
         file_put_contents($path, $yaml);

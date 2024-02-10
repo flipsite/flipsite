@@ -20,6 +20,10 @@ interface SiteDataInterface
 
     public function getShare(): ?string;
 
+    public function getThemeColor(): ?string;
+    
+    public function getAppleAppId(): ?string;
+
     public function getSocial(): ?array;
 
     public function getSlugs(): Slugs;

@@ -26,6 +26,17 @@ class ColorHelper
         return $colorString;
     }
 
+    public static function getColorString(string|array $args, array $allColors): ?string {
+        $color = self::getColor($args, $allColors);
+        if (null === $color) {
+            return null;
+        }
+        if ($color->getAlpha() < 1.0) {
+            return (string)$color;
+        }
+        return sprintf("#%02x%02x%02x", $color->getRed(), $color->getGreen(), $color->getBlue());
+    }
+
     public static function getColor(string|array $args, array $allColors): ?Color
     {
         if (is_string($args)) {

@@ -11,6 +11,7 @@ use Flipsite\Components\Element;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\EnvironmentInterface;
 use Flipsite\Utils\Path;
+use Flipsite\Utils\ColorHelper;
 
 class MetaBuilder implements BuilderInterface
 {
@@ -75,9 +76,26 @@ class MetaBuilder implements BuilderInterface
         $elements[] = $this->meta('twitter:card', 'summary_large_image');
         $elements[] = $this->meta('twitter:image:alt', $title);
 
-        // Theme color TODO
-        // $themeColor = $this->siteData->get('pwa.themeColor') ?? $this->siteData->get('theme.colors.primary');
-        // $elements[] = $this->meta('theme-color', $themeColor);
+        // App smart banner
+        $appleAppId = $this->siteData->getAppleAppId();
+        if ($appleAppId) {
+            $tmp = explode(',', $appleAppId);
+            $value = 'app-id='.$tmp[0];
+            if (isset($tmp[1])) {
+                $value.= ', app-argument='.$tmp[1];
+            }
+            $elements[] = $this->meta('apple-itunes-app', $value);
+        }
+        
+        // Theme color
+        $color = $this->siteData->getThemeColor();
+        if ($color) {
+            if ($color[0] === '#') {
+                $color = '['.$color.']';
+            }
+            $themeColor = ColorHelper::getColorString($color, $this->siteData->getColors());
+            $elements[] = $this->meta('theme-color', $themeColor); 
+        }
 
         foreach ($elements as $el) {
             if (null !== $el) {
