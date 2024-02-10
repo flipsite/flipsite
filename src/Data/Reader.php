@@ -345,8 +345,11 @@ final class Reader implements SiteDataInterface
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $collection = $this->getCollection($meta[$page]['content']);
+                if (!$collection) {
+                    continue;
+                }
                 $slugField = $collection->getSlugField();
-                $items = $collection->getItems(true);
+                $items = $collection->getItemsArray(true);
                 if ($slugField && $items) {
                     foreach ($items as $dataItem) {
                         if (!isset($dataItem[$slugField]) || !$dataItem[$slugField]) {

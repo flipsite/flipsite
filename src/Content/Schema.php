@@ -14,6 +14,15 @@ class Schema implements \JsonSerializable
         }
     }
 
+    public function getSlugField() : ?string {
+        foreach ($this->fields as $fieldId => $val) {
+            if ('slug' === ($val->getType() ?? '')) {
+                return $fieldId;
+            }
+        }
+        return null;
+    }
+
     public function hasField(string $fieldId) : bool
     {
         return array_key_exists($fieldId, $this->fields);

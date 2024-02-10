@@ -108,10 +108,6 @@ abstract class AbstractGroup extends AbstractComponent
             $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
             unset($data['_params']);
         }
-        if (isset($data['_params'])) {
-            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
-            unset($data['_params']);
-        }
         return $data;
     }
 

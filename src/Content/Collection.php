@@ -53,12 +53,7 @@ class Collection implements \JsonSerializable
 
     public function getSlugField() : ?string
     {
-        foreach ($this->schema as $field => $val) {
-            if (is_array($val) && 'slug' === ($val['type'] ?? '')) {
-                return $field;
-            }
-        }
-        return null;
+        return $this->schema->getSlugField();
     }
 
     
