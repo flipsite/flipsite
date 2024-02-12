@@ -32,9 +32,11 @@ class Collection implements \JsonSerializable
 
     public function getItems(bool $onlyPublished = false) : array
     {
-        if ($onlyPublished && $this->schema->hasPublishedField()) {
-            return array_filter($this->items, function ($item) {
-                return $item->isPublished();
+        $publishedFieldId = $this->schema->getPublishedField();
+
+        if ($onlyPublished && $publishedFieldId) {
+            return array_filter($this->items, function ($item) use ($publishedFieldId){
+                return !!$item->get($publishedFieldId);
             });
         }
         return $this->items;
@@ -56,7 +58,6 @@ class Collection implements \JsonSerializable
         return $this->schema->getSlugField();
     }
 
-    
     public function addField(array $rawField) : bool
     {
         if (!$rawField['name'] || $this->schema->hasField($rawField['name'])) {

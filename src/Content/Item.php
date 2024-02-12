@@ -19,11 +19,6 @@ class Item implements \JsonSerializable
         return $this->id;
     }
 
-    public function isPublished() : bool
-    {
-        return true;
-    }
-
     public function renameField(string $oldName, string $newName)
     {
         if (array_key_exists($oldName, $this->data)) {

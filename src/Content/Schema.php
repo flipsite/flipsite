@@ -14,7 +14,8 @@ class Schema implements \JsonSerializable
         }
     }
 
-    public function getSlugField() : ?string {
+    public function getSlugField() : ?string
+    {
         foreach ($this->fields as $fieldId => $val) {
             if ('slug' === ($val->getType() ?? '')) {
                 return $fieldId;
@@ -28,13 +29,15 @@ class Schema implements \JsonSerializable
         return array_key_exists($fieldId, $this->fields);
     }
 
-    public function addField(array $rawField) {
+    public function addField(array $rawField)
+    {
         $field = $rawField['name'];
         unset($rawField['name']);
         $this->fields[$field] = new SchemaField($field, $rawField);
     }
 
-    public function editField(string $fieldId, array $delta) : ?string {
+    public function editField(string $fieldId, array $delta) : ?string
+    {
         $newName = $delta['name'] ?? null;
         unset($delta['name']);
         $this->fields[$fieldId]->appendDelta($delta);
@@ -50,11 +53,11 @@ class Schema implements \JsonSerializable
         return $this->fields[$field] ?? null;
     }
 
-    public function hasPublishedField() : bool
+    public function getPublishedField() : string|bool
     {
-        foreach ($this->fields as $field) {
+        foreach ($this->fields as $fieldId => $field) {
             if ('published' === $field->getType()) {
-                return true;
+                return $fieldId;
             }
         }
         return false;

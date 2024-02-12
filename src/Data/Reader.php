@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -217,10 +216,9 @@ final class Reader implements SiteDataInterface
             $style = $this->data['theme']['components'][array_shift($tmp)] ?? [];
             $dot   = new Dot($style);
             return $dot->get(implode('.', $tmp)) ?? [];
-
         }
         $style = $this->data['theme']['components'][$component] ?? [];
-        if (in_array($component, ['social','nav'])) {
+        if (in_array($component, ['social', 'nav'])) {
             unset($style['type']);
         }
         return $style;
@@ -363,7 +361,7 @@ final class Reader implements SiteDataInterface
                     continue;
                 }
                 $slugField = $collection->getSlugField();
-                $items = $collection->getItemsArray(true);
+                $items     = $collection->getItemsArray(true);
                 if ($slugField && $items) {
                     foreach ($items as $dataItem) {
                         if (!isset($dataItem[$slugField]) || !$dataItem[$slugField]) {
@@ -457,9 +455,9 @@ final class Reader implements SiteDataInterface
                         $value = str_replace('${content.', '', $value);
                         $value = substr($value, 0, strlen($value) - 1);
                     }
-                    $tmp = explode('.', $value);
+                    $tmp    = explode('.', $value);
                     $tmp[1] = intval($tmp[1]) + 1;
-                    $value = implode('.', $tmp);
+                    $value  = implode('.', $tmp);
                     error_log('Updated datasource to '.$value);
                     return $value;
                 }
@@ -491,7 +489,7 @@ final class Reader implements SiteDataInterface
     private function dumpYaml(array $yaml, string $path)
     {
         $yaml = Yaml::dump($yaml, 16, 2);
-        $yaml = str_replace("''", "", $yaml);
+        $yaml = str_replace("''", '', $yaml);
         file_put_contents($path, $yaml);
     }
 }
