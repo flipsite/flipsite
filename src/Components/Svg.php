@@ -30,7 +30,11 @@ class Svg extends AbstractComponent
 
     public function build(array $data, array $style, array $options) : void
     {
-        $svg = $this->assets->getSvg($data['src']);
+        try {
+            $svg = $this->assets->getSvg($data['src']);
+        } catch (\Exception $e) {
+            return;
+        }   
         $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         $this->addStyle($style);
         if ($svg) {

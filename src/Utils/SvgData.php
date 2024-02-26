@@ -17,11 +17,17 @@ final class SvgData implements SvgInterface
         if (file_exists($data)) {
             $this->hash = substr(md5($data), 0, 6);
             $data       = file_get_contents($data);
+            if (mime_content_type($data) !== 'image/svg+xml') {
+                throw new \Exception('File is not a valid SVG');
+            }
         } else {
             $this->hash = substr(md5($data), 0, 6);
         }
 
         $svgTagPos = strpos($data, '<svg');
+        if (false === $svgTagPos) {
+            throw new \Exception('Not valid SVG');
+        }
         $data      = substr($data, $svgTagPos);
 
         preg_match('/viewBox="(.*?)"/', $data, $matches);
