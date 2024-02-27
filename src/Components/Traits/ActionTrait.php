@@ -100,7 +100,7 @@ trait ActionTrait
                     'onclick' => 'javascript:toggle(this)',
                 ];
         }
-        if (isset($attributes['href']) && isset($data['_fragment'])) {
+        if (isset($attributes['href']) && isset($data['_fragment']) && substr($data['_fragment'], 0, 1) !== '{' && substr($data['_fragment'], -1) !== '}' && !!trim($data['_fragment'])) {
             if (str_contains($attributes['href'], '#')) {
                 $attributes['href'] .= '#'.$data['_fragment'];
             } else {
