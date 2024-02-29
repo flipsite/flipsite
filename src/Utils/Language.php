@@ -3,11 +3,15 @@
 declare(strict_types=1);
 namespace Flipsite\Utils;
 
+use Symfony\Component\Yaml\Yaml;
+
 use TypeError;
 
 final class Language
 {
     private string $language;
+
+    private ?array $inLanguages = null;
     /**
      * @var array<string>
      */
@@ -69,5 +73,13 @@ final class Language
             return 'sv_SE';
         }
         return mb_strtoupper($this->language.'_'.$this->language);
+    }
+
+    public function getInLanguage() : string
+    {
+        if (null === $this->inLanguages) {
+            $this->inLanguages = Yaml::parseFile(__DIR__.'/inLanguages.yaml');
+        }
+        return $this->inLanguages[$this->language];
     }
 }

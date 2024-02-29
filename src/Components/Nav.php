@@ -8,6 +8,8 @@ use Flipsite\Utils\ArrayHelper;
 
 final class Nav extends AbstractGroup
 {
+    protected string $tag  = 'nav';
+
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
@@ -21,7 +23,6 @@ final class Nav extends AbstractGroup
                 $level = intval(str_replace('_pages-', '', $data['_repeat']));
             }
             $repeat = $this->getPages($level, $parentPage);
-            $data = $this->normalizeRepeat($data, $repeat);
         } else {
             $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
             $repeat = [];
@@ -31,8 +32,25 @@ final class Nav extends AbstractGroup
                     $repeat[] = $pageItemData;
                 }
             }
-            $data = $this->normalizeRepeat($data, $repeat);
         }
+
+        if ($data['_options']['languages'] ?? false) {
+            $languages = $this->siteData->getLanguages();
+            if (count($languages) > 1) {
+                $active = $this->path->getLanguage();
+                foreach ($languages as $language) {
+                    if (!$language->isSame($active)) {
+                        $repeat[] = [
+                            'slug'      => (string)$language,
+                            'name'     => $language->getInLanguage(),
+                        ];
+                    }
+                }
+            }
+        }
+
+        $data = $this->normalizeRepeat($data, $repeat);
+
         return $data;
     }
 
