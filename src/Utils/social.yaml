@@ -64,6 +64,11 @@ soundcloud:
   color: "#FF3300"
   icon: simple-icons/soundcloud.svg
   url: https://soundcloud.com/{handle}
+tiktok:
+  name: Toktok
+  color: "#000000"
+  icon: simple-icons/tiktok.svg
+  url: https://www.tiktok.com/{handle}
 twitter:
   name: Twitter
   color: "#1DA1F2"
