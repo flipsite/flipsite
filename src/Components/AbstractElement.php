@@ -263,7 +263,12 @@ abstract class AbstractElement
                 } elseif (is_array($value)) {
                     $value = htmlentities(json_encode($value), ENT_QUOTES, 'UTF-8');
                 }
-                $html .= ' '.$attr.'="'.$value.'"';
+                if (strpos((string)$value,'"') !== false) {
+                    $value = str_replace("'","\'",$value);
+                    $html .= " ".$attr."='".$value."'";
+                } else {
+                    $html .= ' '.$attr.'="'.$value.'"';
+                }
             }
         }
         return $html;
