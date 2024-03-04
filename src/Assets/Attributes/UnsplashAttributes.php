@@ -23,6 +23,7 @@ class UnsplashAttributes extends AbstractImageAttributes
         if (isset($options['aspectRatio'])) {
             $this->srcTpl.='&fit=crop';
         }
+        $this->srcTpl.='&auto=format';
     
         $this->src = $this->buildSrc($this->width,$this->height);
     }
