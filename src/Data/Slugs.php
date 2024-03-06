@@ -61,12 +61,13 @@ final class Slugs
         return $all;
     }
 
-    public function getSlug(string $page, Language $language) : ?string
+    public function getSlug(string $page, Language $language = null) : ?string
     {
         if (!isset($this->slugs[$page])) {
             return null;
         }
-        return (string)$this->slugs[$page][(string) $language] ?? null;
+        $slug = $this->slugs[$page];
+        return $language !== null ? (string)$this->slugs[$page][(string) $language] ?? null : json_encode(array_merge(['_loc'=>true],$this->slugs[$page]));
     }
 
     public function isPage(string $page) : bool
@@ -80,19 +81,6 @@ final class Slugs
         foreach ($this->slugs as $page => $slugs) {
             foreach ($slugs as $langauge => $localizedSlug) {
                 if ($localizedSlug === $slug) {
-                    return $page;
-                }
-            }
-        }
-        return null;
-    }
-
-    public function getSimilarPage(string $slug, float $neededSimilarity = 85.0) : ?string
-    {
-        foreach ($this->slugs as $page => $slugs) {
-            foreach ($slugs as $langauge => $localizedSlug) {
-                similar_text((string)$localizedSlug, (string)$slug, $percent);
-                if ($percent >= $neededSimilarity) {
                     return $page;
                 }
             }

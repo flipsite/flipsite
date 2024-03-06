@@ -14,9 +14,9 @@ interface SiteDataInterface
 
     public function getName(): string;
 
-    public function getTitle(Language $language): ?string;
+    public function getTitle(?Language $language = null): ?string;
 
-    public function getDescription(Language $language): ?string;
+    public function getDescription(?Language $language = null): ?string;
 
     public function getShare(): ?string;
 
@@ -36,7 +36,7 @@ interface SiteDataInterface
 
     public function getPublish(): ?array;
 
-    public function getSections(string $page, Language $language): array;
+    public function getSections(string $page, ?Language $language = null): array;
 
     public function getColors(): array;
 
@@ -48,13 +48,13 @@ interface SiteDataInterface
 
     public function getComponentStyle(string $component): array;
 
-    public function getMeta(string $page, Language $language): ?array;
+    public function getMeta(string $page, ?Language $language = null): ?array;
 
-    public function getPageMeta(string $page, Language $language) : ?array;
+    public function getPageMeta(string $page, ?Language $language = null) : ?array;
 
     public function getHiddenPages() : array;
 
-    public function getPageName(string $page, Language $language);
+    public function getPageName(string $page, ?Language $language = null);
 
     public function getCode(string $position, string $page, bool $fallback): ?string;
 

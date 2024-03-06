@@ -42,17 +42,13 @@ class StyleBuilder implements BuilderInterface
                 $this->dispatch(new Event('ready-script', $prefix, file_get_contents(__DIR__.'/../../js/ready.'.$prefix.'.min.js')));
             }
         }
+
+        // if ('w-scrollY' === $classes[0]) {
+        //     $this->dispatch(new Event('ready-script', 'scrollY', file_get_contents(__DIR__.'/../../js/ready.scrollProgress.min.js')));
+        // }
+
         
-        // $bodyHtml = $document->getChild('body')->render(2, 1);
-        // if (strpos($bodyHtml, 'scroll:')) {
-        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'scroll', file_get_contents(__DIR__.'/../js/ready.scroll.min.js')));
-        // }
-        // if (strpos($bodyHtml, 'stuck:')) {
-        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'stuck', file_get_contents(__DIR__.'/../js/ready.stuck.min.js')));
-        // }
-        // if (strpos($bodyHtml, 'enter:')) {
-        //     $componentBuilder->dispatch(new Flipsite\Builders\Event('ready-script', 'enter', file_get_contents(__DIR__.'/../js/ready.enter.min.js')));
-        // }
+        
     
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));

@@ -144,12 +144,12 @@ final class Reader implements SiteDataInterface
         return $this->get('name');
     }
 
-    public function getTitle(Language $language): ?string
+    public function getTitle(?Language $language = null): ?string
     {
         return $this->get('title', $language);
     }
 
-    public function getDescription(Language $language): ?string
+    public function getDescription(?Language $language = null): ?string
     {
         return $this->get('description', $language);
     }
@@ -259,7 +259,7 @@ final class Reader implements SiteDataInterface
         return $this->pageNameResolver->getName($page, $language, $exclude);
     }
 
-    public function getSections(string $page, Language $language): array
+    public function getSections(string $page, ?Language $language = null): array
     {
         $before = $this->data['before'] ?? [];
         if (ArrayHelper::isAssociative($before)) {
@@ -287,7 +287,7 @@ final class Reader implements SiteDataInterface
         return $sections;
     }
 
-    public function getMeta(string $page, Language $language): ?array
+    public function getMeta(string $page, ?Language $language = null): ?array
     {
         $pageMeta    = $this->getPageMeta($page, $language) ?? [];
         $description = $pageMeta['description'] ?? $this->get('description', $language);
@@ -326,7 +326,7 @@ final class Reader implements SiteDataInterface
         ];
     }
 
-    public function getPageMeta(string $page, Language $language): ?array
+    public function getPageMeta(string $page, ?Language $language = null): ?array
     {
         return $this->get('meta.' . $page, $language);
     }
