@@ -16,13 +16,18 @@ final class Localizer
         }
     }
 
-    public function localize(array $data, ?Language $language = null)
+    public function localize(array|string $data, ?Language $language = null)
     {
+        if (is_string($data)) {
+            $json = json_decode($data, true);
+            if (null === $json) {
+                return $data;
+            }
+            return $this->localize(json_decode($data, true), $language);
+        }
         if ($this->isLoc($data)) {
             if ($language) {
-                return $data[(string) $language]
-                    ?? $data[(string) $this->languages[0]]
-                    ?? array_shift($data);
+                return $data[(string) $language] ?? $data[(string) $this->languages[0]] ?? null;
             } else {
                 $data['_loc'] = true;
                 return json_encode($data);

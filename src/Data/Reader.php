@@ -133,10 +133,10 @@ final class Reader implements SiteDataInterface
     public function get(string $path, ?Language $language = null)
     {
         $data = ArrayHelper::getDot(explode('.', $path), $this->data);
-        if (null === $data || !is_array($data) || null === $language) {
-            return $data;
+        if (null !== $language && $data) {
+            return $this->localizer->localize($data, $language);
         }
-        return $this->localizer->localize($data, $language);
+        return $data;
     }
 
     public function getName(): string
@@ -290,33 +290,64 @@ final class Reader implements SiteDataInterface
     public function getMeta(string $page, ?Language $language = null): ?array
     {
         $pageMeta    = $this->getPageMeta($page, $language) ?? [];
+        
         $description = $pageMeta['description'] ?? $this->get('description', $language);
         $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
         $icon        = $pageMeta['icon'] ?? null;
 
+        $title = '';
+        // Build title
         if ('home' === $page) {
-            $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name', $language);
+            $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name');
         } else {
-            $baseTitle = $this->get('title', $language);
-            if (isset($pageMeta['title'])) {
-                $title = $pageMeta['title'];
-            } else {
-                $p     = explode('/', $page);
-                $title = [];
-                while (count($p) > 0) {
-                    $page  = implode('/', $p);
-                    $pages = array_keys($this->data['pages']);
-                    if (in_array($page, $pages)) {
-                        $name    = $this->getPageName($page, $language);
-                        $title[] = $name;
-                    }
-                    array_pop($p);
-                }
-                $title = implode(' - ', $title);
-            }
-            if ($baseTitle) {
-                $title .= ' - ' . $baseTitle;
-            }
+            // $baseTitle = $this->get('title', $language);
+            // if (isset($pageMeta['title'])) {
+            //     $title = $pageMeta['title'];
+            // } else {
+            //     $p     = explode('/', $page);
+            //     $title = [];
+            //     while (count($p) > 0) {
+            //         $page  = implode('/', $p);
+            //         $pages = array_keys($this->data['pages']);
+            //         if (in_array($page, $pages)) {
+            //             $name    = $this->getPageName($page, $language);
+            //             $title[] = $name;
+            //         }
+            //         array_pop($p);
+            //     }
+            //     $title = implode(' - ', $title);
+            // }
+            // if ($baseTitle) {
+            //     $title .= ' - ' . $baseTitle;
+            // }
+        }
+
+        // if ('home' === $page) {
+        //     $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name');
+        // } else {
+        //     $baseTitle = $this->get('title', $language);
+        //     if (isset($pageMeta['title'])) {
+        //         $title = $pageMeta['title'];
+        //     } else {
+        //         $p     = explode('/', $page);
+        //         $title = [];
+        //         while (count($p) > 0) {
+        //             $page  = implode('/', $p);
+        //             $pages = array_keys($this->data['pages']);
+        //             if (in_array($page, $pages)) {
+        //                 $name    = $this->getPageName($page, $language);
+        //                 $title[] = $name;
+        //             }
+        //             array_pop($p);
+        //         }
+        //         $title = implode(' - ', $title);
+        //     }
+        //     if ($baseTitle) {
+        //         $title .= ' - ' . $baseTitle;
+        //     }
+        // }
+        if ($language && !$language->isSame($this->getDefaultLanguage())) {
+            $title.= ' ('.$language->getInLanguage().')';
         }
         return [
             'title'       => $title,

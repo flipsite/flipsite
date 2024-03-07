@@ -67,7 +67,16 @@ final class Slugs
             return null;
         }
         $slug = $this->slugs[$page];
-        return $language !== null ? (string)$this->slugs[$page][(string) $language] ?? null : json_encode(array_merge(['_loc'=>true],$this->slugs[$page]));
+        if ($language !== null) {
+            return $slug[(string) $language] ?? null;
+        }
+        $loc = ['_loc'=>true];
+        foreach ($slug as $lang => $localizedSlug) {
+            if (!str_starts_with($localizedSlug, (string) $lang.'/')) {
+                $loc[$lang] = $localizedSlug;
+            }
+        }
+        return json_encode($loc);
     }
 
     public function isPage(string $page) : bool
