@@ -408,7 +408,7 @@ class ComponentBuilder
         $collectionId = $tmp[0];
         $itemId       = intval($tmp[1]);
 
-        $collection = $this->siteData->getCollection($collectionId);
+        $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {
             return [];
         }
