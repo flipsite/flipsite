@@ -61,7 +61,7 @@ final class Slugs
         return $all;
     }
 
-    public function getSlug(string $page, Language $language = null) : ?string
+    public function getSlug(string $page, Language $language = null, bool $fallback = true) : ?string
     {
         if (!isset($this->slugs[$page])) {
             return null;
@@ -72,7 +72,7 @@ final class Slugs
         }
         $loc = ['_loc'=>true];
         foreach ($slug as $lang => $localizedSlug) {
-            if (!str_starts_with($localizedSlug, (string) $lang.'/')) {
+            if (!$fallback || !str_starts_with($localizedSlug, (string) $lang.'/')) {
                 $loc[$lang] = $localizedSlug;
             }
         }

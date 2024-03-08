@@ -299,53 +299,24 @@ final class Reader implements SiteDataInterface
         // Build title
         if ('home' === $page) {
             $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name');
+        } else if (isset($pageMeta['title'])) {
+            $title = $pageMeta['title'];
         } else {
-            // $baseTitle = $this->get('title', $language);
-            // if (isset($pageMeta['title'])) {
-            //     $title = $pageMeta['title'];
-            // } else {
-            //     $p     = explode('/', $page);
-            //     $title = [];
-            //     while (count($p) > 0) {
-            //         $page  = implode('/', $p);
-            //         $pages = array_keys($this->data['pages']);
-            //         if (in_array($page, $pages)) {
-            //             $name    = $this->getPageName($page, $language);
-            //             $title[] = $name;
-            //         }
-            //         array_pop($p);
-            //     }
-            //     $title = implode(' - ', $title);
-            // }
-            // if ($baseTitle) {
-            //     $title .= ' - ' . $baseTitle;
-            // }
+            $p     = explode('/', $page);
+            $title = [];
+            while (count($p) > 0) {
+                $page  = implode('/', $p);
+                $pages = array_keys($this->data['pages']);
+                if (in_array($page, $pages)) {
+                    $name    = $this->getPageName($page, $language);
+                    $title[] = $name;
+                }
+                array_pop($p);
+            }
+            $title[] = $this->get('title', $language) ?? $this->get('name');
+            $title = implode(' - ', $title);
         }
 
-        // if ('home' === $page) {
-        //     $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name');
-        // } else {
-        //     $baseTitle = $this->get('title', $language);
-        //     if (isset($pageMeta['title'])) {
-        //         $title = $pageMeta['title'];
-        //     } else {
-        //         $p     = explode('/', $page);
-        //         $title = [];
-        //         while (count($p) > 0) {
-        //             $page  = implode('/', $p);
-        //             $pages = array_keys($this->data['pages']);
-        //             if (in_array($page, $pages)) {
-        //                 $name    = $this->getPageName($page, $language);
-        //                 $title[] = $name;
-        //             }
-        //             array_pop($p);
-        //         }
-        //         $title = implode(' - ', $title);
-        //     }
-        //     if ($baseTitle) {
-        //         $title .= ' - ' . $baseTitle;
-        //     }
-        // }
         if ($language && !$language->isSame($this->getDefaultLanguage())) {
             $title.= ' ('.$language->getInLanguage().')';
         }
@@ -398,6 +369,9 @@ final class Reader implements SiteDataInterface
                         if (!isset($dataItem[$slugField]) || !$dataItem[$slugField]) {
                             continue;
                         }
+
+
+                        //echo $dataItem[$slugField];
                         $expandedPage = str_replace(':slug', $dataItem[$slugField], $page);
 
                         // Dont overwrite existing page
@@ -417,6 +391,8 @@ final class Reader implements SiteDataInterface
                         if (isset($meta[$page])) {
                             $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
                         }
+
+                        //$slug 
                         // TODO localized slugs
                     }
                 }
@@ -430,7 +406,11 @@ final class Reader implements SiteDataInterface
                 }
             }
         }
-        //print_r(array_keys($expandedPages,true));
+        // print_r(array_keys($expandedPages,true));
+
+        // print_r(array_keys($expandedSlugs,true));
+        // die();
+
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;
         $this->data['meta']  = $expandedMeta;
