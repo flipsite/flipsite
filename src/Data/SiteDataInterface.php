@@ -60,7 +60,7 @@ interface SiteDataInterface
 
     public function getCollectionIds(): array;
 
-    public function getCollection(string $collectionId): ?Collection;
+    public function getCollection(string $collectionId, ?Language $language = null): ?Collection;
 
     public function getModifiedTimestamp() : int;
 }

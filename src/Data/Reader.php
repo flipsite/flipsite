@@ -70,13 +70,13 @@ final class Reader implements SiteDataInterface
         return $collectionIds;
     }
 
-    public function getCollection(string $collectionId): ?Collection
+    public function getCollection(string $collectionId, ?Language $language = null): ?Collection
     {
         $schema = $this->get('contentSchemas.' . $collectionId);
         if (!$schema) {
             return null;
         }
-        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId) ?? []);
+        return new Collection($collectionId, $schema, $this->get('content.' . $collectionId, $language) ?? []);
     }
 
     public function getModifiedTimestamp(): int

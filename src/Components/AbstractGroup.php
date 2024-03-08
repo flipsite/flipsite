@@ -214,7 +214,7 @@ abstract class AbstractGroup extends AbstractComponent
         if (str_starts_with($collectionId, '${content.')) {
             $collectionId = substr($collectionId, 10, strlen($collectionId) - 11);
         }
-        $collection = $this->siteData->getCollection($collectionId);
+        $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {
             return [];
         }

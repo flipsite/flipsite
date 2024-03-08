@@ -27,6 +27,7 @@ class SchemaField implements \JsonSerializable
     private ?bool $required  = null;
     private ?string $default = null;
     private ?string $options = null;
+    private ?bool $localizable = null;
 
     public function __construct(private string $id, private array $rawField)
     {
@@ -63,6 +64,8 @@ class SchemaField implements \JsonSerializable
         if (in_array($this->type, ['enum', 'published'])) {
             $this->required = true;
         }
+
+        $this->localizable = $rawField['localizable'] ?? false;
     }
     public function getType() : string {
         return $this->type;
@@ -79,10 +82,13 @@ class SchemaField implements \JsonSerializable
             $this->default = $delta['default'];
         }
         if (array_key_exists('required', $delta)) {
-            $this->required = $delta['required'];
+            $this->required = !!$delta['required'];
         }
         if (array_key_exists('options', $delta)) {
             $this->options = $delta['options'];
+        }
+        if (array_key_exists('localizable', $delta)) {
+            $this->localizable = !!$delta['localizable'];
         }
     }
     public function getDefault() : null|string|bool {
@@ -119,6 +125,9 @@ class SchemaField implements \JsonSerializable
         }
         if ($this->options) {
             $json['options'] = $this->options;
+        }
+        if ($this->localizable) {
+            $json['localizable'] = $this->localizable;
         }
         return $json;
     }

@@ -73,7 +73,7 @@ class Collection implements \JsonSerializable
 
     public function editField(string $fieldId, array $delta) : bool
     {
-        if ($delta['name'] && $this->schema->hasField($delta['name'])) {
+        if (isset($delta['name']) && $this->schema->hasField($delta['name'])) {
             return false;
         }
         $newFieldName = $this->schema->editField($fieldId, $delta);

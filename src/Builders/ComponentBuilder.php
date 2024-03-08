@@ -319,6 +319,26 @@ class ComponentBuilder
             }
             return true;
         }
+        if (isset($options['isLanguage'])) {
+            $languages = ArrayHelper::decodeJsonOrCsv($options['isLanguage']);
+            $currentLanguage = (string)$this->path->getLanguage();
+            foreach ($languages as $language) {
+                if ($currentLanguage === $language) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (isset($options['notLanguage'])) {
+            $languages = ArrayHelper::decodeJsonOrCsv($options['notLanguage']);
+            $currentLanguage = (string)$this->path->getLanguage();
+            foreach ($languages as $language) {
+                if ($currentLanguage === $language) {
+                    return false;
+                }
+            }
+            return true;
+        }
         return true;
     }
 
