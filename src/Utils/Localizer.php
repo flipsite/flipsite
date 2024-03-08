@@ -36,7 +36,7 @@ final class Localizer
         foreach ($data as &$val) {
             if (is_array($val)) {
                 $val = $this->localize($val, $language);
-            } else if (is_string($val) && strpos($val, '"_loc":true') !== false) {
+            } elseif (is_string($val) && strpos($val, '"_loc":true') !== false) {
                 $val = json_decode($val, true);
                 $val = $this->localize($val, $language);
             }
@@ -46,6 +46,9 @@ final class Localizer
 
     private function isLoc(array $data) : bool
     {
+        if (count($data) === 0) {
+            return false;
+        }
         if ($data['_loc'] ?? false) {
             return true;
         }
