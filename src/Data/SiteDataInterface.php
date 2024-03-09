@@ -28,6 +28,8 @@ interface SiteDataInterface
 
     public function getSlugs(): Slugs;
 
+    public function getExpanded(string $page): ?array;
+
     public function getFavicon(): null|string|array;
 
     public function getIntegrations(): ?array;

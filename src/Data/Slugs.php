@@ -23,23 +23,37 @@ final class Slugs
         $this->languages = 0 === count($languages) ? [$default] : $languages;
         $this->slugs     = [];
         foreach ($this->pages as $page) {
-            $this->slugs[$page]                    = [];
-            $this->slugs[$page][(string) $default] = self::HOME === $page ? '' : $page;
-            foreach ($this->languages as $language) {
-                if ((string) $language === (string) $default) {
-                    continue;
-                }
-                if (isset($slugs[$page])) {
-                    $slug = $slugs[$page];
-                    // slug is an object
-                    if (is_array($slug)) {
-                        $this->slugs[$page][(string) $language] = $slug[(string) $language] ?? trim($language.'/'.$page, '/');
+            if (!$this->isAlreadySlug($page)) {
+                $this->slugs[$page]                    = [];
+                $this->slugs[$page][(string) $default] = self::HOME === $page ? '' : $page;
+                foreach ($this->languages as $language) {
+                    if ((string) $language === (string) $default) {
+                        continue;
                     }
-                } else {
-                    $this->slugs[$page][(string) $language] = self::HOME === $page ? (string) $language : $language.'/'.$page;
+                    if (isset($slugs[$page])) {
+                        $slug = $slugs[$page];
+                        // slug is an object
+                        if (is_array($slug)) {
+                            $this->slugs[$page][(string) $language] = $slug[(string) $language] ?? trim($language.'/'.$page, '/');
+                        }
+                    } else {
+                        $this->slugs[$page][(string) $language] = self::HOME === $page ? (string) $language : $language.'/'.$page;
+                    }
                 }
             }
         }
+    }
+
+    private function isAlreadySlug(string $slug) : bool
+    {
+        foreach ($this->slugs as $page => $slugs) {
+            foreach ($slugs as $definedSlug) {
+                if ($definedSlug === $slug) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public function getPages() : array
@@ -97,20 +111,18 @@ final class Slugs
         return null;
     }
 
-    public function getLanguage(string $slug) : ?Language
+    public function getPath(string $path, ?Language $language = null, string $active = 'home') : ?string
     {
-        foreach ($this->slugs as $page => $slugs) {
-            foreach ($slugs as $langauge => $localizedSlug) {
-                if ($localizedSlug === $slug) {
-                    return new Language($langauge);
+        // Check if path is language, replace path with current page
+        
+        foreach ($this->slugs as $pageId => $slugs) {
+            foreach ($slugs as $slugLanguage => $slug) {
+                if ($slugLanguage === (string)$language && $slug === $path) {
+                    return '/'.$path;
                 }
             }
         }
-        return null;
-    }
-
-    public function getPath(string $path, ?Language $language = null, string $active = 'home') : ?string
-    {
+        
         $pathLanguage = $this->getPathLanguage($path);
         if ($pathLanguage) {
             $language = $pathLanguage;

@@ -8,6 +8,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Language;
 use Symfony\Component\Yaml\Yaml;
 use Flipsite\Utils\Localizer;
+use Flipsite\Utils\Localization;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\CustomHtmlParser;
@@ -30,6 +31,8 @@ final class Reader implements SiteDataInterface
      * @var array<string,mixed>
      */
     private array $data;
+
+    private array $expandedPages = [];
 
     private Slugs $slugs;
 
@@ -104,12 +107,12 @@ final class Reader implements SiteDataInterface
 
     private function loadSite(array $yaml, bool $expand)
     {
-        $this->data          = $yaml;
-        if ($expand) {
-            $this->expandPagesAndSlugs();
-        }
+        $this->data = $yaml;
         foreach (explode(',', $this->data['languages']) as $language) {
             $this->languages[] = new Language($language);
+        }
+        if ($expand) {
+            $this->expandPagesAndSlugs();
         }
         $this->localizer = new Localizer($this->languages);
         $this->slugs     = new Slugs(
@@ -118,6 +121,7 @@ final class Reader implements SiteDataInterface
             $this->getDefaultLanguage(),
             $this->getLanguages()
         );
+
         $this->hash = md5(json_encode($this->data));
         if (isset($this->data['theme']['extend'])) {
             $this->data['theme']['components'] = ArrayHelper::merge($this->data['theme']['components'], $this->data['theme']['extend']);
@@ -247,6 +251,10 @@ final class Reader implements SiteDataInterface
         return $this->slugs;
     }
 
+    public function getExpanded(string $page): ?array {
+        return $this->expandedPages[$page] ?? null;
+    }
+
     public function getPageName(string $page, ?Language $language = null, array $exclude = []): string
     {
         $language ??= $this->getDefaultLanguage();
@@ -356,12 +364,18 @@ final class Reader implements SiteDataInterface
         $expandedPages = [];
         $expandedSlugs = [];
         $expandedMeta  = [];
+
+        $languages = $this->getLanguages();
+        $mainLanguage = array_shift($languages); //all languages except main one
+
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
+                $this->expandedPages[$page] = [(string)$mainLanguage => $page];
                 $collection = $this->getCollection($meta[$page]['content']);
                 if (!$collection) {
                     continue;
                 }
+
                 $slugField = $collection->getSlugField();
                 $items     = $collection->getItemsArray(true);
                 if ($slugField && $items) {
@@ -370,9 +384,8 @@ final class Reader implements SiteDataInterface
                             continue;
                         }
 
-
-                        //echo $dataItem[$slugField];
-                        $expandedPage = str_replace(':slug', $dataItem[$slugField], $page);
+                        $loc = new Localization($this->languages, $dataItem[$slugField]);
+                        $expandedPage = str_replace(':slug', $loc->getValue() ?? '', $page);
 
                         // Dont overwrite existing page
                         if (isset($expandedPages[$expandedPage])) {
@@ -392,8 +405,16 @@ final class Reader implements SiteDataInterface
                             $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
                         }
 
-                        //$slug 
-                        // TODO localized slugs
+                        foreach ($languages as $language) {
+                            $localizedSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
+                            if ($localizedSlug) {
+                                $this->expandedPages[$page][(string)$language] = $localizedSlug;
+                                $expandedLocalizedPage = str_replace(':slug', $loc->getValue($language) ?? '', $localizedSlug);
+                                $expandedPages[$expandedLocalizedPage] = $expandedPages[$expandedPage];
+                                $expandedMeta[$expandedLocalizedPage] = $expandedMeta[$expandedPage];
+                                $expandedSlugs[$expandedPage][(string)$language] = $expandedLocalizedPage;
+                            }
+                        }
                     }
                 }
             } else {
@@ -406,10 +427,6 @@ final class Reader implements SiteDataInterface
                 }
             }
         }
-        // print_r(array_keys($expandedPages,true));
-
-        // print_r(array_keys($expandedSlugs,true));
-        // die();
 
         $this->data['pages'] = $expandedPages;
         $this->data['slugs'] = $expandedSlugs;

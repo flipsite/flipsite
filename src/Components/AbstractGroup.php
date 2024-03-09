@@ -105,7 +105,8 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['_page']);
         }
         if (isset($data['_params'])) {
-            $data['_target'] = str_replace(':slug', $data['_params'], $data['_target']);
+            $expanded = $this->siteData->getExpanded($data['_target']);
+            $data['_target'] = str_replace(':slug', $data['_params'], $expanded[(string)$this->path->getLanguage()] ?? $data['_target']);
             unset($data['_params']);
         }
         return $data;

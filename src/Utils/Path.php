@@ -22,16 +22,16 @@ final class Path
     public function __construct(string $path, Language $default, array $languages, Slugs $slugs)
     {
         $this->languages = $languages;
-        $parts           = explode('/', $path);
-        $pathLanguage    = $this->parsePathLanguage(array_shift($parts));
-        if (null !== $pathLanguage) {
-            $pathWithoutLanguage = implode('/', $parts);
-        } else {
-            $pathWithoutLanguage = $path;
+        $all = $slugs->getAll();
+        if (isset($all[$path])) {
+            $this->page = $all[$path][(string)$default];
+            foreach ($all[$path] as $language => $page) {
+                if ($path === $page) {
+                    $this->language = new Language($language);
+                    return;
+                }
+            }
         }
-
-        $this->page = $slugs->getPage($pathWithoutLanguage);
-        $this->language = $pathLanguage ?? $slugs->getLanguage($pathWithoutLanguage) ?? $default;
     }
 
     public function getLanguage(): Language
@@ -41,19 +41,9 @@ final class Path
 
     public function getPage(): ?string
     {
+        if ('' === $this->page) {
+            return 'home';
+        }
         return $this->page;
-    }
-
-    private function parsePathLanguage(string $path): ?Language
-    {
-        if (2 !== mb_strlen($path)) {
-            return null;
-        }
-        foreach ($this->languages as $language) {
-            if ($language->isSame($path)) {
-                return $language;
-            }
-        }
-        return null;
     }
 }
