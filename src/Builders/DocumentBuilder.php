@@ -17,9 +17,16 @@ final class DocumentBuilder
 
     public function getDocument() : Document
     {
-        // <html>
         $document = new Document();
         $document->setAttribute('lang', (string)($this->language ?? 'en'));
+
+        $rtl = ['ar', 'he', 'fa', 'ur', 'ps', 'ku'];
+        if (null !== $this->language && in_array((string)$this->language, $rtl)) {
+            $document->setAttribute('dir', 'rtl');
+        } else {
+            $document->setAttribute('dir', 'ltr');
+        }
+
         $document->addStyle($this->htmlStyle);
 
         // <head>
