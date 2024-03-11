@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
+use Flipsite\Utils\Localization;
 
 interface PageNameResolverInterface
 {
@@ -14,11 +15,11 @@ class PageNameResolver implements PageNameResolverInterface
 {
     private array $resolvers = [];
 
-    public function __construct(array $meta, Slugs $slugs)
+    public function __construct(array $languages, array $meta, Slugs $slugs)
     {
-        $this->resolvers['meta'] = new MetaNameResolver($meta);
+        $this->resolvers['meta'] = new MetaNameResolver($meta, $languages);
         $this->resolvers['home'] = new HomeNameResolver();
-        $this->resolvers['slug'] = new SlugNameResolver($slugs);
+        $this->resolvers['slug'] = new SlugNameResolver($slugs, $languages);
     }
 
     public function getName(string $page, Language $language, array $exclude = []): string
@@ -41,7 +42,7 @@ class MetaNameResolver implements PageNameResolverInterface
 {
     private array $names = [];
 
-    public function __construct(array $meta)
+    public function __construct(array $meta, private array $languages)
     {
         foreach ($meta as $page => $metaData) {
             if (isset($metaData['name'])) {
@@ -54,18 +55,8 @@ class MetaNameResolver implements PageNameResolverInterface
     {
         if (isset($this->names[$page])) {
             $name = $this->names[$page];
-            if (is_string($name)) {
-                return $name;
-            }
-            // Localization
-            $lang = (string)$language;
-            if (isset($name[$lang])) {
-                return $name[$lang];
-            }
-            $lang = array_key_first($name);
-            if (isset($name[$lang])) {
-                return $name[$lang];
-            }
+            $localization = new Localization($this->languages, $name);
+            return $localization->getValue($language) ?? null;
         }
         return null;
     }
@@ -88,7 +79,7 @@ class HomeNameResolver implements PageNameResolverInterface
 
 class SlugNameResolver implements PageNameResolverInterface
 {
-    public function __construct(private Slugs $slugs)
+    public function __construct(private Slugs $slugs, private array $languages)
     {
     }
 

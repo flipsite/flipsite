@@ -260,6 +260,7 @@ final class Reader implements SiteDataInterface
         $language ??= $this->getDefaultLanguage();
         if (is_null($this->pageNameResolver)) {
             $this->pageNameResolver = new PageNameResolver(
+                $this->getLanguages(),
                 $this->data['meta'] ?? [],
                 $this->getSlugs()
             );
