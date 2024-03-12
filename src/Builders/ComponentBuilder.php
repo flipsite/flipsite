@@ -342,7 +342,7 @@ class ComponentBuilder
         return true;
     }
 
-    private function handleBackground(AbstractElement &$element, array $style): void
+    public function handleBackground(AbstractElement &$element, array $style): void
     {
         $src      = $style['src'] ?? false;
         $gradient = $this->parseThemeColors($style['gradient'] ?? '');
@@ -377,12 +377,6 @@ class ComponentBuilder
         foreach ($style as $attr => $val) {
             $element->addStyle(['bg.' . $attr => $val]);
         }
-    }
-
-    private function handleGlobalVars(array $data): array
-    {
-        error_log('handleGlobalVars');
-        return $data;
     }
 
     private function parseThemeColors(string $gradient): string
