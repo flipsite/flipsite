@@ -175,12 +175,6 @@ class ComponentBuilder
             }
             unset($data['_attr']['_data']);
         }
-        if (isset($data['_attr'])) {
-            foreach ($data['_attr'] as $attr => $value) {
-                $component->setAttribute($attr, $value);
-            }
-            unset($data['_attr']);
-        }
         if (isset($style['tag'])) {
             $component->setTag($style['tag']);
             unset($style['tag']);
@@ -192,9 +186,20 @@ class ComponentBuilder
             $style['background']['src'] = $data['_bg'];
             unset($data['_bg']);
         }
+        if (isset($style['width']) && strpos($style['width'],'w-scroll') !== false) {
+            $data['_attr'] ??= [];
+            $data['_attr']['data-scroll-progress-width'] = true;
+            $this->dispatch(new Event('ready-script', 'scroll-progress', file_get_contents(__DIR__.'/../../js/ready.scroll-progress.min.js')));
+        }
         if (isset($style['background'])) {
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
+        }
+        if (isset($data['_attr'])) {
+            foreach ($data['_attr'] as $attr => $value) {
+                $component->setAttribute($attr, $value);
+            }
+            unset($data['_attr']);
         }
         $component->build($data, $style ?? [], $options);
         return $component;
