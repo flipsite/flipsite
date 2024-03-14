@@ -1,5 +1,4 @@
 ready(() => {
-
   const updateWidths = () => {
     const scrollTop = document.documentElement.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight;

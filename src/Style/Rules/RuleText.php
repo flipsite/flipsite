@@ -20,18 +20,8 @@ final class RuleText extends AbstractRule
         if ($this->setColor($args, 'color')) {
             return;
         }
-        $fontSize = $this->getConfig('textSize', $args[0]);
-        if (1 === count($args)) {
-            if (is_array($fontSize) && isset($fontSize[1]['lineHeight'])) {
-                $this->setDeclaration('font-size', $fontSize[0]);
-                $this->setDeclaration('line-height', $fontSize[1]['lineHeight']);
-                return;
-            }
-            if (is_string($fontSize)) {
-                $this->setDeclaration('font-size', $fontSize);
-            }
-        }
-
+        // $args[] = rand(75,125)/100.0;
+        // $args[] = '_multiplier';
         $value = $this->checkCallbacks('size', $args);
         if ($value) {
             $this->setDeclaration('font-size', $value);

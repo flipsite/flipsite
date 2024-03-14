@@ -11,6 +11,12 @@ class ResponsiveSizeCallback
 
     public function __invoke(array $args)
     {
+        $multiplier = 1.0;
+        if ('_multiplier' === end($args)) {
+            array_pop($args);
+            $multiplier = array_pop($args);
+        }
+
         $screens = array_keys($this->screens);
         $tmp     = explode('|', $args[0]);
         if (2 === count($tmp) && count($args) === 1) {
@@ -22,11 +28,11 @@ class ResponsiveSizeCallback
         }
 
         $minScreenPx = floatval($this->screens[$args[0]]);
-        $minSizePx   = floatval($this->getPx($args[1]));
+        $minSizePx   = floatval($this->getPx($args[1]))*$multiplier;
         $maxScreenPx = floatval($this->screens[$args[2]]);
-        $maxSizePx   = floatval($this->getPx($args[3]));
-        $minSizeRem  = $minSizePx / 16.0;
-        $maxSizeRem  = $maxSizePx / 16.0;
+        $maxSizePx   = floatval($this->getPx($args[3]))*$multiplier;
+        $minSizeRem  = $minSizePx / 16.0*$multiplier;
+        $maxSizeRem  = $maxSizePx / 16.0*$multiplier;
 
         if (!$this->isCssMathFunctionsSupported) {
             return ($minSizeRem + 0.5 * ($maxSizeRem - $minSizeRem)) . 'rem';

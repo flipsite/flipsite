@@ -32,16 +32,50 @@ final class RuleRounded extends AbstractRule
         } else {
             $properties = ['border-radius'];
         }
+
+        $value = null;
         if (!isset($args[0])) {
             $args[0] = '1';
-        }
-        $value = null;
-        if ($args[0] === 'full') {
+        } else if (in_array($args[0], ['frame','btn'])) {
+            $theme = 'xl';
+            $value = $this->getThemeValue($theme, $args[0], $args[1]);
+
+        } else if ($args[0] === 'full') {
             $value = '9999px';
         }
         $value ??= $this->checkCallbacks('size', $args);
         foreach ($properties as $property) {
             $this->setDeclaration($property, $value);
         }
+    }
+    private function getThemeValue(string $theme, string $type, string $size) {
+        if ('none' === $theme) {
+            return null;
+        }
+        if ('full' === $theme && 'btn' === $type) {
+            return '9999px';
+        }
+        
+        $radius = [
+            'xs' => 0.25,
+            'sm' => 0.5,
+            'md' => 0.75,
+            'lg' => 1,
+            'xl' => 1.5,
+        ];
+        $radius = $radius[$size] ?? null;
+        if (null === $radius) {
+            return;
+        }
+
+        $multiplier = [
+            'xs' => 0.8,
+            'sm' => 1.0,
+            'md' => 1.2,
+            'lg' => 1.4,
+            'xl' => 1.6,
+        ];
+        echo $radius*= $multiplier[$theme] ?? 1.0;
+        return $radius.'rem';
     }
 }

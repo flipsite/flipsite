@@ -239,7 +239,7 @@ abstract class AbstractElement
         return $i.wordwrap($content, 120, "\n".$i)."\n";
     }
 
-    protected function renderAttributes(): string
+    public function renderAttributes(): string
     {
         if (count($this->style)) {
             $class = $this->getClasses();

@@ -71,9 +71,9 @@ abstract class AbstractRule
         }
     }
 
-    protected function checkCallbacks(string $property, array $args): ?string
+    protected function checkCallbacks(string $property, array $args, ?array $options = null): ?string
     {
-        return $this->callbacks->call($property, $args);
+        return $this->callbacks->call($property, $args, $options);
     }
 
     /**

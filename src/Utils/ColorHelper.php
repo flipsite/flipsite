@@ -8,9 +8,21 @@ use SSNepenthe\ColorUtils\Colors\Color;
 use SSNepenthe\ColorUtils\Colors\ColorFactory;
 use SSNepenthe\ColorUtils\Transformers\Darken;
 use SSNepenthe\ColorUtils\Transformers\Lighten;
+use SSNepenthe\ColorUtils\Transformers\Desaturate;
 
 class ColorHelper
 {
+    public static function getGray(string $colorString, int $desaturate = 90, int $minBrightness = 120) : string {
+        $color = ColorFactory::fromString($colorString);
+        $transform = new Desaturate($desaturate);
+        $color = $transform->transform($color);
+        $transform = new Darken(1);
+        $i = 0;
+        while( $color->calculatePerceivedBrightness() > $minBrightness && $i < 100) {
+            $color = $transform->transform($color);
+        }
+        return sprintf("#%02x%02x%02x", $color->getRed(), $color->getGreen(), $color->getBlue());
+    }
     public static function parseAndReplace(string $colorString, array $allColors): string
     {
         $pattern = '/('.implode('|', array_keys($allColors)).')(-[0-9]{1,3})?(\/[0-9]{1,3})?/';
@@ -45,6 +57,7 @@ class ColorHelper
         if (0 === count($args)) {
             return null;
         }
+
         $tmp    = explode('/', $args[0]);
         $colors = $allColors[$tmp[0]] ?? null;
         if (null === $colors) {
@@ -64,16 +77,35 @@ class ColorHelper
             $colors = [500 => $colors];
         }
 
-        if (isset($args[0]) && is_numeric($args[0])) {
-            $shade = array_shift($args);
-        } elseif (isset($args[0]) && is_string($args[0]) && strpos($args[0], '/')) {
-            $tmp = explode('/', array_shift($args));
-            if (count($tmp) === 2) {
-                $shade = intval($tmp[0]);
-                $alpha = floatval($tmp[1]) / 100.0;
+        $shade = 500;
+        if (isset($args[0])) {
+            if (is_numeric($args[0])) {
+                $shade = intval($args[0]);
+            } else {
+                $tmp = explode('/', array_shift($args));
+                if (isset($tmp[1])) {
+                    $alpha = floatval(array_pop($tmp)) / 100.0;
+                }
+                if (is_numeric($tmp[0])) {
+                    $shade = $tmp[0];
+                } else if (is_string($tmp[0])) {
+                    $color = ColorFactory::fromString($colors[500]);
+                    $shades = [
+                        'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
+                        'd1','d2','d3','d4','d5','d6','d7','d8','d10','d11','d12'
+                    ];
+                    if (in_array($tmp[0], $shades)) {
+                        $colorScale = new ColorScale();
+                        $isLight = substr($tmp[0], 0, 1) === 'l';
+                        $index = intval(substr($tmp[0], 1));
+                        if ($isLight) {
+                            return $colorScale->getLight($color, $index);
+                        } else {
+                            return $colorScale->getDark($color, $index);
+                        }
+                    }
+                }
             }
-        } else {
-            $shade = 500;
         }
 
         if (isset($colors[$shade])) {

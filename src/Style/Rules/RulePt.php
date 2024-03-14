@@ -9,6 +9,4 @@ final class RulePt extends AbstractRuleSpacing
      * @var array<string>
      */
     protected array $properties = ['padding-top'];
-
-    protected ?array $safeAreaInset = ['safe-area-inset-top'];
 }

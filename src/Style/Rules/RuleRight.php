@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flipsite\Style\Rules;
 
-final class RuleRight extends AbstractRuleSpacing
+final class RuleRight extends AbstractRulePosition
 {
     /**
      * @var array<string>

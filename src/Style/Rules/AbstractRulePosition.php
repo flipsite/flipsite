@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-abstract class AbstractRuleSpacing extends AbstractRule
+abstract class AbstractRulePosition extends AbstractRule
 {
     /**
      * @var array<string>
@@ -15,8 +15,6 @@ abstract class AbstractRuleSpacing extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        // $args[] = rand(75,125)/100.0;
-        // $args[] = '_multiplier';
         $value = $this->checkCallbacks('size', $args);
         $value ??= $this->getConfig('spacing', $args[0]);
         foreach ($this->properties as $i => $property) {
