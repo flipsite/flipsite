@@ -203,12 +203,18 @@ final class Reader implements SiteDataInterface
         return $this->data['theme']['fonts'] ?? [];
     }
 
-    public function getHtmlStyle(): array
-    {
-        return $this->data['theme']['components']['html'] ?? [];
+    public function getAppearance(?string $page = null): string {
+        return $this->data['theme']['components']['html']['appearance'] ?? 'light';
     }
 
-    public function getBodyStyle(string $page): array
+    public function getHtmlStyle(?string $page = null): array
+    {
+        $style = $this->data['theme']['components']['html'] ?? [];
+        unset($style['appearance']);
+        return $style;
+    }
+
+    public function getBodyStyle(?string $page = null): array
     {
         return $this->data['theme']['components']['body'] ?? [];
     }

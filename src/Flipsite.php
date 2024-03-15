@@ -22,7 +22,6 @@ use Flipsite\Utils\Robots;
 use Flipsite\Utils\Sitemap;
 use voku\helper\HtmlMin;
 
-
 final class Flipsite
 {
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
@@ -37,12 +36,15 @@ final class Flipsite
             $this->siteData->getLanguages(),
             $this->siteData->getSlugs(),
         );
+        $page = $path->getPage();
 
         // Create builders
+        $appearance = $this->siteData->getAppearance($path->getPage());
         $documentBuilder = new DocumentBuilder(
             $path->getLanguage(),
-            $this->siteData->getHtmlStyle(),
-            $this->siteData->getBodyStyle($path->getPage() ?? ''),
+            $this->siteData->getHtmlStyle($path->getPage()),
+            $this->siteData->getBodyStyle($path->getPage()),
+            $appearance
         );
         $metaBuilder = new MetaBuilder(
             $this->environment,
@@ -71,7 +73,6 @@ final class Flipsite
 
         $document = $documentBuilder->getDocument();
 
-        $page = $path->getPage();
         if (null === $page) {
             return $document;
         } else {
@@ -84,7 +85,7 @@ final class Flipsite
             if ($this->plugins) {
                 $sectionData = $this->plugins->run('section', $sectionData);
             }
-            $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => 'light']); // TODO page appearence
+            $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => $appearance]);
             $document->getChild('body')->addChild($section);
         }
 
@@ -109,7 +110,6 @@ final class Flipsite
         // Custom HTML
         $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
         $document          = $customCodeBuilder->getDocument($document);
-
         $document = $scriptBuilder->getDocument($document);
 
         return $document;

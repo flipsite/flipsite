@@ -44,9 +44,11 @@ interface SiteDataInterface
 
     public function getFonts(): array;
 
-    public function getHtmlStyle(): array;
+    public function getAppearance(?string $page = null): string;
 
-    public function getBodyStyle(string $page): array;
+    public function getHtmlStyle(?string $page = null): array;
+
+    public function getBodyStyle(?string $page = null): array;
 
     public function getComponentStyle(string $component): array;
 

@@ -32,50 +32,33 @@ final class RuleRounded extends AbstractRule
         } else {
             $properties = ['border-radius'];
         }
-
         $value = null;
         if (!isset($args[0])) {
             $args[0] = '1';
-        } else if (in_array($args[0], ['frame','btn'])) {
-            $theme = 'xl';
-            $value = $this->getThemeValue($theme, $args[0], $args[1]);
-
-        } else if ($args[0] === 'full') {
-            $value = '9999px';
+        } else if (in_array($args[0], ['box','btn'])) {
+            $scale = 1.5;
+            if ($scale < 0.5) {
+                return;
+            }
+            if ('btn' === $args[0] && $scale > 1.99) {
+                $value = '9999px';
+            } else {
+                $value = $this->getScaledValue($scale, $args[1]);
+            }
         }
         $value ??= $this->checkCallbacks('size', $args);
         foreach ($properties as $property) {
             $this->setDeclaration($property, $value);
         }
     }
-    private function getThemeValue(string $theme, string $type, string $size) {
-        if ('none' === $theme) {
-            return null;
-        }
-        if ('full' === $theme && 'btn' === $type) {
-            return '9999px';
-        }
-        
-        $radius = [
-            'xs' => 0.25,
-            'sm' => 0.5,
-            'md' => 0.75,
-            'lg' => 1,
-            'xl' => 1.5,
+    private function getScaledValue(float $scale, string $size) {
+        $radiusPx = [
+            'xs' => 2.25,
+            'sm' => 3,
+            'md' => 4.5,
+            'lg' => 6,
+            'xl' => 9,
         ];
-        $radius = $radius[$size] ?? null;
-        if (null === $radius) {
-            return;
-        }
-
-        $multiplier = [
-            'xs' => 0.8,
-            'sm' => 1.0,
-            'md' => 1.2,
-            'lg' => 1.4,
-            'xl' => 1.6,
-        ];
-        echo $radius*= $multiplier[$theme] ?? 1.0;
-        return $radius.'rem';
+        return  ($radiusPx[$size] * $scale / 16.0) . 'rem';        
     }
 }

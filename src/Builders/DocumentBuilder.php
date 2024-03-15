@@ -11,8 +11,7 @@ use Flipsite\Utils\Language;
 
 final class DocumentBuilder
 {
-    public function __construct(private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = []) {
-
+    public function __construct(private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = [], private string $appearance = 'light') {
     }
 
     public function getDocument() : Document
@@ -27,7 +26,8 @@ final class DocumentBuilder
             $document->setAttribute('dir', 'ltr');
         }
 
-        $document->addStyle($this->htmlStyle);
+        $htmlStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->htmlStyle, $this->appearance);
+        $document->addStyle($htmlStyle);
 
         // <head>
         $head = new Element('head');
@@ -52,7 +52,8 @@ final class DocumentBuilder
 
         // <body>
         $body = new Element('body');
-        $body->addStyle($this->bodyStyle);
+        $bodyStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->bodyStyle, $this->appearance);
+        $body->addStyle($bodyStyle);
         $document->addChild($body, 'body');
 
         return $document;

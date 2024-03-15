@@ -90,6 +90,21 @@ class ColorHelper
                     $shade = $tmp[0];
                 } else if (is_string($tmp[0])) {
                     $color = ColorFactory::fromString($colors[500]);
+                    if ($tmp[0] === 'contrast') {
+                        $brightness = $color->getRgb()->calculatePerceivedBrightness();
+                        if ($brightness < 128) {
+                            return ColorFactory::fromString('#ffffff');
+                        } else {
+                            $colorScale = new ColorScale();
+                            $contrastColor = $colorScale->getLight($color, 12);
+                            $contrastRatio = $contrastColor->calculateContrastRatioWith($color);
+                            if ($contrastRatio < 4.5) {
+                                return ColorFactory::fromString('#000000');
+                            } else {
+                                return $contrastColor;
+                            }
+                        }
+                    }
                     $shades = [
                         'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
                         'd1','d2','d3','d4','d5','d6','d7','d8','d10','d11','d12'
