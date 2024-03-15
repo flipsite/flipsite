@@ -195,7 +195,11 @@ final class Reader implements SiteDataInterface
 
     public function getColors(): array
     {
-        return $this->data['theme']['colors'] ?? [];
+        $colors = $this->data['theme']['colors'];
+        if (!isset($colors['gray'])) {
+            $colors['gray'] = \Flipsite\Utils\ColorHelper::getGray($colors['primary']);
+        }
+        return $colors;
     }
 
     public function getFonts(): array

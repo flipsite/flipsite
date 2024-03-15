@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
-use Flipsite\Utils\StyleAppearanceHelper;
 
 final class Md extends AbstractComponent
 {
@@ -71,25 +70,5 @@ final class Md extends AbstractComponent
         //     $this->container->setContent($html);
         //     return $this->container->render($indentation, $level, $oneline);
         // }
-    }
-
-    private function extendStyle(array $style, string $appearance) : array
-    {
-        foreach ($style as $tag => &$def) {
-            // if (isset($def['inherit'])) {
-            //     $tmp                         = explode(':', $def['inherit']);
-            //     $inheritedComponentStyle     = $this->builder->getComponentStyle($tmp[0]);
-            //     $variant                     = $tmp[1] ?? null;
-            //     if ($variant) {
-            //         $variant = $inheritedComponentStyle['variants'][$variant];
-            //         unset($style['variants']);
-            //         $inheritedComponentStyle = ArrayHelper::merge($inheritedComponentStyle, $variant);
-            //     }
-            //     $inheritedComponentStyle = StyleAppearanceHelper::apply($inheritedComponentStyle, $appearance);
-            //     unset($inheritedComponentStyle['dark'], $inheritedComponentStyle['markdown'], $inheritedComponentStyle['variants'], $inheritedComponentStyle['inherit']);
-            //     $def = ArrayHelper::merge($inheritedComponentStyle, $def);
-            // }
-        }
-        return $style;
     }
 }
