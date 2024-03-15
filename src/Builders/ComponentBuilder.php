@@ -85,9 +85,7 @@ class ComponentBuilder
 
         $options['appearance'] = $style['appearance'] ?? $options['appearance'];
         unset($style['appearance']);
-        if (isset($style['dark'])) {
-            $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
-        }
+        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
         if (is_array($style)) {
             $type = $style['type'] ?? $type;
