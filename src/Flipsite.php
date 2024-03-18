@@ -56,7 +56,8 @@ final class Flipsite
         $perloadBuilder = new PreloadBuilder();
         $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
-            $this->siteData->getFonts()
+            $this->siteData->getFonts(),
+            $this->siteData->getThemeSettings()
         );
         $componentBuilder = new ComponentBuilder(
             $this->environment,

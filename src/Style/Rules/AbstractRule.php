@@ -21,13 +21,17 @@ abstract class AbstractRule
     protected int $order = 100;
 
     protected array $config;
+
+    protected array $themeSettings;
+
     private CallbackInterface $callbacks;
 
-    public function __construct(array $args, bool $negative, array &$config, CallbackInterface $callbacks = null)
+    public function __construct(array $args, bool $negative, array &$config, array &$themeSettings, CallbackInterface $callbacks = null)
     {
-        $this->negative  = $negative;
-        $this->config    = $config;
-        $this->callbacks = $callbacks;
+        $this->negative      = $negative;
+        $this->config        = $config;
+        $this->themeSettings = $themeSettings;
+        $this->callbacks     = $callbacks;
         $this->process($args);
     }
 

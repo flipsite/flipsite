@@ -15,8 +15,11 @@ abstract class AbstractRuleSpacing extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        // $args[] = rand(75,125)/100.0;
-        // $args[] = '_multiplier';
+        $scale = $this->themeSettings['spacingScale'] ?? 1.0;
+        if ($scale != 1.0) {
+            $args[] = $scale;
+            $args[] = '_multiplier';
+        }
         $value = $this->checkCallbacks('size', $args);
         $value ??= $this->getConfig('spacing', $args[0]);
         foreach ($this->properties as $i => $property) {

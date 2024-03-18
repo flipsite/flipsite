@@ -16,7 +16,7 @@ use Flipsite\Builders\EventListenerInterface;
 
 class StyleBuilder implements BuilderInterface
 {
-    public function __construct(private array $colors, private array $fonts = [])
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [])
     {
     }
 
@@ -83,7 +83,7 @@ class StyleBuilder implements BuilderInterface
             $config['fontFamily'][$type] = $font;
         }
 
-        $tailwind = new Tailwind($config);
+        $tailwind = new Tailwind($config, $this->themeSettings);
         $tailwind->addCallback('size', new UnitCallback());
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));

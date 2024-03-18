@@ -11,14 +11,12 @@ final class Tailwind implements CallbackInterface
 {
     private string $dark = 'media';
     private array $rules;
-    private array $config;
     private array $variants  = [];
     private array $callbacks = [];
 
-    public function __construct(array $config)
+    public function __construct(private array $config, private array $themeSettings = [])
     {
         $this->rules  = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
-        $this->config = $config;
     }
 
     public function call(string $property, array $args): ?string
@@ -234,7 +232,7 @@ final class Tailwind implements CallbackInterface
                 array_shift($args);
                 array_shift($args);
                 array_shift($args);
-                return new $ruleClass($args, $negative, $this->config, $this);
+                return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
             }
         }
         if (isset($args[1])) {
@@ -243,13 +241,13 @@ final class Tailwind implements CallbackInterface
             if (class_exists($ruleClass)) {
                 array_shift($args);
                 array_shift($args);
-                return new $ruleClass($args, $negative, $this->config, $this);
+                return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
             }
         }
         $ruleClass = 'Flipsite\Style\Rules\Rule'.$first;
         if (class_exists($ruleClass)) {
             array_shift($args);
-            return new $ruleClass($args, $negative, $this->config, $this);
+            return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
         }
         return null;
     }

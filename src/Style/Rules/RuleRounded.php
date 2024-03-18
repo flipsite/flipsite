@@ -36,7 +36,7 @@ final class RuleRounded extends AbstractRule
         if (!isset($args[0])) {
             $args[0] = '1';
         } else if (in_array($args[0], ['box','btn'])) {
-            $scale = 1.5;
+            $scale = $this->themeSettings['borderRadiusScale'] ?? 1.0;
             if ($scale < 0.5) {
                 return;
             }

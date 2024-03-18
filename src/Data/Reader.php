@@ -207,6 +207,29 @@ final class Reader implements SiteDataInterface
         return $this->data['theme']['fonts'] ?? [];
     }
 
+    public function getThemeSettings(): array
+    {
+        $style = $this->data['theme']['components']['html'] ?? [];
+        $settings = [];
+
+        if (isset($style['textScale'])) {
+            $value = str_replace('text-scale-', '', $style['textScale']);
+            $settings['textScale'] = floatval($value)/100.0;
+        } else $settings['textScale'] = 1.0;
+
+        if (isset($style['spacingScale'])) {
+            $value = str_replace('spacing-scale-', '', $style['spacingScale']);
+            $settings['spacingScale'] = floatval($value)/100.0;
+        } else $settings['spacingScale'] = 1.0;
+
+        if (isset($style['borderRadiusScale'])) {
+            $value = str_replace('rounded-scale-', '', $style['borderRadiusScale']);
+            $settings['borderRadiusScale'] = floatval($value)/100.0;
+        } else $settings['borderRadiusScale'] = 1.0;
+
+        return $settings;
+    }
+
     public function getAppearance(?string $page = null): string {
         return $this->data['theme']['components']['html']['appearance'] ?? 'light';
     }
@@ -215,6 +238,9 @@ final class Reader implements SiteDataInterface
     {
         $style = $this->data['theme']['components']['html'] ?? [];
         unset($style['appearance']);
+        unset($style['textScale']);
+        unset($style['spacingScale']);
+        unset($style['borderRadiusScale']);
         return $style;
     }
 
@@ -232,9 +258,9 @@ final class Reader implements SiteDataInterface
             return $dot->get(implode('.', $tmp)) ?? [];
         }
         $style = $this->data['theme']['components'][$component] ?? [];
-        if (in_array($component, ['social', 'nav'])) {
-            unset($style['type']);
-        }
+        // if (in_array($component, ['social', 'nav'])) {
+        //     unset($style['type']);
+        // }
         return $style;
     }
 

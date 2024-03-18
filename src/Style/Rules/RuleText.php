@@ -20,8 +20,12 @@ final class RuleText extends AbstractRule
         if ($this->setColor($args, 'color')) {
             return;
         }
-        // $args[] = rand(75,125)/100.0;
-        // $args[] = '_multiplier';
+
+        $scale = $this->themeSettings['textScale'] ?? 1.0;
+        if ($scale != 1.0) {
+            $args[] = $scale;
+            $args[] = '_multiplier';
+        }
         $value = $this->checkCallbacks('size', $args);
         if ($value) {
             $this->setDeclaration('font-size', $value);

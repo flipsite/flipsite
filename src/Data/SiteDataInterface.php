@@ -44,6 +44,8 @@ interface SiteDataInterface
 
     public function getFonts(): array;
 
+    public function getThemeSettings(): array;
+
     public function getAppearance(?string $page = null): string;
 
     public function getHtmlStyle(?string $page = null): array;
