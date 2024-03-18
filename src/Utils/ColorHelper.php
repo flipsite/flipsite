@@ -82,6 +82,9 @@ class ColorHelper
             if (!isset($allColors[$themeColor])) {
                 return null;
             }
+            if (is_string($allColors[$themeColor])) {
+                $allColors[$themeColor] = ['500' => $allColors[$themeColor]];
+            }
             if (isset($tmp[1])) {
                 $shades = [
                     'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
@@ -102,9 +105,6 @@ class ColorHelper
                 }
             }
             if (!$color && isset($allColors[$themeColor])) {
-                if (is_string($allColors[$themeColor])) {
-                    $allColors[$themeColor] = ['500' => $allColors[$themeColor]];
-                }
                 $color = ColorFactory::fromString($allColors[$themeColor][500]);
                 $color = self::getShade($color, intval($shade));
             }
