@@ -51,100 +51,82 @@ class ColorHelper
 
     public static function getColor(string|array $args, array $allColors): ?Color
     {
-        if (is_string($args)) {
-            $args = explode('-', $args);
+        if (is_array($args)) {
+            $args = implode('-', $args);
         }
-        if (0 === count($args)) {
+        if (!$args) {
             return null;
         }
 
-        $tmp    = explode('/', $args[0]);
-        $colors = $allColors[$tmp[0]] ?? null;
-        if (null === $colors) {
-            if (substr($args[0], 0, 2) === '[#') {
-                $colors = substr($args[0], 1, 7);
-            } else {
+        $contrast = false;
+        if (str_ends_with($args, '-contrast')) {
+            $contrast = true;
+            $args = substr($args, 0, strlen($args)-9);
+        }
+
+        $alpha = 1.0;
+        $tmp = explode('/', $args);
+        if (count($tmp) === 2) {
+            $alpha = floatval($tmp[1])/100.0;
+            $args = $tmp[0];
+        }
+
+        $color = null;
+
+        if (substr($args, 0, 2) === '[#' && strlen($args) ===  9) {
+            $color = ColorFactory::fromString(substr($args, 1, 7));
+        } else {
+            $shade = 500;
+            $tmp = explode('-', $args);
+            $themeColor = $tmp[0];
+            if (!isset($allColors[$themeColor])) {
                 return null;
             }
-        }
-        $alpha = null;
-        if (isset($tmp[1]) && is_numeric($tmp[1])) {
-            $alpha = floatval($tmp[1]) / 100.0;
-        }
-        array_shift($args);
-
-        if (is_string($colors)) {
-            $colors = [500 => $colors];
-        }
-
-        $shade = 500;
-        if (isset($args[0])) {
-            if (is_numeric($args[0])) {
-                $shade = intval($args[0]);
-            } else {
-                $tmp = explode('/', array_shift($args));
-                if (isset($tmp[1])) {
-                    $alpha = floatval(array_pop($tmp)) / 100.0;
-                }
-                if (is_numeric($tmp[0])) {
-                    $shade = $tmp[0];
-                } else if (is_string($tmp[0])) {
-                    $color = ColorFactory::fromString($colors[500]);
-                    if ($tmp[0] === 'contrast') {
-                        $brightness = $color->getRgb()->calculatePerceivedBrightness();
-                        if ($brightness < 128) {
-                            return ColorFactory::fromString('#ffffff');
-                        } else {
-                            $colorScale = new ColorScale();
-                            $contrastColor = $colorScale->getLight($color, 12);
-                            $contrastRatio = $contrastColor->calculateContrastRatioWith($color);
-                            if ($contrastRatio < 4.5) {
-                                return ColorFactory::fromString('#000000');
-                            } else {
-                                return $contrastColor;
-                            }
-                        }
+            if (isset($tmp[1])) {
+                $shades = [
+                    'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
+                    'd1','d2','d3','d4','d5','d6','d7','d8','d10','d11','d12'
+                ];
+                if (in_array($tmp[1], $shades)) {
+                    $color = ColorFactory::fromString($allColors[$themeColor][500]);
+                    $colorScale = new ColorScale();
+                    $isLight = substr($tmp[1], 0, 1) === 'l';
+                    $index = intval(substr($tmp[1], 1));
+                    if ($isLight) {
+                        $color = $colorScale->getLight($color, $index);
+                    } else {
+                        $color = $colorScale->getDark($color, $index);
                     }
-                    $shades = [
-                        'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
-                        'd1','d2','d3','d4','d5','d6','d7','d8','d10','d11','d12'
-                    ];
-                    if (in_array($tmp[0], $shades)) {
-                        $colorScale = new ColorScale();
-                        $isLight = substr($tmp[0], 0, 1) === 'l';
-                        $index = intval(substr($tmp[0], 1));
-                        if ($isLight) {
-                            return $colorScale->getLight($color, $index);
-                        } else {
-                            return $colorScale->getDark($color, $index);
-                        }
-                    }
+                } elseif (is_numeric($tmp[1])) {
+                    $shade = intval($tmp[1]);
                 }
+            }
+            if (!$color && isset($allColors[$themeColor])) {
+                if (is_string($allColors[$themeColor])) {
+                    $allColors[$themeColor] = ['500' => $allColors[$themeColor]];
+                }
+                $color = ColorFactory::fromString($allColors[$themeColor][500]);
+                $color = self::getShade($color, intval($shade));
             }
         }
 
-        if (isset($colors[$shade])) {
-            try {
-                $color = ColorFactory::fromString($colors[$shade]);
-            } catch (\Exception $e) {
-                // Check if reference to other color
-                $args = explode('-', $colors[$shade]);
-                return self::getColor($args, $allColors);
-            }
-        } else {
-            $color = ColorFactory::fromString($colors[500]);
-            $color = self::getShade($color, intval($shade));
-        }
-
-        // Old deprecated oValue opacity
-        if (isset($args[0]) && is_string($args[0])) {
-            $alpha = floatval(str_replace('o', '', $args[0]) / 100.0);
-        }
-
-        if (null !== $alpha) {
+        if ($alpha != 1.0) {
             $color = $color->with(['alpha' => $alpha]);
         }
-
+        
+        if ($contrast) {
+            $brightness = $color->getRgb()->calculatePerceivedBrightness();
+            if ($brightness < 128) {
+                $color =  ColorFactory::fromString('#ffffff');
+            } else {
+                $colorScale = new ColorScale();
+                $color = $colorScale->getLight($color, 12);
+                $contrastRatio = $color->calculateContrastRatioWith($color);
+                if ($contrastRatio < 4.5) {
+                    $color = ColorFactory::fromString('#000000');
+                }
+            }
+        }
         return $color;
     }
 
