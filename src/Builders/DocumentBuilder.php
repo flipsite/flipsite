@@ -6,12 +6,13 @@ namespace Flipsite\Builders;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
+use Flipsite\Builders\ComponentBuilder;
 
 use Flipsite\Utils\Language;
 
 final class DocumentBuilder
 {
-    public function __construct(private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = [], private string $appearance = 'light') {
+    public function __construct(private ComponentBuilder $componentBuilder, private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = [], private string $appearance = 'light') {
     }
 
     public function getDocument() : Document
@@ -27,6 +28,10 @@ final class DocumentBuilder
         }
 
         $htmlStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->htmlStyle, $this->appearance);
+        if (isset($htmlStyle['background'])) {
+            $this->componentBuilder->handleBackground($document, $htmlStyle['background']);
+            unset($htmlStyle['background']);
+        }
         $document->addStyle($htmlStyle);
 
         // <head>
@@ -53,6 +58,10 @@ final class DocumentBuilder
         // <body>
         $body = new Element('body');
         $bodyStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->bodyStyle, $this->appearance);
+        if (isset($bodyStyle['background'])) {
+            $this->componentBuilder->handleBackground($body, $bodyStyle['background']);
+            unset($bodyStyle['background']);
+        }
         $body->addStyle($bodyStyle);
         $document->addChild($body, 'body');
 

@@ -246,7 +246,10 @@ final class Reader implements SiteDataInterface
 
     public function getBodyStyle(?string $page = null): array
     {
-        return $this->data['theme']['components']['body'] ?? [];
+        $style = $this->data['theme']['components']['body'] ?? [];
+        unset($style['bgColor']);
+        unset($style['dark']['bgColor']);
+        return $style;
     }
 
     public function getComponentStyle(string $component): array

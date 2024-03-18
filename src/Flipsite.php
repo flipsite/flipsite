@@ -40,7 +40,15 @@ final class Flipsite
 
         // Create builders
         $appearance = $this->siteData->getAppearance($path->getPage());
+
+        $componentBuilder = new ComponentBuilder(
+            $this->environment,
+            $this->siteData,
+            $path
+        );
+
         $documentBuilder = new DocumentBuilder(
+            $componentBuilder,
             $path->getLanguage(),
             $this->siteData->getHtmlStyle($path->getPage()),
             $this->siteData->getBodyStyle($path->getPage()),
@@ -59,11 +67,7 @@ final class Flipsite
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings()
         );
-        $componentBuilder = new ComponentBuilder(
-            $this->environment,
-            $this->siteData,
-            $path
-        );
+        
         $svgBuilder = new SvgBuilder();
 
         // Add listeners
