@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 namespace Flipsite\Components;
+
 use Flipsite\Builders\Event;
 
 class Svg extends AbstractComponent
@@ -28,13 +29,18 @@ class Svg extends AbstractComponent
         return $data;
     }
 
+    public function getDefaultStyle(): array
+    {
+        return ['fill' => 'fill-current'];
+    }
+
     public function build(array $data, array $style, array $options) : void
     {
         try {
             $svg = $this->assets->getSvg($data['src']);
         } catch (\Exception $e) {
             return;
-        }   
+        }
         $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         $this->addStyle($style);
         if ($svg) {

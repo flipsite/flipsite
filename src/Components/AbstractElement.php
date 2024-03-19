@@ -24,6 +24,12 @@ abstract class AbstractElement
     public function getStyle(): array {
         return $this->style;
     }
+
+    public function getDefaultStyle(): array
+    {
+        return [];
+    }
+    
     public function addStyle(null|array|string $style): self
     {
         if (null === $style) {

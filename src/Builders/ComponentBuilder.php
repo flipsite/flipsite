@@ -41,6 +41,12 @@ class ComponentBuilder
         $flags = explode(':', $type);
         $type  = array_shift($flags);
 
+        // Fallback
+        $fallback = ['container','logo','button','link','toggle','question'];
+        if (in_array($type,$fallback)) {
+            $type = 'group';
+        }
+
         $parentType = false;
         if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
             $parentType = $parentStyle['type'];
@@ -85,7 +91,6 @@ class ComponentBuilder
 
         $options['appearance'] = $style['appearance'] ?? $options['appearance'];
         unset($style['appearance']);
-        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
         if (is_array($style)) {
             $type = $style['type'] ?? $type;
@@ -142,6 +147,12 @@ class ComponentBuilder
                 $options['navState']['active'] = true;
             }
         }
+
+
+        $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
+
+        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
+
         if (count($options['navState'] ?? [])) {
             $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
@@ -177,7 +188,7 @@ class ComponentBuilder
             $component->setTag($style['tag']);
             unset($style['tag']);
         }
-        unset($data['_meta'],$data['_name']);
+        unset($data['_meta'], $data['_name']);
 
         if (isset($data['_bg'])) {
             $style['background'] ??= [];
