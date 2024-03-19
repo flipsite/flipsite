@@ -28,7 +28,7 @@ final class DocumentBuilder
         }
 
         $htmlStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->htmlStyle, $this->appearance);
-        if (isset($htmlStyle['background'])) {
+        if (isset($htmlStyle['background']) && is_array($htmlStyle['background'])) {
             $this->componentBuilder->handleBackground($document, $htmlStyle['background']);
             unset($htmlStyle['background']);
         }
@@ -58,7 +58,7 @@ final class DocumentBuilder
         // <body>
         $body = new Element('body');
         $bodyStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->bodyStyle, $this->appearance);
-        if (isset($bodyStyle['background'])) {
+        if (isset($bodyStyle['background']) && is_array($bodyStyle['background']) ) {
             $this->componentBuilder->handleBackground($body, $bodyStyle['background']);
             unset($bodyStyle['background']);
         }

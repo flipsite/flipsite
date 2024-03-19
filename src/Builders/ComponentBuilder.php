@@ -35,6 +35,9 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
     {
+        if (str_starts_with($type,'_')) {
+            return null;
+        }
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
         }

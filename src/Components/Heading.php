@@ -36,8 +36,9 @@ final class Heading extends AbstractComponent
 
     public function getDefaultStyle(): array
     {
-        $style = [];
         $htmlStyle = $this->siteData->getHtmlStyle();
-        return $htmlStyle['heading'] ?? [];
+        $style = $htmlStyle['heading'] ?? [];
+        $style['font-family'] = 'font-headings';
+        return $style;
     }
 }

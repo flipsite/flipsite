@@ -260,6 +260,12 @@ final class Reader implements SiteDataInterface
             $dot   = new Dot($style);
             return $dot->get(implode('.', $tmp)) ?? [];
         }
+
+        if (in_array($component, ['heading','button','container','icon','link','logo','nav','paragraph','question','social','svg','tagline','timer','toggle'])) {
+            return [];
+        }
+
+
         $style = $this->data['theme']['components'][$component] ?? [];
         // if (in_array($component, ['social', 'nav'])) {
         //     unset($style['type']);
