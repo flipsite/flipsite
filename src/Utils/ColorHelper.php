@@ -25,7 +25,7 @@ class ColorHelper
     }
     public static function parseAndReplace(string $colorString, array $allColors): string
     {
-        $pattern = '/('.implode('|', array_keys($allColors)).')(-[0-9]{1,3})?(\/[0-9]{1,3})?/';
+        $pattern = '/('.implode('|', array_keys($allColors)).')(-[dl0-9]{1,3})?(\/[dl0-9]{1,3})?/';
         $matches = [];
         preg_match_all($pattern, $colorString, $matches);
         foreach ($matches[0] as $match) {
