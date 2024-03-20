@@ -30,7 +30,7 @@ final class StyleAppearanceHelper
 
 class AutoDark {
     public function apply(array $dark, array $style) : array {
-        $attributes = ['textColor','borderColor','background'];
+        $attributes = ['textColor','borderColor'];
         foreach ($attributes as $attr) {
             if (!isset($dark[$attr]) && isset($style[$attr]) && is_string($style[$attr])) {
                 $value = $this->getDark($style[$attr]);
@@ -39,10 +39,10 @@ class AutoDark {
                 }
             }   
         }
-        if (!isset($dark['backround']['color']) && isset($style['backround']['color']) && is_string($style['backround']['color'])) {
-            $value = $this->getDark($style['backround']['color']);
+        if (!isset($dark['background']['color']) && isset($style['background']['color']) && is_string($style['background']['color'])) {
+            $value = $this->getDark($style['background']['color']);
             if ($value) {
-                $dark['backround']['color'] = $value;
+                $dark['background']['color'] = $value;
             }
         }
         return $dark;
