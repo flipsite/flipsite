@@ -83,6 +83,9 @@ abstract class AbstractGroup extends AbstractComponent
 
     public function normalize(string|int|bool|array $data): array
     {
+        if (!is_array($data)) {
+            $data = ['value' => $data];
+        }
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
 
@@ -108,6 +111,7 @@ abstract class AbstractGroup extends AbstractComponent
             $expanded = $this->siteData->getExpanded($data['_target']);
             $data['_target'] = str_replace(':slug', $data['_params'], $expanded[(string)$this->path->getLanguage()] ?? $data['_target']);
             unset($data['_params']);
+
         }
         return $data;
     }

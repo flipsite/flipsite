@@ -15,6 +15,9 @@ final class Nav extends AbstractGroup
 
     public function normalize(string|int|bool|array $data): array
     {
+        if (!is_array($data)) {
+            $data = ['value' => $data];
+        }
         $repeat = [];
         if (!isset($data['_options']['pages'])) {
             $level = 0;
