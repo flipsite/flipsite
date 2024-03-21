@@ -558,13 +558,14 @@ final class Reader implements SiteDataInterface
     private function repairTheme(array $theme, string $sourcePath): array
     {
         if (($theme['_version'] ?? 0) < 1) {
-            unset($theme['body']['bgColor']);
             unset($theme['colors']['light']);
             unset($theme['colors']['dark']);
             $theme['components']['html'] ??= [];
             $theme['components']['html']['heading'] ??= $theme['components']['heading'];
+            unset($theme['components']['body']);
+            $theme['components']['body']['textColor'] = 'text-gray-l11';
+            $theme['components']['body']['dark']['textColor'] = 'text-gray-d11';
             unset($theme['components']['heading']);
-            unset($theme['components']['button']);
             unset($theme['components']['button']);
             unset($theme['components']['container']);
             unset($theme['components']['form']);
@@ -572,6 +573,8 @@ final class Reader implements SiteDataInterface
             unset($theme['components']['input']);
             unset($theme['components']['link']);
             unset($theme['components']['logo']);
+            unset($theme['components']['question']);
+            unset($theme['components']['label']);
             unset($theme['components']['nav']);
             unset($theme['components']['paragraph']);
             unset($theme['components']['social']);
