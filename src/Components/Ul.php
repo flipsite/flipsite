@@ -11,6 +11,9 @@ final class Ul extends AbstractGroup
 
     public function normalize(string|int|bool|array $data): array
     {
+        if (!is_array($data)) {
+            $data = ['value' => $data];
+        }
         $repeat = [];
         if (isset($data['_repeat'])) {
             $list = ArrayHelper::decodeJsonOrCsv($data['_repeat']);

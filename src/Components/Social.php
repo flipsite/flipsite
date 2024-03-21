@@ -9,6 +9,9 @@ final class Social extends AbstractGroup
 {
     public function normalize(string|int|bool|array $data): array
     {
+        if (!is_array($data)) {
+            $data = ['value' => $data];
+        }
         $dataSourceList = $this->getSocial($data['phoneFormat'] ?? null);
         unset($data['phoneFormat']);
         $filter     = ArrayHelper::decodeJsonOrCsv($data['filter'] ?? null);
