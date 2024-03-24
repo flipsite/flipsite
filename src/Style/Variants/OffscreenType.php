@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Flipsite\Style\Variants;
 
-class EnterType extends AbstractType
+class OffscreenType extends AbstractType
 {
-    protected string $prefix = 'enter';
+    protected string $prefix = 'offscreen';
     protected int $order = 300;
 }

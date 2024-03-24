@@ -297,6 +297,7 @@ final class Tailwind implements CallbackInterface
                 foreach ($variantId as &$word) {
                     $word = ucfirst(mb_strtolower($word));
                 }
+                
                 $variantId = implode('', $variantId);
                 // To extract possible group hover name
                 $tmp = explode('/',$variantId);

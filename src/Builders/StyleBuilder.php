@@ -29,7 +29,7 @@ class StyleBuilder implements BuilderInterface
         $classes  = array_values(array_unique($classes));
 
         
-        $prefixNeedingScript = ['scroll','stuck','enter'];
+        $prefixNeedingScript = ['scroll','stuck','offscreen'];
         foreach ($classes as $class) {
             if (strpos($class,':') === false) {
                 continue;
