@@ -12,7 +12,7 @@ use SSNepenthe\ColorUtils\Transformers\Desaturate;
 
 class ColorHelper
 {
-    public static function getGray(string $colorString, int $desaturate = 90, int $minBrightness = 120) : string {
+    public static function getGray(string $colorString, int $desaturate = 90, int $minBrightness = 60) : string {
         $color = ColorFactory::fromString($colorString);
         $transform = new Desaturate($desaturate);
         $color = $transform->transform($color);
