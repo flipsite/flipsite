@@ -60,6 +60,9 @@ class SchemaField implements \JsonSerializable
                 $options = ArrayHelper::decodeJsonOrCsv($this->options);
                 $this->default = $options[0] ?? null;
             }
+            if (is_array($this->options)) {
+                $this->options = array_map('trim', $this->options);
+            }
         }
         if (in_array($this->type, ['enum', 'published'])) {
             $this->required = true;
