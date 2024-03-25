@@ -33,7 +33,7 @@ class ColorScale {
                 return $this->lightHover($color,19,6);
             case 9: return $color;
             case 10: return $this->lightHover($color, 6, 5);
-            case 11: return $this->increaseAndDarken($color, $targetColor, 5.8);
+            case 11: return $this->increaseAndDarken($color, $targetColor, 4.6);
             case 12: return $this->increaseAndDarken($color, $targetColor, 14);
         }
         return $targetColor;
@@ -61,7 +61,7 @@ class ColorScale {
                 return $this->darkHover($color,19,6);
             case 9: return $color;
             case 10: return $this->darkHover($color, 3, 4);
-            case 11: return $this->increaseAndLighten($color, $targetColor, 6.5);
+            case 11: return $this->increaseAndLighten($color, $targetColor, 4.6);
             case 12: return $this->increaseAndLighten($color, $targetColor, 15);
         }
         return $targetColor;

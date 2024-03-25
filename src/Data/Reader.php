@@ -562,9 +562,13 @@ final class Reader implements SiteDataInterface
             unset($theme['colors']['dark']);
             $theme['components']['html'] ??= [];
             $theme['components']['html']['heading'] ??= $theme['components']['heading'];
+            $bodyFontWeght = $theme['components']['body']['fontWeight'] ?? null;
             unset($theme['components']['body']);
             $theme['components']['body']['textColor'] = 'text-gray-l11';
             $theme['components']['body']['dark']['textColor'] = 'text-gray-d11';
+            if ($bodyFontWeght) {
+                $theme['components']['body']['font-weight'] = $bodyFontWeght;
+            }
             unset($theme['components']['heading']);
             unset($theme['components']['button']);
             unset($theme['components']['container']);
