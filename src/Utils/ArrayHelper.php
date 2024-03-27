@@ -57,42 +57,34 @@ final class ArrayHelper
 
     public static function unDot(array $array, string $delimiter = '.'): array
     {
-        $exploded       = [];
+        $exploded = [];
         $renameAndEmpty = [];
 
+        $result = [];
         foreach ($array as $attr => $val) {
             if (is_array($val)) {
                 $val = self::unDot($val, $delimiter);
             }
             if (is_string($attr) && false !== mb_strpos($attr, $delimiter)) {
-                $attrs   = explode($delimiter, $attr);
+                $attrs = explode($delimiter, $attr);
                 $newAttr = array_shift($attrs);
                 if (count($attrs)) {
                     $val = self::unDot([implode($delimiter, $attrs) => $val], $delimiter);
                 }
                 $val = is_array($val) ? self::unDot($val, $delimiter) : $val;
-                if (isset($exploded[$newAttr])) {
-                    $exploded[$newAttr] = self::merge($exploded[$newAttr], $val);
-                    unset($array[$attr]);
+
+                if (isset($result[$newAttr])) {
+                    $result[$newAttr] = self::merge($result[$newAttr], $val);
                 } else {
-                    $exploded[$newAttr]    = $val;
-                    $renameAndEmpty[$attr] = $newAttr;
+                    $result[$newAttr] = $val;
                 }
             } else {
-                $array[$attr] = $val;
+                $result[$attr] = $val;
             }
         }
-        if (count($exploded)) {
-            foreach ($renameAndEmpty as $old => $new) {
-                $existing    = $array[$new] ?? [];
-                $array       = self::renameKey($array, $old, $new);
-                $array[$new] = self::merge($existing, $exploded[$new]);
-                unset($exploded[$new]);
-            }
-        }
-        return $array;
-    }
 
+        return $result;
+    }
     public static function strReplace(string $search, string $replace, array $array): array
     {
         foreach ($array as $key => &$value) {
