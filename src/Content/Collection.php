@@ -118,6 +118,11 @@ class Collection implements \JsonSerializable
         uasort($this->items, function ($a, $b) use ($field, $direction) {
             $a = $a->get($field);
             $b = $b->get($field);
+            if (is_numeric($a) && is_numeric($b)) {
+                $a = (float) $a;
+                $b = (float) $b;
+                return 'asc' === $direction ? $a - $b : $b - $a;
+            }
             return 'asc' === $direction ? $a <=> $b : $b <=> $a;
         });
     }
