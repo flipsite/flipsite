@@ -7,8 +7,6 @@ use Flipsite\Assets\ImageHandler;
 use Flipsite\Assets\VideoHandler;
 use Flipsite\Components\AbstractElement;
 use Flipsite\Components\AbstractComponent;
-use Flipsite\Builders\EventListenerInterface;
-use Flipsite\Builders\Event;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\Data\Slugs;
 use Flipsite\EnvironmentInterface;
@@ -17,6 +15,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
+use Flipsite\Style\Encoders\StyleInt;
 
 class ComponentBuilder
 {
@@ -35,7 +34,7 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
     {
-        if (str_starts_with($type,'_')) {
+        if (str_starts_with($type, '_')) {
             return null;
         }
         if (isset($data['_script'])) {
@@ -45,8 +44,8 @@ class ComponentBuilder
         $type  = array_shift($flags);
 
         // Fallback
-        $fallback = ['container','logo','button','link','toggle','question'];
-        if (in_array($type,$fallback)) {
+        $fallback = ['container', 'logo', 'button', 'link', 'toggle', 'question'];
+        if (in_array($type, $fallback)) {
             $type = 'group';
         }
 
@@ -108,6 +107,20 @@ class ComponentBuilder
             $data                = DataHelper::applyData($data, $dataSource, '_dataSource');
         }
 
+        if (isset($data['_options']['transitionMultiplier'])) {
+            $multiplier = intval($data['_options']['transitionMultiplier']) - 1;
+            unset($data['_options']['transitionMultiplier']);
+            $style['transitionDelay'] ??= 'delay-0';
+            $delay    = new StyleInt($style['transitionDelay'], 'delay-');
+            $step     = new StyleInt($style['transitionDelayStep'] ?? null, 'delay-step-');
+            $variants = $delay->getVariants();
+            foreach ($variants as $variant) {
+                $delay->addValue($multiplier * $step->getValue($variant), $variant);
+            }
+            $style['transitionDelay'] = $delay->encode();
+            unset($style['transitionDelayStep'], $data['_options']['transitionMultiplier']);
+        }
+
         $class = 'Flipsite\\Components\\' . ucfirst($type);
         if (class_exists($class)) {
             $component = new $class();
@@ -151,7 +164,6 @@ class ComponentBuilder
             }
         }
 
-
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
 
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
@@ -159,8 +171,8 @@ class ComponentBuilder
         if (count($options['navState'] ?? [])) {
             $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
-        
-        $style = $this->handleStyleStates($style, ['open','selected']);
+
+        $style = $this->handleStyleStates($style, ['open', 'selected']);
 
         $data = $component->normalize($data);
         if (isset($data['default']) && (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value']))) {
@@ -198,7 +210,7 @@ class ComponentBuilder
             $style['background']['src'] = $data['_bg'];
             unset($data['_bg']);
         }
-        if (isset($style['width']) && strpos($style['width'],'w-scroll') !== false) {
+        if (isset($style['width']) && strpos($style['width'], 'w-scroll') !== false) {
             $data['_attr'] ??= [];
             $data['_attr']['data-scroll-progress-width'] = true;
             $this->dispatch(new Event('ready-script', 'scroll-progress', file_get_contents(__DIR__.'/../../js/ready.scroll-progress.min.js')));
@@ -245,25 +257,27 @@ class ComponentBuilder
         }
     }
 
-    private function handleStyleStates(array $style, array $states) {
+    private function handleStyleStates(array $style, array $states)
+    {
         foreach ($style as $attr => &$value) {
             if (is_string($value)) {
                 foreach ($states as $state) {
                     if (strpos($value, $state.':') !== false) {
-                        $tmp = explode(' ',$value);
+                        $tmp      = explode(' ', $value);
                         $noPrefix = null;
                         foreach ($tmp as $cls) {
-                            if (strpos($cls,':') === false) {
+                            if (strpos($cls, ':') === false) {
                                 $noPrefix = $cls;
                             }
                         }
-                        $value.= ' !'.$state.':'.$noPrefix;
+                        $value .= ' !'.$state.':'.$noPrefix;
                     }
                 }
             }
         }
         return $style;
     }
+
     private function handleNavStyle(array $style, array $types): array
     {
         $style = ArrayHelper::applyStringCallback($style, function ($str) use ($types) {
@@ -337,7 +351,7 @@ class ComponentBuilder
             return true;
         }
         if (isset($options['isLanguage'])) {
-            $languages = ArrayHelper::decodeJsonOrCsv($options['isLanguage']);
+            $languages       = ArrayHelper::decodeJsonOrCsv($options['isLanguage']);
             $currentLanguage = (string)$this->path->getLanguage();
             foreach ($languages as $language) {
                 if ($currentLanguage === $language) {
@@ -347,7 +361,7 @@ class ComponentBuilder
             return false;
         }
         if (isset($options['notLanguage'])) {
-            $languages = ArrayHelper::decodeJsonOrCsv($options['notLanguage']);
+            $languages       = ArrayHelper::decodeJsonOrCsv($options['notLanguage']);
             $currentLanguage = (string)$this->path->getLanguage();
             foreach ($languages as $language) {
                 if ($currentLanguage === $language) {

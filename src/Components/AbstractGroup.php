@@ -108,10 +108,9 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['_page']);
         }
         if (isset($data['_params'])) {
-            $expanded = $this->siteData->getExpanded($data['_target']);
+            $expanded        = $this->siteData->getExpanded($data['_target']);
             $data['_target'] = str_replace(':slug', $data['_params'], $expanded[(string)$this->path->getLanguage()] ?? $data['_target']);
             unset($data['_params']);
-
         }
         return $data;
     }
@@ -142,7 +141,7 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_options']['filter'], $data['_options']['filterField'])) {
             if ('true' === $data['_options']['filter']) {
                 $filter = true;
-            } else if ('false' === $data['_options']['filter']) {
+            } elseif ('false' === $data['_options']['filter']) {
                 $filter = false;
             } else {
                 $filter = ArrayHelper::decodeJsonOrCsv($data['_options']['filter']);
@@ -153,7 +152,7 @@ abstract class AbstractGroup extends AbstractComponent
                 }
             }
             $filterField = $data['_options']['filterField'];
-            $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
+            $repeat      = array_values(array_filter($repeat, function ($item) use ($filter, $filterField) {
                 if (is_bool($filter)) {
                     $value = $item[$filterField] ?? false;
                     return $filter === $value;
@@ -206,10 +205,12 @@ abstract class AbstractGroup extends AbstractComponent
 
             $data['_isEmpty'] = true;
         } else {
-            foreach ($data['_repeatData'] as $index0 => &$item) {
-                $item['index'] = $index0 + 1;
+            $index0 = 0;
+            foreach ($data['_repeatData'] as &$item) {
+                $item['index'] = ++$index0;
             }
         }
+
         return $data;
     }
 
