@@ -58,8 +58,9 @@ abstract class AbstractGroup extends AbstractComponent
                     if (!is_array($repeatTplComponent)) {
                         $repeatTplComponent = ['value' => $repeatTplComponent];
                     }
-                    $repeatTplComponent['_dataSource'] = $repeatDataItem;
-                    $optimizedStyle                    = $this->optimizeStyle($style[$type] ?? [], $i, $total);
+                    $repeatTplComponent['_dataSource']       = $repeatDataItem;
+                    $repeatTplComponent['_repeatIndex']      = $repeatDataItem['index'];
+                    $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $i, $total);
                     if (isset($optimizedStyle['background'])) {
                         $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $i, $total);
                     }

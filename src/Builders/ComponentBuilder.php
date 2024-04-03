@@ -107,9 +107,8 @@ class ComponentBuilder
             $data                = DataHelper::applyData($data, $dataSource, '_dataSource');
         }
 
-        if (isset($data['_options']['transitionMultiplier'])) {
-            $multiplier = intval($data['_options']['transitionMultiplier']) - 1;
-            unset($data['_options']['transitionMultiplier']);
+        if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
+            $multiplier = intval($data['_repeatIndex']);
             $style['transitionDelay'] ??= 'delay-0';
             $delay    = new StyleInt($style['transitionDelay'], 'delay-');
             $step     = new StyleInt($style['transitionDelayStep'] ?? null, 'delay-step-');
@@ -118,7 +117,7 @@ class ComponentBuilder
                 $delay->addValue($multiplier * $step->getValue($variant), $variant);
             }
             $style['transitionDelay'] = $delay->encode();
-            unset($style['transitionDelayStep'], $data['_options']['transitionMultiplier']);
+            unset($style['transitionDelayStep']);
         }
 
         $class = 'Flipsite\\Components\\' . ucfirst($type);
