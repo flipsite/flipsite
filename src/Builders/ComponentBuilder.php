@@ -310,7 +310,7 @@ class ComponentBuilder
             if (!$options['hasValue']) {
                 return false;
             }
-            return !preg_match('/^\{[a-zA-Z]+\}$/', $options['hasValue']);
+            return !preg_match('/^\{[a-zA-Z\.]+\}$/', $options['hasValue']);
         }
         if (isset($options['hasSubpages'])) {
             if (!$this->siteData->getSlugs()->hasSubpages($options['hasSubpages'])) {
