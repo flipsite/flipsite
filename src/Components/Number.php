@@ -12,10 +12,10 @@ final class Number extends AbstractComponent
 
     public function build(array $data, array $style, array $options) : void
     {
-        $value = $data['value'] ?? 1;
+        $value = (string)($data['value'] ?? 1);
         // If , as decimal separator, replace with .
-        $value = str_replace(',','.',$value);
-        $value = str_replace(' ','',$value);
+        $value = str_replace(',', '.', $value);
+        $value = str_replace(' ', '', $value);
         $value = floatval($value);
 
         // number_format(
@@ -29,19 +29,18 @@ final class Number extends AbstractComponent
             $value = $this->numberToFormat(intval($value), $data['format'] ?? '1');
         } else {
             $separators = [
-                'none' => '',
-                'space'=> ' ',
-                'comma'=> ',',
-                'period'=> '.',
+                'none'      => '',
+                'space'     => ' ',
+                'comma'     => ',',
+                'period'    => '.',
                 'apostrophe'=> '\'',
             ];
-            $decimals = intval($data['decimals'] ?? 0);
-            $decimalSeparator = $data['decimalSeparator'] ?? 'period';
+            $decimals           = intval($data['decimals'] ?? 0);
+            $decimalSeparator   = $data['decimalSeparator'] ?? 'period';
             $thousandsSeparator = $data['thousandsSeparator'] ?? 'none';
-            $initial = $value;
-            $value = number_format($value, $decimals, $separators[$decimalSeparator], $separators[$thousandsSeparator]);
+            $initial            = $value;
+            $value              = number_format($value, $decimals, $separators[$decimalSeparator], $separators[$thousandsSeparator]);
             if (floor($initial) != $initial && ($data['removeZeros'] ?? false)) {
-
                 while (substr($value, -1) === '0' || substr($value, -1) === $separators[$decimalSeparator]) {
                     // Remove the last character from the string
                     $value = substr($value, 0, -1);
