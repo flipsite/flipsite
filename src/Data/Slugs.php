@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -44,7 +45,7 @@ final class Slugs
         }
     }
 
-    private function isAlreadySlug(string $slug) : bool
+    private function isAlreadySlug(string $slug): bool
     {
         foreach ($this->slugs as $page => $slugs) {
             foreach ($slugs as $definedSlug) {
@@ -56,12 +57,12 @@ final class Slugs
         return false;
     }
 
-    public function getPages() : array
+    public function getPages(): array
     {
         return $this->pages;
     }
 
-    public function getAll() : array
+    public function getAll(): array
     {
         $all = [];
         foreach ($this->languages as $language) {
@@ -75,8 +76,11 @@ final class Slugs
         return $all;
     }
 
-    public function getSlug(string $page, Language $language = null, bool $fallback = true) : ?string
+    public function getSlug(string $page, Language $language = null, bool $fallback = true): ?string
     {
+        if (count($this->languages) === 1) {
+            return $page;
+        }
         if (!isset($this->slugs[$page])) {
             return null;
         }
@@ -84,7 +88,7 @@ final class Slugs
         if ($language !== null) {
             return $slug[(string) $language] ?? null;
         }
-        $loc = ['_loc'=>true];
+        $loc = ['_loc' => true];
         foreach ($slug as $lang => $localizedSlug) {
             if (!$fallback || !str_starts_with($localizedSlug, (string) $lang.'/')) {
                 $loc[$lang] = $localizedSlug;
@@ -93,14 +97,16 @@ final class Slugs
         return json_encode($loc);
     }
 
-    public function isPage(string $page) : bool
+    public function isPage(string $page): bool
     {
         return in_array($page, $this->pages);
     }
 
-    public function getPage(string $slug) : ?string
+    public function getPage(string $slug): ?string
     {
-        if ($slug === 'home') return 'home';
+        if ($slug === 'home') {
+            return 'home';
+        }
         foreach ($this->slugs as $page => $slugs) {
             foreach ($slugs as $langauge => $localizedSlug) {
                 if ($localizedSlug === $slug) {
@@ -111,10 +117,10 @@ final class Slugs
         return null;
     }
 
-    public function getPath(string $path, ?Language $language = null, string $active = 'home') : ?string
+    public function getPath(string $path, ?Language $language = null, string $active = 'home'): ?string
     {
         // Check if path is language, replace path with current page
-        
+
         foreach ($this->slugs as $pageId => $slugs) {
             foreach ($slugs as $slugLanguage => $slug) {
                 if ($slugLanguage === (string)$language && $slug === $path) {
@@ -122,7 +128,7 @@ final class Slugs
                 }
             }
         }
-        
+
         $pathLanguage = $this->getPathLanguage($path);
         if ($pathLanguage) {
             $language = $pathLanguage;
@@ -139,18 +145,19 @@ final class Slugs
         return '/'.$this->slugs[$page][(string) $language] ?? null;
     }
 
-    public function hasSubpages(string $page) : bool {
+    public function hasSubpages(string $page): bool
+    {
         // Check if has direct subpages
         foreach ($this->pages as $page_) {
-            if (str_starts_with($page_,$page.'/')) {
-                $subpage = str_replace($page.'/','',$page_);
-                return strpos($subpage,'/') === false;
+            if (str_starts_with($page_, $page.'/')) {
+                $subpage = str_replace($page.'/', '', $page_);
+                return strpos($subpage, '/') === false;
             }
         }
         return false;
     }
 
-    private function convertPathToPage(string $path) : ?string
+    private function convertPathToPage(string $path): ?string
     {
         $page = trim($path, '/');
 
@@ -184,7 +191,7 @@ final class Slugs
         return null;
     }
 
-    private function getPathLanguage(string $path) : ?Language
+    private function getPathLanguage(string $path): ?Language
     {
         if ($this->isMultilingual()) {
             foreach ($this->languages as $language) {
@@ -196,12 +203,12 @@ final class Slugs
         return null;
     }
 
-    private function isMultilingual() : bool
+    private function isMultilingual(): bool
     {
         return count($this->languages) > 1;
     }
 
-    private function isBilingual() : bool
+    private function isBilingual(): bool
     {
         return 2 === count($this->languages);
     }
