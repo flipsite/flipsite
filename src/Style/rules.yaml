@@ -120,7 +120,7 @@ ease-out: transition-timing-function:cubic-bezier(0,0,0.2,1)
 fill-inherit: fill:inherit
 fill-current: fill:currentColor
 fill-transparent: fill:transparent
-filter: '--tw-blur:blur(0);--tw-brightness:brightness(1);--tw-contrast:contrast(1);--tw-grayscale:grayscale(0);--tw-hue-rotate:hue-rotate(0deg);--tw-invert:invert(0);--tw-saturate:saturate(1);--tw-sepia:sepia(0);--tw-drop-shadow:drop-shadow(0 0 #0000);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)'
+filter: "--tw-blur:blur(0);--tw-brightness:brightness(1);--tw-contrast:contrast(1);--tw-grayscale:grayscale(0);--tw-hue-rotate:hue-rotate(0deg);--tw-invert:invert(0);--tw-saturate:saturate(1);--tw-sepia:sepia(0);--tw-drop-shadow:drop-shadow(0 0 #0000);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
 filter-none: filter:none
 fixed: position:fixed
 flex-1: flex:1 1 0%
@@ -362,6 +362,10 @@ text-justify: text-align:justify
 text-left: text-align:left
 text-right: text-align:right
 text-shadow-none: text-shadow:none
+text-wrap: text-wrap:wrap
+text-nowrap: text-wrap:nowrap
+text-balance: text-wrap:balance
+text-pretty: text-wrap:pretty
 touch-auto: touch-action:auto
 touch-none: touch-action:none
 touch-pan-x: touch-action:pan-x
