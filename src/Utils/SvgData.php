@@ -8,7 +8,7 @@ use Flipsite\Assets\SvgInterface;
 final class SvgData implements SvgInterface
 {
     private string $viewbox;
-    private string $def;
+    private string $def = '';
     private int $width;
     private int $height;
 
@@ -24,25 +24,35 @@ final class SvgData implements SvgInterface
             $this->hash = substr(md5($data), 0, 6);
         }
 
-        $svgTagPos = strpos($data, '<svg');
-        if (false === $svgTagPos) {
+        $xml = simplexml_load_string($data);
+        if ('svg' !== $xml->getName()) {
             throw new \Exception('Not valid SVG');
         }
-        $data      = substr($data, $svgTagPos);
 
-        preg_match('/viewBox="(.*?)"/', $data, $matches);
-        $this->viewbox = $matches[1] ?? '0 0 24 24';
-
-        $from      = mb_strpos($data, '>') + 1;
-        $this->def = mb_substr($data, $from);
-
-        $this->def    = trim(str_replace('</svg>', '', $this->def));
-        $this->def    = str_replace("\n", ' ', $this->def);
-        $this->def    = str_replace('> <', '><', $this->def);
-        $this->def    = preg_replace('/<title>.*?<\/title>/', '', $this->def);
-        $parts        = explode(' ', $this->viewbox);
-        $this->width  = intval($parts[2]) - intval($parts[0]);
-        $this->height = intval($parts[3]) - intval($parts[1]);
+        if (isset($xml['viewBox'])) {
+            $this->viewbox = (string)$xml['viewBox'];
+        }
+        if (isset($xml['width']) && $xml['height']) {
+            $this->width  = intval($xml['width']);
+            $this->height = intval($xml['height']);
+        }
+        if (!isset($this->viewbox) && isset($this->width) && isset($this->height)) {
+            $this->viewbox = '0 0 '.(string)$this->width.' '.(string)$this->height;
+        }
+        if (isset($this->viewbox) && !isset($this->width) && !isset($this->height)) {
+            $parts        = explode(' ', $this->viewbox);
+            $this->width  = intval($parts[2]) - intval($parts[0]);
+            $this->height = intval($parts[3]) - intval($parts[1]);
+        }
+        if (!isset($this->viewbox) || !isset($this->width) || !isset($this->height)) {
+            throw new \Exception('No SVG dimensions');
+        }
+        foreach ($xml->children() as $child) {
+            if ('title' !== $child->getName()) {
+                $this->def .= $child->asXML();
+            }
+        }
+        $this->def = str_replace("\n", '', $this->def);
     }
 
     public function getHash() : string
