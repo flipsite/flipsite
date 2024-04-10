@@ -28,7 +28,8 @@ class Assets
         return $this->assetSources;
     }
 
-    public function getContents(string $asset): string|bool {
+    public function getContents(string $asset): string|bool
+    {
         $assetInfo = $this->assetSources->getInfo($asset);
         if ($assetInfo) {
             return $assetInfo->getContents();
@@ -53,21 +54,22 @@ class Assets
             return $this->assetSources->getResponse($response, $asset);
         }
         $this->addToCache($asset);
-        
+
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
         return $response->withStatus(404);
     }
 
-    private function addToCache(string $asset) {
-        $pathinfo = pathinfo($asset);
+    private function addToCache(string $asset)
+    {
+        $pathinfo    = pathinfo($asset);
         $withoutHash = preg_replace('/\.[a-f0-9]{6}/', '', $pathinfo['filename']);
-        $tmp = explode('@', $withoutHash);
-        $filename = $tmp[0];
+        $tmp         = explode('@', $withoutHash);
+        $filename    = $tmp[0];
 
         $assetInfo = $this->assetSources->getInfo($filename.'.'.$pathinfo['extension']);
-        
+
         switch ($assetInfo->getType()) {
             case AssetType::IMAGE:
                 if ('svg' !== $pathinfo['extension']) {
@@ -86,7 +88,6 @@ class Assets
                 $this->assetSources->addToCache($asset, $assetInfo->getContents());
                 break;
         }
-
     }
 
     public function getSvg(string $svg): ?SvgInterface
@@ -139,13 +140,13 @@ class Assets
         if ($assetInfo) {
             return false;
         }
-        
+
         $asset = $this->cleanupAssetFilename($asset);
-        
+
         if ($this->assetExists($asset)) {
             return false;
         }
-        
+
         return $this->assetSources->upload(AssetType::fromMimetype(mime_content_type($filepath)), $asset, $filepath) ? $asset : null;
     }
 
@@ -160,7 +161,7 @@ class Assets
             return false;
         }
 
-        $pathinfo = pathinfo($asset);
+        $pathinfo    = pathinfo($asset);
         $pathinfoNew = pathinfo($newFilename);
         if (!isset($pathinfoNew['extension']) || $pathinfoNew['extension'] !== $pathinfo['extension']) {
             return false;
@@ -181,7 +182,7 @@ class Assets
     private function cleanupAssetFilename(string $asset): string
     {
         $tmp      = explode('@', $asset);
-        $asset = $tmp[0];
+        $asset    = $tmp[0];
 
         // Replace spaces with underscores
         $asset = str_replace(' ', '_', $asset);
