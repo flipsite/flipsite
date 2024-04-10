@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Compiler;
 
 use Flipsite\EnvironmentInterface;
@@ -59,7 +60,7 @@ class Compiler implements LoggerAwareInterface
 
         // Remove base path
         foreach ($assetList as &$asset) {
-            if ($basePath && $basePath !== '/') { 
+            if ($basePath && $basePath !== '/') {
                 $asset      = str_replace($basePath, '', $asset);
             }
             $allFiles[] = $asset;
@@ -73,11 +74,11 @@ class Compiler implements LoggerAwareInterface
         foreach ($assetList as $asset) {
             $filename = false;
             if (str_starts_with($asset, '/img/')) {
-                $filename = substr($asset,5);
-            } else if (str_starts_with($asset, '/videos/')) {
-                $filename = substr($asset,8);
-            } else if (str_starts_with($asset, '/files/')) {
-                $filename = substr($asset,7);
+                $filename = substr($asset, 5);
+            } elseif (str_starts_with($asset, '/videos/')) {
+                $filename = substr($asset, 8);
+            } elseif (str_starts_with($asset, '/files/')) {
+                $filename = substr($asset, 7);
             }
             if ($filename) {
                 $target = $this->targetDir.$asset;
@@ -97,8 +98,19 @@ class Compiler implements LoggerAwareInterface
         $this->writeFile($this->targetDir, '/robots.txt', $flipsite->render('robots.txt'));
         $allFiles[] = 'robots.txt';
 
-        // Delete files that are not needed anymore
+        // Redirects
+        $redirects = $this->siteData->getRedirects();
+        if ($redirects && ($compileOptions['redirects'] ?? '') === 'meta') {
+            $indexTpl = file_get_contents(__DIR__.'/redirect.tpl.html');
+            foreach ($redirects as $redirect) {
+                $file = '/'.$redirect['from'].'/index.html';
+                $url = $this->environment->getAbsoluteUrl($redirect['to']);
+                $this->writeFile($this->targetDir, $file, str_replace('{{url}}', $url, $indexTpl));
+                $allFiles[] = $file;
+            }
+        }
 
+        // Delete files that are not needed anymore
         $allFilesInCurrentCompileDir = $this->getDirContents($this->targetDir);
         $deleteFiles                 = [];
 
@@ -154,7 +166,7 @@ class Compiler implements LoggerAwareInterface
         closedir($dh);
     }
 
-    public function getFiles() : array
+    public function getFiles(): array
     {
         $files = $this->getDirContents($this->targetDir);
         return array_filter($files, function ($file) {
@@ -187,6 +199,9 @@ class Compiler implements LoggerAwareInterface
         $files      = $this->getDirContents($targetDir);
         foreach ($files as $file) {
             if (false !== mb_strpos($file, 'index.html')) {
+                $filesystem->remove($file);
+            }
+            if (false !== mb_strpos($file, '.htaccess')) {
                 $filesystem->remove($file);
             }
         }
@@ -258,7 +273,7 @@ class Compiler implements LoggerAwareInterface
         return array_values(array_filter($notDeleted));
     }
 
-    private function getDirContents(string $dir, &$results = []) : array
+    private function getDirContents(string $dir, &$results = []): array
     {
         if (!is_dir($dir)) {
             return [];

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Builders\ComponentBuilder;
@@ -65,9 +66,10 @@ final class Flipsite
         $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
-            $this->siteData->getThemeSettings()
+            $this->siteData->getThemeSettings(),
+            $this->environment->minimizeCss()
         );
-        
+
         $svgBuilder = new SvgBuilder();
 
         // Add listeners
@@ -118,6 +120,21 @@ final class Flipsite
         $document = $scriptBuilder->getDocument($document);
 
         return $document;
+    }
+
+    public function getRedirect(string $rawPath): ?string
+    {
+        $redirects = $this->siteData->getRedirects();
+        if (!$redirects) {
+            return null;
+        }
+        foreach ($redirects as $redirect) {
+            if ($redirect['from'] === $rawPath) {
+                return $this->environment->getAbsoluteUrl($redirect['to']);
+            }
+        }
+
+        return null;
     }
 
     public function render(string $rawPath): string

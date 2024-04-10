@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -16,7 +17,7 @@ use Flipsite\Builders\EventListenerInterface;
 
 class StyleBuilder implements BuilderInterface
 {
-    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [])
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses)
     {
     }
 
@@ -28,15 +29,15 @@ class StyleBuilder implements BuilderInterface
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
 
-        
+
         $prefixNeedingScript = ['scroll','stuck','offscreen'];
         foreach ($classes as $class) {
-            if (strpos($class,':') === false) {
+            if (strpos($class, ':') === false) {
                 continue;
             }
-            $tmp = explode(':',$class);
+            $tmp = explode(':', $class);
             $prefix = $tmp[0];
-            if (in_array($prefix,$prefixNeedingScript)) {
+            if (in_array($prefix, $prefixNeedingScript)) {
                 $keyToRemove = array_search($prefix, $prefixNeedingScript);
                 unset($prefixNeedingScript[$keyToRemove]);
                 $this->dispatch(new Event('ready-script', $prefix, file_get_contents(__DIR__.'/../../js/ready.'.$prefix.'.min.js')));
@@ -47,9 +48,9 @@ class StyleBuilder implements BuilderInterface
         //     $this->dispatch(new Event('ready-script', 'scrollY', file_get_contents(__DIR__.'/../../js/ready.scrollProgress.min.js')));
         // }
 
-        
-        
-    
+
+
+
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
@@ -90,9 +91,11 @@ class StyleBuilder implements BuilderInterface
 
         $css = $tailwind->getCss($elements, $classes);
         $newClasses = [];
-        
-        // $css = $this->minmizeClasses($css, $classes, $newClasses);
-        // $this->parseElement($document->getChild('body'), $newClasses);
+
+        if ($this->minmizeClasses) {
+            $css = $this->minmizeClasses($css, $classes, $newClasses);
+            $this->parseElement($document->getChild('body'), $newClasses);
+        }
 
         $style = new Element('style', true);
         $style->setContent($css);
@@ -124,10 +127,10 @@ class StyleBuilder implements BuilderInterface
             if (preg_match_all($pattern, $content, $matches)) {
                 $contentClasses = array_unique($matches[1]);
                 foreach ($contentClasses as $cls) {
-                    $classes = array_merge($classes, explode(' ',$cls));
+                    $classes = array_merge($classes, explode(' ', $cls));
                 }
             }
-            
+
             $pattern = '/<([a-zA-Z][^\s>]*)/';
             // Perform the regular expression match all
             if (preg_match_all($pattern, $content, $matches)) {
@@ -190,21 +193,23 @@ class StyleBuilder implements BuilderInterface
         return strtolower($label);
     }
 
-    private function parseElement(AbstractElement $element, array $newClasses) {
+    private function parseElement(AbstractElement $element, array $newClasses)
+    {
         $element->replaceStyle($this->replaceClasses($element->getStyle(), $newClasses));
         foreach ($element->getChildren() as $child) {
             $this->parseElement($child, $newClasses);
         }
     }
-    private function replaceClasses(array $style, array $newClasses) : array {
+    private function replaceClasses(array $style, array $newClasses): array
+    {
         $states = ['open:','!open:','selected','!selected'];
         $replaced = [];
         foreach ($style as $attr => $oldClasses) {
             if (is_array($oldClasses)) {
-                $replaced[$attr] = $this->replaceClasses($oldClasses, $newClasses); 
+                $replaced[$attr] = $this->replaceClasses($oldClasses, $newClasses);
             } else {
                 $new = [];
-                foreach (explode(' ',$oldClasses) as $class) {
+                foreach (explode(' ', $oldClasses) as $class) {
                     $tmp = explode(' ', $class);
                     foreach ($tmp as $oldClass) {
                         $prefix = '';
@@ -214,7 +219,7 @@ class StyleBuilder implements BuilderInterface
                                 $oldClass = substr($oldClass, strlen($prefix));
                             }
                         }
-        
+
                         if (isset($newClasses[$oldClass])) {
                             $new[] = $prefix.$newClasses[$oldClass];
                         } else {

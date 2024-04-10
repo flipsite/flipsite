@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -21,7 +22,7 @@ interface SiteDataInterface
     public function getShare(): ?string;
 
     public function getThemeColor(): ?string;
-    
+
     public function getAppleAppId(): ?string;
 
     public function getSocial(): ?array;
@@ -33,6 +34,8 @@ interface SiteDataInterface
     public function getFavicon(): null|string|array;
 
     public function getIntegrations(): ?array;
+
+    public function getRedirects(): ?array;
 
     public function getCompile(): ?array;
 
@@ -56,9 +59,9 @@ interface SiteDataInterface
 
     public function getMeta(string $page, ?Language $language = null): ?array;
 
-    public function getPageMeta(string $page, ?Language $language = null) : ?array;
+    public function getPageMeta(string $page, ?Language $language = null): ?array;
 
-    public function getHiddenPages() : array;
+    public function getHiddenPages(): array;
 
     public function getPageName(string $page, ?Language $language = null);
 
@@ -68,5 +71,5 @@ interface SiteDataInterface
 
     public function getCollection(string $collectionId, ?Language $language = null): ?Collection;
 
-    public function getModifiedTimestamp() : int;
+    public function getModifiedTimestamp(): int;
 }

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -193,6 +194,11 @@ final class Reader implements SiteDataInterface
         return $this->get('integrations') ?? null;
     }
 
+    public function getRedirects(): ?array
+    {
+        return $this->get('redirects') ?? null;
+    }
+
     public function getColors(): array
     {
         $colors = $this->data['theme']['colors'];
@@ -214,23 +220,30 @@ final class Reader implements SiteDataInterface
 
         if (isset($style['textScale'])) {
             $value = str_replace('text-scale-', '', $style['textScale']);
-            $settings['textScale'] = floatval($value)/100.0;
-        } else $settings['textScale'] = 1.0;
+            $settings['textScale'] = floatval($value) / 100.0;
+        } else {
+            $settings['textScale'] = 1.0;
+        }
 
         if (isset($style['spacingScale'])) {
             $value = str_replace('spacing-scale-', '', $style['spacingScale']);
-            $settings['spacingScale'] = floatval($value)/100.0;
-        } else $settings['spacingScale'] = 1.0;
+            $settings['spacingScale'] = floatval($value) / 100.0;
+        } else {
+            $settings['spacingScale'] = 1.0;
+        }
 
         if (isset($style['borderRadiusScale'])) {
             $value = str_replace('rounded-scale-', '', $style['borderRadiusScale']);
-            $settings['borderRadiusScale'] = floatval($value)/100.0;
-        } else $settings['borderRadiusScale'] = 1.0;
+            $settings['borderRadiusScale'] = floatval($value) / 100.0;
+        } else {
+            $settings['borderRadiusScale'] = 1.0;
+        }
 
         return $settings;
     }
 
-    public function getAppearance(?string $page = null): string {
+    public function getAppearance(?string $page = null): string
+    {
         return $this->data['theme']['components']['html']['appearance'] ?? 'light';
     }
 
@@ -296,7 +309,8 @@ final class Reader implements SiteDataInterface
         return $this->slugs;
     }
 
-    public function getExpanded(string $page): ?array {
+    public function getExpanded(string $page): ?array
+    {
         return $this->expandedPages[$page] ?? null;
     }
 
@@ -344,7 +358,7 @@ final class Reader implements SiteDataInterface
     public function getMeta(string $page, ?Language $language = null): ?array
     {
         $pageMeta    = $this->getPageMeta($page, $language) ?? [];
-        
+
         $description = $pageMeta['description'] ?? $this->get('description', $language);
         $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
         $icon        = $pageMeta['icon'] ?? null;
@@ -353,7 +367,7 @@ final class Reader implements SiteDataInterface
         // Build title
         if ('home' === $page) {
             $title = $pageMeta['title'] ?? $this->get('title', $language) ?? $this->get('name');
-        } else if (isset($pageMeta['title'])) {
+        } elseif (isset($pageMeta['title'])) {
             $title = $pageMeta['title'];
         } else {
             $p     = explode('/', $page);
@@ -372,7 +386,7 @@ final class Reader implements SiteDataInterface
         }
 
         if ($language && !$language->isSame($this->getDefaultLanguage())) {
-            $title.= ' ('.$language->getInLanguage().')';
+            $title .= ' ('.$language->getInLanguage().')';
         }
         return [
             'title'       => $title,
