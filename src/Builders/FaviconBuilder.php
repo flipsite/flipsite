@@ -25,6 +25,8 @@ class FaviconBuilder implements BuilderInterface
         if (is_string($favicon)) {
             if (str_ends_with($favicon, '.svg')) {
                 $favicon = ['svg' => $favicon];
+            } elseif (str_ends_with($favicon, '.png')) {
+                $favicon = ['png' => $favicon];
             }
         }
 
@@ -50,6 +52,15 @@ class FaviconBuilder implements BuilderInterface
             $el->setAttribute('rel', 'icon');
             $el->setAttribute('href', $image->getSrc());
             $el->setAttribute('type', 'image/svg+xml');
+            $document->getChild('head')->addChild($el);
+        }
+
+        if (isset($favicon['png'])) {
+            $image = $this->assets->getImageAttributes($favicon['png'], ['width' => 64, 'height' => 64]);
+            $el    = new Element('link', true, true);
+            $el->setAttribute('rel', 'icon');
+            $el->setAttribute('href', $image->getSrc());
+            $el->setAttribute('type', 'image/png');
             $document->getChild('head')->addChild($el);
         }
 
