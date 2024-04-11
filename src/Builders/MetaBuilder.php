@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -28,7 +27,11 @@ class MetaBuilder implements BuilderInterface
         $language = $this->path->getLanguage();
         $page     = $this->path->getPage();
         $slug     = $this->siteData->getSlugs()->getSlug($page, $language);
-        
+
+        if (!$slug) {
+            return $document;
+        }
+
         $canonical = $this->environment->getAbsoluteUrl($slug);
 
         $elements[] = $this->meta('canonical', $canonical);
@@ -64,7 +67,7 @@ class MetaBuilder implements BuilderInterface
         $elements[] = $this->og('og:description', $meta['description'] ?? null);
 
         if (isset($meta['share']) && $imageAttributes = $this->assets->getImageAttributes($meta['share'], ['width' => 1200, 'height' => 630, 'webp' => false])) {
-            $src = $imageAttributes->getSrc();
+            $src        = $imageAttributes->getSrc();
             $elements[] = $this->og('og:image', $this->environment->getAbsoluteSrc($src, true));
         }
 
@@ -79,14 +82,14 @@ class MetaBuilder implements BuilderInterface
         // App smart banner
         $appleAppId = $this->siteData->getAppleAppId();
         if ($appleAppId) {
-            $tmp = explode(',', $appleAppId);
+            $tmp   = explode(',', $appleAppId);
             $value = 'app-id='.$tmp[0];
             if (isset($tmp[1])) {
-                $value.= ', app-argument='.$tmp[1];
+                $value .= ', app-argument='.$tmp[1];
             }
             $elements[] = $this->meta('apple-itunes-app', $value);
         }
-        
+
         // Theme color
         $color = $this->siteData->getThemeColor();
         if ($color) {
@@ -94,7 +97,7 @@ class MetaBuilder implements BuilderInterface
                 $color = '['.$color.']';
             }
             $themeColor = ColorHelper::getColorString($color, $this->siteData->getColors());
-            $elements[] = $this->meta('theme-color', $themeColor); 
+            $elements[] = $this->meta('theme-color', $themeColor);
         }
 
         foreach ($elements as $el) {

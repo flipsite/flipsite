@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Flipsite\Data\Slugs;
@@ -12,8 +11,8 @@ final class Path
     /**
      * @var array<Language>
      */
-    private array $languages = [];
-    private ?string $page;
+    private array $languages  = [];
+    private ?string $page     = '404';
     private ?string $redirect = null;
 
     /**
@@ -22,7 +21,7 @@ final class Path
     public function __construct(string $path, Language $default, array $languages, Slugs $slugs)
     {
         $this->languages = $languages;
-        $all = $slugs->getAll();
+        $all             = $slugs->getAll();
         if (isset($all[$path])) {
             $this->page = $all[$path][(string)$default];
             foreach ($all[$path] as $language => $page) {
@@ -32,6 +31,7 @@ final class Path
                 }
             }
         }
+        $this->language = $languages[0];
     }
 
     public function getLanguage(): Language
