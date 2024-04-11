@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 final class Gallery extends AbstractGroup
 {
     protected string $tag   = 'div';
@@ -11,7 +13,7 @@ final class Gallery extends AbstractGroup
     {
         $repeat = [];
         if (isset($data['_repeat'])) {
-            $list = json_decode($data['_repeat'], true) ?? [];
+            $list = ArrayHelper::decodeJsonOrCsv($data['_repeat']);
             foreach ($list as $item) {
                 $repeat[] = ['image' => trim($item)];
             }
