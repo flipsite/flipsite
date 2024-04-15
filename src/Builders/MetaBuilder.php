@@ -28,7 +28,7 @@ class MetaBuilder implements BuilderInterface
         $page     = $this->path->getPage();
         $slug     = $this->siteData->getSlugs()->getSlug($page, $language);
 
-        if (!$slug) {
+        if (!$page) {
             return $document;
         }
 
