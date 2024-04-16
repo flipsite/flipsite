@@ -12,6 +12,7 @@ class IntegrationsBuilder implements BuilderInterface
     private ?string $gtm        = null;
     private ?string $ga         = null;
     private ?string $metaPixel  = null;
+    private ?string $plausible  = null;
 
     public function __construct(private bool $isLive, array $integrations)
     {
@@ -23,6 +24,9 @@ class IntegrationsBuilder implements BuilderInterface
         }
         if (isset($integrations['metaPixel'])) {
             $this->metaPixel = (string)$integrations['metaPixel'];
+        }
+        if (isset($integrations['plausibleAnalytics'])) {
+            $this->plausible = (string)$integrations['plausibleAnalytics'];
         }
     }
 
@@ -80,6 +84,16 @@ class IntegrationsBuilder implements BuilderInterface
             $noScript->setContent('<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id='.$this->metaPixel.'&ev=PageView&noscript=1"/>');
             $noScript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->addChild($noScript);
+        }
+
+        // Plausible
+        if ($this->plausible) {
+            $script = new Element('script', true);
+            $script->setAttribute('defer', true);
+            $script->setAttribute('src', 'https://plausible.io/js/script.js');
+            $script->setAttribute('data-domain', $this->plausible);
+            $script->commentOut(!$this->isLive, 'Not live environment');
+            $document->getChild('head')->prependChild($script);
         }
 
         return $document;
