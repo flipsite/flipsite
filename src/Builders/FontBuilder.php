@@ -64,13 +64,16 @@ class FontBuilder implements BuilderInterface
         if (!$fonts) {
             return null;
         }
+        foreach ($fonts as &$font) {
+            $font = $this->normalizeGoogleFont($font);
+        }
+        $fonts = $this->mergeFonts($fonts);
 
         $families = [];
         $all      = [];
         foreach ($fonts as $font) {
-            $font  = $this->normalizeGoogleFont($font);
             $param = $font['family'];
-            if (count($font['italic'])) {
+            if (isset($font['italic']) && count($font['italic'])) {
                 foreach ($font['normal'] as $w) {
                     $all[] = '0,'.$w;
                 }
@@ -104,5 +107,29 @@ class FontBuilder implements BuilderInterface
         }
         array_walk($data, 'intval');
         return $data;
+    }
+
+    private function mergeFonts(array $fonts): array
+    {
+        $mergedFonts = [];
+        foreach ($fonts as $font) {
+            if (!isset($mergedFonts[$font['family']])) {
+                $mergedFonts[$font['family']] = $font;
+            } else {
+                $mergedFont           = $mergedFonts[$font['family']];
+                $mergedFont['normal'] = array_unique(array_merge($mergedFont['normal'] ?? [], $font['normal'] ?? []));
+                $mergedFont['italic'] = array_unique(array_merge($mergedFont['italic'] ?? [], $font['italic'] ?? []));
+                sort($mergedFont['normal']);
+                sort($mergedFont['italic']);
+                if (!count($mergedFont['normal'])) {
+                    unset($mergedFont['normal']);
+                }
+                if (!count($mergedFont['italic'])) {
+                    unset($mergedFont['italic']);
+                }
+                $mergedFonts[$font['family']] = $mergedFont;
+            }
+        }
+        return array_values($mergedFonts);
     }
 }
