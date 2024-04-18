@@ -4,13 +4,16 @@ declare(strict_types=1);
 namespace Flipsite\Content;
 
 use \Flipsite\Utils\ArrayHelper;
+
 class SchemaField implements \JsonSerializable
 {
     private const TYPES = [
+        'color',
         'date',
         'email',
         'enum',
         'gallery',
+        'gradient',
         'icon',
         'image',
         'list',
@@ -24,9 +27,9 @@ class SchemaField implements \JsonSerializable
     ];
 
     private string $type;
-    private ?bool $required  = null;
-    private ?string $default = null;
-    private ?string $options = null;
+    private ?bool $required    = null;
+    private ?string $default   = null;
+    private ?string $options   = null;
     private ?bool $localizable = null;
 
     public function __construct(private string $id, private array $rawField)
@@ -50,14 +53,14 @@ class SchemaField implements \JsonSerializable
         if (!in_array($this->type, self::TYPES)) {
             throw new \Exception('Invalid field type '.$this->type);
         }
-        $this->default = $rawField['default'] ?? null;
+        $this->default  = $rawField['default'] ?? null;
         $this->required = $rawField['required'] ?? null;
         if ('enum' === $this->type) {
             if ($rawField['options']) {
                 $this->options = is_array($rawField['options']) ? json_encode($rawField['options']) : $rawField['options'];
             }
             if (!$this->default) {
-                $options = ArrayHelper::decodeJsonOrCsv($this->options);
+                $options       = ArrayHelper::decodeJsonOrCsv($this->options);
                 $this->default = $options[0] ?? null;
             }
             if (is_array($this->options)) {
@@ -70,11 +73,14 @@ class SchemaField implements \JsonSerializable
 
         $this->localizable = $rawField['localizable'] ?? false;
     }
-    public function getType() : string {
+
+    public function getType() : string
+    {
         return $this->type;
     }
 
-    public function appendDelta(array $delta) {
+    public function appendDelta(array $delta)
+    {
         if (array_key_exists('type', $delta)) {
             $this->type = $delta['type'];
             if (!in_array($this->type, self::TYPES)) {
@@ -94,13 +100,16 @@ class SchemaField implements \JsonSerializable
             $this->localizable = !!$delta['localizable'];
         }
     }
-    public function getDefault() : null|string|bool {
-        if (null === $this->default && 'enum' === $this->type) {    
+
+    public function getDefault() : null|string|bool
+    {
+        if (null === $this->default && 'enum' === $this->type) {
             $options = ArrayHelper::decodeJsonOrCsv($this->options);
             return $options[0] ?? $this->default;
         }
         return $this->default;
     }
+
     public function validate(string|bool $value) : string|bool
     {
         if ('published' === $this->type) {
