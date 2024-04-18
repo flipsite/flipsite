@@ -76,7 +76,7 @@ final class Nav extends AbstractGroup
             }
         } else {
             $parts           = explode('/', $parentPage ?? $this->path->getPage());
-            $startsWith      = implode('/', array_splice($parts, 0, $level));
+            $startsWith      = implode('/', array_splice($parts, 0, $level)).'/';
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');
                 if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level && $pageItemData = $this->getPageItemData($page)) {
