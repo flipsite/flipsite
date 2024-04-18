@@ -214,6 +214,12 @@ class ComponentBuilder
             $data['_attr']['data-scroll-progress-width'] = true;
             $this->dispatch(new Event('ready-script', 'scroll-progress', file_get_contents(__DIR__.'/../../js/ready.scroll-progress.min.js')));
         }
+        if (($style['textScale'] ?? '') === 'text-scale') {
+            $data['_attr'] ??= [];
+            $data['_attr']['data-text-scale'] = true;
+            $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/ready.text-scale.min.js')));
+        }
+        unset($style['textScale']);
         if (isset($style['background'])) {
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
