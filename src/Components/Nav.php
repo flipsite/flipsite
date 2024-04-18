@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -20,18 +19,18 @@ final class Nav extends AbstractGroup
         }
         $repeat = [];
         if (!isset($data['_options']['pages'])) {
-            $level = 0;
+            $level      = 0;
             $parentPage = $data['_options']['parentPage'] ?? null;
             if (isset($data['_repeat']) && str_starts_with($data['_repeat'], '_pages-')) {
                 $level = intval(str_replace('_pages-', '', $data['_repeat']));
             }
             $repeat = $this->getPages($level, $parentPage);
         } else {
-            $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
+            $pages  = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
             $repeat = [];
             foreach ($pages as $page) {
                 $pageItemData = $this->getPageItemData($page);
-                if ($pageItemData){
+                if ($pageItemData) {
                     $repeat[] = $pageItemData;
                 }
             }
@@ -45,11 +44,18 @@ final class Nav extends AbstractGroup
                     if (!$language->isSame($active)) {
                         $repeat[] = [
                             'slug'      => (string)$language,
-                            'name'     => $language->getInLanguage(),
+                            'name'      => $language->getInLanguage(),
                         ];
                     }
                 }
             }
+        }
+
+        if ($data['_options']['hideActive'] ?? false) {
+            $active = $this->path->getPage();
+            $repeat = array_filter($repeat, function ($item) use ($active) {
+                return $item['slug'] !== $active;
+            });
         }
 
         $data = $this->normalizeRepeat($data, $repeat);
@@ -64,7 +70,7 @@ final class Nav extends AbstractGroup
         $firstExact = false;
         if ($level === 0) {
             foreach ($all as $page) {
-                if (strpos($page,'/') === false && $pageItemData = $this->getPageItemData($page)) {
+                if (strpos($page, '/') === false && $pageItemData = $this->getPageItemData($page)) {
                     $pages[] = $pageItemData;
                 }
             }
@@ -81,7 +87,8 @@ final class Nav extends AbstractGroup
         return $pages;
     }
 
-    private function getPageItemData(string $page) : ?array {
+    private function getPageItemData(string $page) : ?array
+    {
         if (!$this->siteData->getSlugs()->isPage($page)) {
             $pattern = '/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/';
             preg_match($pattern, $page, $matches);
@@ -90,11 +97,13 @@ final class Nav extends AbstractGroup
                     'slug'  => $matches[2],
                     'name'  => $matches[1]
                 ];
-            } else return null;
+            } else {
+                return null;
+            }
             return null;
         }
         $pageMeta = $this->siteData->getPageMeta($page, $this->path->getLanguage()) ?? [];
-        
+
         if (isset($pageMeta['hidden']) && $pageMeta['hidden']) {
             return null;
         }
