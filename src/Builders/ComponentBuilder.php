@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -380,15 +381,21 @@ class ComponentBuilder
 
     public function handleBackground(AbstractElement &$element, array $style): void
     {
-        $src      = $style['src'] ?? false;
+        $src = $style['src'] ?? false;
+        if ($src && str_starts_with($src, '{') && str_ends_with($src, '}')) {
+            $src = false;
+        }
         $gradient = $this->parseThemeColors($style['gradient'] ?? '');
         $options  = $style['options'] ?? [];
         $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
         $options['webp'] ??= true;
-        $style['position'] ??= 'bg-center';
-        $style['size'] ??= 'bg-cover';
-        $style['repeat'] ??= 'bg-no-repeat';
+
+        if ($src) {
+            $style['position'] ??= 'bg-center';
+            $style['size'] ??= 'bg-cover';
+            $style['repeat'] ??= 'bg-no-repeat';
+        }
         unset($style['src'],$style['gradient'],$style['options']);
         if ($src) {
             $imageAttributes = $this->assets->getImageAttributes($src, $options);
