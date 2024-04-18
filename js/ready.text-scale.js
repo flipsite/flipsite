@@ -5,8 +5,8 @@ ready(() => {
     elements.forEach(element => {
       element.style.transform = 'scale(1)';
       const rect = element.getBoundingClientRect();
-      const parentRect = element.getBoundingClientRect();
-      const parentStyle = element.getComputedStyle();
+      const parentRect = element.parentNode.getBoundingClientRect();
+      const parentStyle = window.getComputedStyle(element.parentNode);
       const maxWidth = parentRect.width - parseFloat(parentStyle.paddingLeft) - parseFloat(parentStyle.paddingRight);
       const scale = maxWidth / rect.width;
       if (scale < 1) {
@@ -15,5 +15,8 @@ ready(() => {
     });
   }
   window.addEventListener('resize', updateScale );
+  document.fonts.ready.then(() => {
+    updateScale();
+  });
   updateScale();
 });
