@@ -283,7 +283,7 @@ class ComponentBuilder
             foreach ($matches[0] as $match) {
                 $key = trim($match, '{}');
                 if (isset($variables[$key])) {
-                    $data = str_replace($match, $variables[$key], $data);
+                    $data = str_replace($match, (string)$variables[$key], $data);
                     $found[] = $key;
                 }
             }
@@ -307,7 +307,7 @@ class ComponentBuilder
     private function handleApplyStyleData(array $style, array $variables): array
     {
         foreach ($style as $key => &$value) {
-            if (is_string($value) && strpos($key, 'Color') !== false) {
+            if (is_string($value) && (strpos($key, 'Color') !== false) || in_array($key, ['fill','gradient'])) {
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 foreach ($matches[0] as $match) {
                     $key = trim($match, '{}');
