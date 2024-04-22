@@ -32,9 +32,7 @@ abstract class AbstractRule
         $this->config        = $config;
         $this->themeSettings = $themeSettings;
         $this->callbacks     = $callbacks;
-        if (count($args)) {
-            $this->process($args);
-        }
+        $this->process($args);
     }
 
     public function getDeclarations(): string

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style\Callbacks;
 
 class ResponsiveSizeCallback
@@ -16,6 +17,9 @@ class ResponsiveSizeCallback
             array_pop($args);
             $multiplier = array_pop($args);
         }
+        if (!isset($args[0])) {
+            return null;
+        }
 
         $screens = array_keys($this->screens);
         $tmp     = explode('|', $args[0]);
@@ -28,11 +32,11 @@ class ResponsiveSizeCallback
         }
 
         $minScreenPx = floatval($this->screens[$args[0]]);
-        $minSizePx   = floatval($this->getPx($args[1]))*$multiplier;
+        $minSizePx   = floatval($this->getPx($args[1])) * $multiplier;
         $maxScreenPx = floatval($this->screens[$args[2]]);
-        $maxSizePx   = floatval($this->getPx($args[3]))*$multiplier;
-        $minSizeRem  = $minSizePx / 16.0*$multiplier;
-        $maxSizeRem  = $maxSizePx / 16.0*$multiplier;
+        $maxSizePx   = floatval($this->getPx($args[3])) * $multiplier;
+        $minSizeRem  = $minSizePx / 16.0 * $multiplier;
+        $maxSizeRem  = $maxSizePx / 16.0 * $multiplier;
 
         if (!$this->isCssMathFunctionsSupported) {
             return ($minSizeRem + 0.5 * ($maxSizeRem - $minSizeRem)) . 'rem';

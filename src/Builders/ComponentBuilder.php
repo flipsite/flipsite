@@ -109,7 +109,7 @@ class ComponentBuilder
 
         $found = [];
         $data = $this->handleApplyData($data, $options['parentDataSource'], $found);
-        $style = $this->handleApplyData($style, $options['parentDataSource'], $found);
+        //$style = $this->handleApplyData($style, $options['parentDataSource'], $found);
         if (false !== array_search('{copyright.year}', $found)) {
             $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/ready.copyright.min.js')));
         }
@@ -276,6 +276,9 @@ class ComponentBuilder
             if (is_string($data)) {
                 $data = str_replace($variable, (string)$replaceWith, $data);
             } elseif (is_array($data)) {
+                if (isset($data['src']) && is_string($data['src'])) {
+                    $data['src'] = str_replace($variable, (string)$replaceWith, $data['src']);
+                }
                 foreach ($data as $dataKey => &$dataVal) {
                     if (is_string($dataVal)) {
                         $before = $dataVal;
@@ -286,6 +289,7 @@ class ComponentBuilder
                     } elseif (is_array($dataVal)) {
                         $parts = explode(':', $dataKey);
                         $componentType = $parts[0];
+                        //echo $componentType;
                         //print_r($dataVal);
                         if (!$this->isContainer($componentType)) {
                             $dataVal = $this->handleApplyData($dataVal, $variables, $found);

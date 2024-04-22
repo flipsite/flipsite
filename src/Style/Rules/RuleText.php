@@ -13,7 +13,7 @@ final class RuleText extends AbstractRule
      */
     protected function process(array $args): void
     {
-        if ('transparent' === $args[0]) {
+        if ('transparent' === ($args[0] ?? '')) {
             $this->setDeclaration('color', 'transparent');
             return;
         }
