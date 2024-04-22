@@ -30,7 +30,6 @@ class ComponentBuilder
     public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path)
     {
         $this->assets = new Assets($environment->getAssetSources());
-        // $this->slugs = $reader->getSlugs();
     }
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
@@ -100,12 +99,19 @@ class ComponentBuilder
             unset($style['type'],$style['section']);
         }
 
-        if (isset($data['_dataSource']) && is_array($data['_dataSource'])) {
-            $data = DataHelper::applyData($data, $data['_dataSource'], '_dataSource');
-        } elseif (isset($data['_dataSource']) && is_string($data['_dataSource'])) {
-            $dataSource          = $this->getDataSource($data['_dataSource']);
-            $data['_dataSource'] = [];
-            $data                = DataHelper::applyData($data, $dataSource, '_dataSource');
+        if (isset($data['_dataSource'])) {
+            $dataSource = is_array($data['_dataSource']) ? $data['_dataSource'] : $this->getDataSource($data['_dataSource']);
+            unset($data['_dataSource']);
+            foreach ($dataSource as $key => $value) {
+                $options['parentDataSource'][$key] = $value;
+            }
+        }
+
+        $found = [];
+        $data = $this->handleApplyData($data, $options['parentDataSource'], $found);
+        $style = $this->handleApplyData($style, $options['parentDataSource'], $found);
+        if (false !== array_search('{copyright.year}', $found)) {
+            $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/ready.copyright.min.js')));
         }
 
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
@@ -261,6 +267,38 @@ class ComponentBuilder
                 $this->dispatch(new Event('ready-script', $id, file_get_contents($filepath)));
             }
         }
+    }
+
+    private function handleApplyData(array|string $data, array $variables, array &$found): array|string
+    {
+        foreach ($variables as $variable => $replaceWith) {
+            $variable = '{' . $variable . '}';
+            if (is_string($data)) {
+                $data = str_replace($variable, (string)$replaceWith, $data);
+            } elseif (is_array($data)) {
+                foreach ($data as $dataKey => &$dataVal) {
+                    if (is_string($dataVal)) {
+                        $before = $dataVal;
+                        $dataVal = str_replace($variable, (string)$replaceWith, (string)$dataVal);
+                        if ($before !== $dataVal) {
+                            $found[] = $variable;
+                        }
+                    } elseif (is_array($dataVal)) {
+                        $parts = explode(':', $dataKey);
+                        $componentType = $parts[0];
+                        //print_r($dataVal);
+                        if (!$this->isContainer($componentType)) {
+                            $dataVal = $this->handleApplyData($dataVal, $variables, $found);
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+    private function isContainer(string $type): bool
+    {
+        return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question','nav','social']);
     }
 
     private function handleStyleStates(array $style, array $states)

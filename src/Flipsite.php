@@ -86,13 +86,15 @@ final class Flipsite
             $sections = $this->siteData->getSections($path->getPage(), $path->getLanguage());
         }
 
-        $sections = $this->addGlobalVars($sections, $scriptBuilder, $this->siteData->getSocial());
+        $globalVars = $this->getGlobalVars($this->siteData->getSocial());
 
         foreach ($sections as $sectionId => $sectionData) {
             if ($this->plugins) {
                 $sectionData = $this->plugins->run('section', $sectionData);
             }
-            $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => $appearance]);
+            $parentDataSource = array_merge($sectionData['_pageDataSource'] ?? [], $globalVars);
+            unset($sectionData['_pageDataSource']);
+            $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => $appearance, 'parentDataSource' => $parentDataSource]);
             $document->getChild('body')->addChild($section);
         }
 
@@ -191,29 +193,15 @@ final class Flipsite
         return $htmlMin->minify($html);
     }
 
-    private function addGlobalVars(array $sections, ScriptBuilder $scriptBuilder, ?array $social): array
+    private function getGlobalVars(?array $social): array
     {
-        foreach ($sections as $attr => &$value) {
-            if (is_array($value)) {
-                $value = $this->addGlobalVars($value, $scriptBuilder, $social);
-            } elseif (is_string($value)) {
-                if (strpos($value, '{site.name}') !== false) {
-                    $value = str_replace('{site.name}', $this->siteData->getName(), $value);
-                }
-                if (strpos($value, '{social.') !== false) {
-                    foreach ($social as $type => $handle) {
-                        $needle = '{social.'.$type.'}';
-                        if (strpos($value, $needle) !== false) {
-                            $value = str_replace($needle, $handle, $value);
-                        }
-                    }
-                }
-                if (strpos($value, '{copyright.year}') !== false) {
-                    $scriptBuilder->handleEvent(new \Flipsite\Builders\Event('ready-script', 'copyright', file_get_contents(__DIR__ . '/../js/ready.copyright.min.js')));
-                    $value = str_replace('{copyright.year}', '<span data-copyright>' . date('Y') . '</span>', $value);
-                }
-            }
+        $globalVars = [
+            'site.name' => $this->siteData->getName(),
+            'copyright.year' => '<span data-copyright>' . date('Y') . '</span>'
+        ];
+        foreach ($social as $type => $handle) {
+            $globalVars['social.'.$type] = $handle;
         }
-        return $sections;
+        return $globalVars;
     }
 }

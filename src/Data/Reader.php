@@ -458,7 +458,7 @@ final class Reader implements SiteDataInterface
                         }
                         $pageSections = $sections ?? [];
                         foreach ($pageSections as &$pageSection) {
-                            $pageSection['_dataSource'] = $pageDataItem;
+                            $pageSection['_pageDataSource'] = $pageDataItem;
                         }
                         $expandedPages[$expandedPage] = $pageSections;
                         if (isset($meta[$page])) {
