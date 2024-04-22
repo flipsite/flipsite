@@ -67,12 +67,6 @@ class ComponentBuilder
         if ($data['_options']['hidden'] ?? false) {
             return null;
         }
-        if (isset($data['_options']['render'])) {
-            if (!$this->handleRenderOptions($data['_options']['render'])) {
-                return null;
-            }
-            unset($data['_options']['render']);
-        }
 
         if (is_array($data) && isset($data['_style'])) {
             // If string, => inherit
@@ -109,8 +103,14 @@ class ComponentBuilder
 
         $found = [];
         $data = $this->handleApplyData($data, $options['parentDataSource'], $found);
-        //$style = $this->handleApplyData($style, $options['parentDataSource'], $found);
-        if (false !== array_search('{copyright.year}', $found)) {
+        if (isset($data['_options']['render'])) {
+            if (!$this->handleRenderOptions($data['_options']['render'])) {
+                return null;
+            }
+            unset($data['_options']['render']);
+        }
+
+        if (false !== array_search('copyright.year', $found)) {
             $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/ready.copyright.min.js')));
         }
 
@@ -237,6 +237,9 @@ class ComponentBuilder
             }
             unset($data['_attr']);
         }
+
+        $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
+
         $component->build($data, $style ?? [], $options);
         return $component;
     }
@@ -269,36 +272,52 @@ class ComponentBuilder
         }
     }
 
-    private function handleApplyData(array|string $data, array $variables, array &$found): array|string
+    private function handleApplyData(array|string $data, array $variables, array &$found, bool $checkIfContainer = true): array|string
     {
-        foreach ($variables as $variable => $replaceWith) {
-            $variable = '{' . $variable . '}';
-            if (is_string($data)) {
-                $data = str_replace($variable, (string)$replaceWith, $data);
-            } elseif (is_array($data)) {
-                if (isset($data['src']) && is_string($data['src'])) {
-                    $data['src'] = str_replace($variable, (string)$replaceWith, $data['src']);
+        if (is_string($data)) {
+            if (strpos($data, '{') === false) {
+                return $data;
+            }
+            $matches = [];
+            preg_match_all('/\{[^{}]+\}/', $data, $matches);
+            foreach ($matches[0] as $match) {
+                $key = trim($match, '{}');
+                if (isset($variables[$key])) {
+                    $data = str_replace($match, $variables[$key], $data);
+                    $found[] = $key;
                 }
-                foreach ($data as $dataKey => &$dataVal) {
-                    if (is_string($dataVal)) {
-                        $before = $dataVal;
-                        $dataVal = str_replace($variable, (string)$replaceWith, (string)$dataVal);
-                        if ($before !== $dataVal) {
-                            $found[] = $variable;
-                        }
-                    } elseif (is_array($dataVal)) {
-                        $parts = explode(':', $dataKey);
-                        $componentType = $parts[0];
-                        //echo $componentType;
-                        //print_r($dataVal);
-                        if (!$this->isContainer($componentType)) {
-                            $dataVal = $this->handleApplyData($dataVal, $variables, $found);
-                        }
+            }
+            return $data;
+        } elseif (is_array($data)) {
+            foreach ($data as $key => &$value) {
+                if (is_string($value)) {
+                    $value = $this->handleApplyData($value, $variables, $found);
+                } elseif (is_array($value)) {
+                    $parts = explode(':', $key);
+                    $componentType = $parts[0];
+                    if (!$checkIfContainer || !$this->isContainer($componentType)) {
+
+                        $value = $this->handleApplyData($value, $variables, $found, false);
                     }
                 }
             }
         }
         return $data;
+    }
+    private function handleApplyStyleData(array $style, array $variables): array
+    {
+        foreach ($style as $key => &$value) {
+            if (is_string($value) && strpos($key, 'Color') !== false) {
+                preg_match_all('/\{[^{}]+\}/', $value, $matches);
+                foreach ($matches[0] as $match) {
+                    $key = trim($match, '{}');
+                    if (isset($variables[$key])) {
+                        $value = str_replace($match, $variables[$key], $value);
+                    }
+                }
+            }
+        }
+        return $style;
     }
     private function isContainer(string $type): bool
     {
