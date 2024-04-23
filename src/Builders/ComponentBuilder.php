@@ -307,7 +307,8 @@ class ComponentBuilder
     private function handleApplyStyleData(array $style, array $variables): array
     {
         foreach ($style as $key => &$value) {
-            if (is_string($value) && (strpos($key, 'Color') !== false) || in_array($key, ['fill', 'gradient'])) {
+            if (is_string($value) && in_array($key, ['textColor', 'borderColor', 'fill', 'gradient', 'color'])) {
+                $matches = [];
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 foreach ($matches[0] as $match) {
                     $key = trim($match, '{}');
