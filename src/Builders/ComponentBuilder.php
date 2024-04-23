@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -13,7 +12,6 @@ use Flipsite\Data\Slugs;
 use Flipsite\EnvironmentInterface;
 use Flipsite\Assets\Assets;
 use Flipsite\Utils\ArrayHelper;
-use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Encoders\StyleInt;
@@ -102,7 +100,7 @@ class ComponentBuilder
         }
 
         $found = [];
-        $data = $this->handleApplyData($data, $options['parentDataSource'], $found);
+        $data  = $this->handleApplyData($data, $options['parentDataSource'], $found);
         if (isset($data['_options']['render'])) {
             if (!$this->handleRenderOptions($data['_options']['render'])) {
                 return null;
@@ -205,6 +203,9 @@ class ComponentBuilder
             }
             unset($data['_attr']['_data']);
         }
+
+        $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
+
         if (isset($style['tag'])) {
             $component->setTag($style['tag']);
             unset($style['tag']);
@@ -228,6 +229,7 @@ class ComponentBuilder
         }
         unset($style['textScale']);
         if (isset($style['background'])) {
+            $style['background'] = $this->handleApplyStyleData($style['background'], $options['parentDataSource']);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
@@ -237,8 +239,6 @@ class ComponentBuilder
             }
             unset($data['_attr']);
         }
-
-        $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
 
         $component->build($data, $style ?? [], $options);
         return $component;
@@ -283,7 +283,7 @@ class ComponentBuilder
             foreach ($matches[0] as $match) {
                 $key = trim($match, '{}');
                 if (isset($variables[$key])) {
-                    $data = str_replace($match, (string)$variables[$key], $data);
+                    $data    = str_replace($match, (string)$variables[$key], $data);
                     $found[] = $key;
                 }
             }
@@ -293,10 +293,9 @@ class ComponentBuilder
                 if (is_string($value)) {
                     $value = $this->handleApplyData($value, $variables, $found);
                 } elseif (is_array($value)) {
-                    $parts = explode(':', $key);
+                    $parts         = explode(':', $key);
                     $componentType = $parts[0];
                     if (!$checkIfContainer || !$this->isContainer($componentType)) {
-
                         $value = $this->handleApplyData($value, $variables, $found, false);
                     }
                 }
@@ -304,10 +303,11 @@ class ComponentBuilder
         }
         return $data;
     }
+
     private function handleApplyStyleData(array $style, array $variables): array
     {
         foreach ($style as $key => &$value) {
-            if (is_string($value) && (strpos($key, 'Color') !== false) || in_array($key, ['fill','gradient'])) {
+            if (is_string($value) && (strpos($key, 'Color') !== false) || in_array($key, ['fill', 'gradient'])) {
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 foreach ($matches[0] as $match) {
                     $key = trim($match, '{}');
@@ -319,9 +319,10 @@ class ComponentBuilder
         }
         return $style;
     }
+
     private function isContainer(string $type): bool
     {
-        return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question','nav','social']);
+        return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question', 'nav', 'social']);
     }
 
     private function handleStyleStates(array $style, array $states)
