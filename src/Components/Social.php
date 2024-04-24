@@ -90,7 +90,8 @@ final class Social extends AbstractGroup
             if ($phoneFormat && 'phone' === $type) {
                 $item['name'] = $this->getFormattedPhoneNumber($handle, $phoneFormat);
             }
-            $items[] = $item;
+            $item['color'] = '['.$item['color'].']';
+            $items[]       = $item;
         }
 
         return $items;

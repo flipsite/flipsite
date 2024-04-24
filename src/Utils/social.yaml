@@ -1,12 +1,12 @@
 ---
 discord:
   name: Discord
-  color: "#7289d9"
+  color: "#5865F2"
   icon: simple-icons/discord.svg
-  url: '{handle}'
+  url: "{handle}"
 facebook:
   name: Facebook
-  color: "#4172B8"
+  color: "#0866FF"
   icon: simple-icons/facebook.svg
   url: https://facebook.com/{handle}
 github:
@@ -16,7 +16,7 @@ github:
   url: https://github.com/{handle}
 linkedin:
   name: LinkedIn
-  color: "#0077B5"
+  color: "#0A66C2"
   icon: simple-icons/linkedin.svg
   url: https://linkedin.com/{handle}
 instagram:
@@ -33,7 +33,7 @@ maps:
   name: Google Maps
   color: "#4285F4"
   icon: zondicons/location.svg
-  url: '{handle}'
+  url: "{handle}"
 messenger:
   name: Messenger
   color: "#00B2FF"
@@ -41,7 +41,7 @@ messenger:
   url: https://www.messenger.com/t/{handle}
 phone:
   name: Phone
-  color: "#5ec640"
+  color: "#34DA50"
   icon: zondicons/phone.svg
   url: tel:{handle}
 pinterest:
