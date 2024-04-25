@@ -20,6 +20,15 @@ ready(() => {
     }
   }
 
+  const getStyle = (style) => {
+    let clonedStyle = {};
+    for (let i = 0; i < style.length; i++) {
+      const propertyName = style[i];
+      const propertyValue = style.getPropertyValue(propertyName);
+      clonedStyle[propertyName] = propertyValue;
+    }
+    return clonedStyle;
+  }
   const getDiff = (offscreen, onscreen) => {
     const diff = {};
     const regex = /^[0-9]+|^webkit/i;
@@ -60,10 +69,12 @@ ready(() => {
         rp: el.hasAttribute('data-replay')
       });
     } else {
-      const offscreenStyle = JSON.parse(JSON.stringify(window.getComputedStyle(el)));
+      const offscreenStyle = getStyle(window.getComputedStyle(el));
       el.classList.remove(...offscreenClasses);
-      const onscreenStyle = JSON.parse(JSON.stringify(window.getComputedStyle(el)));
+      const onscreenStyle = getStyle(window.getComputedStyle(el));
       el.classList.add(...offscreenClasses);
+      
+      console.log(offscreenStyle.transform)
       scrollAnimations.push({
         el: el,         
         tr: getTrigger(el),
