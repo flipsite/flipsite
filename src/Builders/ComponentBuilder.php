@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -100,12 +101,14 @@ class ComponentBuilder
         }
 
         $found = [];
-        $data  = $this->handleApplyData($data, $options['parentDataSource'], $found);
-        if (isset($data['_options']['render'])) {
-            if (!$this->handleRenderOptions($data['_options']['render'])) {
-                return null;
+        if (is_string($data) || is_array($data)) {
+            $data  = $this->handleApplyData($data, $options['parentDataSource'], $found);
+            if (isset($data['_options']['render'])) {
+                if (!$this->handleRenderOptions($data['_options']['render'])) {
+                    return null;
+                }
+                unset($data['_options']['render']);
             }
-            unset($data['_options']['render']);
         }
 
         if (false !== array_search('copyright.year', $found)) {
