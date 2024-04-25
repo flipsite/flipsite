@@ -448,6 +448,13 @@ class ComponentBuilder
         if ($src && str_starts_with($src, '{') && str_ends_with($src, '}')) {
             $src = false;
         }
+        if (isset($style['gradient']) && str_starts_with($style['gradient'], '{') && str_ends_with($style['gradient'], '}')) {
+            unset($style['gradient']);
+        }
+        if (isset($style['color']) && str_starts_with($style['color'], 'bg-{') && str_ends_with($style['color'], '}')) {
+            unset($style['color']);
+        }
+
         $gradient = $this->parseThemeColors($style['gradient'] ?? '');
         $options  = $style['options'] ?? [];
         $options['width'] ??= 512;
