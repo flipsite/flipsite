@@ -110,6 +110,11 @@ class SchemaField implements \JsonSerializable
         return $this->default;
     }
 
+    public function isRequired() : bool
+    {
+        return $this->required ?? false;
+    }
+
     public function validate(string|bool $value) : string|bool
     {
         if ('published' === $this->type) {

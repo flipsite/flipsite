@@ -35,7 +35,7 @@ class Collection implements \JsonSerializable
         $publishedFieldId = $this->schema->getPublishedField();
 
         if ($onlyPublished && $publishedFieldId) {
-            return array_filter($this->items, function ($item) use ($publishedFieldId){
+            return array_filter($this->items, function ($item) use ($publishedFieldId) {
                 return !!$item->get($publishedFieldId);
             });
         }
@@ -66,7 +66,7 @@ class Collection implements \JsonSerializable
         $this->schema->addField($rawField);
         foreach ($this->items as &$item) {
             $item->setSchema($this->schema);
-            $item->applyDelta([]);
+            $item->applyDelta([], true);
         }
         return true;
     }
@@ -82,7 +82,7 @@ class Collection implements \JsonSerializable
                 $item->renameField($fieldId, $newFieldName);
             }
             $item->setSchema($this->schema);
-            $item->applyDelta([]);
+            $item->applyDelta([], true);
         }
         return true;
     }

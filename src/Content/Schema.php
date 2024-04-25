@@ -63,13 +63,13 @@ class Schema implements \JsonSerializable
         return false;
     }
 
-    public function validate(array $rawData) : array
+    public function validate(array $rawData, bool $setDefault = false) : array
     {
         $data = [];
         foreach ($this->fields as $field => $schemaField) {
-            if (!array_key_exists($field, $rawData)) {
+            if (!array_key_exists($field, $rawData) && ($schemaField->isRequired() || $setDefault)) {
                 $data[$field] = $schemaField->getDefault();
-            } elseif ($rawData[$field] !== null) {
+            } elseif (isset($rawData[$field]) && $rawData[$field] !== null) {
                 $data[$field] = $schemaField->validate($rawData[$field]);
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
+
 class Item implements \JsonSerializable
 {
     private int $id;
@@ -33,10 +34,10 @@ class Item implements \JsonSerializable
         $this->schema = $schema;
     }
 
-    public function applyDelta(array $delta)
+    public function applyDelta(array $delta, bool $setDefault = false)
     {
-        $dataWithDelta = ArrayHelper::merge($this->data, $delta);   
-        $this->data = $this->schema->validate($dataWithDelta);
+        $dataWithDelta = ArrayHelper::merge($this->data, $delta);
+        $this->data    = $this->schema->validate($dataWithDelta, $setDefault);
     }
 
     public function get(string $field) : mixed
