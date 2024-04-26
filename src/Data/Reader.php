@@ -85,7 +85,8 @@ final class Reader implements SiteDataInterface
 
     public function getModifiedTimestamp(): int
     {
-        return filemtime($this->siteDir);
+        $res = \Flipsite\Utils\FileHelper::getMostRecentlyModifiedFile($this->siteDir);
+        return $res['modificationTime'];
     }
 
     public function getCode(string $position, string $page, bool $fallback): ?string
