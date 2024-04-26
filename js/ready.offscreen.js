@@ -1,11 +1,6 @@
 ready(() => {
   const elements = document.querySelectorAll('[class*="offscreen:"]');
   if (!elements) return;
-  // const getProgress = (start, end, progress) => {
-  //   return start.map((value, index) => {
-  //     return value + (end[index] - value) * progress;
-  //   });
-  // }
   const getTrigger = (element) => {
     const trigger = element.getAttribute('data-trigger');
     switch(trigger) {
@@ -16,6 +11,8 @@ ready(() => {
           element = element.parentNode;
         }
         return element;
+      case 'body':
+        return document.body;
       default: return element;
     }
   }
@@ -55,16 +52,20 @@ ready(() => {
 
   let appearAnimations = [];
   let scrollAnimations = [];
-
   elements.forEach((el)=> {
     const isScrollTransform = el.hasAttribute('data-scroll-transform');
     const offscreenClasses = [...el.classList].filter(className => className.startsWith('offscreen'));
+    const event = el.getAttribute('data-event') || 'enter';
     if (!isScrollTransform) {
+      if ('exit' === event) {
+        el.classList.remove(...offscreenClasses);
+      }
       appearAnimations.push({
-        el: el,         
+        el: el,
+        ev: event,
         tr: getTrigger(el),
-        sp: parseFloat(el.getAttribute('data-start') || 0)/100.0,
-        ep: parseFloat(el.getAttribute('data-end') || 100)/100.0,
+        sp: el.getAttribute('data-start') || '0%',
+        ep: el.getAttribute('data-end') || '100%',
         of: offscreenClasses,
         rp: el.hasAttribute('data-replay')
       });
@@ -72,15 +73,16 @@ ready(() => {
       const offscreenStyle = getStyle(window.getComputedStyle(el));
       el.classList.remove(...offscreenClasses);
       const onscreenStyle = getStyle(window.getComputedStyle(el));
-      el.classList.add(...offscreenClasses);
-      
-      console.log(offscreenStyle.transform)
+      if('enter' === event) {
+        el.classList.add(...offscreenClasses);
+      }
       scrollAnimations.push({
-        el: el,         
+        el: el,
+        ev: event,
         tr: getTrigger(el),
-        sp: parseFloat(el.getAttribute('data-start') || 0)/100.0,
-        ep: parseFloat(el.getAttribute('data-end') || 100)/100.0,
-        di: getDiff(offscreenStyle, onscreenStyle),
+        sp: el.getAttribute('data-start') || '0%',
+        ep: el.getAttribute('data-end') || '100%',
+        di: 'enter' === event ? getDiff(offscreenStyle, onscreenStyle) : getDiff(onscreenStyle, offscreenStyle),
         rp: el.hasAttribute('data-replay'),
         lp: 0
       });
@@ -88,49 +90,32 @@ ready(() => {
     return;
   });
     
-  //   const offscreenStyle = window.getComputedStyle(el);
-  //   // Loop through the properties of the computed styles
-  //   for (let i = 0; i < offscreenStyle.length; i++) {
-  //     const propertyName = offscreenStyle[i];
-  //     const propertyValue = offscreenStyle.getPropertyValue(propertyName);
-  //     console.log(propertyName + ': ' + propertyValue);
-  //   }
-
-    
-  //   const is3d = offscreenStyle.transform.startsWith('matrix3d');
-  //   const offscreen = {
-  //     transform: offscreenStyle.transform.slice(is3d ? 9 : 7, -1).split(', ').map(parseFloat),
-  //     opacity: parseFloat(offscreenStyle.opacity),
-  //   }
-  //   el.classList.remove(...offscreenClasses);
-  //   const onscreenStyle = window.getComputedStyle(el);
-  //   animations.push({
-  //     element: el,
-  //     trigger: getTrigger(el),
-  //     startProgress: parseFloat(el.getAttribute('data-start') || 0),
-  //     endProgress: parseFloat(el.getAttribute('data-end') || 1),
-  //     offscreenClasses: offscreenClasses,
-  //     offscreen: offscreen,
-  //     onscreen:{
-  //       transform: onscreenStyle.transform.slice(is3d ? 9 : 7, -1).split(', ').map(parseFloat),
-  //       opacity: parseFloat(onscreenStyle.opacity),
-  //     },
-  //   });
-  //   el.classList.add(...offscreenClasses);
-  // });
-
   const getOffsetTop = (element) => {
     let offsetTop  = 0;
-    do{ offsetTop  += element.offsetTop;
+    do{ offsetTop  += parseInt(element.offsetTop);
         element = element.offsetParent;
     } while( element );
     return offsetTop;
   }
-  const getProgress = (element, startProgress, endProgress) => {
-    const rect = element.getBoundingClientRect();
-    const pixelsAboveBottom = window.innerHeight+window.scrollY-getOffsetTop(element)
-    const percentageOverBottom = Math.min(pixelsAboveBottom/element.clientHeight,1.0);
-    return percentageOverBottom < startProgress ? 0 : percentageOverBottom > endProgress ? 1 : (percentageOverBottom-startProgress)/(endProgress-startProgress);
+  // Returns progress in percentage value 0...1
+  const getProgress = (element, event, startProgress, endProgress) => {
+    if (startProgress.indexOf('px') !== -1) {
+      startProgress = parseFloat(startProgress)/element.offsetHeight;
+    } else startProgress = parseFloat(startProgress)/100;
+    if (endProgress.indexOf('px') !== -1) {
+      endProgress = parseFloat(endProgress)/element.offsetHeight;
+    } else endProgress = parseFloat(endProgress)/100;
+    const offsetTop = getOffsetTop(element);
+    if ('enter' === event) {
+      const pixelsAboveBottom = window.innerHeight+window.scrollY-offsetTop
+      const percentageOverBottom = Math.min(pixelsAboveBottom/element.clientHeight,1.0);
+      return percentageOverBottom < startProgress ? 0 : percentageOverBottom > endProgress ? 1 : (percentageOverBottom-startProgress)/(endProgress-startProgress);
+    } else if ('exit' === event) {
+      const pixelsAboveTop = window.scrollY-offsetTop
+      const percentagAboveTop = Math.min(pixelsAboveTop/element.clientHeight,1.0);
+      return percentagAboveTop < startProgress ? 0 : percentagAboveTop > endProgress ? 1 : (percentagAboveTop-startProgress)/(endProgress-startProgress);
+    }
+    else return 1
   }
   const setProgress = (element, diff, progress) => {
     for (let propertyName in diff) {
@@ -148,16 +133,16 @@ ready(() => {
 
   const updateAnimations = () => { 
     appearAnimations.forEach(anim => {
-      const progress = getProgress(anim.tr, anim.sp, anim.ep);
+      const progress = getProgress(anim.tr, anim.ev, anim.sp, anim.ep);
       if (progress) {
-        anim.el.classList.remove(...anim.of);
+        'enter' === anim.ev ? anim.el.classList.remove(...anim.of) : anim.el.classList.add(...anim.of);
         anim.remove = !anim.rp;
       } else if (anim.rp) {
-        anim.el.classList.add(...anim.of);
+        'enter' === anim.ev ? anim.el.classList.add(...anim.of) : anim.el.classList.remove(...anim.of);
       }
     });
     scrollAnimations.forEach(anim => {
-      const progress = getProgress(anim.tr, anim.sp, anim.ep);
+      const progress = getProgress(anim.tr, anim.ev, anim.sp, anim.ep);
       if (!anim.rp && progress < anim.lp) {
         return;
       }
@@ -172,23 +157,6 @@ ready(() => {
       window.removeEventListener('scroll', updateAnimations );
     }
     return;
-
-    animations.forEach(anim => {
-      const rect = anim.trigger.getBoundingClientRect();
-      const pixelsAboveBottom = window.innerHeight+window.scrollY-getOffsetTop(anim.trigger)
-      const percentageOverBottom = Math.min(pixelsAboveBottom/anim.trigger.clientHeight,1.0);
-      const progress = percentageOverBottom < anim.startProgress ? 0 : percentageOverBottom > anim.endProgress ? 1 : (percentageOverBottom-anim.startProgress)/(anim.endProgress-anim.startProgress);
-
-      if (percentageOverBottom > 0.2) {
-        anim.element.classList.remove(...anim.offscreenClasses);
-      } else {
-        anim.element.classList.add(...anim.offscreenClasses);
-      }
-
-      // Scroll transform
-      //anim.element.style.transform = 'matrix'+(anim.onscreen.transform.length > 6 ? '3d' : '')+'('+getProgress(anim.offscreen.transform,anim.onscreen.transform,progress).join(', ')+')';
-      //anim.element.style.opacity = getProgress([anim.offscreen.opacity],[anim.onscreen.opacity],progress)[0];
-    });
   };
   window.addEventListener('scroll', updateAnimations );
   updateAnimations();
