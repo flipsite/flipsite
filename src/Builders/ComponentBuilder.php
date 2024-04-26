@@ -276,8 +276,11 @@ class ComponentBuilder
         }
     }
 
-    private function handleApplyData(array|string $data, array $variables, array &$found, bool $checkIfContainer = true): array|string
+    private function handleApplyData(array|string $data, ?array $variables, array &$found, bool $checkIfContainer = true): array|string
     {
+        if (null === $variables) {
+            return $data;
+        }
         if (is_string($data)) {
             if (strpos($data, '{') === false) {
                 return $data;
