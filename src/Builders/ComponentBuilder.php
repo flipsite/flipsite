@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -101,7 +100,7 @@ class ComponentBuilder
         }
 
         $found = [];
-        if (is_string($data) || is_array($data)) {
+        if (isset($options['parentDataSource']) && (is_string($data) || is_array($data))) {
             $data  = $this->handleApplyData($data, $options['parentDataSource'], $found);
             if (isset($data['_options']['render'])) {
                 if (!$this->handleRenderOptions($data['_options']['render'])) {
@@ -207,7 +206,9 @@ class ComponentBuilder
             unset($data['_attr']['_data']);
         }
 
-        $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
+        if (isset($options['parentDataSource'])) {
+            $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
+        }
 
         if (isset($style['tag'])) {
             $component->setTag($style['tag']);
