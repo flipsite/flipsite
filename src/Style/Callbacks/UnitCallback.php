@@ -33,12 +33,10 @@ class UnitCallback
         }
         if (str_starts_with($args[0], '[') && str_ends_with($args[0], ']')) {
             $value = substr($args[0], 1, strlen($args[0]) - 2);
-            foreach (self::UNITS as $unit) {
-                if (false !== mb_strpos($value, $unit)) {
-                    $value = floatval(str_replace($unit, '', $value));
-                    $value *= $multiplier;
-                    return $value.$unit;
-                }
+            $unit = preg_replace('/[0-9]+/', '', $value);
+            $value = floatval(str_replace($unit, '', $value));
+            if (in_array($unit, self::UNITS)) {
+                return $value.$unit;
             }
         }
         return null;
