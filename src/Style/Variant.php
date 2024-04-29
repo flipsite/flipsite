@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Style\Variants\AbstractType;
@@ -34,7 +33,7 @@ class Variant
         $this->classes[] = $class;
     }
 
-    public function getCss(): string
+    public function getCss(array &$added): string
     {
         $css          = '';
         $mediaQueries = [];
@@ -56,7 +55,7 @@ class Variant
         if (count($mediaQueries)) {
             $css .= '@media'.$mediaQueries[0].'{';
         }
-        $css .= $this->getRulesets($parent, $prefix, $pseudo);
+        $css .= $this->getRulesets($parent, $prefix, $pseudo, $added);
         if (count($mediaQueries)) {
             $css .= '}';
         }
@@ -69,12 +68,12 @@ class Variant
         return !isset($this->types[0]) ? 100 : $this->types[0]->order();
     }
 
-    protected function getRulesets(string $parent, string $prefix, string $pseudo): string
+    protected function getRulesets(string $parent, string $prefix, string $pseudo, array &$added): string
     {
         $rulesets = [];
-        $escape = ['/', '.', '|', '#', '[', ']','%'];
+        $escape   = ['/', '.', '|', '#', '[', ']', '%'];
         foreach ($this->classes as $class) {
-            $css = '';
+            $css   = '';
             $order = 100;
             $rules = $this->tailwind->getRules($class);
             if (null === $rules) {
@@ -84,8 +83,8 @@ class Variant
             if (!is_string($rules)) {
                 $childCombinator = $rules->getChildCombinator();
                 $pseudoElement   = $rules->getPseudoElement();
-                $order = $rules->getOrder();
-                $rules = $rules->getDeclarations();
+                $order           = $rules->getOrder();
+                $rules           = $rules->getDeclarations();
             }
 
             if ($parent) {
@@ -105,10 +104,15 @@ class Variant
             if (null !== $childCombinator) {
                 $css .= '>'.$childCombinator;
             }
+
+            if (isset($added[$css])) {
+                continue;
+            }
+            $added[$css] = true;
             $css .= '{'.$rules.'}';
 
             $rulesets[$order] ??= '';
-            $rulesets[$order].= $css;
+            $rulesets[$order] .= $css;
         }
         ksort($rulesets);
         return implode('', $rulesets);

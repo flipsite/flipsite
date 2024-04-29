@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -13,11 +12,10 @@ use Flipsite\Style\Tailwind;
 use Flipsite\Style\Callbacks\UnitCallback;
 use Flipsite\Style\Callbacks\ScreenWidthCallback;
 use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
-use Flipsite\Builders\EventListenerInterface;
 
 class StyleBuilder implements BuilderInterface
 {
-    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses)
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false)
     {
     }
 
@@ -29,13 +27,12 @@ class StyleBuilder implements BuilderInterface
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
 
-
-        $prefixNeedingScript = ['scroll','stuck','offscreen'];
+        $prefixNeedingScript = ['stuck', 'offscreen'];
         foreach ($classes as $class) {
             if (strpos($class, ':') === false) {
                 continue;
             }
-            $tmp = explode(':', $class);
+            $tmp    = explode(':', $class);
             $prefix = $tmp[0];
             if (in_array($prefix, $prefixNeedingScript)) {
                 $keyToRemove = array_search($prefix, $prefixNeedingScript);
@@ -47,10 +44,6 @@ class StyleBuilder implements BuilderInterface
         // if ('w-scrollY' === $classes[0]) {
         //     $this->dispatch(new Event('ready-script', 'scrollY', file_get_contents(__DIR__.'/../../js/ready.scrollProgress.min.js')));
         // }
-
-
-
-
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
@@ -89,7 +82,7 @@ class StyleBuilder implements BuilderInterface
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));
 
-        $css = $tailwind->getCss($elements, $classes);
+        $css        = $tailwind->getCss($elements, $classes);
         $newClasses = [];
 
         if ($this->minmizeClasses) {
@@ -118,7 +111,7 @@ class StyleBuilder implements BuilderInterface
 
     private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)
     {
-        $tag = $element->getTag();
+        $tag        = $element->getTag();
         $elements[] = $element->getTag();
         $classes    = array_merge($classes, $element->getClasses('array'));
         $content    = $element->getContent();
@@ -141,27 +134,28 @@ class StyleBuilder implements BuilderInterface
             $this->getElementsAndClasses($child, $elements, $classes);
         }
     }
+
     private function minmizeClasses(string $css, array $classes, array &$newClasses): string
     {
         usort($classes, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
-        $escape = ["/",'|','.',':','%','[',']'];
+        $escape = ['/', '|', '.', ':', '%', '[', ']'];
         foreach ($classes as $i => $class) {
             if (strpos($class, 'open:') !== false) {
                 continue;
             }
             $orginal = $class;
-            $tmp = explode(':', $class);
-            $prefix = false;
+            $tmp     = explode(':', $class);
+            $prefix  = false;
             if (count($tmp) > 1) {
-                $class = array_pop($tmp);
+                $class  = array_pop($tmp);
                 $prefix = implode(':', $tmp);
             }
             $newClassName = $this->getClassName($i + 1);
             if ($prefix) {
                 $newClassName = $prefix.':'.$newClassName;
-                $oldInCss = $prefix.':'.$class;
+                $oldInCss     = $prefix.':'.$class;
             } else {
                 $oldInCss = $class;
             }
@@ -186,8 +180,8 @@ class StyleBuilder implements BuilderInterface
         // Convert the index to a base-26 representation
         while ($index > 0) {
             $remainder = ($index - 1) % 26;
-            $label = chr(65 + $remainder) . $label;
-            $index = intval(($index - $remainder) / 26);
+            $label     = chr(65 + $remainder) . $label;
+            $index     = intval(($index - $remainder) / 26);
         }
 
         return strtolower($label);
@@ -200,9 +194,10 @@ class StyleBuilder implements BuilderInterface
             $this->parseElement($child, $newClasses);
         }
     }
+
     private function replaceClasses(array $style, array $newClasses): array
     {
-        $states = ['open:','!open:','selected','!selected'];
+        $states   = ['open:', '!open:', 'selected', '!selected'];
         $replaced = [];
         foreach ($style as $attr => $oldClasses) {
             if (is_array($oldClasses)) {
@@ -215,7 +210,7 @@ class StyleBuilder implements BuilderInterface
                         $prefix = '';
                         foreach ($states as $state) {
                             if (str_starts_with($oldClass, $state)) {
-                                $prefix = $state;
+                                $prefix   = $state;
                                 $oldClass = substr($oldClass, strlen($prefix));
                             }
                         }

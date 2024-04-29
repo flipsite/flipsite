@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -65,8 +64,10 @@ final class Tailwind implements CallbackInterface
         uasort($this->variants, function ($a, $b) {
             return $a->order() <=> $b->order();
         });
+
+        $added = [];
         foreach ($this->variants as $variant) {
-            $css .= $variant->getCss();
+            $css .= $variant->getCss($added);
         }
 
         // Keyframes
@@ -80,15 +81,15 @@ final class Tailwind implements CallbackInterface
         // Fix tranform vars
         $transform = [
             'perspective' => 'perspective',
-            'translateX' => 'translate-x',
-            'translateY' => 'translate-y',
-            'rotate' => 'rotate',
-            'rotateX' => 'rotate-x',
-            'rotateY' => 'rotate-y',
-            'skewX' => 'skew-x',
-            'skewY' => 'skew-y',
-            'scaleX' => 'scale-x',
-            'scaleY' => 'scale-y',
+            'translateX'  => 'translate-x',
+            'translateY'  => 'translate-y',
+            'rotate'      => 'rotate',
+            'rotateX'     => 'rotate-x',
+            'rotateY'     => 'rotate-y',
+            'skewX'       => 'skew-x',
+            'skewY'       => 'skew-y',
+            'scaleX'      => 'scale-x',
+            'scaleY'      => 'scale-y',
         ];
         foreach ($transform as $func => $var) {
             if (strpos($css, '-tw-'.$var.':') === false) {
@@ -101,7 +102,7 @@ final class Tailwind implements CallbackInterface
         $matches = [];
         preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
         $addDefaultValues = [];
-        $vars = [];
+        $vars             = [];
         foreach (array_unique($matches[0]) as $i => $var) {
             $vars[] = $var;
         }
@@ -109,7 +110,7 @@ final class Tailwind implements CallbackInterface
             return strlen($b) - strlen($a);
         });
 
-        foreach ($vars as $i => $var) {   
+        foreach ($vars as $i => $var) {
             $addDefaultValues[$var] = '--'.$this->getVar($i);
             $css                    = str_replace($var, '--'.$this->getVar($i), $css);
         }
@@ -211,8 +212,8 @@ final class Tailwind implements CallbackInterface
             return null;
         }
         $negative = false;
-        if (strpos($className,'[-') !== false) {
-            $className = '-'.str_replace('[-','[',$className);
+        if (strpos($className, '[-') !== false) {
+            $className = '-'.str_replace('[-', '[', $className);
         }
 
         $args     = explode('-', $className);
@@ -297,10 +298,10 @@ final class Tailwind implements CallbackInterface
                 foreach ($variantId as &$word) {
                     $word = ucfirst(mb_strtolower($word));
                 }
-                
+
                 $variantId = implode('', $variantId);
                 // To extract possible group hover name
-                $tmp = explode('/',$variantId);
+                $tmp       = explode('/', $variantId);
                 $variantId = array_shift($tmp);
                 $class     = 'Flipsite\Style\Variants\\'.$variantId.'Type';
                 if (!class_exists($class)) {
@@ -335,13 +336,13 @@ final class Tailwind implements CallbackInterface
 
     private function getVar(int $index): string
     {
-        $index+=1;
+        $index += 1;
         $label = '';
         // Convert the index to a base-26 representation
         while ($index > 0) {
             $remainder = ($index - 1) % 26;
-            $label = chr(65 + $remainder) . $label;
-            $index = intval(($index - $remainder) / 26);
+            $label     = chr(65 + $remainder) . $label;
+            $index     = intval(($index - $remainder) / 26);
         }
         return strtolower($label);
     }
