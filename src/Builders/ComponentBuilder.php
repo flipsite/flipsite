@@ -24,6 +24,7 @@ class ComponentBuilder
     private array $theme        = [];
     private array $localization = [];
     private Slugs $slugs;
+    private array $recursiveData = [];
 
     public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path)
     {
@@ -32,6 +33,31 @@ class ComponentBuilder
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
     {
+        if (($options['recursionDepth'] ?? 0) > 50) {
+            return null;
+        }
+        if (is_array($data)) {
+            if ($data['_options']['recursiveId'] ?? false) {
+                $recursiveId = $data['_options']['recursiveId'];
+                unset($data['_options']['recursiveId']);
+                $this->recursiveData[$recursiveId] =[
+                    'type'        => $type,
+                    'data'        => $data,
+                    'parentStyle' => $parentStyle
+                ];
+            };
+            if ($data['_options']['recursiveContent'] ?? false) {
+                $recursiveId = $data['_options']['recursiveContent'];
+                unset($data['_options']['recursiveContent']);
+                $recursive                   = $this->recursiveData[$recursiveId];
+                $recursiveType               = $recursive['type'];
+                $data[$recursiveType]        = $recursive['data'];
+                $parentStyle[$recursiveType] = $recursive['parentStyle'];
+                $options['recursionDepth'] ??= 0;
+                $options['recursionDepth']++;
+            }
+        }
+
         if (str_starts_with($type, '_')) {
             return null;
         }
