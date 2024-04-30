@@ -19,9 +19,11 @@ final class Nav extends AbstractGroup
         }
         $repeat = [];
         if (!isset($data['_options']['pages'])) {
-            $level      = 0;
-            $parentPage = $data['_options']['parentPage'] ?? null;
-            if (isset($data['_repeat']) && str_starts_with($data['_repeat'], '_pages-')) {
+            $level           = 0;
+            $parentPage      = $data['_options']['parentPage'] ?? null;
+            if ($parentPage) {
+                $level = substr_count($parentPage, '/') + 1;
+            } elseif (isset($data['_repeat']) && str_starts_with($data['_repeat'], '_pages-')) {
                 $level = intval(str_replace('_pages-', '', $data['_repeat']));
             }
             $repeat = $this->getPages($level, $parentPage);
