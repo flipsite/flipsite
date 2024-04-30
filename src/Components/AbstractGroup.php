@@ -121,10 +121,12 @@ abstract class AbstractGroup extends AbstractComponent
         if (!isset($data['_hover'])) {
             return $data;
         }
-        switch ($data['_hover']) {
+        $parts = explode('|', $data['_hover']);
+        switch ($parts[0]) {
             case 'toggle':
-                $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,768)');
-                $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,768)');
+                $width = $parts[1] ?? 768;
+                $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,'.$width.')');
+                $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,'.$width.')');
                 $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
                 break;
         }
