@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Symfony\Component\Yaml\Yaml;
@@ -18,7 +17,7 @@ final class SocialHelper
             return null;
         }
         if (is_string($handle) || is_numeric($handle)) {
-            $data['url'] = str_replace('{handle}', $handle, $data['url']);
+            $data['url'] = self::getUrl($type, $handle);
         }
         switch ($type) {
             case 'phone':
@@ -31,6 +30,9 @@ final class SocialHelper
 
     public static function getUrl(string $type, string $handle): string
     {
+        if (str_starts_with($handle, 'http')) {
+            return $handle;
+        }
         self::loadData();
         $url = self::$data[$type]['url'];
         return str_replace('{handle}', $handle, $url);

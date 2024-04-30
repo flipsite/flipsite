@@ -3,7 +3,7 @@ discord:
   name: Discord
   color: "#5865F2"
   icon: simple-icons/discord.svg
-  url: "{handle}"
+  url: https://discord.gg/{handle}
 facebook:
   name: Facebook
   color: "#0866FF"
