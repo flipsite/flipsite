@@ -148,33 +148,42 @@ abstract class AbstractGroup extends AbstractComponent
             } elseif ('false' === ($data['_options']['filter'] ?? '')) {
                 $filter = false;
             } else {
-                $filter = ArrayHelper::decodeJsonOrCsv($data['_options']['filter'] ?? '');
-            }
-            foreach ($filter as &$f) {
-                if ('{this.slug}' === $f) {
-                    $f = $this->path->getPage();
+                $filter = ArrayHelper::decodeJsonOrCsv($data['_options']['filter'] ?? null);
+                if (count($filter) === 0) {
+                    $filter = null;
+                } else {
+                    foreach ($filter as &$f) {
+                        if ('{this.slug}' === $f) {
+                            $f = $this->path->getPage();
+                        }
+                    }
                 }
             }
             $filterField = $data['_options']['filterField'];
             $filterType  = $data['_options']['filterType'] ?? 'or'; // Can be or, not or notEmpty
-            $repeat      = array_values(array_filter($repeat, function ($item) use ($filter, $filterField, $filterType) {
-                if ('notEmpty' === $filterType) {
-                    return isset($item[$filterField]) && $item[$filterField];
-                }
-                if (is_bool($filter)) {
-                    $value = $item[$filterField] ?? false;
-                    return $filter === $value;
-                }
-                if (!isset($item[$filterField])) {
-                    return 'or' !== $filterType;
-                }
 
-                if ($item) {
-                    $fieldFieldValues = ArrayHelper::decodeJsonOrCsv($item[$filterField]);
-                }
-                $count = count(array_intersect($fieldFieldValues, $filter));
-                return 'or' === $filterType ? $count > 0 : $count === 0;
-            }));
+            if (null === $filter && 'notEmpty' !== $filterType) {
+            } else {
+                $repeat = array_values(array_filter($repeat, function ($item) use ($filter, $filterField, $filterType) {
+                    if ('notEmpty' === $filterType) {
+                        return isset($item[$filterField]) && $item[$filterField];
+                    }
+
+                    if (is_bool($filter)) {
+                        $value = $item[$filterField] ?? false;
+                        return $filter === $value;
+                    }
+                    if (!isset($item[$filterField])) {
+                        return 'or' !== $filterType;
+                    }
+
+                    if ($item) {
+                        $fieldFieldValues = ArrayHelper::decodeJsonOrCsv($item[$filterField]);
+                    }
+                    $count = count(array_intersect($fieldFieldValues, $filter));
+                    return 'or' === $filterType ? $count > 0 : $count === 0;
+                }));
+            }
         }
         if (isset($data['_options']['filterField'], $data['_options']['filterPattern'])) {
             $filterField       = $data['_options']['filterField'];
