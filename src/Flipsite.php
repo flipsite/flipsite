@@ -1,9 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
+use Flipsite\Components\AbstractElement;
 use Flipsite\Builders\ComponentBuilder;
 use Flipsite\Builders\CustomCodeBuilder;
 use Flipsite\Builders\DocumentBuilder;
@@ -23,10 +23,63 @@ use Flipsite\Utils\Robots;
 use Flipsite\Utils\Sitemap;
 use voku\helper\HtmlMin;
 
+abstract class AbstractDocumentCallback
+{
+    public function __invoke(Document $document): Document
+    {
+        return $this->process($document);
+    }
+
+    protected function process(AbstractElement $element): AbstractElement
+    {
+        if ($element->childCount() > 0) {
+            foreach ($element->getChildren() as &$child) {
+                if (!in_array($child->getTag(), ['defs', 'head'])) {
+                    $child = $this->process($child);
+                }
+            }
+        }
+        $element = $this->processElement($element);
+        return $element;
+    }
+
+    abstract protected function processElement(AbstractElement $element): AbstractElement;
+}
+
+class OpenToggleCallback extends AbstractDocumentCallback
+{
+    protected function processElement(AbstractElement $element): AbstractElement
+    {
+        if ($element->getAttribute('data-toggle-target') && !$this->hasOpenStlyes($element)) {
+            $element->setAttribute('data-toggle-target', null);
+            $element->setAttribute('onmouseleave', null);
+            $element->setAttribute('onmouseenter', null);
+        }
+        return $element;
+    }
+
+    private function hasOpenStlyes(AbstractElement $element) : bool
+    {
+        $classes = $element->getClasses();
+        if (strpos($classes, 'open:') !== false) {
+            return true;
+        }
+        foreach ($element->getChildren() as $child) {
+            if ($this->hasOpenStlyes($child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 final class Flipsite
 {
+    private array $callbacks = [];
+
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
     {
+        $this->callbacks[] = new OpenToggleCallback();
     }
 
     public function getDocument(string $rawPath): Document
@@ -119,7 +172,12 @@ final class Flipsite
         // Custom HTML
         $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
         $document          = $customCodeBuilder->getDocument($document);
-        $document = $scriptBuilder->getDocument($document);
+        $document          = $scriptBuilder->getDocument($document);
+
+        // Cleanup
+        foreach ($this->callbacks as $callback) {
+            $document = $callback($document);
+        }
 
         return $document;
     }
@@ -196,7 +254,7 @@ final class Flipsite
     private function getGlobalVars(?array $social): array
     {
         $globalVars = [
-            'site.name' => $this->siteData->getName(),
+            'site.name'      => $this->siteData->getName(),
             'copyright.year' => '<span data-copyright>' . date('Y') . '</span>'
         ];
         foreach ($social as $type => $handle) {
