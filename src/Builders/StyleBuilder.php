@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -114,6 +115,9 @@ class StyleBuilder implements BuilderInterface
         $tag        = $element->getTag();
         $elements[] = $element->getTag();
         $classes    = array_merge($classes, $element->getClasses('array'));
+        if ($dataToggle = $element->getAttribute('data-toggle')) {
+            $classes =  array_merge($classes, explode(' ', $dataToggle));
+        }
         $content    = $element->getContent();
         if ($content) {
             $pattern = '/class="([^"]+)"/';

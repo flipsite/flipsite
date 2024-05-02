@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -14,7 +15,7 @@ use Flipsite\Assets\Assets;
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
-use Flipsite\Style\Encoders\StyleInt;
+use Flipsite\Style\Style;
 
 class ComponentBuilder
 {
@@ -40,7 +41,7 @@ class ComponentBuilder
             if ($data['_options']['recursiveId'] ?? false) {
                 $recursiveId = $data['_options']['recursiveId'];
                 unset($data['_options']['recursiveId']);
-                $this->recursiveData[$recursiveId] =[
+                $this->recursiveData[$recursiveId] = [
                     'type'        => $type,
                     'data'        => $data,
                     'parentStyle' => $parentStyle
@@ -143,11 +144,12 @@ class ComponentBuilder
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
             $multiplier = intval($data['_repeatIndex']);
             $style['transitionDelay'] ??= 'delay-0';
-            $delay    = new StyleInt($style['transitionDelay'], 'delay-');
-            $step     = new StyleInt($style['transitionDelayStep'] ?? null, 'delay-step-');
+            $delay    = new Style($style['transitionDelay'], 'delay-');
+            $step     = new Style(['transitionDelayStep'] ?? null, 'delay-step-');
             $variants = $delay->getVariants();
+            $initialValue = intval($step->getValue($variant));
             foreach ($variants as $variant) {
-                $delay->addValue($multiplier * $step->getValue($variant), $variant);
+                $delay->setValue($variant, $multiplier * $initialValue);
             }
             $style['transitionDelay'] = $delay->encode();
             unset($style['transitionDelayStep']);
@@ -200,12 +202,6 @@ class ComponentBuilder
 
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
-        if (count($options['navState'] ?? [])) {
-            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
-        }
-
-        $style = $this->handleStyleStates($style, ['open', 'selected']);
-
         $data = $component->normalize($data);
         if (isset($data['default']) && (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value']))) {
             $data['value'] = $data['default'];
@@ -215,7 +211,6 @@ class ComponentBuilder
         if ($data['_isEmpty'] ?? false) {
             return null;
         }
-
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
             if (is_string($data['_attr']['_data'])) {
@@ -231,6 +226,7 @@ class ComponentBuilder
             }
             unset($data['_attr']['_data']);
         }
+        $style = $this->handleStyleStates($style, $options['navState'] ?? [], $data);
 
         if (isset($options['parentDataSource'])) {
             $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
@@ -260,9 +256,11 @@ class ComponentBuilder
         unset($style['textScale']);
         if (isset($style['background'])) {
             $style['background'] = $this->handleApplyStyleData($style['background'], $options['parentDataSource']);
+            $style['background'] = $this->handleStyleStates($style['background'], $options['navState'] ?? [], $data);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
+        unset($options['navState']);
         if (isset($data['_attr'])) {
             foreach ($data['_attr'] as $attr => $value) {
                 $component->setAttribute($attr, $value);
@@ -359,21 +357,29 @@ class ComponentBuilder
         return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question', 'nav', 'social']);
     }
 
-    private function handleStyleStates(array $style, array $states)
+    private function handleStyleStates(array $style, array $navStates, array &$data)
     {
         foreach ($style as $attr => &$value) {
             if (is_string($value)) {
-                foreach ($states as $state) {
-                    if (strpos($value, $state.':') !== false) {
-                        $tmp      = explode(' ', $value);
-                        $noPrefix = null;
-                        foreach ($tmp as $cls) {
-                            if (strpos($cls, ':') === false) {
-                                $noPrefix = $cls;
-                            }
-                        }
-                        $value .= ' !'.$state.':'.$noPrefix;
-                    }
+                $update = false;
+                $setting = new Style($value);
+                if ($setting->hasVariant('open')) {
+                    $open = $setting->removeValue('open');
+                    $notOpen = $setting->getValue('base');
+                    $data['_attr'] ??= [];
+                    $data['_attr']['data-toggle'] = $open.' '.$notOpen;
+                    $update = true;
+
+                }
+
+                // foreach ($states as $state) {
+                //     if ($parsed->hasState($state)) {
+                //         $value = $parsed->removeState($state);
+                //         $value = $this->handleStyleState($value, $state, $data);
+                //     }
+                // }
+                if ($update) {
+                    $value = $setting->encode();
                 }
             }
         }
