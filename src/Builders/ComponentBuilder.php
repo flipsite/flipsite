@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -389,6 +390,17 @@ class ComponentBuilder
                     } else {
                         $data['_attr'] ??= [];
                         $data['_attr']['data-animate'] = $animate.' '.$notAnimate;
+                    }
+                    $update = true;
+                }
+                if ($setting->hasVariant('selected')) {
+                    $selected    = $setting->removeValue('selected');
+                    $notSelected = $setting->getValue();
+                    if (isset($data['_attr']['data-selected'])) {
+                        $data['_attr']['data-selected'] .= ' '.$selected.' '.$notSelected;
+                    } else {
+                        $data['_attr'] ??= [];
+                        $data['_attr']['data-selected'] = $selected.' '.$notSelected;
                     }
                     $update = true;
                 }

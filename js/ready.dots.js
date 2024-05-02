@@ -20,24 +20,25 @@ function ScrollDots(dots, target) {
   this.dotTpl = dots.children[0].cloneNode();
   this.selectedClasses = [];
   this.notSelectedClasses = [];
-  for (let i=0; i<this.dotTpl.classList.length; i++) {
-    const cls = this.dotTpl.classList[i];
-    if (cls.startsWith('!selected:')) {
-      this.notSelectedClasses.push(cls.replace('!selected:',''));
-    } else if (cls.startsWith('selected:')) {
-      this.selectedClasses.push(cls.replace('selected:',''));
+  var that = this;
+  this.dotTpl.getAttribute('data-selected').split(' ').forEach((cls) => {
+    if (that.dotTpl.classList.contains(cls)) {
+      that.notSelectedClasses.push(cls);
+    } else {
+      that.selectedClasses.push(cls);
     }
-  }
+  });
+  this.dotTpl.removeAttribute('data-selected')
+  
   for (let i=0; i<this.notSelectedClasses.length; i++) {
-    this.dotTpl.classList.remove('!selected:'+this.notSelectedClasses[i])
+    this.dotTpl.classList.remove(this.notSelectedClasses[i])
   }
   for (let i=0; i<this.selectedClasses.length; i++) {
-    this.dotTpl.classList.remove('selected:'+this.selectedClasses[i])
+    this.dotTpl.classList.remove(this.selectedClasses[i])
   }
   this.handleResize();
   this.setSelected(0,false);
 
-  const that = this;
   this.target.onscroll = function(e) {
     if (that.scrollDisabled) return;
     const index = Math.round(e.target.scrollLeft/(that.itemWidth*that.visibleItems));

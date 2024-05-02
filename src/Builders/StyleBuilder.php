@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -15,7 +16,7 @@ use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
 
 class StyleBuilder implements BuilderInterface
 {
-    private array $dataAttributesWithClasses = ['data-toggle', 'data-animate'];
+    private array $dataAttributesWithClasses = ['data-toggle', 'data-animate', 'data-selected'];
 
     public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false)
     {

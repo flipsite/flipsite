@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -11,7 +12,7 @@ final class Dots extends AbstractGroup
     protected string $tag  = 'ol';
     public function build(array $data, array $style, array $options): void
     {
-        $this->setAttribute('role','list');
+        $this->setAttribute('role', 'list');
         $this->setAttribute('data-dots', true);
         $this->setAttribute('data-target', $data['target'] ?? null);
         $this->addStyle($style);
