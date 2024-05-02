@@ -1,22 +1,21 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 final class Style
 {
-    private array $values = ['base' => 0];
+    private array $values = ['' => ''];
 
     public function __construct(?string $encoded, private string $prefix = '')
     {
-        $encoded = 'base:'.$encoded;
+        $encoded         = ' :'.$encoded;
         $encodedVariants = explode(' ', str_replace($prefix, '', $encoded));
         foreach ($encodedVariants as $encodedVariant) {
-            $parts                         = explode(':', $encodedVariant);
-            $value                        = array_pop($parts);
-            $key = implode(':', $parts);
-            $this->values[$key] = $value;
+            $parts                  = explode(':', $encodedVariant);
+            $value                  = array_pop($parts);
+            $variant                = trim(implode(':', $parts));
+            $this->values[$variant] = $value;
         }
     }
 
@@ -30,14 +29,14 @@ final class Style
         return isset($this->values[$variant]);
     }
 
-    public function getValue(string $variant = 'base'): ?string
+    public function getValue(string $variant = ''): ?string
     {
         return $this->values[$variant] ?? null;
     }
 
     public function removeValue(string $variant): ?string
     {
-        if ('base' === $variant) {
+        if ('' === $variant) {
             return null;
         }
         $value = $this->values[$variant] ?? null;
@@ -45,15 +44,16 @@ final class Style
         return $value;
     }
 
-    public function setValue(string|int $value, string $variant = 'base')
+    public function setValue(string $variant, string|int $value)
     {
         $this->values[$variant] = (string)$value;
     }
+
     public function encode(): string
     {
         $encoded = [];
         foreach ($this->values as $variant => $value) {
-            if ('base' === $variant) {
+            if ('' === $variant) {
                 $encoded[] = $this->prefix.(string)$value;
             } else {
                 $encoded[] = $variant.':'.$this->prefix.(string)$value;

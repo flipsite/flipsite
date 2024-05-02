@@ -50,7 +50,7 @@ class OpenToggleCallback extends AbstractDocumentCallback
 {
     protected function processElement(AbstractElement $element): AbstractElement
     {
-        if ($element->getAttribute('data-toggle-target') && !$this->hasOpenStlyes($element)) {
+        if ($element->getAttribute('data-toggle-target') && !$this->hasDataToggle($element)) {
             $element->setAttribute('data-toggle-target', null);
             $element->setAttribute('onmouseleave', null);
             $element->setAttribute('onmouseenter', null);
@@ -58,14 +58,13 @@ class OpenToggleCallback extends AbstractDocumentCallback
         return $element;
     }
 
-    private function hasOpenStlyes(AbstractElement $element) : bool
+    private function hasDataToggle(AbstractElement $element) : bool
     {
-        $classes = $element->getClasses();
-        if (strpos($classes, 'open:') !== false) {
+        if ($element->hasAttribute('data-toggle')) {
             return true;
         }
         foreach ($element->getChildren() as $child) {
-            if ($this->hasOpenStlyes($child)) {
+            if ($this->hasDataToggle($child)) {
                 return true;
             }
         }

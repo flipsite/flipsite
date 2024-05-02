@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -16,6 +15,8 @@ use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
 
 class StyleBuilder implements BuilderInterface
 {
+    private array $dataAttributesWithClasses = ['data-toggle', 'data-animate'];
+
     public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false)
     {
     }
@@ -27,24 +28,6 @@ class StyleBuilder implements BuilderInterface
         $this->getElementsAndClasses($document, $elements, $classes);
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
-
-        $prefixNeedingScript = ['stuck', 'offscreen'];
-        foreach ($classes as $class) {
-            if (strpos($class, ':') === false) {
-                continue;
-            }
-            $tmp    = explode(':', $class);
-            $prefix = $tmp[0];
-            if (in_array($prefix, $prefixNeedingScript)) {
-                $keyToRemove = array_search($prefix, $prefixNeedingScript);
-                unset($prefixNeedingScript[$keyToRemove]);
-                $this->dispatch(new Event('ready-script', $prefix, file_get_contents(__DIR__.'/../../js/ready.'.$prefix.'.min.js')));
-            }
-        }
-
-        // if ('w-scrollY' === $classes[0]) {
-        //     $this->dispatch(new Event('ready-script', 'scrollY', file_get_contents(__DIR__.'/../../js/ready.scrollProgress.min.js')));
-        // }
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
 
@@ -88,7 +71,7 @@ class StyleBuilder implements BuilderInterface
 
         if ($this->minmizeClasses) {
             $css = $this->minmizeClasses($css, $classes, $newClasses);
-            $this->parseElement($document->getChild('body'), $newClasses);
+            $this->replaceClasses($document, $newClasses);
         }
 
         $style = new Element('style', true);
@@ -112,13 +95,16 @@ class StyleBuilder implements BuilderInterface
 
     private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)
     {
-        $tag        = $element->getTag();
         $elements[] = $element->getTag();
         $classes    = array_merge($classes, $element->getClasses('array'));
-        if ($dataToggle = $element->getAttribute('data-toggle')) {
-            $classes =  array_merge($classes, explode(' ', $dataToggle));
+
+        foreach ($this->dataAttributesWithClasses as $dataAttribute) {
+            if ($dataClasses = $element->getAttribute($dataAttribute)) {
+                $classes = array_merge($classes, explode(' ', $dataClasses));
+            }
         }
-        $content    = $element->getContent();
+
+        $content = $element->getContent();
         if ($content) {
             $pattern = '/class="([^"]+)"/';
             if (preg_match_all($pattern, $content, $matches)) {
@@ -144,11 +130,8 @@ class StyleBuilder implements BuilderInterface
         usort($classes, function ($a, $b) {
             return strlen($b) - strlen($a);
         });
-        $escape = ['/', '|', '.', ':', '%', '[', ']'];
+        $escape = ['/', '|', '.', ':', '%', '[', ']', '#'];
         foreach ($classes as $i => $class) {
-            if (strpos($class, 'open:') !== false) {
-                continue;
-            }
             $orginal = $class;
             $tmp     = explode(':', $class);
             $prefix  = false;
@@ -157,6 +140,7 @@ class StyleBuilder implements BuilderInterface
                 $prefix = implode(':', $tmp);
             }
             $newClassName = $this->getClassName($i + 1);
+
             if ($prefix) {
                 $newClassName = $prefix.':'.$newClassName;
                 $oldInCss     = $prefix.':'.$class;
@@ -191,44 +175,32 @@ class StyleBuilder implements BuilderInterface
         return strtolower($label);
     }
 
-    private function parseElement(AbstractElement $element, array $newClasses)
+    private function replaceClasses(AbstractElement $element, array $newClasses)
     {
-        $element->replaceStyle($this->replaceClasses($element->getStyle(), $newClasses));
-        foreach ($element->getChildren() as $child) {
-            $this->parseElement($child, $newClasses);
-        }
-    }
-
-    private function replaceClasses(array $style, array $newClasses): array
-    {
-        $states   = ['open:', '!open:', 'selected', '!selected'];
-        $replaced = [];
-        foreach ($style as $attr => $oldClasses) {
-            if (is_array($oldClasses)) {
-                $replaced[$attr] = $this->replaceClasses($oldClasses, $newClasses);
-            } else {
-                $new = [];
-                foreach (explode(' ', $oldClasses) as $class) {
-                    $tmp = explode(' ', $class);
-                    foreach ($tmp as $oldClass) {
-                        $prefix = '';
-                        foreach ($states as $state) {
-                            if (str_starts_with($oldClass, $state)) {
-                                $prefix   = $state;
-                                $oldClass = substr($oldClass, strlen($prefix));
-                            }
-                        }
-
-                        if (isset($newClasses[$oldClass])) {
-                            $new[] = $prefix.$newClasses[$oldClass];
-                        } else {
-                            $new[] = $oldClass;
-                        }
-                    }
+        $style = $element->getStyle();
+        foreach ($style as $attr => &$classes) {
+            foreach ($classes as &$class) {
+                if (isset($newClasses[$class])) {
+                    $class = $newClasses[$class];
                 }
-                $replaced[$attr] = implode(' ', $new);
             }
         }
-        return $replaced;
+        $element->replaceStyle($style);
+
+        foreach ($this->dataAttributesWithClasses as $dataAttribute) {
+            if ($dataClasses = $element->getAttribute($dataAttribute)) {
+                $tmp = explode(' ', $dataClasses);
+                foreach ($tmp as &$dataClass) {
+                    if (isset($newClasses[$dataClass])) {
+                        $dataClass = $newClasses[$dataClass];
+                    }
+                }
+                $element->setAttribute($dataAttribute, implode(' ', $tmp));
+            }
+        }
+
+        foreach ($element->getChildren() as $child) {
+            $this->replaceClasses($child, $newClasses);
+        }
     }
 }

@@ -28,9 +28,6 @@ abstract class AbstractGroup extends AbstractComponent
             if ('mailto' === $data['_action']) {
                 // handle tel replace
             }
-            if ('toggle' === $data['_action']) {
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
-            }
             if ('scrollLeft' === $data['_action'] || 'scrollRight' === $data['_action']) {
                 $this->builder->dispatch(new Event('global-script', 'scrollX', file_get_contents(__DIR__ . '/../../js/scrollX.min.js')));
             }
@@ -127,7 +124,6 @@ abstract class AbstractGroup extends AbstractComponent
                 $width = $parts[1] ?? 768;
                 $this->setAttribute('onmouseenter', 'javascript:toggle(this,true,'.$width.')');
                 $this->setAttribute('onmouseleave', 'javascript:toggle(this,false,'.$width.')');
-                $this->builder->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
                 break;
         }
         unset($data['_hover']);

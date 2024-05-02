@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -144,11 +143,11 @@ class ComponentBuilder
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
             $multiplier = intval($data['_repeatIndex']);
             $style['transitionDelay'] ??= 'delay-0';
-            $delay    = new Style($style['transitionDelay'], 'delay-');
-            $step     = new Style(['transitionDelayStep'] ?? null, 'delay-step-');
-            $variants = $delay->getVariants();
-            $initialValue = intval($step->getValue($variant));
+            $delay        = new Style($style['transitionDelay'], 'delay-');
+            $step         = new Style($style['transitionDelayStep'] ?? null, 'delay-step-');
+            $variants     = $delay->getVariants();
             foreach ($variants as $variant) {
+                $initialValue = intval($step->getValue($variant));
                 $delay->setValue($variant, $multiplier * $initialValue);
             }
             $style['transitionDelay'] = $delay->encode();
@@ -211,6 +210,11 @@ class ComponentBuilder
         if ($data['_isEmpty'] ?? false) {
             return null;
         }
+
+        if (count($options['navState'] ?? [])) {
+            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
+        }
+
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
             if (is_string($data['_attr']['_data'])) {
@@ -226,7 +230,7 @@ class ComponentBuilder
             }
             unset($data['_attr']['_data']);
         }
-        $style = $this->handleStyleStates($style, $options['navState'] ?? [], $data);
+        $style = $this->handleStyleStates($style, $data);
 
         if (isset($options['parentDataSource'])) {
             $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
@@ -256,7 +260,7 @@ class ComponentBuilder
         unset($style['textScale']);
         if (isset($style['background'])) {
             $style['background'] = $this->handleApplyStyleData($style['background'], $options['parentDataSource']);
-            $style['background'] = $this->handleStyleStates($style['background'], $options['navState'] ?? [], $data);
+            $style['background'] = $this->handleStyleStates($style['background'], $data);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
@@ -357,27 +361,37 @@ class ComponentBuilder
         return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question', 'nav', 'social']);
     }
 
-    private function handleStyleStates(array $style, array $navStates, array &$data)
+    private function handleStyleStates(array $style, array &$data)
     {
         foreach ($style as $attr => &$value) {
             if (is_string($value)) {
-                $update = false;
+                $update  = false;
                 $setting = new Style($value);
                 if ($setting->hasVariant('open')) {
-                    $open = $setting->removeValue('open');
-                    $notOpen = $setting->getValue('base');
-                    $data['_attr'] ??= [];
-                    $data['_attr']['data-toggle'] = $open.' '.$notOpen;
+                    $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
+                    $setting->removeValue('!open');
+                    $open    = $setting->removeValue('open');
+                    $notOpen = $setting->getValue();
+                    if (isset($data['_attr']['data-toggle'])) {
+                        $data['_attr']['data-toggle'] .= ' '.$open.' '.$notOpen;
+                    } else {
+                        $data['_attr'] ??= [];
+                        $data['_attr']['data-toggle'] = $open.' '.$notOpen;
+                    }
                     $update = true;
-
                 }
-
-                // foreach ($states as $state) {
-                //     if ($parsed->hasState($state)) {
-                //         $value = $parsed->removeState($state);
-                //         $value = $this->handleStyleState($value, $state, $data);
-                //     }
-                // }
+                if ($setting->hasVariant('offscreen')) {
+                    $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/ready.anim.min.js')));
+                    $animate      = $setting->removeValue('offscreen');
+                    $notAnimate   = $setting->getValue();
+                    if (isset($data['_attr']['data-animate'])) {
+                        $data['_attr']['data-animate'] .= ' '.$animate.' '.$notAnimate;
+                    } else {
+                        $data['_attr'] ??= [];
+                        $data['_attr']['data-animate'] = $animate.' '.$notAnimate;
+                    }
+                    $update = true;
+                }
                 if ($update) {
                     $value = $setting->encode();
                 }
@@ -395,8 +409,8 @@ class ComponentBuilder
             $res = [];
             $tmp = explode(' ', $str);
             foreach ($tmp as $cls) {
-                $active = str_starts_with($cls, 'nav-active:');
-                $exact  = str_starts_with($cls, 'nav-exact:');
+                $active = strpos($cls, 'nav-active:') !== false;
+                $exact  = strpos($cls, 'nav-exact:') !== false;
                 if (count($types) === 0 && !$active && !$exact) {
                     $res[] = $cls;
                 }
