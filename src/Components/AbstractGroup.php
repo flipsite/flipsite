@@ -6,6 +6,7 @@ namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\Filter;
 
 abstract class AbstractGroup extends AbstractComponent
 {
@@ -138,6 +139,16 @@ abstract class AbstractGroup extends AbstractComponent
             $data['_options']['filterField'] = $data['_options']['filterBy'];
             unset($data['_options']['filterBy']);
         }
+        // Unclear if this is used anymore
+        if (isset($data['_options']['filter']) && is_string($data['_options']['filter']) && strpos($data['_options']['filter'], 'this.slug')) {
+            // Do something
+        }
+
+        if (isset($data['_options']['filterField']) && (isset($data['_options']['filter']) || isset($data['_options']['filterType']) || isset($data['_options']['filterPattern']))) {
+            $filter = new Filter($data['_options']['filterType'] ?? 'or', $data['_options']['filter'] ?? null, $data['_options']['filterPattern'] ?? null);
+            $repeat = $filter->filterList($repeat, $data['_options']['filterField'] ?? null);
+        }
+        /*
         if (isset($data['_options']['filterField'])) {
             $filter = null;
             if ('true' === ($data['_options']['filter'] ?? '')) {
@@ -189,6 +200,8 @@ abstract class AbstractGroup extends AbstractComponent
                 return preg_match('/'.$filterPattern.'/', $item[$filterField]);
             }));
         }
+*/
+
 
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
             $offset = intval($data['_options']['offset'] ?? 0);

@@ -16,6 +16,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Style;
+use Flipsite\Utils\Filter;
 
 class ComponentBuilder
 {
@@ -441,12 +442,6 @@ class ComponentBuilder
 
     private function handleRenderOptions(array $options): bool
     {
-        if (isset($options['hasValue'])) {
-            if (!$options['hasValue']) {
-                return false;
-            }
-            return !preg_match('/^\{[a-zA-Z\.]+\}$/', $options['hasValue']);
-        }
         if (isset($options['hasSubpages'])) {
             if (!$this->siteData->getSlugs()->hasSubpages($options['hasSubpages'])) {
                 return false;
@@ -504,6 +499,16 @@ class ComponentBuilder
             }
             return true;
         }
+
+        if (isset($options['filterType']) || isset($options['filter']) || isset($options['filterPattern'])) {
+            $options['filterField'] ??= '';
+            if (preg_match('/^\{[a-zA-Z\.]+\}$/', $options['filterField'])) {
+                $options['filterField'] = '';
+            }
+            $filter = new Filter($data['filterType'] ?? 'or', $options['filter'] ?? null, $options['filterPattern'] ?? null);
+            return $filter->filterValue($options['filterFieldValue'] ?? null);
+        }
+
         return true;
     }
 
