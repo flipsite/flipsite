@@ -21,7 +21,7 @@ final class Filter
             return !$value;
         }
         if ($value && $this->pattern) {
-            return preg_match('/'.$this->pattern.'/', $value);
+            return !!preg_match('/'.$this->pattern.'/', $value);
         }
 
         $filter = ArrayHelper::decodeJsonOrCsv($this->filter);
