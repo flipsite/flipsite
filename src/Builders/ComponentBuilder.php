@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -501,12 +500,12 @@ class ComponentBuilder
         }
 
         if (isset($options['filterType']) || isset($options['filter']) || isset($options['filterPattern'])) {
-            $options['filterField'] ??= '';
-            if (preg_match('/^\{[a-zA-Z\.]+\}$/', $options['filterField'])) {
-                $options['filterField'] = '';
+            $options['filterFieldValue'] ??= null;
+            if (preg_match('/^\{[a-zA-Z\.]+\}$/', $options['filterFieldValue'])) {
+                $options['filterFieldValue'] = null;
             }
-            $filter = new Filter($data['filterType'] ?? 'or', $options['filter'] ?? null, $options['filterPattern'] ?? null);
-            return $filter->filterValue($options['filterFieldValue'] ?? null);
+            $filter = new Filter($options['filterType'] ?? 'or', $options['filter'] ?? null, $options['filterPattern'] ?? null);
+            return $filter->filterValue($options['filterFieldValue']);
         }
 
         return true;
