@@ -381,6 +381,20 @@ class ComponentBuilder
                     }
                     $update = true;
                 }
+                foreach (['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as $bp) {
+                    if ($setting->hasVariant($bp.':open')) {
+                        $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
+                        $open    = $bp.':'.$setting->removeValue($bp.':open');
+                        $notOpen = $bp.':'.$setting->getValue($bp);
+                        if (isset($data['_attr']['data-toggle'])) {
+                            $data['_attr']['data-toggle'] .= ' '.$open.' '.$notOpen;
+                        } else {
+                            $data['_attr'] ??= [];
+                            $data['_attr']['data-toggle'] = $open.' '.$notOpen;
+                        }
+                        $update = true;
+                    }
+                }
                 if ($setting->hasVariant('offscreen')) {
                     $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/ready.anim.min.js')));
                     $animate      = $setting->removeValue('offscreen');
