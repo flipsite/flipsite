@@ -138,7 +138,7 @@ final class Flipsite
             $sections = $this->siteData->getSections($path->getPage(), $path->getLanguage());
         }
 
-        $globalVars = $this->getGlobalVars($this->siteData->getSocial());
+        $globalVars = $this->getGlobalVars($this->siteData->getSocial(), $path);
 
         foreach ($sections as $sectionId => $sectionData) {
             if ($this->plugins) {
@@ -250,12 +250,22 @@ final class Flipsite
         return $htmlMin->minify($html);
     }
 
-    private function getGlobalVars(?array $social): array
+    private function getGlobalVars(?array $social, Path $path): array
     {
         $globalVars = [
-            'site.name'      => $this->siteData->getName(),
-            'copyright.year' => '<span data-copyright>' . date('Y') . '</span>'
+            'site.name'        => $this->siteData->getName(),
+            'site.description' => $this->siteData->getDescription(),
+            'site.image'       => $this->siteData->getShare(),
+            'copyright.year'   => '<span data-copyright>' . date('Y') . '</span>'
         ];
+        $globalVars['meta.name'] = $this->siteData->getPageName($path->getPage(), $path->getLanguage());
+        $meta                    = $this->siteData->getPageMeta($path->getPage(), $path->getLanguage());
+        foreach ($meta ?? [] as $key => $value) {
+            if ($value) {
+                $globalVars['meta.'.$key] = $value;
+            }
+        }
+        unset($globalVars['meta.content']);
         foreach ($social as $type => $handle) {
             $globalVars['social.'.$type] = $handle;
         }
