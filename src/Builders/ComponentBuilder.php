@@ -268,7 +268,9 @@ class ComponentBuilder
         unset($options['navState']);
         if (isset($data['_attr'])) {
             foreach ($data['_attr'] as $attr => $value) {
-                $component->setAttribute($attr, $value);
+                if (!is_string($value) || (!str_starts_with($value, '{') && !str_ends_with($value, '}'))) {
+                    $component->setAttribute($attr, $value);
+                }
             }
             unset($data['_attr']);
         }
