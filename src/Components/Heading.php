@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Heading extends AbstractComponent
@@ -37,8 +36,8 @@ final class Heading extends AbstractComponent
 
     public function getDefaultStyle(): array
     {
-        $htmlStyle = $this->siteData->getHtmlStyle();
-        $style = $htmlStyle['heading'] ?? [];
+        $htmlStyle            = $this->siteData->getHtmlStyle();
+        $style                = $htmlStyle['heading'] ?? [];
         $style['font-family'] = 'font-headings';
         return $style;
     }

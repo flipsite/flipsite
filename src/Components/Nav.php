@@ -28,12 +28,42 @@ final class Nav extends AbstractGroup
             }
             $repeat = $this->getPages($level, $parentPage);
         } else {
-            $pages  = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
-            $repeat = [];
+            $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
             foreach ($pages as $page) {
                 $pageItemData = $this->getPageItemData($page);
                 if ($pageItemData) {
                     $repeat[] = $pageItemData;
+                } else {
+                    $name     = null;
+                    $fragment = null;
+                    if (str_starts_with($page, '[') && str_ends_with($page, ')')) {
+                        $tmp        = explode('](', substr($page, 1, -1));
+                        $name       = $tmp[0];
+                        $page       = $tmp[1];
+                    }
+                    $tmp      = explode('#', $page);
+                    if (count($tmp) > 1) {
+                        $page     = $tmp[0];
+                        $fragment = $tmp[1];
+                    }
+                    $page = trim($page, '/');
+                    if ($page) {
+                        $pageItemData = $this->getPageItemData($page);
+                        if ($pageItemData) {
+                            $pageItemData['name'] = $name ?? $pageItemData['name'];
+                            if ($fragment) {
+                                $pageItemData['slug'] .= '#'.$fragment;
+                            }
+
+                            $repeat[] = $pageItemData;
+                            continue;
+                        }
+                    } elseif ($fragment) {
+                        $repeat[] = [
+                            'slug' => '#'.$fragment,
+                            'name' => $name ?? ucwords(str_replace('-', ' ', $fragment))
+                        ];
+                    }
                 }
             }
         }

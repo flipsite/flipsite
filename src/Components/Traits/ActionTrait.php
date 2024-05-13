@@ -31,11 +31,16 @@ trait ActionTrait
                 ];
                 break;
             case 'page':
+                $tmp             = explode('#', $data['_target']);
+                $data['_target'] = $tmp[0];
+                if (isset($tmp[1])) {
+                    $data['_fragment'] = $tmp[1];
+                }
                 if ('home' === ($data['_target'] ?? '')) {
                     $data['_target'] = '';
                 }
                 if (isset($data['_target'])) {
-                    $path = $this->siteData->getSlugs()->getPath($data['_target'], $this->path->getLanguage(), $this->path->getPage());
+                    $path       = $this->siteData->getSlugs()->getPath($data['_target'], $this->path->getLanguage(), $this->path->getPage());
                     $attributes = [
                         'tag'  => 'a',
                         'href' => $this->environment->getUrl($path ?? '')
@@ -70,7 +75,7 @@ trait ActionTrait
                         'download' => true
                     ];
                 }
-                $file = $this->environment->getAssetSources()->addBasePath(\Flipsite\Assets\Sources\AssetType::FILE, $data['_target']);
+                $file       = $this->environment->getAssetSources()->addBasePath(\Flipsite\Assets\Sources\AssetType::FILE, $data['_target']);
                 $attributes = [
                     'tag'      => 'a',
                     'href'     => $file ?? '#',
