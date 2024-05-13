@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Heading extends AbstractComponent
@@ -16,10 +17,10 @@ final class Heading extends AbstractComponent
         $html  = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
         $html  = $this->addClassesToHtml($html, ['a', 'strong'], $style, $options['appearance']);
         $this->addStyle($style);
-        if (isset($data['name'])) {
+        if (isset($data['anchor'])) {
             $a = new Element('a');
             $a->setContent($html);
-            $a->setAttribute('name', $data['name']);
+            $a->setAttribute('href', '#'.$data['anchor']);
             $this->addChild($a);
         } else {
             $this->setContent($html);
