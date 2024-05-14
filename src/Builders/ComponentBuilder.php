@@ -327,16 +327,21 @@ class ComponentBuilder
             }
             return $data;
         } elseif (is_array($data)) {
-            foreach ($data as $key => &$value) {
-                if (is_string($value)) {
-                    $value = $this->handleApplyData($value, $variables, $found);
-                } elseif (is_array($value)) {
-                    $parts         = explode(':', $key);
-                    $componentType = $parts[0];
-                    if (!$checkIfContainer || !$this->isContainer($componentType)) {
-                        $value = $this->handleApplyData($value, $variables, $found, false);
+            $isRepeat = isset($data['_repeat']);
+            if (!$isRepeat) {
+                foreach ($data as $key => &$value) {
+                    if (is_string($value)) {
+                        $value = $this->handleApplyData($value, $variables, $found);
+                    } elseif (is_array($value)) {
+                        $parts         = explode(':', $key);
+                        $componentType = $parts[0];
+                        if (!$checkIfContainer || !$this->isContainer($componentType)) {
+                            $value = $this->handleApplyData($value, $variables, $found, false);
+                        }
                     }
                 }
+            } elseif (isset($data['_options'])) {
+                $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
             }
         }
         return $data;
