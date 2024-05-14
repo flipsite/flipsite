@@ -340,8 +340,13 @@ class ComponentBuilder
                         }
                     }
                 }
-            } elseif (isset($data['_options'])) {
-                $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
+            } else {
+                if ((isset($data['_repeat']))) {
+                    $data['_repeat']  = $this->handleApplyData($data['_repeat'], $variables, $found, false);
+                }
+                if ((isset($data['_options']))) {
+                    $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
+                }
             }
         }
         return $data;
