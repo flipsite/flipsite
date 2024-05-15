@@ -18,6 +18,7 @@ final class Social extends AbstractGroup
         $sort       = ArrayHelper::decodeJsonOrCsv($data['sort'] ?? null);
         $phoneIcon  = $data['phoneIcon'] ?? false;
         $emailIcon  = $data['emailIcon'] ?? false;
+        $phoneValue = $data['phoneValue'] ?? false;
         unset($data['filter'],$data['phoneIcon'],$data['emailIcon']);
 
         $data = $this->normalizeRepeat($data, $dataSourceList);
@@ -54,10 +55,15 @@ final class Social extends AbstractGroup
             }
         }
 
-        if ($phoneIcon) {
+        if ($phoneIcon || $phoneValue) {
             foreach ($data['_repeatData'] as &$item) {
                 if ('phone' === $item['type']) {
-                    $item['icon'] = $phoneIcon;
+                    if ($phoneIcon) {
+                        $item['icon'] = $phoneIcon;
+                    }
+                    if ($phoneValue) {
+                        $item['name'] = $phoneValue;
+                    }
                 }
             }
         }
