@@ -5,7 +5,7 @@ namespace Flipsite\Components;
 
 final class Text extends AbstractComponent
 {
-    protected string $plainText;
+    protected string $plainText = '';
 
     public function normalize(string|int|bool|array $data) : array
     {
@@ -17,7 +17,7 @@ final class Text extends AbstractComponent
 
     public function build(array $data, array $style, array $options) : void
     {
-        $this->plainText = $data['value'];
+        $this->plainText = $data['value'] ?? '';
     }
 
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
