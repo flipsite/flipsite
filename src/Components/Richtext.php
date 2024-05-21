@@ -53,7 +53,10 @@ final class Richtext extends AbstractGroup
                         '_style'    => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag]),
                         'paragraph' => [
                             'value'  => '{item}',
-                            '_style' => ['tag' => 'li']
+                            '_style' => ArrayHelper::merge(['tag' => 'li'], [
+                                'a'      => $style['a'] ?? [],
+                                'strong' => $style['strong'] ?? [],
+                            ])
                         ]
                     ];
                     break;
@@ -100,7 +103,7 @@ final class Richtext extends AbstractGroup
         $dom->formatOutput = true;
         $html              = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         $html              = '<html><body>'.$html.'</body></html>';
-        $dom->loadHtml($html);
+        @$dom->loadHtml($html);
 
         libxml_clear_errors();
 
@@ -231,28 +234,42 @@ final class Richtext extends AbstractGroup
                     $tableDom->loadHtml($html);
                     libxml_clear_errors();
                     $table = $tableDom->getElementsByTagName('table')[0];
-                    $index = 0;
-                    $th    = [];
-                    $td    = [];
-                    foreach ($table->childNodes as $row) {
-                        if ('tr' === $row->nodeName) {
-                            foreach ($row->childNodes as $cell) {
-                                if ('th' === $cell->nodeName) {
-                                    $th[] = trim($cell->textContent);
+                    if ($table) {
+                        $index = 0;
+                        $th    = [];
+                        $td    = [];
+                        foreach ($table->childNodes as $row) {
+                            if ('tr' === $row->nodeName) {
+                                foreach ($row->childNodes as $cell) {
+                                    if ('th' === $cell->nodeName) {
+                                        $th[] = trim($cell->textContent);
+                                    }
+                                    if ('td' === $cell->nodeName) {
+                                        $td[$index] ??= [];
+                                        $td[$index][] = trim($cell->textContent);
+                                    }
                                 }
-                                if ('td' === $cell->nodeName) {
-                                    $td[$index] ??= [];
-                                    $td[$index][] = trim($cell->textContent);
-                                }
+                                $index++;
                             }
-                            $index++;
+                        }
+                        $components[] = [
+                            'tag'    => 'table',
+                            'th'     => $th,
+                            'td'     => $td
+                        ];
+                    } else {
+                        $iframe = $tableDom->getElementsByTagName('iframe')[0];
+                        if ($iframe) {
+                            $src = $iframe->getAttribute('src');
+                            if (strpos($src, 'youtube')) {
+                                $tmp          = explode('/', $src);
+                                $components[] = [
+                                    'tag'    => 'youtube',
+                                    'value'  => array_pop($tmp)
+                                ];
+                            }
                         }
                     }
-                    $components[] = [
-                        'tag'    => 'table',
-                        'th'     => $th,
-                        'td'     => $td
-                    ];
                     break;
                 default:
                     echo $child->nodeName."\n";
