@@ -188,13 +188,13 @@ class ComponentBuilder
         }
         // Handle nav stuff
         if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
-            $options['navState'] = [];
+            $options['navState'] = ['active' => false, 'exact' => false];
             $page                = $this->path->getPage();
             if (str_starts_with($page, $data['_target'])) {
                 $options['navState']['active'] = true;
             }
             if ($data['_target'] === $page) {
-                $options['navState']['active'] = true;
+                $options['navState']['exact'] = true;
             }
         }
 
@@ -440,6 +440,8 @@ class ComponentBuilder
 
     private function handleNavStyle(array $style, array $types): array
     {
+        $types['active'] ??= false;
+        $types['exact'] ??= false;
         $style = ArrayHelper::applyStringCallback($style, function ($str) use ($types) {
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
@@ -452,10 +454,11 @@ class ComponentBuilder
                 if (count($types) === 0 && !$active && !$exact) {
                     $res[] = $cls;
                 }
-                if (isset($types['active']) && $active) {
+                if ($types['active'] && $active) {
                     $res[] = str_replace('nav-active:', '', $cls);
                 }
-                if (isset($types['exact']) && $exact) {
+
+                if ($types['exact'] && $exact) {
                     $res[] = str_replace('nav-exact:', '', $cls);
                 }
             }
