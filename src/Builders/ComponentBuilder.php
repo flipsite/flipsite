@@ -451,7 +451,7 @@ class ComponentBuilder
             foreach ($tmp as $cls) {
                 $active = strpos($cls, 'nav-active:') !== false;
                 $exact  = strpos($cls, 'nav-exact:') !== false;
-                if (count($types) === 0 && !$active && !$exact) {
+                if (!$types['active'] && !$types['exact'] && !$active && !$exact) {
                     $res[] = $cls;
                 }
                 if ($types['active'] && $active) {
