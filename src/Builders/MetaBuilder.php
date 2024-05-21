@@ -32,6 +32,9 @@ class MetaBuilder implements BuilderInterface
             return $document;
         }
 
+        if ($slug === 'home') {
+            $slug = '';
+        }
         $canonical = $this->environment->getAbsoluteUrl($slug);
 
         $elements[] = $this->meta('canonical', $canonical);
