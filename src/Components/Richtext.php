@@ -1,11 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
-use Flipsite\Utils\StyleAppearanceHelper;
 
 final class Richtext extends AbstractGroup
 {
@@ -27,126 +25,266 @@ final class Richtext extends AbstractGroup
             return;
         }
 
-        libxml_use_internal_errors(true);
-        $doc = new \DOMDocument();
-        $html = mb_convert_encoding($data['value'], 'HTML-ENTITIES', 'UTF-8');
-        $html = $this->convertPreToHtml($html);
-
-        if ($data['magicLinks'] ?? false) {
-            // Mailto
-            $html = preg_replace("/([A-z0-9\._-]+\@[A-z0-9_-]+\.)([A-z0-9\_\-\.]{1,}[A-z])/", '<a href="mailto:$1$2">$1$2</a>', $html);
-            $html = preg_replace('/(?:http|ftp)s?:\/\/(?:www\.)?([a-z0-9.-]+\.[a-z]{2,5}(?:\/\S*)?)/', '<a href="$1" rel="noopener noreferrer" target="_blank">$1</a>', $html);
-        } else {
-            $html = $this->fixUrlsInHtml($html);
+        // If old HTML string
+        if (is_string($data['value'])) {
+            $data['value'] = $this->getComponentsFromHtml($data['value']);
         }
 
-        $doc->loadHtml($html);
+        foreach ($data['value'] as $index => $component) {
+            $tag         = $component['tag'];
+            $componentId = null;
+            switch ($tag) {
+                case 'h1':
+                case 'h2':
+                case 'h3':
+                case 'h4':
+                case 'h5':
+                case 'h6':
+                    $data['heading:'.$index] = [
+                        'value'  => $component['value'],
+                        '_style' => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag])
+                    ];
+                    break;
+                case 'ul':
+                case 'ol':
+                    $data['ul:'.$index] = [
 
-        // Modify HTML
-        $doc = $this->modifyImages($doc, $style['img'] ?? [], $options['appearance']);
-
-        // Render HTML
-        $this->content = $doc->saveHtml($doc->getElementsByTagName('body')[0]);
-
-        $pattern = '/ style\s*=\s*["\'][^"\']*?["\']/i';
-
-        // Remove the style attribute using preg_replace
-        $this->content = preg_replace($pattern, '', $this->content);
-
-        $this->content = $this->addClasses($this->content, $style, $options['appearance']);
-        $this->content = str_replace('<body>','',$this->content);
-        $this->content = str_replace("</body>",'',$this->content);
-        $this->content = str_replace('</h1>',"</h1>\n",$this->content);
-        $this->content = str_replace('</h2>',"</h2>\n",$this->content);
-        $this->content = str_replace('</h3>',"</h3>\n",$this->content);
-        $this->content = str_replace('</h4>',"</h4>\n",$this->content);
-        $this->content = str_replace('</h5>',"</h5>\n",$this->content);
-        $this->content = str_replace('</h6>',"</h6>\n",$this->content);
-        $this->content = str_replace('</p>',"</p>\n",$this->content);
-        $this->content = str_replace('/>',"/>\n",$this->content);
-        $this->content = preg_replace('/<span class="ql-cursor">.*?<\/span>/', '', $this->content);
-        $this->content = preg_replace('/<span[^>]*>(.*?)<\/span>/', '$1', $this->content);
-
-        $this->content = trim($this->content);
-        
-
-        // Normalize HTML
-        
-
-        if ($data['removeEmptyLines'] ?? false) {
-            $this->content = str_replace("<p><br></p>\n", '', $this->content);
+                        '_repeat'   => $component['value'],
+                        '_style'    => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag]),
+                        'paragraph' => [
+                            'value'  => '{item}',
+                            '_style' => ['tag' => 'li']
+                        ]
+                    ];
+                    break;
+                case 'img':
+                    $data['image:'.$index] = [
+                        'value'  => $component['value'],
+                        '_style' => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag])
+                    ];
+                    break;
+                case 'p':
+                    $data['paragraph:'.$index] = [
+                        'value'  => $component['value'],
+                        '_style' => ArrayHelper::merge(['tag' => $tag], [
+                            'a'      => $style['a'] ?? [],
+                            'strong' => $style['strong'] ?? [],
+                        ])
+                    ];
+                    break;
+                case 'table':
+                    $data['table:'.$index] = [
+                        'th'      => $component['th'] ?? [],
+                        'td'      => $component['td'] ?? [],
+                        '_style'  => ArrayHelper::merge($style['tbl'] ?? [], [
+                            'th' => $style['th'] ?? [],
+                            'td' => $style['td'] ?? [],
+                        ])
+                    ];
+                    break;
+                case 'youtube':
+                    $data['youtube:'.$index] = [
+                        'value'  => $component['value'],
+                        '_style' => $style['youtube'] ?? [],
+                    ];
+                    break;
+            }
         }
+        unset($data['value']);
         parent::build($data, $style, $options);
     }
 
-    protected function renderContent(int $indentation, int $level, string $content): string
+    public function getComponentsFromHtml(string $html): array
     {
-        $i               = str_repeat(' ', $indentation * $level);
-        $rows            = explode("\n", $content);
-        $renderedContent = '';
-        foreach ($rows as $row) {
-            $renderedContent .= $i.trim($row)."\n";
-        }
-        return $renderedContent;
-    }
+        $dom               = new \DOMDocument();
+        $dom->formatOutput = true;
+        $html              = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        $html              = '<html><body>'.$html.'</body></html>';
+        $dom->loadHtml($html);
 
-    private function modifyImages(\DOMDocument $doc, array $style, string $appearance): \DOMDocument
-    {
-        foreach ($doc->getElementsByTagName('img') as $tag) {
-            $src = $tag->getAttribute('src');
-            if (strpos($src, '@')) {
-                $pathinfo = pathinfo($src);
-                $tmp = explode('@', $pathinfo['basename']);
-                $asset = $tmp[0].'.'.$pathinfo['extension'];
-                $img = $this->builder->build('image', ['src' => $asset], $style, ['appearance' => $appearance]);
-                foreach ($img->getAttributes() as $attr => $value) {
-                    $tag->setAttribute($attr, (string)$value);
+        libxml_clear_errors();
+
+        // Get all span elements
+        $spans = $dom->getElementsByTagName('span');
+
+        // Remove spans while preserving their content
+        while ($spans->length > 0) {
+            $span   = $spans->item(0);
+            $parent = $span->parentNode;
+
+            // Move all child nodes of the span to its parent
+            while ($span->firstChild) {
+                $parent->insertBefore($span->firstChild, $span);
+            }
+
+            // Remove the empty span tag
+            $parent->removeChild($span);
+        }
+
+        // Remove <p> tags wrapping <img> tags while preserving the <img> elements
+        $paragraphs = $dom->getElementsByTagName('p');
+        for ($i = $paragraphs->length - 1; $i >= 0; $i--) {
+            $p = $paragraphs->item($i);
+            if ($p->getElementsByTagName('img')->length > 0) {
+                $newNodes = [];
+                $index    = 0;
+                foreach ($p->childNodes as $child) {
+                    if ($child instanceof \DOMElement && $child->nodeName === 'img') {
+                        $newNodes[$index++] = $child->cloneNode(true);
+                    } else {
+                        $newNodes[$index++] ??= [];
+                        $newNodes[$index][] = $child->cloneNode(true);
+                    }
+                }
+                $parentNode = $p->parentNode;
+
+                foreach ($newNodes as $newNode) {
+                    if (is_array($newNode) && count($newNode)) {
+                        $newP = $dom->createElement('p');
+                        foreach ($newNode as $child) {
+                            $newP->appendChild($child);
+                        }
+                        $parentNode->insertBefore($newP, $p);
+                    } elseif ($newNode instanceof \DOMElement) {
+                        $parentNode->insertBefore($newNode, $p);
+                    }
+                }
+                $parentNode->removeChild($p);
+            } else {
+                $text = trim($p->textContent);
+                if (!$text) {
+                    $parent = $p->parentNode;
+                    $parent->removeChild($p);
                 }
             }
         }
 
-        return $doc;
-    }
-
-    private function addClasses(string $html, array $style, string $appearance): string
-    {
-        $headingBaseStyle = $this->siteData->getComponentStyle('heading') ?? [];
-        $headings     = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-        foreach ($headings as $hx) {
-            $mergedStyle  = ArrayHelper::merge($headingBaseStyle, $style[$hx] ?? []);
-            $headingStyle = StyleAppearanceHelper::apply($mergedStyle, $appearance);
-            $headingStyle = array_filter($headingStyle, function($item){ return is_string($item);});
-            $html         = str_replace('<'.$hx.'>', '<'.$hx.' class="'.implode(' ', $headingStyle).'">', $html);
+        // Remove all style attributes from all elements
+        $xpath          = new \DOMXPath($dom);
+        $nodesWithStyle = $xpath->query('//*[@style]');
+        foreach ($nodesWithStyle as $node) {
+            $node->removeAttribute('style');
         }
 
-        $elements = ['a', 'img', 'strong','table','tbl','td','tr','th','ul','ol','li'];
-        foreach ($elements as $el) {
-            if (isset($style[$el])) {
-                $tag = $el === 'tbl' ? 'table' : $el;
-                $elStyle = StyleAppearanceHelper::apply($style[$el], $appearance);
-                $html = str_replace('<'.$tag, '<'.$tag.' class="'.implode(' ', $elStyle).'"', $html);
+        $body =  $dom->getElementsByTagName('body')->item(0);
+
+        $components = [];
+        foreach ($body->childNodes as $child) {
+            switch ($child->nodeName) {
+                case 'h1':
+                case 'h2':
+                case 'h3':
+                case 'h4':
+                case 'h5':
+                case 'h6':
+                    if (trim($child->textContent)) {
+                        $components[] = [
+                            'tag'    => $child->nodeName,
+                            'value'  => trim($child->textContent),
+                        ];
+                    }
+                    break;
+                case 'iframe':
+                    $src = $child->getAttribute('src');
+                    if (strpos($src, 'youtube')) {
+                        $tmp          = explode('/', $src);
+                        $components[] = [
+                            'tag'    => 'youtube',
+                            'value'  => array_pop($tmp)
+                        ];
+                    }
+                    break;
+                case 'img':
+                    $src = $child->getAttribute('src');
+                    if (strpos($src, '@')) {
+                        $pathinfo = pathinfo($src);
+                        $tmp      = explode('@', $pathinfo['basename']);
+                        $src      = $tmp[0].'.'.$pathinfo['extension'];
+                    }
+                    $components[] = [
+                        'tag'    => $child->nodeName,
+                        'value'  => $src,
+                    ];
+                    break;
+                case 'p':
+                    $components[] = [
+                        'tag'    => 'p',
+                        'value'  => $this->getMarkdown($child)
+                    ];
+                    break;
+                case 'ul':
+                case 'ol':
+                    $items = [];
+                    foreach ($child->childNodes as $item) {
+                        if ($item->nodeName === 'li') {
+                            $items[] = $this->getMarkdown($item);
+                        }
+                    }
+                    $components[] = [
+                        'tag'    => $child->nodeName,
+                        'value'  => json_encode($items)
+                    ];
+                    break;
+                case 'pre':
+                    $tableDom             = new \DOMDocument();
+                    $html                 = str_replace('&nbsp;', '', $child->textContent);
+                    $tableDom->loadHtml($html);
+                    libxml_clear_errors();
+                    $table = $tableDom->getElementsByTagName('table')[0];
+                    $index = 0;
+                    $th    = [];
+                    $td    = [];
+                    foreach ($table->childNodes as $row) {
+                        if ('tr' === $row->nodeName) {
+                            foreach ($row->childNodes as $cell) {
+                                if ('th' === $cell->nodeName) {
+                                    $th[] = trim($cell->textContent);
+                                }
+                                if ('td' === $cell->nodeName) {
+                                    $td[$index] ??= [];
+                                    $td[$index][] = trim($cell->textContent);
+                                }
+                            }
+                            $index++;
+                        }
+                    }
+                    $components[] = [
+                        'tag'    => 'table',
+                        'th'     => $th,
+                        'td'     => $td
+                    ];
+                    break;
+                default:
+                    echo $child->nodeName."\n";
             }
         }
-
-        return $html;
+        return $components;
     }
 
-    private function getImgClasses(array $style, string $appearance): string
+    private function getMarkdown(\DOMNode $node) : string
     {
-        return implode(' ', StyleAppearanceHelper::apply($style, $appearance));
-    }
-
-    private function convertPreToHtml(string $html):string {
-        $matches = [];
-        preg_match_all('/<pre class="ql-syntax" spellcheck="false">((.|\n)*?)<\/pre>/', $html, $matches);
-
-        foreach ($matches[1] as $i => $match) {
-            $match = str_replace('&nbsp;','',$match);
-            $match = str_replace('&lt;','<',$match);
-            $match = str_replace('&gt;','>',$match);
-            $html = str_replace($matches[0][$i], $match, $html);
-
+        $markdown = [];
+        foreach ($node->childNodes as $child) {
+            switch ($child->nodeType) {
+                case XML_TEXT_NODE:
+                    $markdown[] = $child->textContent;
+                    break;
+                case XML_ELEMENT_NODE:
+                    switch ($child->nodeName) {
+                        case 'strong':
+                            $markdown[] = '**'.$child->textContent.'**';
+                            break;
+                        case 'em':
+                            $markdown[] = '*'.$child->textContent.'*';
+                            break;
+                        case 'a':
+                            $markdown[] = '['.$child->textContent.']('.trim($child->getAttribute('href'), '/').')';
+                            break;
+                        default:
+                            $markdown[] = $child->textContent;
+                    }
+            }
         }
-        return $html;
+        return implode(' ', $markdown);
     }
 }

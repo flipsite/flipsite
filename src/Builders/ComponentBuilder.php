@@ -332,7 +332,7 @@ class ComponentBuilder
                 foreach ($data as $key => &$value) {
                     if (is_string($value)) {
                         $value = $this->handleApplyData($value, $variables, $found);
-                    } elseif (is_array($value)) {
+                    } elseif (is_array($value) && is_string($key)) {
                         $parts         = explode(':', $key);
                         $componentType = $parts[0];
                         if (!$checkIfContainer || !$this->isContainer($componentType)) {

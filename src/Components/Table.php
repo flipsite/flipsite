@@ -3,8 +3,6 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
-use League\Csv\Reader;
-
 final class Table extends AbstractComponent
 {
     use Traits\MarkdownTrait;
@@ -14,44 +12,16 @@ final class Table extends AbstractComponent
 
     public function normalize(string|int|bool|array $data) : array
     {
-    //     if (is_string($data)) {
-    //         $data = ['import' => $data];
-    //     }
-    //     if (isset($data['import'])) {
-    //         $filename = $this->environment->getSiteDir().'/'.$data['import'];
-    //         unset($data['import']);
-    //         if (file_exists($filename)) {
-    //             $csv = Reader::createFromPath($filename, 'r');
-    //             $csv->setDelimiter(';');
-    //             if (!isset($data['header'])) {
-    //                 $csv->setHeaderOffset(0);
-    //                 $data['header'] = [];
-    //                 foreach ($csv->getHeader() as $h) {
-    //                     $data['header'][] = $h;
-    //                 }
-    //             }
-    //             $data['rows'] = [];
-    //             foreach ($csv->getRecords() as $i => $row) {
-    //                 $data['rows'][$i] = [];
-    //                 foreach ($row as $col) {
-    //                     $data['rows'][$i][] = $col;
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (isset($data['header']) && is_string($data['header'])) {
-    //         $data['header'] = explode(',', $data['header']);
-    //     }
         return $data;
     }
 
     public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
-        
-        if ($data['header'] ?? false) {
+
+        if ($data['th'] ?? false && count($data['th'])) {
             $tr      = new Element('tr');
-            foreach ($data['header'] as $i => $col) {
+            foreach ($data['th'] as $i => $col) {
                 $th = new Element('th', true);
                 $th->addStyle($style['th']);
                 $th->setContent($col);
@@ -60,46 +30,17 @@ final class Table extends AbstractComponent
             $this->addChild($tr);
         }
 
-        $totalRows = count($data['rows']);
-        foreach ($data['rows'] as $i => $row) {
-            $tr = new Element('tr');
-            $tr->addStyle($this->getNth($i, $totalRows, $style['tr'] ?? [], 'tr'));
-            foreach ($row as $j => $col) {
-                $tag = $style['td'][$j]['tag'] ?? 'td';
-                $td  = new Element($tag, true);
-                $td->addStyle($style['td']);
-
-                if (isset($data['format'])) {
-                    $td->setContent($this->format($data['format'], $col, $j));
-                } else {
-                    $td->setContent((string)$col);
+        if ($data['td'] ?? false && count($data['th'])) {
+            foreach ($data['td'] as $i => $row) {
+                $tr      = new Element('tr');
+                foreach ($row as $cell) {
+                    $td = new Element('td', true);
+                    $td->addStyle($style['td']);
+                    $td->setContent($cell);
+                    $tr->addChild($td);
                 }
-                $tr->addChild($td);
+                $this->addChild($tr);
             }
-            $this->addChild($tr);
-        }
-    }
-
-    private function format(array $format, string $content, int $index) : string
-    {
-        if (!$content) {
-            return $content;
-        }
-        $f = $format['tdAll'] ?? 'none';
-        if (isset($format['td'][$index])) {
-            $f = $format['td'][$index];
-        }
-        $parts = explode('|', $f);
-        switch ($parts[0]) {
-            case 'currency':
-                $value  = number_format(floatVal($content), 2, ',', '');
-                $format = $parts[1] ?? false;
-                if (isset($parts[1])) {
-                    return  sprintf($parts[1], $value);
-                }
-                // no break
-            case 'none':
-            default: return $content;
         }
     }
 }
