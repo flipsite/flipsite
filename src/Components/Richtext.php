@@ -297,6 +297,9 @@ final class Richtext extends AbstractGroup
                         case 'a':
                             $markdown[] = '['.$child->textContent.']('.trim($child->getAttribute('href'), '/').')';
                             break;
+                        case 'br':
+                            $markdown[] = '<br>';
+                            break;
                         default:
                             $markdown[] = $child->textContent;
                     }
