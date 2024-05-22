@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Callbacks;
 
 class UnitCallback
 {
-    public const UNITS = ['%', 'px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch','svh','lvh','dvh','svw','lvw','dvw','svmin','lvmin','dvmin','svmax','lvmax','dvmax','vi','svi','lvi','dvi','vb','svb','lvb','dvb'];
+    public const UNITS = ['%', 'px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch', 'svh', 'lvh', 'dvh', 'svw', 'lvw', 'dvw', 'svmin', 'lvmin', 'dvmin', 'svmax', 'lvmax', 'dvmax', 'vi', 'svi', 'lvi', 'dvi', 'vb', 'svb', 'lvb', 'dvb'];
+
     public function __invoke(array $args)
     {
         $multiplier = 1.0;
@@ -32,7 +32,7 @@ class UnitCallback
         }
         if (str_starts_with($args[0], '[') && str_ends_with($args[0], ']')) {
             $value = substr($args[0], 1, strlen($args[0]) - 2);
-            $unit = preg_replace('/[0-9]+/', '', $value);
+            $unit  = preg_replace('/[0-9\.]+/', '', $value);
             $value = floatval(str_replace($unit, '', $value));
             if (in_array($unit, self::UNITS)) {
                 return $value.$unit;
