@@ -147,12 +147,6 @@ abstract class AbstractGroup extends AbstractComponent
             $repeat = $filter->filterList($repeat, $data['_options']['filterField'] ?? null);
         }
 
-        if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
-            $offset = intval($data['_options']['offset'] ?? 0);
-            $length = intval($data['_options']['length'] ?? 999999);
-            $repeat = array_splice($repeat, $offset, $length);
-        }
-
         if (isset($data['_options']['sortBy'])) {
             $sortField = $data['_options']['sortBy'];
             uasort($repeat, function ($a, $b) use ($sortField) {
@@ -164,6 +158,12 @@ abstract class AbstractGroup extends AbstractComponent
         }
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
             $repeat = array_reverse($repeat);
+        }
+
+        if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
+            $offset = intval($data['_options']['offset'] ?? 0);
+            $length = intval($data['_options']['length'] ?? 999999);
+            $repeat = array_splice($repeat, $offset, $length);
         }
 
         $components = array_filter($data, function ($key): bool {
