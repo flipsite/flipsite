@@ -3,8 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-final class RuleTranslateX extends AbstractRuleTransform
+final class RuleTranslateZ extends AbstractRuleTransform
 {
-    protected array $properties = ['--tw-translate-x'];
+    protected array $properties = ['--tw-translate-z'];
     protected array $callbacks  = ['size'];
 }

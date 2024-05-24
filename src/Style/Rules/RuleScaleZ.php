@@ -3,8 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-final class RuleScaleY extends AbstractRuleTransform
+final class RuleScaleZ extends AbstractRuleTransform
 {
-    protected array $properties = ['--tw-scale-y'];
+    protected array $properties = ['--tw-scale-z'];
     protected string $unit      = '%';
 }

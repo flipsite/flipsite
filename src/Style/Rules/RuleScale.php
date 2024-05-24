@@ -1,13 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
-final class RuleScale extends AbstractRuleScale
+final class RuleScale extends AbstractRuleTransform
 {
-    /**
-     * @var array<string>
-     */
-    protected array $properties = ['--tw-scale-x', '--tw-scale-y'];
+    protected array $properties = ['--tw-scale-x', '--tw-scale-y', '--tw-scale-z'];
+    protected string $unit      = '%';
 }

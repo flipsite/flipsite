@@ -1,13 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
-final class RuleTranslateY extends AbstractRuleTranslate
+final class RuleTranslateY extends AbstractRuleTransform
 {
-    /**
-     * @var array<string>
-     */
     protected array $properties = ['--tw-translate-y'];
+    protected array $callbacks  = ['size'];
 }

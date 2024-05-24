@@ -3,8 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-final class RuleRotateY extends AbstractRuleTransform
+final class RuleRotateZ extends AbstractRuleTransform
 {
-    protected array $properties = ['--tw-rotate-y'];
+    protected array $properties = ['--tw-rotate-z'];
     protected string $unit      = 'deg';
 }
