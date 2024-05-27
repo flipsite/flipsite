@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 final class RuleObject extends AbstractRule
@@ -11,7 +10,7 @@ final class RuleObject extends AbstractRule
      */
     protected function process(array $args) : void
     {
-        $value = $this->getConfig('objectPosition', $args[0]);
+        $value = $this->getConfig('objectPosition', implode('-', $args));
         $this->setDeclaration('object-position', $value);
     }
 }
