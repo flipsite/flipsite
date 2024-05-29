@@ -30,7 +30,7 @@ email:
   icon: zondicons/envelope.svg
   url: mailto:{handle}
 maps:
-  name: Google Maps
+  name: Directions
   color: "#4285F4"
   icon: zondicons/location.svg
   url: "{handle}"
@@ -39,6 +39,11 @@ messenger:
   color: "#00B2FF"
   icon: simple-icons/messenger.svg
   url: https://www.messenger.com/t/{handle}
+open:
+  name: Business hours
+  color: "#CB333B"
+  icon: zondicons/time.svg
+  url: "#"
 phone:
   name: Phone
   color: "#34DA50"

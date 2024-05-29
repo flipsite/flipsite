@@ -12,14 +12,13 @@ final class Social extends AbstractGroup
         if (!is_array($data)) {
             $data = ['value' => $data];
         }
-        $dataSourceList = $this->getSocial($data['phoneFormat'] ?? null);
-        unset($data['phoneFormat']);
+        $dataSourceList = $this->getSocial();
+        $dataSourceList = $this->applyCustom($dataSourceList, $data);
+
         $filter     = ArrayHelper::decodeJsonOrCsv($data['filter'] ?? null);
         $sort       = ArrayHelper::decodeJsonOrCsv($data['sort'] ?? null);
-        $phoneIcon  = $data['phoneIcon'] ?? false;
-        $emailIcon  = $data['emailIcon'] ?? false;
-        $phoneValue = $data['phoneValue'] ?? false;
-        unset($data['filter'],$data['phoneIcon'],$data['emailIcon']);
+
+        unset($data['filter'],$data['phoneFormat'],$data['phoneValue'], $data['phoneIcon'],$data['emailIcon'],$data['mapsIcon'],$data['openIcon']);
 
         $data = $this->normalizeRepeat($data, $dataSourceList);
         if ($filter) {
@@ -55,25 +54,6 @@ final class Social extends AbstractGroup
             }
         }
 
-        if ($phoneIcon || $phoneValue) {
-            foreach ($data['_repeatData'] as &$item) {
-                if ('phone' === $item['type']) {
-                    if ($phoneIcon) {
-                        $item['icon'] = $phoneIcon;
-                    }
-                    if ($phoneValue) {
-                        $item['name'] = $phoneValue;
-                    }
-                }
-            }
-        }
-        if ($emailIcon) {
-            foreach ($data['_repeatData'] as &$item) {
-                if ('email' === $item['type']) {
-                    $item['icon'] = $emailIcon;
-                }
-            }
-        }
         return $data;
     }
 
@@ -87,20 +67,43 @@ final class Social extends AbstractGroup
         if (!$social) {
             return [];
         }
-
         foreach ($social as $type => $handle) {
             $item           = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
             $item['type']   = $type;
             $item['handle'] = $handle;
             $item['url']    = $item['url'];
-            if ($phoneFormat && 'phone' === $type) {
-                $item['name'] = $this->getFormattedPhoneNumber($handle, $phoneFormat);
-            }
-            $item['color'] = '['.$item['color'].']';
-            $items[]       = $item;
+            $item['color']  = '['.$item['color'].']';
+            $items[]        = $item;
         }
 
         return $items;
+    }
+
+    private function applyCustom(array $social, array $data) : array
+    {
+        foreach ($social as &$item) {
+            switch ($item['type']) {
+                case 'phone':
+                    $item['icon'] = $data['phoneIcon'] ?? $item['icon'];
+                    $item['name'] = $data['phoneValue'] ?? $item['name'];
+                    if (!isset($data['phoneValue']) && isset($data['phoneFormat'])) {
+                        $item['name'] = $this->getFormattedPhoneNumber($item['handle'], $data['phoneFormat']);
+                    }
+                    break;
+                case 'email':
+                    $item['icon'] = $data['emailIcon'] ?? $item['icon'];
+                    break;
+                case 'maps':
+                    $item['icon'] = $data['mapsIcon'] ?? $item['icon'];
+                    $item['name'] = $data['mapsValue'] ?? $item['name'];
+                    break;
+                case 'open':
+                    $item['icon'] = $data['openIcon'] ?? $item['icon'];
+                    $item['name'] = $item['handle'] ?? $item['name'];
+                    break;
+            }
+        }
+        return $social;
     }
 
     private function getFormattedPhoneNumber(string $value, string $format) : string
