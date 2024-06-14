@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -12,18 +11,19 @@ use SSNepenthe\ColorUtils\Transformers\Desaturate;
 
 class ColorHelper
 {
-    public static function getGray(string $colorString, int $desaturate = 90, int $minBrightness = 60): string
+    public static function getGray(?string $colorString, int $desaturate = 90, int $minBrightness = 60): string
     {
-        $color = ColorFactory::fromString($colorString);
+        $color     = ColorFactory::fromString($colorString ?? '#121212');
         $transform = new Desaturate($desaturate);
-        $color = $transform->transform($color);
+        $color     = $transform->transform($color);
         $transform = new Darken(1);
-        $i = 0;
-        while($color->calculatePerceivedBrightness() > $minBrightness && $i < 100) {
+        $i         = 0;
+        while ($color->calculatePerceivedBrightness() > $minBrightness && $i < 100) {
             $color = $transform->transform($color);
         }
-        return sprintf("#%02x%02x%02x", $color->getRed(), $color->getGreen(), $color->getBlue());
+        return sprintf('#%02x%02x%02x', $color->getRed(), $color->getGreen(), $color->getBlue());
     }
+
     public static function parseAndReplace(string $colorString, array $allColors): string
     {
         $pattern = '/('.implode('|', array_keys($allColors)).')(-[dl0-9]{1,3})?(\/[dl0-9]{1,3})?/';
@@ -31,7 +31,7 @@ class ColorHelper
         preg_match_all($pattern, $colorString, $matches);
         foreach ($matches[0] as $match) {
             $color = ColorHelper::getColor($match, $allColors);
-            $pos = strpos($colorString, $match);
+            $pos   = strpos($colorString, $match);
             if ($pos !== false) {
                 $colorString = substr_replace($colorString, (string)$color, $pos, strlen($match));
             }
@@ -48,7 +48,7 @@ class ColorHelper
         if ($color->getAlpha() < 1.0) {
             return (string)$color;
         }
-        return sprintf("#%02x%02x%02x", $color->getRed(), $color->getGreen(), $color->getBlue());
+        return sprintf('#%02x%02x%02x', $color->getRed(), $color->getGreen(), $color->getBlue());
     }
 
     public static function getColor(string|array $args, array $allColors): ?Color
@@ -63,14 +63,14 @@ class ColorHelper
         $contrast = false;
         if (str_ends_with($args, '-contrast')) {
             $contrast = true;
-            $args = substr($args, 0, strlen($args) - 9);
+            $args     = substr($args, 0, strlen($args) - 9);
         }
 
         $alpha = 1.0;
-        $tmp = explode('/', $args);
+        $tmp   = explode('/', $args);
         if (count($tmp) === 2) {
             $alpha = floatval($tmp[1]) / 100.0;
-            $args = $tmp[0];
+            $args  = $tmp[0];
         }
 
         $color = null;
@@ -79,11 +79,11 @@ class ColorHelper
             return null;
         }
 
-        if (substr($args, 0, 2) === '[#' && strlen($args) ===  9) {
+        if (substr($args, 0, 2) === '[#' && strlen($args) === 9) {
             $color = ColorFactory::fromString(substr($args, 1, 7));
         } else {
-            $shade = 500;
-            $tmp = explode('-', $args);
+            $shade      = 500;
+            $tmp        = explode('-', $args);
             $themeColor = $tmp[0];
             if (!isset($allColors[$themeColor])) {
                 return null;
@@ -93,14 +93,14 @@ class ColorHelper
             }
             if (isset($tmp[1])) {
                 $shades = [
-                    'l1','l2','l3','l4','l5','l6','l7','l8','l10','l11','l12',
-                    'd1','d2','d3','d4','d5','d6','d7','d8','d10','d11','d12'
+                    'l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7', 'l8', 'l10', 'l11', 'l12',
+                    'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd10', 'd11', 'd12'
                 ];
                 if (in_array($tmp[1], $shades)) {
-                    $color = ColorFactory::fromString($allColors[$themeColor][500]);
+                    $color      = ColorFactory::fromString($allColors[$themeColor][500]);
                     $colorScale = new ColorScale();
-                    $isLight = substr($tmp[1], 0, 1) === 'l';
-                    $index = intval(substr($tmp[1], 1));
+                    $isLight    = substr($tmp[1], 0, 1) === 'l';
+                    $index      = intval(substr($tmp[1], 1));
                     if ($isLight) {
                         $color = $colorScale->getLight($color, $index);
                     } else {
@@ -125,8 +125,8 @@ class ColorHelper
             if ($brightness < 128) {
                 $color =  ColorFactory::fromString('#ffffff');
             } else {
-                $colorScale = new ColorScale();
-                $color = $colorScale->getLight($color, 12);
+                $colorScale    = new ColorScale();
+                $color         = $colorScale->getLight($color, 12);
                 $contrastRatio = $color->calculateContrastRatioWith($color);
                 if ($contrastRatio < 4.5) {
                     $color = ColorFactory::fromString('#000000');

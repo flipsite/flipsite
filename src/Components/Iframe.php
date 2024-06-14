@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
-final class Iframe extends AbstractComponent
+class Iframe extends AbstractComponent
 {
     protected bool $oneline = true;
     protected string $tag   = 'iframe';
