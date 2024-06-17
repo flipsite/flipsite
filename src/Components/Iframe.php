@@ -11,11 +11,5 @@ class Iframe extends AbstractComponent
     public function build(array $data, array $style, array $options): void
     {
         $this->addStyle($style);
-        if (isset($data['value'])) {
-            $this->setAttribute('value', $data['value']);
-        }
-        if (isset($data['title'])) {
-            $this->setAttribute('title', $data['title']);
-        }
     }
 }
