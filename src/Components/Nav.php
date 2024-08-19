@@ -69,11 +69,12 @@ final class Nav extends AbstractGroup
         }
 
         if ($data['_options']['languages'] ?? false) {
-            $languages = $this->siteData->getLanguages();
+            $languages            = $this->siteData->getLanguages();
+            $hideActiveLanguage   = $data['_options']['hideActiveLanguage'] ?? false;
             if (count($languages) > 1) {
                 $active = $this->path->getLanguage();
                 foreach ($languages as $language) {
-                    if (!$language->isSame($active)) {
+                    if (!$hideActiveLanguage || !$language->isSame($active)) {
                         $repeat[] = [
                             'slug'      => (string)$language,
                             'name'      => $language->getInLanguage(),

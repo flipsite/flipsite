@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 class Languages extends AbstractGroup
@@ -13,18 +12,22 @@ class Languages extends AbstractGroup
 
     public function normalize(string|int|bool|array $data): array
     {
-        $repeat = [];
+        $repeat    = [];
         $languages = $this->siteData->getLanguages();
-    
-        $active = $this->path->getLanguage();
+
+        $active               = $this->path->getLanguage();
+        $hideActiveLanguage   = $data['_options']['hideActiveLanguage'] ?? false;
+
         foreach ($languages as $language) {
-            $repeat[] = [
-                'slug' => (string)$language,
-                'code' => (string)$language,
-                'name' => $language->getInLanguage(),
-            ];
+            if (!$hideActiveLanguage || !$language->isSame($active)) {
+                $repeat[] = [
+                    'slug' => (string)$language,
+                    'code' => (string)$language,
+                    'name' => $language->getInLanguage(),
+                ];
+            }
         }
-    
+
         return $this->normalizeRepeat($data, $repeat);
     }
 }
