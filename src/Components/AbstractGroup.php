@@ -186,6 +186,15 @@ abstract class AbstractGroup extends AbstractComponent
             }
         }
 
+        if ($data['_options']['duplicate'] ?? false) {
+            $count            = intval($data['_options']['duplicate']) ?? 1;
+            $duplicated       = [];
+            for ($i = 0; $i <= $count; $i++) {
+                $duplicated = array_merge($duplicated, $data['_repeatData']);
+            }
+            $data['_repeatData'] = $duplicated;
+        }
+
         return $data;
     }
 

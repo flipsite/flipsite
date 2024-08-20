@@ -38,11 +38,12 @@ spacing:
   auto: auto
   px: 1px
 animation:
-  spin: spin 1s linear infinite
-  ping: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite
-  pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite
-  bounce: bounce 1s infinite
-  shake: shake 0.82s cubic-bezier(.36,.07,.19,.97)
+  spin: spin var(--tw-animation-duration) linear infinite
+  ping: ping var(--tw-animation-duration) cubic-bezier(0, 0, 0.2, 1) infinite
+  pulse: pulse var(--tw-animation-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite
+  bounce: bounce var(--tw-animation-duration) infinite
+  shake: shake var(--tw-animation-duration) cubic-bezier(.36,.07,.19,.97)
+  scroll: scroll var(--tw-animation-duration) linear infinite
 keyframes:
   spin:
     from:
@@ -74,6 +75,11 @@ keyframes:
       transform: translate3d(-4px, 0, 0);
     40%,60%:
       transform: translate3d(4px, 0, 0);
+  scroll:
+    0%:
+      transform: translateX(0%);
+    100%:
+      transform: translateX(-50%);
 backgroundImage:
   none: none
 backgroundPosition:

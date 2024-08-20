@@ -358,6 +358,8 @@ snap-proximity: --tw-scroll-snap-strictness:proximity
 sr-only: position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0
 static: position:static
 sticky: position:sticky
+state-running: animation-play-state:running
+state-paused: animation-play-state:paused
 stroke-inherit: stroke:inherit
 stroke-current: stroke:currentColor
 stroke-transparent: stroke:transparent

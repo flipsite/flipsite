@@ -128,6 +128,7 @@ final class Tailwind implements CallbackInterface
     {
         $default       = '';
         $defaultValues = [
+            '--tw-animation-duration'     => '1s',
             '--tw-border-spacing-x'       => 0,
             '--tw-border-spacing-y'       => 0,
             '--tw-translate-x'            => 0,
