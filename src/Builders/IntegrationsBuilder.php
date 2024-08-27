@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -13,6 +14,7 @@ class IntegrationsBuilder implements BuilderInterface
     private ?string $ga         = null;
     private ?string $metaPixel  = null;
     private ?string $plausible  = null;
+    private string $plausibleScript  = 'script.js';
 
     public function __construct(private bool $isLive, array $integrations)
     {
@@ -27,6 +29,9 @@ class IntegrationsBuilder implements BuilderInterface
         }
         if (isset($integrations['plausibleAnalytics'])) {
             $this->plausible = (string)$integrations['plausibleAnalytics'];
+            if (isset($integrations['plausibleAnalyticsSrc'])) {
+                $this->plausibleScript = (string)$integrations['plausibleAnalyticsSrc'];
+            }
         }
     }
 
@@ -90,7 +95,7 @@ class IntegrationsBuilder implements BuilderInterface
         if ($this->plausible) {
             $script = new Element('script', true);
             $script->setAttribute('defer', true);
-            $script->setAttribute('src', 'https://plausible.io/js/script.js');
+            $script->setAttribute('src', 'https://plausible.io/js/'.$this->plausibleScript);
             $script->setAttribute('data-domain', $this->plausible);
             $script->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->prependChild($script);
