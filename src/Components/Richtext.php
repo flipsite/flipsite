@@ -215,6 +215,12 @@ final class Richtext extends AbstractGroup
                         'value'  => $this->getMarkdown($child)
                     ];
                     break;
+                case '#text':
+                    $components[] = [
+                        'tag'    => 'p',
+                        'value'  => $child->wholeText
+                    ];
+                    break;
                 case 'ul':
                 case 'ol':
                     $items = [];
