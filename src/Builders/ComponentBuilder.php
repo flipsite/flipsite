@@ -530,7 +530,7 @@ class ComponentBuilder
 
         if (isset($options['filterType']) || isset($options['filter']) || isset($options['filterPattern'])) {
             $options['filterFieldValue'] ??= null;
-            if (preg_match('/^\{[a-zA-Z\.]+\}$/', $options['filterFieldValue'])) {
+            if (is_string($options['filterFieldValue']) && preg_match('/^\{[a-zA-Z\.]+\}$/', $options['filterFieldValue'])) {
                 $options['filterFieldValue'] = null;
             }
             $filter = new Filter($options['filterType'] ?? 'or', $options['filter'] ?? null, $options['filterPattern'] ?? null);
