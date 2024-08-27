@@ -2,14 +2,16 @@ ready(() => {
   document.querySelectorAll('[data-dots]').forEach((dots) => {
     dots.removeAttribute('data-dots');
     const targetId = dots.getAttribute('data-target');
-    const scrollDots = new ScrollDots(dots, document.getElementById(targetId));
+    const backgrounds = JSON.parse(dots.getAttribute('data-backgrounds') || '');
+    dots.removeAttribute('data-backgrounds');
+    const scrollDots = new ScrollDots(dots, backgrounds, document.getElementById(targetId));
     window.addEventListener('resize', function() {
       scrollDots.handleResize();
     });
   });
 });
 
-function ScrollDots(dots, target) {
+function ScrollDots(dots, backgrounds, target) {
   this.selectedIndex = -1;
   this.visibleItems = -1;
   this.timeout = null;
@@ -17,6 +19,7 @@ function ScrollDots(dots, target) {
   this.dots = dots;
   this.target = target;
   this.itemsCount = target.children.length;
+  this.backgrounds = backgrounds;
   this.dotTpl = dots.children[0].cloneNode();
   this.selectedClasses = [];
   this.notSelectedClasses = [];
@@ -29,7 +32,6 @@ function ScrollDots(dots, target) {
     }
   });
   this.dotTpl.removeAttribute('data-selected')
-  
   for (let i=0; i<this.notSelectedClasses.length; i++) {
     this.dotTpl.classList.remove(this.notSelectedClasses[i])
   }
@@ -61,6 +63,9 @@ ScrollDots.prototype.handleResize = function() {
   const neededDots = Math.ceil(this.itemsCount/this.visibleItems); 
   for (let i=0; i<neededDots; i++) {
     const dot = this.dotTpl.cloneNode()
+    if (undefined !== this.backgrounds[i]) {
+      dot.style.backgroundImage = 'url('+this.backgrounds[i]+')';
+    }
     dot.onclick = function(){
       that.setSelected(i,true)
       that.scrollDisabled = true;
