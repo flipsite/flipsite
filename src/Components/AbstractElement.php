@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Utils\ArrayHelper;
+
 abstract class AbstractElement
 {
     protected bool $empty               = false;
@@ -258,7 +260,13 @@ abstract class AbstractElement
     public function renderAttributes(): string
     {
         if (count($this->style)) {
-            $class = $this->getClasses();
+            $nonStyleClasses = $this->getAttribute('class');
+            $class           = $this->getClasses();
+            if ($nonStyleClasses) {
+                $classes = ArrayHelper::decodeJsonOrCsv($nonStyleClasses);
+                $class .= ' '.implode(' ', $classes);
+                $class = trim($class);
+            }
             $this->setAttribute('class', $class);
         }
         $html = '';
