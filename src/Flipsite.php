@@ -253,10 +253,10 @@ final class Flipsite
     private function getGlobalVars(?array $social, Path $path): array
     {
         $globalVars = [
-            'site.name'        => $this->siteData->getName(),
-            'site.description' => $this->siteData->getDescription(),
-            'site.image'       => $this->siteData->getShare(),
-            'copyright.year'   => '<span data-copyright>' . date('Y') . '</span>'
+            'site.name'             => $this->siteData->getName(),
+            'site.description'      => $this->siteData->getDescription(),
+            'site.image'            => $this->siteData->getShare(),
+            'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
         ];
         $globalVars['meta.name'] = $this->siteData->getPageName($path->getPage(), $path->getLanguage());
         $meta                    = $this->siteData->getPageMeta($path->getPage(), $path->getLanguage());
@@ -268,6 +268,9 @@ final class Flipsite
         unset($globalVars['meta.content']);
         foreach ($social as $type => $handle) {
             $globalVars['social.'.$type] = $handle;
+        }
+        foreach ($this->siteData->getPlaceholders() as $var => $value) {
+            $globalVars[$var] = $value;
         }
         return $globalVars;
     }

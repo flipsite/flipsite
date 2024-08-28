@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -216,25 +215,25 @@ final class Reader implements SiteDataInterface
 
     public function getThemeSettings(): array
     {
-        $style = $this->data['theme']['components']['html'] ?? [];
+        $style    = $this->data['theme']['components']['html'] ?? [];
         $settings = [];
 
         if (isset($style['textScale'])) {
-            $value = str_replace('text-scale-', '', $style['textScale']);
+            $value                 = str_replace('text-scale-', '', $style['textScale']);
             $settings['textScale'] = floatval($value) / 100.0;
         } else {
             $settings['textScale'] = 1.0;
         }
 
         if (isset($style['spacingScale'])) {
-            $value = str_replace('spacing-scale-', '', $style['spacingScale']);
+            $value                    = str_replace('spacing-scale-', '', $style['spacingScale']);
             $settings['spacingScale'] = floatval($value) / 100.0;
         } else {
             $settings['spacingScale'] = 1.0;
         }
 
         if (isset($style['borderRadiusScale'])) {
-            $value = str_replace('rounded-scale-', '', $style['borderRadiusScale']);
+            $value                         = str_replace('rounded-scale-', '', $style['borderRadiusScale']);
             $settings['borderRadiusScale'] = floatval($value) / 100.0;
         } else {
             $settings['borderRadiusScale'] = 1.0;
@@ -251,18 +250,16 @@ final class Reader implements SiteDataInterface
     public function getHtmlStyle(?string $page = null): array
     {
         $style = $this->data['theme']['components']['html'] ?? [];
-        unset($style['appearance']);
-        unset($style['textScale']);
-        unset($style['spacingScale']);
-        unset($style['borderRadiusScale']);
+        unset($style['appearance'], $style['textScale'], $style['spacingScale'], $style['borderRadiusScale']);
+
         return $style;
     }
 
     public function getBodyStyle(?string $page = null): array
     {
         $style = $this->data['theme']['components']['body'] ?? [];
-        unset($style['bgColor']);
-        unset($style['dark']['bgColor']);
+        unset($style['bgColor'], $style['dark']['bgColor']);
+
         return $style;
     }
 
@@ -275,10 +272,9 @@ final class Reader implements SiteDataInterface
             return $dot->get(implode('.', $tmp)) ?? [];
         }
 
-        if (in_array($component, ['heading','button','container','icon','link','logo','nav','paragraph','question','social','svg','tagline','timer','toggle'])) {
+        if (in_array($component, ['heading', 'button', 'container', 'icon', 'link', 'logo', 'nav', 'paragraph', 'question', 'social', 'svg', 'tagline', 'timer', 'toggle'])) {
             return [];
         }
-
 
         $style = $this->data['theme']['components'][$component] ?? [];
         // if (in_array($component, ['social', 'nav'])) {
@@ -349,7 +345,6 @@ final class Reader implements SiteDataInterface
             $a['_after'] = true;
         }
         $sections = array_merge($before, $all, $after);
-
         $sections = $this->localizer->localize($sections ?? [], $language) ?? [];
 
         $sections = $this->normalize($sections);
@@ -383,7 +378,7 @@ final class Reader implements SiteDataInterface
                 array_pop($p);
             }
             $title[] = $this->get('title', $language) ?? $this->get('name');
-            $title = implode(' - ', $title);
+            $title   = implode(' - ', $title);
         }
 
         if ($language && !$language->isSame($this->getDefaultLanguage())) {
@@ -416,6 +411,23 @@ final class Reader implements SiteDataInterface
         return $hidden;
     }
 
+    public function getPlaceholders(): array
+    {
+        return [
+            'placeholder.hero.heading'  => 'Create the fastest website in the world!',
+            'placeholder.hero.lead'     => 'Easily build sites that score 100% in all lighthouse tests. Static HTML, images for all devices and content tailored for SEO & Accessibility.',
+            'placeholder.button'        => 'Get started',
+            'placeholder.team.heading'  => 'Meet the Minds Behind the Magic',
+            'placeholder.team.lead'     => 'Driven by passion and powered by expertise, our team works collaboratively to build custom websites that captivate and convert.',
+            'placeholder.about.heading' => 'Innovation Meets Design',
+            'placeholder.about.text'    => 'With a focus on creativity and innovation, We transforms ideas into digital realities. Our team of designers and developers collaborates closely with you to deliver tailored web solutions that not only look beautiful but also drive results and enhance your online presence.',
+            'placeholder.cta.heading'   => 'Redo att Förverkliga Ditt Byggprojekt?',
+            'placeholder.cta.lead'      => 'Kontakta oss idag för en kostnadsfri offert och låt oss tillsammans skapa framtidens bygglösningar på Åland.',
+            'placeholder.cta.button'    => 'Begär Offert'
+
+        ];
+    }
+
     private function expandPagesAndSlugs(): void
     {
         $pages    = $this->data['pages'] ?? [];
@@ -426,13 +438,13 @@ final class Reader implements SiteDataInterface
         $expandedSlugs = [];
         $expandedMeta  = [];
 
-        $languages = $this->getLanguages();
+        $languages    = $this->getLanguages();
         $mainLanguage = array_shift($languages); //all languages except main one
 
         foreach ($pages as $page => $sections) {
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $this->expandedPages[$page] = [(string)$mainLanguage => $page];
-                $collection = $this->getCollection($meta[$page]['content']);
+                $collection                 = $this->getCollection($meta[$page]['content']);
                 if (!$collection) {
                     continue;
                 }
@@ -445,7 +457,7 @@ final class Reader implements SiteDataInterface
                             continue;
                         }
 
-                        $loc = new Localization($this->languages, $dataItem[$slugField]);
+                        $loc          = new Localization($this->languages, $dataItem[$slugField]);
                         $expandedPage = str_replace(':slug', $loc->getValue() ?? '', $page);
 
                         // Dont overwrite existing page
@@ -469,10 +481,10 @@ final class Reader implements SiteDataInterface
                         foreach ($languages as $language) {
                             $localizedSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
                             if ($localizedSlug) {
-                                $this->expandedPages[$page][(string)$language] = $localizedSlug;
-                                $expandedLocalizedPage = str_replace(':slug', $loc->getValue($language) ?? '', $localizedSlug);
-                                $expandedPages[$expandedLocalizedPage] = $expandedPages[$expandedPage];
-                                $expandedMeta[$expandedLocalizedPage] = $expandedMeta[$expandedPage];
+                                $this->expandedPages[$page][(string)$language]   = $localizedSlug;
+                                $expandedLocalizedPage                           = str_replace(':slug', $loc->getValue($language) ?? '', $localizedSlug);
+                                $expandedPages[$expandedLocalizedPage]           = $expandedPages[$expandedPage];
+                                $expandedMeta[$expandedLocalizedPage]            = $expandedMeta[$expandedPage];
                                 $expandedSlugs[$expandedPage][(string)$language] = $expandedLocalizedPage;
                             }
                         }
@@ -573,34 +585,19 @@ final class Reader implements SiteDataInterface
     private function repairTheme(array $theme, string $sourcePath): array
     {
         if (($theme['_version'] ?? 0) < 1) {
-            unset($theme['colors']['light']);
-            unset($theme['colors']['dark']);
+            unset($theme['colors']['light'], $theme['colors']['dark']);
+
             $theme['components']['html'] ??= [];
             $theme['components']['html']['heading'] ??= $theme['components']['heading'];
             $bodyFontWeght = $theme['components']['body']['fontWeight'] ?? null;
             unset($theme['components']['body']);
-            $theme['components']['body']['textColor'] = 'text-gray-l11';
+            $theme['components']['body']['textColor']         = 'text-gray-l11';
             $theme['components']['body']['dark']['textColor'] = 'text-gray-d11';
             if ($bodyFontWeght) {
                 $theme['components']['body']['font-weight'] = $bodyFontWeght;
             }
-            unset($theme['components']['heading']);
-            unset($theme['components']['button']);
-            unset($theme['components']['container']);
-            unset($theme['components']['form']);
-            unset($theme['components']['icon']);
-            unset($theme['components']['input']);
-            unset($theme['components']['link']);
-            unset($theme['components']['logo']);
-            unset($theme['components']['question']);
-            unset($theme['components']['label']);
-            unset($theme['components']['nav']);
-            unset($theme['components']['paragraph']);
-            unset($theme['components']['social']);
-            unset($theme['components']['svg']);
-            unset($theme['components']['tagline']);
-            unset($theme['components']['textarea']);
-            unset($theme['components']['toggle']);
+            unset($theme['components']['heading'], $theme['components']['button'], $theme['components']['container'], $theme['components']['form'], $theme['components']['icon'], $theme['components']['input'], $theme['components']['link'], $theme['components']['logo'], $theme['components']['question'], $theme['components']['label'], $theme['components']['nav'], $theme['components']['paragraph'], $theme['components']['social'], $theme['components']['svg'], $theme['components']['tagline'], $theme['components']['textarea'], $theme['components']['toggle']);
+
             $theme['_version'] = 1;
             error_log('Repaired theme.yaml');
             $this->dumpYaml($theme, $sourcePath);
