@@ -414,16 +414,16 @@ final class Reader implements SiteDataInterface
     public function getPlaceholders(): array
     {
         return [
-            'placeholder.hero.heading'  => 'Create the fastest website in the world!',
-            'placeholder.hero.lead'     => 'Easily build sites that score 100% in all lighthouse tests. Static HTML, images for all devices and content tailored for SEO & Accessibility.',
-            'placeholder.button'        => 'Get started',
-            'placeholder.team.heading'  => 'Meet the Minds Behind the Magic',
-            'placeholder.team.lead'     => 'Driven by passion and powered by expertise, our team works collaboratively to build custom websites that captivate and convert.',
-            'placeholder.about.heading' => 'Innovation Meets Design',
-            'placeholder.about.text'    => 'With a focus on creativity and innovation, We transforms ideas into digital realities. Our team of designers and developers collaborates closely with you to deliver tailored web solutions that not only look beautiful but also drive results and enhance your online presence.',
-            'placeholder.cta.heading'   => 'Redo att Förverkliga Ditt Byggprojekt?',
-            'placeholder.cta.lead'      => 'Kontakta oss idag för en kostnadsfri offert och låt oss tillsammans skapa framtidens bygglösningar på Åland.',
-            'placeholder.cta.button'    => 'Begär Offert'
+            'placeholder.hero.heading'   => 'Create the fastest website in the world!',
+            'placeholder.hero.shortText' => 'Easily build sites that score 100% in all lighthouse tests. Static HTML, images for all devices and content tailored for SEO & Accessibility.',
+            'placeholder.hero.button'    => 'Get started',
+            'placeholder.team.heading'   => 'Meet the Minds Behind the Magic',
+            'placeholder.team.lead'      => 'Driven by passion and powered by expertise, our team works collaboratively to build custom websites that captivate and convert.',
+            'placeholder.about.heading'  => 'Innovation Meets Design',
+            'placeholder.about.text'     => 'With a focus on creativity and innovation, We transforms ideas into digital realities. Our team of designers and developers collaborates closely with you to deliver tailored web solutions that not only look beautiful but also drive results and enhance your online presence.',
+            'placeholder.cta.heading'    => 'Redo att Förverkliga Ditt Byggprojekt?',
+            'placeholder.cta.lead'       => 'Kontakta oss idag för en kostnadsfri offert och låt oss tillsammans skapa framtidens bygglösningar på Åland.',
+            'placeholder.cta.button'     => 'Begär Offert'
 
         ];
     }

@@ -20,6 +20,9 @@ final class Path
      * */
     public function __construct(string $path, Language $default, array $languages, Slugs $slugs)
     {
+        if ($path === 'home') {
+            $path = '';
+        }
         $this->languages = $languages;
         $all             = $slugs->getAll();
         if (isset($all[$path])) {
