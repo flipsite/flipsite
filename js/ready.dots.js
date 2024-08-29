@@ -2,7 +2,7 @@ ready(() => {
   document.querySelectorAll('[data-dots]').forEach((dots) => {
     dots.removeAttribute('data-dots');
     const targetId = dots.getAttribute('data-target');
-    const backgrounds = JSON.parse(dots.getAttribute('data-backgrounds') || '');
+    const backgrounds = dots.hasAttribute('data-backgrounds') ? JSON.parse(dots.getAttribute('data-backgrounds')) : [];
     dots.removeAttribute('data-backgrounds');
     const scrollDots = new ScrollDots(dots, backgrounds, document.getElementById(targetId));
     window.addEventListener('resize', function() {
