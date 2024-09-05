@@ -53,6 +53,8 @@ final class SvgData implements SvgInterface
             }
         }
         $this->def = str_replace("\n", '', $this->def);
+        $this->def = str_replace("\n", '', $this->def);
+        $this->def = str_replace(' fill="currentColor"', '', $this->def);
     }
 
     public function getHash() : string
