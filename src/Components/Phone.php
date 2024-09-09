@@ -11,7 +11,7 @@ final class Phone extends AbstractComponent
     public function build(array $data, array $style, array $options) : void
     {
         $this->addStyle($style);
-        $value = $data['value'] ?? '+358501234567';
+        $value     = $data['value'] ?? '+358501234567';
         $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
         try {
             $phoneNumber = $phoneUtil->parse($value, '');
@@ -19,7 +19,7 @@ final class Phone extends AbstractComponent
             $this->render = false;
             return;
         }
-        switch ($data['format'] ?? 'international') {
+        switch ($data['format'] ?? 'national') {
             case 'e164':
                 $format = \libphonenumber\PhoneNumberFormat::E164;
                 break;
@@ -36,7 +36,7 @@ final class Phone extends AbstractComponent
 
         $number = $phoneUtil->format($phoneNumber, $format);
         if (isset($data['content'])) {
-            $string = str_replace('[number]',$number,$data['content']);
+            $string = str_replace('[number]', $number, $data['content']);
         } else {
             $string = $number;
         }
@@ -44,11 +44,11 @@ final class Phone extends AbstractComponent
         if ($data['flag'] ?? false) {
             // Get the country code
             $countryCode = $phoneNumber->getCountryCode();
-            $regionCode = $phoneUtil->getRegionCodeForNumber($phoneNumber);
-            $country = strtolower($regionCode);
-            $flag = $this->builder->build('svg', ['value' => 'flag-icons-4x3/'.$country.'.svg'], $style['flag'] ?? [], $options);
+            $regionCode  = $phoneUtil->getRegionCodeForNumber($phoneNumber);
+            $country     = strtolower($regionCode);
+            $flag        = $this->builder->build('svg', ['value' => 'flag-icons-4x3/'.$country.'.svg'], $style['flag'] ?? [], $options);
             $this->addChild($flag);
-            $text = $this->builder->build('text', ['value' => $number], [],$options);
+            $text = $this->builder->build('text', ['value' => $number], [], $options);
             $this->addChild($text);
         } else {
             $this->setContent($number);
