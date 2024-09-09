@@ -1,8 +1,69 @@
-placeholder.hero.heading: "Create the fastest website in the world!"
-placeholder.hero.shortText: "Easily build sites that score 100% in all Lighthouse tests with static HTML and images tailored for all devices."
-placeholder.hero.button: "Get Started"
-placeholder.about.heading: "User-friendly website builder"
-placeholder.about.shortText: "Drag, drop, edit, and create stunning websites effortlessly."
-placeholder.about.longText: "Our Figma-like drag-and-drop editor offers complete design freedom with beautiful defaults. Easily change, edit, and customize every element on your site with full control over the design process."
-placeholders.logos.heading: Trusted by Leading Brands
-placeholders.logos.shortText: "Our platform powers websites for top companies around the globe, helping them build lightning-fast, optimized websites with ease."
+# placeholder.hero.heading: "Create the fastest website in the world!"
+# placeholder.hero.shortText: "Easily build sites that score 100% in all Lighthouse tests with static HTML and images tailored for all devices."
+# placeholder.hero.button: "Get Started"
+# placeholder.about.heading: "User-friendly website builder"
+# placeholder.about.shortText: "Drag, drop, edit, and create stunning websites effortlessly."
+# placeholder.about.longText: "Our Figma-like drag-and-drop editor offers complete design freedom with beautiful defaults. Easily change, edit, and customize every element on your site with full control over the design process."
+# placeholder.logos.heading: Trusted by Leading Brands
+# placeholder.logos.shortText: "Our platform powers websites for top companies around the globe, helping them build lightning-fast, optimized websites with ease."
+# placeholder.location.heading: "Find Us"
+# placeholder.location.shortText: "Visit our offices or reach out to us for more information about Flipsite."
+# placeholder.location.button: "Get Directions"
+# placeholder.benefits:
+#   - icon: bootstrap-icons/lightning-fill.svg
+#     image: "https://images.unsplash.com/photo-1483058712412-4245e9b90334?ixid=M3w0MjcyOTJ8MHwxfHNlYXJjaHwxOXx8dGVjaG5vbG9neXxlbnwwfHx8fDE3MjU1MjgyNTN8MA&ixlib=rb-4.0.3&w=5760&h=3840"
+#     heading: "Blazing Fast Performance"
+#     description: "Our platform ensures your website is optimized for speed, delivering the best user experience and faster load times."
+#   - icon: bootstrap-icons/search.svg
+#     image: "https://images.unsplash.com/photo-1565363080936-2d144a9a9722?ixid=M3w0MjcyOTJ8MHwxfHNlYXJjaHwxM3x8c2VhcmNofGVufDB8fHx8MTcyNTUyODI3MHww&ixlib=rb-4.0.3&w=4032&h=2268"
+#     heading: "SEO Optimization"
+#     description: "Achieve top search engine rankings with websites that are built to meet modern SEO standards."
+#   - icon: bootstrap-icons/universal-access.svg
+#     image: "https://images.unsplash.com/photo-1527689368864-3a821dbccc34?ixid=M3w0MjcyOTJ8MHwxfHNlYXJjaHwyMHx8YWNjZXNzaWJsZSUyMGRlc2lnbnxlbnwwfHx8fDE3MjU1MjgyODl8MA&ixlib=rb-4.0.3&w=6702&h=4468"
+#     heading: "Accessible Design"
+#     description: "Create websites that are fully accessible, ensuring inclusivity for all users."
+#   - icon: bootstrap-icons/cpu-fill.svg
+#     image: "https://images.unsplash.com/photo-1516192518150-0d8fee5425e3?ixid=M3w0MjcyOTJ8MHwxfHNlYXJjaHwzfHxhcnRpZmljaWFsJTIwaW50ZWxpZ2VuY2V8ZW58MHx8fHwxNzI1NTI4MzA1fDA&ixlib=rb-4.0.3&w=3482&h=4642"
+#     heading: "AI-Powered Content Creation"
+#     description: "Leverage AI to assist with content creation, saving time and ensuring your website is always fresh and engaging."
+hero:
+  heading: "Flexibla huslösningar"
+  shortText: "Med och för kunden – välj stommen eller ett inflyttningsklart hus."
+  button: "Utforska våra tjänster"
+about:
+  heading: "Om oss"
+  shortText: "Följ vår resa från 1970 till idag."
+  longText: "Elementbyggen grundades i april 1970 av Rolf Jansson med målet att bygga friska och funktionella hus i storblockselement, skräddarsydda efter kundens behov. År 2000 övergick företaget till att använda Autocad för att säkerställa hög ritningskvalitet enligt branschstandard. I oktober 2009 blev Conny Jansson, Kim Jansson och Johan Aller delägare, och företaget har nu sju fast anställda."
+logos:
+  heading: Våra samarbetspartners
+  shortText: "Vi samarbetar med ledande varumärken för att leverera kvalitetshus."
+location:
+  heading: "Hitta oss"
+  shortText: "Besök våra kontor eller kontakta oss för mer information om våra huslösningar."
+  button: "Få vägbeskrivning"
+cta:
+  heading: "Bygg ditt drömhus idag"
+  shortText: "Kontakta oss för att få mer information om våra flexibla huslösningar och hur vi kan hjälpa dig förverkliga ditt byggprojekt."
+  button: "Kontakta oss nu"
+benefitsList:
+  - icon: "bootstrap-icons/house-door-fill.svg"
+    image: "{unsplash}"
+    heading: "Elementhus"
+    description: "Välj att beställa enbart stomme eller ett nyckelfärdigt hus – anpassat efter dina behov."
+  - icon: "bootstrap-icons/building.svg"
+    image: "{unsplash}"
+    heading: "Kundanpassade lösningar"
+    description: "Vi arbetar nära kunden för att säkerställa att varje projekt lever upp till specifika önskemål."
+  - icon: "bootstrap-icons/stars.svg"
+    image: "{unsplash}"
+    heading: "Helhetslösningar"
+    description: "Från ritning till färdigt hus – vi tar hand om hela processen för ett smidigt byggprojekt."
+  - icon: "bootstrap-icons/hammer.svg"
+    image: "{unsplash}"
+    heading: "Högkvalitativa material"
+    description: "Vi använder endast de bästa materialen för att säkerställa hållbara och långvariga huskonstruktioner."
+form:
+  button: "Skicka meddelande"
+  name: "Namn"
+  email: "E-post"
+  message: "Meddelande"

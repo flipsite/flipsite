@@ -270,7 +270,12 @@ final class Flipsite
             $globalVars['social.'.$type] = $handle;
         }
         foreach ($this->siteData->getPlaceholders() as $var => $value) {
-            $globalVars[$var] = $value;
+            if (str_ends_with($var, 'List')) {
+                continue;
+            }
+            foreach ($value as $key => $val) {
+                $globalVars['placeholder.'.$var.'.'.$key] = $val;
+            }
         }
         return $globalVars;
     }
