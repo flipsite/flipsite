@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -57,7 +56,7 @@ final class ArrayHelper
 
     public static function unDot(array $array, string $delimiter = '.'): array
     {
-        $exploded = [];
+        $exploded       = [];
         $renameAndEmpty = [];
 
         $result = [];
@@ -66,7 +65,7 @@ final class ArrayHelper
                 $val = self::unDot($val, $delimiter);
             }
             if (is_string($attr) && false !== mb_strpos($attr, $delimiter)) {
-                $attrs = explode($delimiter, $attr);
+                $attrs   = explode($delimiter, $attr);
                 $newAttr = array_shift($attrs);
                 if (count($attrs)) {
                     $val = self::unDot([implode($delimiter, $attrs) => $val], $delimiter);
@@ -85,6 +84,7 @@ final class ArrayHelper
 
         return $result;
     }
+
     public static function strReplace(string $search, string $replace, array $array): array
     {
         foreach ($array as $key => &$value) {
@@ -102,8 +102,8 @@ final class ArrayHelper
         $new = [];
         foreach ($array as $key => $val) {
             if (is_string($val)) {
-                $val               = $prefix . $val;
-                $val               = str_replace(' ', ' ' . $prefix, $val);
+                $val                 = $prefix . $val;
+                $val                 = str_replace(' ', ' ' . $prefix, $val);
                 $new[$prefix . $key] = $val;
             } elseif (is_array($val)) {
                 $val       = self::addPrefix($val, $prefix);

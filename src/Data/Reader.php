@@ -272,7 +272,7 @@ final class Reader implements SiteDataInterface
             return $dot->get(implode('.', $tmp)) ?? [];
         }
 
-        if (in_array($component, ['heading', 'button', 'container', 'icon', 'link', 'logo', 'nav', 'paragraph', 'question', 'social', 'svg', 'tagline', 'timer', 'toggle'])) {
+        if (in_array($component, ['heading', 'button', 'container', 'icon', 'link', 'nav', 'paragraph', 'question', 'social', 'svg', 'tagline', 'timer', 'toggle'])) {
             return [];
         }
 
@@ -414,7 +414,8 @@ final class Reader implements SiteDataInterface
     public function getPlaceholders(): array
     {
         $default = Yaml::parseFile(__DIR__ . '/placeholders.yaml');
-        return $default;
+        $site    = $this->data['placeholders'] ?? [];
+        return $site ? ArrayHelper::merge($default, $site) : $default;
     }
 
     private function expandPagesAndSlugs(): void

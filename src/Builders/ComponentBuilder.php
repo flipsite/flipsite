@@ -101,7 +101,7 @@ class ComponentBuilder
 
             // Resolve inheritance
             while (isset($data['_style']['inherit'])) {
-                $inheritType    = $data['_style']['inherit'];
+                $inheritType   = $data['_style']['inherit'];
                 unset($data['_style']['inherit']);
                 $data['_style'] = ArrayHelper::merge($this->siteData->getComponentStyle($inheritType), $data['_style']);
             }
