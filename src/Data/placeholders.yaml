@@ -1,7 +1,13 @@
+button:
+  hero: "Create Free Account"
+  directions: "Get Directions"
+  openHours: "Business hours"
+  contact: "Contact Us"
+  cta: "Start Building"
+  form: "Send"
 hero:
   heading: "Create the Fastest Website in the World!"
   shortText: "Static HTML, SEO-tailored content, and accessible designs for the best performance."
-  button: "Create Free Account"
 about:
   heading: "User-friendly Website Builder"
   shortText: "Figma-like drag-and-drop editor with full design freedom."
@@ -12,11 +18,9 @@ logos:
 location:
   heading: "Find Us"
   shortText: "Based in the Åland Islands, serving clients globally."
-  button: "Get Directions"
 cta:
   heading: "Start Building Today!"
   shortText: "Get started with a free account and unleash your creativity."
-  button: "Sign Up Now"
 benefitsList:
   - icon: "bootstrap-icons/speedometer2.svg"
     image: "{image}"
@@ -35,7 +39,6 @@ benefitsList:
     heading: "Deploy Anywhere"
     description: "Publish your site with Cloudflare Pages, GitHub Pages, or FTP to any server."
 form:
-  button: "Submit"
   name: "Name"
   email: "Email"
   message: "Message"
