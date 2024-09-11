@@ -111,6 +111,7 @@
   color: inherit
   overflow: visible
   text-transform: none
+  border: none
 - for:
     - input
     - optgroup
