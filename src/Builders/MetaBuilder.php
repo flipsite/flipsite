@@ -64,6 +64,10 @@ class MetaBuilder implements BuilderInterface
 
         // Generator
         $elements[] = $this->meta('generator', $this->environment->getGenerator());
+        if ($this->environment->compileTimestamp()) {
+            $date       = new \DateTime('now', new \DateTimeZone('UTC'));
+            $elements[] = $this->meta('compiled', $date->format("Y-m-d\TH:i:s\Z"));
+        }
 
         // Facebook opengraph tags
         $elements[] = $this->og('og:title', $title);
