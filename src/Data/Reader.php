@@ -146,7 +146,7 @@ final class Reader implements SiteDataInterface
 
     public function getName(): string
     {
-        return $this->get('name');
+        return (string)$this->get('name');
     }
 
     public function getTitle(?Language $language = null): ?string

@@ -21,6 +21,10 @@ location:
 cta:
   heading: "Start Building Today!"
   shortText: "Get started with a free account and unleash your creativity."
+testimonials:
+  heading: What Our Clients Are Saying
+  shortText: Discover why businesses love using our platform for building high-performance websites.
+  longText: Our clients consistently praise the speed, ease of use, and creative freedom our platform provides. From startups to large corporations, hear how we’ve helped companies achieve their online goals with faster websites, optimized SEO, and effortless design workflows.
 benefitsList:
   - icon: "bootstrap-icons/speedometer2.svg"
     image: "{image}"
