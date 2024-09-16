@@ -19,7 +19,7 @@ final class Dots extends AbstractGroup
         $this->setAttribute('data-target', $data['target'] ?? null);
         $this->addStyle($style);
 
-        if (isset($data['backgrounds'])) {
+        if ($data['backgrounds'] ?? false) {
             $bgStyle = $style['dot']['background'] ?? [];
             unset($style['dot']['background']);
 
@@ -34,10 +34,12 @@ final class Dots extends AbstractGroup
 
             $style['dot'] = ArrayHelper::merge($style['dot'], $bgStyle);
 
-            $backgrounds = ArrayHelper::decodeJsonOrCsv($data['backgrounds']);
-            foreach ($backgrounds as &$background) {
-                $bgAttributes     = $this->assets->getImageAttributes($background, $bgOptions);
-                $background       = $bgAttributes->getSrc();
+            $backgrounds = [];
+            $key         = $data['cmsField'] ?? 'image';
+            foreach ($this->builder->getSharedData($data['target']) as $item) {
+                $image            = $item[$key] ?? $item['image'] ?? '';
+                $bgAttributes     = $this->assets->getImageAttributes($image, $bgOptions);
+                $backgrounds[]    = $bgAttributes->getSrc();
             }
             $this->setAttribute('data-backgrounds', json_encode($backgrounds));
         }

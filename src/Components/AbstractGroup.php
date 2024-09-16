@@ -94,7 +94,12 @@ abstract class AbstractGroup extends AbstractComponent
                 $repeat = $this->getCollection($repeat, true);
             }
             $data = $this->normalizeRepeat($data, $repeat);
+            if (isset($data['_attr']['id'])) {
+                $id = $data['_attr']['id'];
+                $this->builder->shareData($id, $data['_repeatData']);
+            }
         }
+
         return $data;
     }
 

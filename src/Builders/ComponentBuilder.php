@@ -26,6 +26,7 @@ class ComponentBuilder
     private array $localization = [];
     private Slugs $slugs;
     private array $recursiveData = [];
+    private array $sharedData    = [];
 
     public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path)
     {
@@ -289,6 +290,16 @@ class ComponentBuilder
         foreach ($this->listeners as $listener) {
             $listener->handleEvent($event);
         }
+    }
+
+    public function shareData(string $id, array $data): void
+    {
+        $this->sharedData[$id] = $data;
+    }
+
+    public function getSharedData(string $id): array
+    {
+        return $this->sharedData[$id] ?? [];
     }
 
     private function handleScripts(array $scripts)
