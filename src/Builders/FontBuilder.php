@@ -8,7 +8,7 @@ use Flipsite\Components\Element;
 
 class FontBuilder implements BuilderInterface
 {
-    private array $links;
+    private array $links        = [];
     private ?string $bodyWeight = null;
 
     public function __construct(array $fonts)
@@ -18,15 +18,23 @@ class FontBuilder implements BuilderInterface
             $link = new Element('link', true, true);
             $link->setAttributes([
                 'rel'  => 'preconnect',
-                'href' => 'https://fonts.gstatic.com',
+                'href' => 'https://fonts.googleapis.com',
+            ]);
+            $this->links[] = $link;
+            $link          = new Element('link', true, true);
+            $link->setAttributes([
+                'rel'         => 'preconnect',
+                'href'        => 'https://fonts.gstatic.com',
+                'crossorigin' => true
             ]);
             $this->links[] = $link;
 
             $link = new Element('link', true, true);
             $link->setAttributes([
-                'rel'  => 'preload',
-                'as'   => 'style',
-                'href' => $googleUrl,
+                'rel'         => 'preload',
+                'as'          => 'font',
+                'href'        => $googleUrl,
+                'crossorigin' => 'anonymous'
             ]);
             $this->links[] = $link;
 
@@ -86,7 +94,7 @@ class FontBuilder implements BuilderInterface
             }
             $families[] = $param;
         }
-        return 'https://fonts.googleapis.com/css2?family='.implode('&family=', $families).'&display=swap';
+        return 'https://fonts.googleapis.com/css2?family='.implode('&family=', $families).'&display=swap&subset='.$font['subset'];
     }
 
     private function normalizeGoogleFont(array $font) : array
@@ -94,6 +102,7 @@ class FontBuilder implements BuilderInterface
         $font['family'] = urlencode(trim($font['family']));
         $font['normal'] = $this->toIntArray($font['normal'] ?? []);
         $font['italic'] = $this->toIntArray($font['italic'] ?? $font['italics'] ?? []);
+        $font['subset'] = $font['subset'] ?? 'latin';
         return $font;
     }
 
