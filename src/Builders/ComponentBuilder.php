@@ -566,6 +566,7 @@ class ComponentBuilder
 
         $gradient = $this->parseThemeColors($style['gradient'] ?? '');
         $options  = $style['options'] ?? [];
+        $options['loading'] ??= 'lazy';
         $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
         $options['webp'] ??= true;
@@ -585,10 +586,15 @@ class ComponentBuilder
             if (str_ends_with($src, '.svg')) {
                 $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
             } elseif ($imageAttributes && $srcset = $imageAttributes->getSrcset('url')) {
-                $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
+                if ('eager' === $options['loading']) {
+                    $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
+                } else {
+                    $element->setAttribute('data-lazybg', $gradient . '-webkit-image-set(' . $srcset . ')');
+                    $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/ready.lazybg.min.js')));
+                }
             }
-            if (($style['options']['loading'] ?? '') === 'eager') {
-                $this->builder->dispatch(new Event('preload', 'background', $imageAttributes));
+            if ($options['loading'] === 'eager') {
+                $this->dispatch(new Event('preload', 'background', $imageAttributes));
             }
         } elseif ($gradient) {
             $element->setAttribute('style', 'background-image:' . $gradient);

@@ -12,6 +12,22 @@ ready(() => {
 });
 
 function ScrollDots(dots, backgrounds, target) {
+  this.observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        console.log('Dot intersecting');
+        const element = entry.target;
+        const bg = element.getAttribute("data-lazybg");
+        element.style.backgroundImage = element.getAttribute("data-lazybg");
+        element.removeAttribute("data-lazybg");
+        observer.unobserve(element);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0
+  });
   this.selectedIndex = -1;
   this.visibleItems = -1;
   this.timeout = null;
@@ -58,13 +74,14 @@ ScrollDots.prototype.handleResize = function() {
   while (this.dots.firstChild) {
     this.dots.removeChild(this.dots.firstChild);
   }
+
   // Create new dots
   const that = this;
   const neededDots = Math.ceil(this.itemsCount/this.visibleItems); 
   for (let i=0; i<neededDots; i++) {
     const dot = this.dotTpl.cloneNode()
     if (undefined !== this.backgrounds[i]) {
-      dot.style.backgroundImage = 'url('+this.backgrounds[i]+')';
+      dot.setAttribute('data-lazybg','url('+this.backgrounds[i]+')');
     }
     dot.onclick = function(){
       that.setSelected(i,true)
@@ -75,6 +92,7 @@ ScrollDots.prototype.handleResize = function() {
       },1000)
     }
     this.dots.append(dot)
+    this.observer.observe(dot);
   }
   this.selectedIndex = -1;
   this.setSelected(0,true);
