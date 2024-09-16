@@ -17,6 +17,12 @@ class ImageAttributes extends AbstractImageAttributes
 
     public function __construct(array $options, private AbstractAssetInfo $assetInfo, private AssetSourcesInterface $assetSources)
     {
+        if (isset($options['blur'])) {
+            $options['blur'] = intval($options['blur']);
+        }
+        if (isset($options['blackWhite'])) {
+            $options['blackWhite'] = 'bw' === $options['blackWhite'];
+        }
         $this->image     = $assetInfo->getFilename();
         $pathinfo        = pathinfo($assetInfo->getFilename());
         $this->extension = $pathinfo['extension'];
