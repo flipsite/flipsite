@@ -64,6 +64,7 @@ function ScrollDots(dots, backgrounds, target) {
   }
 }
 
+
 ScrollDots.prototype.handleResize = function() {
   const visibleItems = this.countItemsInViewport();
   if (visibleItems === this.visibleItems) {

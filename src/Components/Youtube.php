@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 final class Youtube extends AbstractGroup
@@ -47,51 +46,5 @@ final class Youtube extends AbstractGroup
         }
         $this->setAttribute('src', $src);
         $this->addStyle($style);
-
-
-        // if (isset($data['value'])) {
-        //     $sources = $this->videoHandler->getSources($data['value']);
-        //     foreach ($sources as $type => $src) {
-        //         $s = new Element('source', true);
-        //         $s->setAttribute('src', $src);
-        //         $s->setAttribute('type', $type);
-        //         $this->addChild($s);
-        //     }
-        // }
     }
-
-    // public function build(array $data, array $style,array $options) : void
-    // {
-    //     $this->setAttribute('onclick', 'playIframeVideo(this)');
-
-    //     $title = $data['title'];
-    //     unset($data['title']);
-
-    //     if (isset($data['youtube'])) {
-    //         $data['iframe'] = [
-    //             'title' => $title,
-    //             '_attr' => [
-    //                 'loading'         => 'lazy',
-    //                 'frameborder'     => '0',
-    //                 'allow'           => 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture',
-    //                 'allowfullscreen' => true,
-    //                 'data-src'        => '//www.youtube.com/embed/'.$data['youtube'].'?autoplay=1&mute=1',
-    //             ]
-    //         ];
-    //     } elseif (isset($data['vimeo'])) {
-    //         $data['iframe'] = [
-    //             'title' => $title,
-    //             '_attr' => [
-    //                 'loading'         => 'lazy',
-    //                 'frameborder'     => '0',
-    //                 'allow'           => 'autoplay; fullscreen',
-    //                 'allowfullscreen' => true,
-    //                 'data-src'        => '//player.vimeo.com/video/'.$data['vimeo'].'?autoplay=1&muted=1'
-    //             ]
-    //         ];
-    //     }
-
-    //     parent::build($data, $style, $options);
-    //     $this->builder->dispatch(new Event('global-script', 'youtube', file_get_contents(__DIR__.'/../../js/play-iframe-video.min.js')));
-    // }
 }

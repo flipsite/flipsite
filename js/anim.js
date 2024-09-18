@@ -1,5 +1,5 @@
 ready(() => {
-  const elements = document.querySelectorAll('[class*="offscreen:"]');
+  const elements = document.querySelectorAll('[data-animate]');
   if (!elements) return;
   const getTrigger = (element) => {
     const trigger = element.getAttribute('data-trigger');
@@ -54,11 +54,13 @@ ready(() => {
   let scrollAnimations = [];
   elements.forEach((el)=> {
     const isScrollTransform = el.hasAttribute('data-scroll-transform');
-    const offscreenClasses = [...el.classList].filter(className => className.startsWith('offscreen'));
+    const offscreenClasses = el.getAttribute('data-animate').split(' ');
     const event = el.getAttribute('data-event') || 'enter';
     if (!isScrollTransform) {
-      if ('exit' === event) {
-        el.classList.remove(...offscreenClasses);
+      if ('enter' === event) {
+        offscreenClasses.forEach((className) => {
+          el.classList.toggle(className)
+        });
       }
       appearAnimations.push({
         el: el,
@@ -67,14 +69,19 @@ ready(() => {
         sp: el.getAttribute('data-start') || '0%',
         ep: el.getAttribute('data-end') || '100%',
         of: offscreenClasses,
-        rp: el.hasAttribute('data-replay')
+        rp: el.hasAttribute('data-replay'),
+        st: false
       });
     } else {
-      const offscreenStyle = getStyle(window.getComputedStyle(el));
-      el.classList.remove(...offscreenClasses);
       const onscreenStyle = getStyle(window.getComputedStyle(el));
+      offscreenClasses.forEach((className) => {
+        el.classList.toggle(className)
+      });
+      const offscreenStyle = getStyle(window.getComputedStyle(el));
       if('enter' === event) {
-        el.classList.add(...offscreenClasses);
+        offscreenClasses.forEach((className) => {
+          el.classList.toggle(className)
+        });
       }
       scrollAnimations.push({
         el: el,
@@ -84,12 +91,13 @@ ready(() => {
         ep: el.getAttribute('data-end') || '100%',
         di: 'enter' === event ? getDiff(offscreenStyle, onscreenStyle) : getDiff(onscreenStyle, offscreenStyle),
         rp: el.hasAttribute('data-replay'),
-        lp: 0
+        lp: 0,
+        st: false
       });
     }
     return;
   });
-    
+  
   const getOffsetTop = (element) => {
     let offsetTop  = 0;
     do{ offsetTop  += parseInt(element.offsetTop);
@@ -134,11 +142,12 @@ ready(() => {
   const updateAnimations = () => { 
     appearAnimations.forEach(anim => {
       const progress = getProgress(anim.tr, anim.ev, anim.sp, anim.ep);
-      if (progress) {
-        'enter' === anim.ev ? anim.el.classList.remove(...anim.of) : anim.el.classList.add(...anim.of);
+      if ((progress && !anim.st) || (!progress && anim.st)) {
+        anim.of.forEach((cls) => {
+          anim.el.classList.toggle(cls)
+        })
+        anim.st = !anim.st;
         anim.remove = !anim.rp;
-      } else if (anim.rp) {
-        'enter' === anim.ev ? anim.el.classList.add(...anim.of) : anim.el.classList.remove(...anim.of);
       }
     });
     scrollAnimations.forEach(anim => {

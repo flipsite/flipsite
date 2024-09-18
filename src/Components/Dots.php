@@ -50,7 +50,7 @@ final class Dots extends AbstractGroup
             '_attr'      => ['role' => 'listitem'],
         ], $style['dot'], $options);
 
-        $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/ready.dots.min.js')));
+        $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/dots.min.js')));
 
         $this->addChild($dot);
     }

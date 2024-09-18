@@ -139,7 +139,7 @@ class ComponentBuilder
         }
 
         if (false !== array_search('copyright.year', $found)) {
-            $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/ready.copyright.min.js')));
+            $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
         }
 
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
@@ -252,12 +252,12 @@ class ComponentBuilder
         if (isset($style['width']) && strpos($style['width'], 'w-scroll') !== false) {
             $data['_attr'] ??= [];
             $data['_attr']['data-scroll-progress-width'] = true;
-            $this->dispatch(new Event('ready-script', 'scroll-progress', file_get_contents(__DIR__.'/../../js/ready.scroll-progress.min.js')));
+            $this->dispatch(new Event('ready-script', 'scroll-progress', file_get_contents(__DIR__.'/../../js/dist/scroll-progress.min.js')));
         }
         if (($style['textScale'] ?? '') === 'text-scale') {
             $data['_attr'] ??= [];
             $data['_attr']['data-text-scale'] = true;
-            $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/ready.text-scale.min.js')));
+            $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/dist/text-scale.min.js')));
         }
         unset($style['textScale']);
         if (isset($style['background'])) {
@@ -419,7 +419,7 @@ class ComponentBuilder
                     }
                 }
                 if ($setting->hasVariant('offscreen')) {
-                    $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/ready.anim.min.js')));
+                    $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/dist/anim.min.js')));
                     $animate      = $setting->removeValue('offscreen');
                     $notAnimate   = $setting->getValue();
                     if (isset($data['_attr']['data-animate'])) {
@@ -590,7 +590,7 @@ class ComponentBuilder
                     $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
                 } else {
                     $element->setAttribute('data-lazybg', $gradient . '-webkit-image-set(' . $srcset . ')');
-                    $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/ready.lazybg.min.js')));
+                    $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/dist/lazybg.min.js')));
                 }
             }
             if ($options['loading'] === 'eager') {
