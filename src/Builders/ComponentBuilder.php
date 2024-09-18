@@ -392,7 +392,7 @@ class ComponentBuilder
                 $update  = false;
                 $setting = new Style($value);
                 if ($setting->hasVariant('open')) {
-                    $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
+                    $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
                     $setting->removeValue('!open');
                     $open    = $setting->removeValue('open');
                     $notOpen = $setting->getValue();
@@ -406,7 +406,7 @@ class ComponentBuilder
                 }
                 foreach (['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as $bp) {
                     if ($setting->hasVariant($bp.':open')) {
-                        $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/toggle.min.js')));
+                        $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
                         $open    = $bp.':'.$setting->removeValue($bp.':open');
                         $notOpen = $bp.':'.$setting->getValue($bp);
                         if (isset($data['_attr']['data-toggle'])) {

@@ -15,11 +15,10 @@ function ScrollDots(dots, backgrounds, target) {
   this.observer = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        console.log('Dot intersecting');
         const element = entry.target;
-        const bg = element.getAttribute("data-lazybg");
-        element.style.backgroundImage = element.getAttribute("data-lazybg");
-        element.removeAttribute("data-lazybg");
+        const bg = element.getAttribute("data-bg");
+        element.style.backgroundImage = element.getAttribute("data-bg");
+        element.removeAttribute("data-bg");
         observer.unobserve(element);
       }
     });
@@ -82,7 +81,7 @@ ScrollDots.prototype.handleResize = function() {
   for (let i=0; i<neededDots; i++) {
     const dot = this.dotTpl.cloneNode()
     if (undefined !== this.backgrounds[i]) {
-      dot.setAttribute('data-lazybg','url('+this.backgrounds[i]+')');
+      dot.setAttribute('data-bg','url('+this.backgrounds[i]+')');
     }
     dot.onclick = function(){
       that.setSelected(i,true)

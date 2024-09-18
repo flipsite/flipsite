@@ -3,9 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Builders\EventListenerInterface;
 use Flipsite\Components\Document;
-use Flipsite\Builders\Event;
 use Flipsite\Components\InlineScript;
 
 class ScriptBuilder implements BuilderInterface, EventListenerInterface
@@ -29,7 +27,9 @@ class ScriptBuilder implements BuilderInterface, EventListenerInterface
             $script->addCode($code);
         }
         foreach ($this->ready as $code) {
-            if ($code) $script->addCode($code);
+            if ($code) {
+                $script->addCode($code);
+            }
         }
         $document->getChild('body')->addChild($script);
         return $document;

@@ -29,7 +29,7 @@ abstract class AbstractGroup extends AbstractComponent
                 // handle tel replace
             }
             if ('scrollLeft' === $data['_action'] || 'scrollRight' === $data['_action']) {
-                $this->builder->dispatch(new Event('global-script', 'scrollX', file_get_contents(__DIR__ . '/../../js/scrollX.min.js')));
+                $this->builder->dispatch(new Event('global-script', 'scrollX', file_get_contents(__DIR__ . '/../../js/dist/scrollX.min.js')));
             }
             $actionAttributes = $this->getActionAttributes($data);
             if (isset($actionAttributes['tag'])) {
