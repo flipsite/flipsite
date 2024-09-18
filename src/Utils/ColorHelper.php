@@ -116,10 +116,6 @@ class ColorHelper
             }
         }
 
-        if ($alpha != 1.0) {
-            $color = $color->with(['alpha' => $alpha]);
-        }
-
         if ($contrast) {
             $brightness = $color->getRgb()->calculatePerceivedBrightness();
             if ($brightness < 128) {
@@ -133,6 +129,11 @@ class ColorHelper
                 }
             }
         }
+
+        if ($alpha != 1.0) {
+            $color = $color->with(['alpha' => $alpha]);
+        }
+
         return $color;
     }
 

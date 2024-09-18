@@ -18,6 +18,8 @@ logos:
 location:
   heading: "Find Us"
   shortText: "Based in the Åland Islands, serving clients globally."
+contact:
+  heading: "Contact us"
 cta:
   heading: "Start Building Today!"
   shortText: "Get started with a free account and unleash your creativity."
