@@ -16,7 +16,7 @@ class AssetParser
         $html = str_replace(' <', '<', $html);
 
         libxml_use_internal_errors(true);
-        $doc = new \DOMDocument();
+        $doc  = new \DOMDocument();
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         $doc->loadHTML($html);
 
@@ -62,7 +62,7 @@ class AssetParser
         foreach ($aTags as $tag) {
             $href = $tag->getAttribute('href');
             if ($href) {
-                $tmp = explode('/files/',$href);
+                $tmp = explode('/files/', $href);
                 if (count($tmp) === 2) {
                     $assets[] = '/files/'.$tmp[1];
                 }
@@ -81,12 +81,22 @@ class AssetParser
             }
         }
 
+        $xpath    = new \DOMXPath($doc);
+        $elements = $xpath->query('//*[@data-backgrounds]');
+        foreach ($elements as $element) {
+            $dataBg = $element->getAttribute('data-backgrounds');
+            $json   = json_decode($dataBg) ?? [];
+            foreach ($json as $image) {
+                $assets[] = $image;
+            }
+        }
+
         $matches = [];
         preg_match_all('/url\([^)]*\)/', $html, $matches);
         if (isset($matches[0])) {
             foreach ($matches[0] as $asset) {
-                $asset = trim($asset,')');
-                $asset = str_replace('url(','',$asset);
+                $asset = trim($asset, ')');
+                $asset = str_replace('url(', '', $asset);
                 if (!str_starts_with($asset, '#')) {
                     $assets[] = $asset;
                 }
@@ -96,16 +106,16 @@ class AssetParser
         $assets = array_values(array_unique($assets));
 
         $internal = [];
-        
+
         foreach ($assets as $asset) {
             $pathinfo = pathinfo($asset);
             if (!isset($pathinfo['extension'])) {
                 continue;
             }
-            if (!in_array($pathinfo['extension'], ['webp','svg','png','jpg','jpeg','gif','mp4','mov','ogg','pdf','txt','csv','xls'])) {
+            if (!in_array($pathinfo['extension'], ['webp', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'ogg', 'pdf', 'txt', 'csv', 'xls'])) {
                 continue;
             }
-            if (str_starts_with($asset,'http')) {
+            if (str_starts_with($asset, 'http')) {
                 $parsedUrl = parse_url($asset);
                 if ($parsedUrl['host'] === $host) {
                     $internal[] = $parsedUrl['path'];
