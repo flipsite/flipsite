@@ -32,9 +32,8 @@ class FontBuilder implements BuilderInterface
             $link = new Element('link', true, true);
             $link->setAttributes([
                 'rel'         => 'preload',
-                'as'          => 'font',
-                'href'        => $googleUrl,
-                'crossorigin' => 'anonymous'
+                'as'          => 'style',
+                'href'        => $googleUrl
             ]);
             $this->links[] = $link;
 
