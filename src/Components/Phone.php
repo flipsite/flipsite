@@ -51,7 +51,7 @@ final class Phone extends AbstractComponent
             $text = $this->builder->build('text', ['value' => $number], [], $options);
             $this->addChild($text);
         } else {
-            $this->setContent($number);
+            $this->setContent($string);
         }
     }
 }
