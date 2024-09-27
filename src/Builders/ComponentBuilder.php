@@ -358,6 +358,9 @@ class ComponentBuilder
                 if ((isset($data['_options']))) {
                     $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
                 }
+                if ((isset($data['_attr']))) {
+                    $data['_attr'] = $this->handleApplyData($data['_attr'], $variables, $found, false);
+                }
             }
         }
         return $data;
