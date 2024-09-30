@@ -92,7 +92,7 @@ trait ActionTrait
             case 'scrollRight':
                 return [
                     'tag'     => 'button',
-                    'onclick' => "javascript:scrollX('".trim($data['_target'])."','".($data['_action'] === 'scrollLeft' ? 'left' : 'right')."')",
+                    'onclick' => "javascript:scrollX('".trim($data['_target'] ?? '')."','".($data['_action'] === 'scrollLeft' ? 'left' : 'right')."')",
                 ];
             case 'submit':
                 return [
