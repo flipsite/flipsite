@@ -14,13 +14,13 @@ final class Plugins
         return isset($this->callbacks[$type]);
     }
 
-    public function run(string $type, $args)
+    public function run(string $type, $data, ...$args)
     {
         if (isset($this->callbacks[$type])) {
             foreach ($this->callbacks[$type] as $callback) {
-                $args = $callback($args);
+                $data = $callback($data, ...$args);
             }
         }
-        return $args;
+        return $data;
     }
 }

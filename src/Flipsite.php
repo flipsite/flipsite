@@ -97,7 +97,8 @@ final class Flipsite
         $componentBuilder = new ComponentBuilder(
             $this->environment,
             $this->siteData,
-            $path
+            $path,
+            $this->plugins
         );
 
         $documentBuilder = new DocumentBuilder(

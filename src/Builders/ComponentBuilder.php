@@ -16,6 +16,7 @@ use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Style;
 use Flipsite\Utils\Filter;
+use Flipsite\Utils\Plugins;
 
 class ComponentBuilder
 {
@@ -28,13 +29,16 @@ class ComponentBuilder
     private array $recursiveData = [];
     private array $sharedData    = [];
 
-    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path, private ?Plugins $plugins = null)
     {
         $this->assets = new Assets($environment->getAssetSources());
     }
 
     public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
     {
+        if (str_starts_with($type, '_')) {
+            return null;
+        }
         if (($options['recursionDepth'] ?? 0) > 50) {
             return null;
         }
@@ -58,11 +62,10 @@ class ComponentBuilder
                 $options['recursionDepth'] ??= 0;
                 $options['recursionDepth']++;
             }
+        } elseif (!is_array($data)) {
+            $data = ['value' => $data];
         }
 
-        if (str_starts_with($type, '_')) {
-            return null;
-        }
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
         }
@@ -73,6 +76,11 @@ class ComponentBuilder
         $fallback = ['container', 'logo', 'button', 'link', 'toggle', 'question'];
         if (in_array($type, $fallback)) {
             $type = 'group';
+        }
+
+        $class = 'Flipsite\\Components\\' . ucfirst($type);
+        if (!class_exists($class)) {
+            return null;
         }
 
         $parentType = false;
@@ -127,21 +135,6 @@ class ComponentBuilder
             }
         }
 
-        $found = [];
-        if (isset($options['parentDataSource']) && (is_string($data) || is_array($data))) {
-            $data  = $this->handleApplyData($data, $options['parentDataSource'], $found);
-            if (isset($data['_options']['render'])) {
-                if (!$this->handleRenderOptions($data['_options']['render'])) {
-                    return null;
-                }
-                unset($data['_options']['render']);
-            }
-        }
-
-        if (false !== array_search('copyright.year', $found)) {
-            $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
-        }
-
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
             $multiplier = intval($data['_repeatIndex']);
             $style['transitionDelay'] ??= 'delay-0';
@@ -156,12 +149,7 @@ class ComponentBuilder
             unset($style['transitionDelayStep']);
         }
 
-        $class = 'Flipsite\\Components\\' . ucfirst($type);
-        if (class_exists($class)) {
-            $component = new $class();
-        } else {
-            return null;
-        }
+        $component = new $class();
 
         if (isset($data['_comment'])) {
             if (isset($data['_comment']['before'])) {
@@ -203,7 +191,18 @@ class ComponentBuilder
 
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
+        if ($options['parentDataSource']) {
+            $data = $component->applyData($data, $options['parentDataSource'] ?? []);
+        }
         $data = $component->normalize($data);
+
+        if (isset($data['_options']['render'])) {
+            if (!$this->handleRenderOptions($data['_options']['render'])) {
+                return null;
+            }
+            unset($data['_options']['render']);
+        }
+
         if (isset($data['default']) && (!isset($data['value']) || !$data['value'] || preg_match('/\{[a-zA-Z]+\}$/', $data['value']))) {
             $data['value'] = $data['default'];
             unset($data['default']);
@@ -217,6 +216,9 @@ class ComponentBuilder
             $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
 
+        if ($this->plugins) {
+            $data = $this->plugins->run('beforeComponentBuild', $data, $options);
+        }
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
             if (is_string($data['_attr']['_data'])) {
@@ -275,7 +277,11 @@ class ComponentBuilder
             }
             unset($data['_attr']);
         }
-
+        if (isset($options['original'])) {
+            if (is_string($options['original'])) {
+                $options['original'] = ['value' => $options['original']];
+            }
+        }
         $component->build($data, $style ?? [], $options);
         return $component;
     }
@@ -318,53 +324,61 @@ class ComponentBuilder
         }
     }
 
-    private function handleApplyData(array|string $data, ?array $variables, array &$found, bool $checkIfContainer = true): array|string
-    {
-        if (null === $variables) {
-            return $data;
-        }
-        if (is_string($data)) {
-            if (strpos($data, '{') === false) {
-                return $data;
-            }
-            $matches = [];
-            preg_match_all('/\{[^{}]+\}/', $data, $matches);
-            foreach ($matches[0] as $match) {
-                $key = trim($match, '{}');
-                if (isset($variables[$key])) {
-                    $data    = str_replace($match, (string)$variables[$key], $data);
-                    $found[] = $key;
-                }
-            }
-            return $data;
-        } elseif (is_array($data)) {
-            $isRepeat = isset($data['_repeat']);
-            if (!$isRepeat) {
-                foreach ($data as $key => &$value) {
-                    if (is_string($value)) {
-                        $value = $this->handleApplyData($value, $variables, $found);
-                    } elseif (is_array($value) && is_string($key)) {
-                        $parts         = explode(':', $key);
-                        $componentType = $parts[0];
-                        if (!$checkIfContainer || !$this->isContainer($componentType)) {
-                            $value = $this->handleApplyData($value, $variables, $found, false);
-                        }
-                    }
-                }
-            } else {
-                if ((isset($data['_repeat']))) {
-                    $data['_repeat']  = $this->handleApplyData($data['_repeat'], $variables, $found, false);
-                }
-                if ((isset($data['_options']))) {
-                    $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
-                }
-                if ((isset($data['_attr']))) {
-                    $data['_attr'] = $this->handleApplyData($data['_attr'], $variables, $found, false);
-                }
-            }
-        }
-        return $data;
-    }
+    // private function handleApplyData(array|string $data, ?array $variables): array|string
+    // {
+    //     if (null === $variables) {
+    //         return $data;
+    //     }
+    //     if (is_string($data)) {
+    //         if (strpos($data, '{') === false) {
+    //             return $data;
+    //         }
+    //         $matches = [];
+    //         preg_match_all('/\{[^{}]+\}/', $data, $matches);
+    //         foreach ($matches[0] as $match) {
+    //             $key = trim($match, '{}');
+    //             if (isset($variables[$key])) {
+    //                 $data    = str_replace($match, (string)$variables[$key], $data);
+    //                 $found[] = $key;
+    //             }
+    //         }
+    //         return $data;
+    //     } elseif (is_array($data)) {
+    //         $isRepeat = isset($data['_repeat']);
+    //         if (!$isRepeat) {
+    //             $original = [];
+    //             foreach ($data as $key => &$value) {
+    //                 if (is_string($value)) {
+    //                     $originalValue = $value;
+    //                     $value         = $this->handleApplyData($value, $variables, $found);
+    //                     if ($originalValue !== $value) {
+    //                         echo 'orginal: '.$originalValue."\n";
+    //                         echo 'new: '.$value."\n";
+    //                         // $originalValue = substr($originalValue, 1, -1);
+    //                         // $value         = $originalValue;
+    //                     }
+    //                 } elseif (is_array($value) && is_string($key)) {
+    //                     $parts         = explode(':', $key);
+    //                     $componentType = $parts[0];
+    //                     if (!$checkIfContainer || !$this->isContainer($componentType)) {
+    //                         $value = $this->handleApplyData($value, $variables, $found, false);
+    //                     }
+    //                 }
+    //             }
+    //         } else {
+    //             if ((isset($data['_repeat']))) {
+    //                 $data['_repeat']  = $this->handleApplyData($data['_repeat'], $variables, $found, false);
+    //             }
+    //             if ((isset($data['_options']))) {
+    //                 $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
+    //             }
+    //             if ((isset($data['_attr']))) {
+    //                 $data['_attr'] = $this->handleApplyData($data['_attr'], $variables, $found, false);
+    //             }
+    //         }
+    //     }
+    //     return $data;
+    // }
 
     private function handleApplyStyleData(array $style, array $variables): array
     {

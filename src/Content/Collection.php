@@ -50,7 +50,8 @@ class Collection implements \JsonSerializable
 
     public function getItem(?int $itemId = null) : ?Item
     {
-        return $this->items[$itemId ?? -1] ?? null;
+        $item = $this->items[$itemId ?? -1] ?? null;
+        return $item;
     }
 
     public function getSlugField() : ?string
@@ -97,7 +98,8 @@ class Collection implements \JsonSerializable
             $nextId++;
             $rawItem['_id'] = $nextId;
         }
-        $item                        = new Item($this->schema, $rawItem);
+        $rawItem['_collectionId']    = $this->id;
+        $item                        = new Item($this->schema, $rawItem, $this->id);
         $this->items[$item->getId()] = $item;
 
         if ($index !== null) {

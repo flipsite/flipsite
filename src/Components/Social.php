@@ -68,14 +68,15 @@ final class Social extends AbstractGroup
             return [];
         }
         foreach ($social as $type => $handle) {
-            $item           = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
-            $item['type']   = $type;
-            $item['handle'] = $handle;
-            $item['url']    = $item['url'];
-            $item['color']  = '['.$item['color'].']';
-            $items[]        = $item;
+            $item                = \Flipsite\Utils\SocialHelper::getData($type, (string)$handle, $name, $language);
+            $item['_id']         = $type;
+            $item['_collection'] = '_social';
+            $item['type']        = $type;
+            $item['handle']      = $handle;
+            $item['url']         = $item['url'];
+            $item['color']       = '['.$item['color'].']';
+            $items[]             = $item;
         }
-
         return $items;
     }
 
