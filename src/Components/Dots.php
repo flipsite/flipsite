@@ -39,7 +39,9 @@ final class Dots extends AbstractGroup
             foreach ($this->builder->getSharedData($data['target']) as $item) {
                 $image            = $item[$key] ?? $item['image'] ?? '';
                 $bgAttributes     = $this->assets->getImageAttributes($image, $bgOptions);
-                $backgrounds[]    = $bgAttributes->getSrc();
+                if ($bgAttributes) {
+                    $backgrounds[]    = $bgAttributes->getSrc();
+                }
             }
             $this->setAttribute('data-backgrounds', json_encode($backgrounds));
         }
