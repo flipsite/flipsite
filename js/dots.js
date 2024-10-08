@@ -122,6 +122,9 @@ ScrollDots.prototype.setSelected = function(index, scroll){
 }
 
 ScrollDots.prototype.countItemsInViewport = function() {
+  if (this.target.children.length === 0) {
+    return 0;
+  }
   this.itemWidth = this.target.children[0].clientWidth;
   return Math.round(this.target.offsetWidth / this.itemWidth); 
 }
