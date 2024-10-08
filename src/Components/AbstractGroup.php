@@ -87,11 +87,13 @@ abstract class AbstractGroup extends AbstractComponent
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
 
+        $repeatCollectionId = null;
         if (isset($data['_repeat'])) {
             $repeat = $data['_repeat'];
             unset($data['_repeat']);
             if (is_string($repeat)) {
-                $repeat = $this->getCollection($repeat, true);
+                $repeatCollectionId = $repeat;
+                $repeat             = $this->getCollection($repeat, true);
             }
             $data = $this->normalizeRepeat($data, $repeat);
             if (isset($data['_attr']['id'])) {
@@ -99,7 +101,7 @@ abstract class AbstractGroup extends AbstractComponent
                 $this->builder->shareData($id, $data['_repeatData']);
             }
         }
-
+        $data['_repeatCollectionId'] = $repeatCollectionId;
         return $data;
     }
 
