@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -198,6 +197,24 @@ class StyleBuilder implements BuilderInterface
                 }
                 $element->setAttribute($dataAttribute, implode(' ', $tmp));
             }
+        }
+
+        $content = $element->getContent();
+        if (strpos($content, 'class="') !== false) {
+            $pattern = '/class="([^"]+)"/';
+            if (preg_match_all($pattern, $content, $matches)) {
+                $contentClasses = array_unique($matches[1]);
+                foreach ($contentClasses as $cls) {
+                    $tmp = explode(' ', $cls);
+                    foreach ($tmp as &$dataClass) {
+                        if (isset($newClasses[$dataClass])) {
+                            $dataClass = $newClasses[$dataClass];
+                        }
+                    }
+                    $content = str_replace($cls, implode(' ', $tmp), $content);
+                }
+            }
+            $element->setContent($content);
         }
 
         foreach ($element->getChildren() as $child) {

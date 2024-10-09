@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 use Flipsite\Utils\StyleAppearanceHelper;
@@ -10,11 +9,12 @@ use Flipsite\Components\Element;
 trait ClassesTrait
 {
     use BuilderTrait;
+
     private function addClassesToHtml(string $html, array $tags, array $style, string $appearance): string
     {
         foreach ($tags as $tag) {
             if (isset($style[$tag])) {
-                $tag = $tag === 'tbl' ? 'table' : $tag;
+                $tag      = $tag === 'tbl' ? 'table' : $tag;
                 $tagStyle = StyleAppearanceHelper::apply($style[$tag], $appearance);
                 if (!$tagStyle) {
                     continue;
@@ -26,7 +26,7 @@ trait ClassesTrait
                 }
                 $element->addStyle($tagStyle);
                 $attributes = $element->renderAttributes();
-                $html = str_replace('<' . $tag, '<' . $tag . ' '.$attributes, $html);
+                $html       = str_replace('<' . $tag, '<' . $tag . $attributes, $html);
             }
         }
         return $html;
