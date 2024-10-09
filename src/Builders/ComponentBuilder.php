@@ -282,6 +282,7 @@ class ComponentBuilder
                 $options['original'] = ['value' => $options['original']];
             }
         }
+        $component->setAttribute('_original', null);
         $component->build($data, $style ?? [], $options);
         return $component;
     }
@@ -323,62 +324,6 @@ class ComponentBuilder
             }
         }
     }
-
-    // private function handleApplyData(array|string $data, ?array $variables): array|string
-    // {
-    //     if (null === $variables) {
-    //         return $data;
-    //     }
-    //     if (is_string($data)) {
-    //         if (strpos($data, '{') === false) {
-    //             return $data;
-    //         }
-    //         $matches = [];
-    //         preg_match_all('/\{[^{}]+\}/', $data, $matches);
-    //         foreach ($matches[0] as $match) {
-    //             $key = trim($match, '{}');
-    //             if (isset($variables[$key])) {
-    //                 $data    = str_replace($match, (string)$variables[$key], $data);
-    //                 $found[] = $key;
-    //             }
-    //         }
-    //         return $data;
-    //     } elseif (is_array($data)) {
-    //         $isRepeat = isset($data['_repeat']);
-    //         if (!$isRepeat) {
-    //             $original = [];
-    //             foreach ($data as $key => &$value) {
-    //                 if (is_string($value)) {
-    //                     $originalValue = $value;
-    //                     $value         = $this->handleApplyData($value, $variables, $found);
-    //                     if ($originalValue !== $value) {
-    //                         echo 'orginal: '.$originalValue."\n";
-    //                         echo 'new: '.$value."\n";
-    //                         // $originalValue = substr($originalValue, 1, -1);
-    //                         // $value         = $originalValue;
-    //                     }
-    //                 } elseif (is_array($value) && is_string($key)) {
-    //                     $parts         = explode(':', $key);
-    //                     $componentType = $parts[0];
-    //                     if (!$checkIfContainer || !$this->isContainer($componentType)) {
-    //                         $value = $this->handleApplyData($value, $variables, $found, false);
-    //                     }
-    //                 }
-    //             }
-    //         } else {
-    //             if ((isset($data['_repeat']))) {
-    //                 $data['_repeat']  = $this->handleApplyData($data['_repeat'], $variables, $found, false);
-    //             }
-    //             if ((isset($data['_options']))) {
-    //                 $data['_options'] = $this->handleApplyData($data['_options'], $variables, $found, false);
-    //             }
-    //             if ((isset($data['_attr']))) {
-    //                 $data['_attr'] = $this->handleApplyData($data['_attr'], $variables, $found, false);
-    //             }
-    //         }
-    //     }
-    //     return $data;
-    // }
 
     private function handleApplyStyleData(array $style, array $variables): array
     {
