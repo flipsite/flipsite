@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -105,6 +106,24 @@ class MetaBuilder implements BuilderInterface
             }
             $themeColor = ColorHelper::getColorString($color, $this->siteData->getColors());
             $elements[] = $this->meta('theme-color', $themeColor);
+        }
+
+        // CDN preconnect
+        $assetsBasePath = $this->environment->getAssetsBasePath();
+        if (str_starts_with($assetsBasePath, 'http')) {
+            $pathinfo = pathinfo($assetsBasePath);
+            $url = $pathinfo['dirname'];
+            $link = new Element('link', true, true);
+            $link->setAttribute('rel', 'preconnect');
+            $link->setAttribute('href', $url);
+            $link->setAttribute('crossorigin', true);
+            $elements[] = $link;
+
+            $link = new Element('link', true, true);
+            $link->setAttribute('rel', 'dns-prefetch');
+            $link->setAttribute('href', $url);
+            $elements[] = $link;
+
         }
 
         foreach ($elements as $el) {
