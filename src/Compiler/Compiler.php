@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Compiler;
 
 use Flipsite\EnvironmentInterface;
@@ -37,8 +36,9 @@ class Compiler implements LoggerAwareInterface
 
         // Create pages and parse assets after each created page
         $allPages = array_keys($this->siteData->getSlugs()->getAll());
+        $allPages = array_map('strval', $allPages);
 
-        $allFiles = [];
+        $allFiles  = [];
         $assetList = [];
         foreach ($allPages as $page) {
             $meta = $this->siteData->getPageMeta($page, $this->siteData->getDefaultLanguage());
@@ -49,11 +49,16 @@ class Compiler implements LoggerAwareInterface
             if ($this->logger) {
                 $this->logger->info('Created file for page '.$page);
             }
-            $this->writeFile($this->targetDir, $page.'/index.html', $html);
-            $allFiles[] = $page.'/index.html';
-            $assetList = array_merge($assetList, AssetParser::parse($html, $compileOptions['domain']));
-        }
 
+            if ('404' == $page) {
+                $filepath = '404.html';
+            } else {
+                $filepath = $page.'/index.html';
+            }
+            $this->writeFile($this->targetDir, $filepath, $html);
+            $allFiles[] = $filepath;
+            $assetList  = array_merge($assetList, AssetParser::parse($html, $compileOptions['domain']));
+        }
 
         // Get list of unique assets
         $assetList = array_values(array_filter(array_unique($assetList)));
@@ -67,8 +72,8 @@ class Compiler implements LoggerAwareInterface
         }
 
         $notDeleted = $this->deleteAssets($this->targetDir, $assetList);
-        $assetList = array_values(array_diff($assetList, $notDeleted));
-        $assetList = json_decode(json_encode($assetList));
+        $assetList  = array_values(array_diff($assetList, $notDeleted));
+        $assetList  = json_decode(json_encode($assetList));
 
         $assets = new Assets($this->environment->getAssetSources());
         foreach ($assetList as $asset) {
@@ -81,7 +86,7 @@ class Compiler implements LoggerAwareInterface
                 $filename = substr($asset, 7);
             }
             if ($filename) {
-                $target = $this->targetDir.$asset;
+                $target   = $this->targetDir.$asset;
                 $pathinfo = pathinfo($target);
                 if (!file_exists($pathinfo['dirname'])) {
                     mkdir($pathinfo['dirname'], 0777, true);
@@ -104,7 +109,7 @@ class Compiler implements LoggerAwareInterface
             $indexTpl = file_get_contents(__DIR__.'/redirect.tpl.html');
             foreach ($redirects as $redirect) {
                 $file = '/'.$redirect['from'].'/index.html';
-                $url = $this->environment->getAbsoluteUrl($redirect['to']);
+                $url  = $this->environment->getAbsoluteUrl($redirect['to']);
                 $this->writeFile($this->targetDir, $file, str_replace('{{url}}', $url, $indexTpl));
                 $allFiles[] = $file;
             }
@@ -198,6 +203,9 @@ class Compiler implements LoggerAwareInterface
         $filesystem = new Filesystem();
         $files      = $this->getDirContents($targetDir);
         foreach ($files as $file) {
+            if (false !== mb_strpos($file, '404.html')) {
+                $filesystem->remove($file);
+            }
             if (false !== mb_strpos($file, 'index.html')) {
                 $filesystem->remove($file);
             }

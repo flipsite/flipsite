@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Flipsite\EnvironmentInterface;
@@ -55,9 +54,6 @@ final class Sitemap
         }
         $xml = '';
         foreach ($alternate as $language => $url) {
-            if (404 === $url) {
-                continue;
-            }
             $xml .= '    <xhtml:link rel="alternate" hreflang="'.$language.'" ';
             $xml .= 'href="'.$this->getUrl($url).'"/>'."\n";
         }

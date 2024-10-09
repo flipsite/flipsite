@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -20,7 +19,11 @@ final class Slugs
 
     public function __construct(array $pages, ?array $slugs, Language $default, array $languages = [])
     {
-        $this->pages     = $pages;
+        $this->pages     = array_map('strval', $pages);
+        if (!in_array('404', $this->pages)) {
+            $this->pages[] = '404';
+        }
+        error_log(print_r($this->pages, true));
         $this->languages = 0 === count($languages) ? [$default] : $languages;
         $this->slugs     = [];
         foreach ($this->pages as $page) {

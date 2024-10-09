@@ -432,6 +432,7 @@ final class Reader implements SiteDataInterface
         $mainLanguage = array_shift($languages); //all languages except main one
 
         foreach ($pages as $page => $sections) {
+            $page = (string)$page;
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
                 $this->expandedPages[$page] = [(string)$mainLanguage => $page];
                 $collection                 = $this->getCollection($meta[$page]['content']);

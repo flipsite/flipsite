@@ -103,6 +103,9 @@ final class Nav extends AbstractGroup
         $firstExact = false;
         if ($level === 0) {
             foreach ($all as $page) {
+                if ('404' === $page) {
+                    continue;
+                }
                 if (strpos($page, '/') === false && $pageItemData = $this->getPageItemData($page)) {
                     $pages[] = $pageItemData;
                 }
@@ -122,6 +125,9 @@ final class Nav extends AbstractGroup
 
     private function getPageItemData(string $page) : ?array
     {
+        if ('404' === $page) {
+            return null;
+        }
         if (!$this->siteData->getSlugs()->isPage($page)) {
             $pattern = '/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/';
             preg_match($pattern, $page, $matches);
