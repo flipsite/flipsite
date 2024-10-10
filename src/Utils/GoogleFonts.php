@@ -16,7 +16,6 @@ class GoogleFonts
             return $this->fonts;
         }
         $fontFaces = $this->parseGoogleFile($url, $subsets);
-        error_log(print_r($fontFaces, true));
 
         $files = [];
         foreach ($fontFaces as $fontFace) {
