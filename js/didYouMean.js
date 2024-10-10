@@ -1,7 +1,7 @@
 ready(() => {
   const currentURL = window.location.href;
   document.querySelectorAll('[data-did-you-mean]').forEach((el) => {
-    const root = el.getAttribute('data-root').split(',');
+    const root = el.getAttribute('data-root');
     const currentPage = window.location.href.replace(root+'/','').split('#')[0];
     if ('404' === currentPage) {
       el.innerHTML = el.getAttribute('data-did-you-mean');
