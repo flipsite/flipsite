@@ -5,6 +5,8 @@ namespace Flipsite\Components;
 
 abstract class AbstractComponent extends AbstractElement
 {
+    use \Flipsite\Traits\ComponentTypeTrait;
+
     abstract public function build(array $data, array $style, array $options) : void;
 
     public function normalize(string|int|bool|array $data) : array
@@ -15,7 +17,8 @@ abstract class AbstractComponent extends AbstractElement
     public function applyData(array $data, array $dataSource) : array
     {
         foreach ($data as $key => &$value) {
-            if (is_string($value) && strpos($value, '{') !== false) {
+            $isComponent = !!$this->getComponentType($key);
+            if (!$isComponent && is_string($value) && strpos($value, '{') !== false) {
                 $matches = [];
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 $original = $value;
@@ -31,7 +34,7 @@ abstract class AbstractComponent extends AbstractElement
                     $data['_original'] ??= [];
                     $data['_original'][$key] = $original;
                 };
-            } elseif (is_array($value) && in_array($key, ['_attr', '_options', 'render'])) {
+            } elseif ($isComponent && is_array($value) && in_array($key, ['_attr', '_options', 'render'])) {
                 $value = $this->applyData($value, $dataSource);
             }
         }

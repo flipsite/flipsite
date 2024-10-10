@@ -20,6 +20,7 @@ use Flipsite\Utils\Plugins;
 
 class ComponentBuilder
 {
+    use \Flipsite\Traits\ComponentTypeTrait;
     private ImageHandler $imageHandler;
     private VideoHandler $videoHandler;
     private array $listeners    = [];
@@ -69,19 +70,12 @@ class ComponentBuilder
         if (isset($data['_script'])) {
             $this->handleScripts($data['_script']);
         }
-        $flags = explode(':', $type);
-        $type  = array_shift($flags);
 
-        // Fallback
-        $fallback = ['container', 'logo', 'button', 'link', 'toggle', 'question'];
-        if (in_array($type, $fallback)) {
-            $type = 'group';
-        }
-
-        $class = 'Flipsite\\Components\\' . ucfirst($type);
-        if (!class_exists($class)) {
+        $type = $this->getComponentType($type);
+        if (!$type) {
             return null;
         }
+        $class = 'Flipsite\\Components\\' . ucfirst($type);
 
         $parentType = false;
         if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
@@ -188,7 +182,6 @@ class ComponentBuilder
         }
 
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
-
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
         if ($options['parentDataSource']) {
