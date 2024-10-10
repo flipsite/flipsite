@@ -18,7 +18,8 @@ abstract class AbstractComponent extends AbstractElement
     {
         foreach ($data as $key => &$value) {
             $isComponent = !!$this->getComponentType($key);
-            if (!$isComponent && is_string($value) && strpos($value, '{') !== false) {
+            if ($isComponent) {
+            } elseif (is_string($value) && strpos($value, '{') !== false) {
                 $matches = [];
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 $original = $value;
@@ -34,7 +35,7 @@ abstract class AbstractComponent extends AbstractElement
                     $data['_original'] ??= [];
                     $data['_original'][$key] = $original;
                 };
-            } elseif ($isComponent && is_array($value) && in_array($key, ['_attr', '_options', 'render'])) {
+            } elseif (is_array($value) && in_array($key, ['_attr', '_options', 'render'])) {
                 $value = $this->applyData($value, $dataSource);
             }
         }
