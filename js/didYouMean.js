@@ -1,8 +1,7 @@
 ready(() => {
-  const currentURL = window.location.href;
   document.querySelectorAll('[data-did-you-mean]').forEach((el) => {
     const root = el.getAttribute('data-root');
-    const currentPage = window.location.href.replace(root+'/','').split('#')[0];
+    const currentPage = window.location.href.replace(root,'').split('#')[0];
     if ('404' === currentPage) {
       el.innerHTML = el.getAttribute('data-did-you-mean');
       return;
@@ -18,9 +17,14 @@ ready(() => {
     }
     if (min < 10) {
       const link = el.querySelector('a');
-      link.setAttribute('href',root+'/'+page);
-      link.innerHTML = page;
-      el.querySelector('strong').innerHTML = currentPage;
+      if (link) {
+        link.setAttribute('href',root+'/'+page);
+        link.innerHTML = page;
+      }
+      const strong = el.querySelector('strong');
+      if (strong) {
+        strong.innerHTML = currentPage;
+      }
     } else {
       el.innerHTML = el.getAttribute('data-did-you-mean');
     }
