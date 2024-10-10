@@ -29,7 +29,6 @@ ready(() => {
     return fontSize + 'px';
   }
   const updateScale = () => {
-    console.log('updateScale')
     elements.forEach(element => {
       const parentRect = element.parentNode.getBoundingClientRect();
       const parentStyle = window.getComputedStyle(element.parentNode);
