@@ -213,6 +213,11 @@ final class Reader implements SiteDataInterface
         return $this->data['theme']['fonts'] ?? [];
     }
 
+    public function setFonts(array $fonts): void
+    {
+        $this->data['theme']['fonts'] = $fonts;
+    }
+
     public function getThemeSettings(): array
     {
         $style    = $this->data['theme']['components']['html'] ?? [];

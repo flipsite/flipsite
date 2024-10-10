@@ -30,16 +30,35 @@ class Compiler implements LoggerAwareInterface
         $compileOptions['domain'] ??= 'flipsite.io';
         $basePath = $compileOptions['basePath'] ?? '/';
 
+        $assetList = [];
+        $allFiles  = [];
+
         $flipsite = new Flipsite($this->environment, $this->siteData);
         // Remove all index.html files
         $this->deleteContent($this->targetDir);
+
+        // Download fonts
+        $fonts      = $this->getDirContents($this->targetDir.'/fonts');
+        $filesystem = new Filesystem();
+        foreach ($fonts as $font) {
+            $filesystem->remove($font);
+        }
+        $filesystem->remove($this->targetDir.'/fonts');
+        if ($this->environment->downloadFonts()) {
+            $googleFonts = new \Flipsite\Utils\GoogleFonts($this->siteData->getFonts());
+            $localFonts  = $googleFonts->download($this->targetDir, 'fonts', $this->environment->getAssetsBasePath());
+            $this->siteData->setFonts($localFonts);
+            foreach ($localFonts as $font) {
+                foreach ($font['files'] ?? [] as $file) {
+                    $allFiles[] = $propValue = substr($file['src'], 5, strlen($file['src']) - 22);
+                }
+            }
+        }
 
         // Create pages and parse assets after each created page
         $allPages = array_keys($this->siteData->getSlugs()->getAll());
         $allPages = array_map('strval', $allPages);
 
-        $allFiles  = [];
-        $assetList = [];
         foreach ($allPages as $page) {
             $meta = $this->siteData->getPageMeta($page, $this->siteData->getDefaultLanguage());
             if ($meta['unpublished'] ?? false) {
@@ -135,6 +154,7 @@ class Compiler implements LoggerAwareInterface
         }
 
         foreach ($deleteFiles as $deleteFile) {
+            $this->logger->info('Deleted file '.$deleteFile);
             unlink($deleteFile);
         }
 
@@ -240,7 +260,6 @@ class Compiler implements LoggerAwareInterface
             }
         }
         $videos = $this->getDirContents($targetDir.'/videos');
-
         foreach ($videos as $video) {
             if (is_dir($video)) {
                 $dirs[] = $video;
@@ -254,7 +273,7 @@ class Compiler implements LoggerAwareInterface
             }
         }
         foreach ($dirs as $dir) {
-            if (count(scandir($dir)) == 2) {
+            if (file_exists($dir) && count(scandir($dir)) == 2) {
                 $filesystem->remove($dir);
             }
         }
@@ -273,6 +292,7 @@ class Compiler implements LoggerAwareInterface
                 $filesystem->remove($video);
             }
         }
+
         foreach ($dirs as $dir) {
             if (file_exists($dir) && count(scandir($dir)) == 2) {
                 $filesystem->remove($dir);

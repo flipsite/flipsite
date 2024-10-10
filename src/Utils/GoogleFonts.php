@@ -9,6 +9,50 @@ class GoogleFonts
     {
     }
 
+    public function download(string $targetDir, string $fontDir, string $basePath, array $subsets = ['latin', 'math', 'symbols']) : array
+    {
+        $url = $this->getUrl();
+        if (!$url) {
+            return $this->fonts;
+        }
+        $fontFaces = $this->parseGoogleFile($url, $subsets);
+        error_log(print_r($fontFaces, true));
+
+        $files = [];
+        foreach ($fontFaces as $fontFace) {
+            $family = $fontFace['font-family'];
+
+            $familyId   = str_replace(' ', '-', strtolower($family));
+            $binaryData = file_get_contents($fontFace['src']);
+            $hash       = substr(md5($binaryData), 0, 6);
+            $filename   = $fontDir.'/'.$familyId.'-'.$fontFace['subset'].'.'.$hash.'.woff2';
+            if (!file_exists($targetDir.'/'.$fontDir)) {
+                mkdir($targetDir.'/'.$fontDir, 0777, true);
+            }
+            file_put_contents($targetDir.'/'.$filename, $binaryData);
+
+            $url    = $basePath.$filename;
+            $file   = [
+                'style'         => $fontFace['font-style'],
+                'weight'        => $fontFace['font-weight'],
+                'display'       => $fontFace['font-display'],
+                'src'           => 'url('.$url.') format("woff2")',
+                'unicode-range' => $fontFace['unicode-range']
+            ];
+            $files[$family][] = $file;
+        }
+        $fonts = $this->fonts;
+        foreach ($fonts as &$font) {
+            $family = $font['family'];
+            if (isset($files[$family])) {
+                $font['provider'] = 'local';
+                $font['files']    = $files[$family];
+            }
+        }
+
+        return $fonts;
+    }
+
     public function getUrl() : ?string
     {
         $fonts = array_filter($this->fonts, function ($value, $key) {
@@ -86,5 +130,73 @@ class GoogleFonts
             }
         }
         return array_values($mergedFonts);
+    }
+
+    private function parseGoogleFile(string $googleUrl, array $subsets): array
+    {
+        // Initialize cURL
+        $ch = curl_init($googleUrl);
+
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);  // Return the response as a string
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  // Follow redirects if any
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        ]);
+
+        // Execute the cURL request
+        $css = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            echo 'cURL error: ' . curl_error($ch);
+            curl_close($ch);
+            exit;
+        }
+        curl_close($ch);
+
+        // Regular expression to match @font-face rules
+        $pattern = '/\/\* (.*?) \*\/\s*@font-face\s*\{([^}]+)\}/';
+
+        // Initialize array to store parsed font data
+        $fonts = [];
+
+        // Find all @font-face blocks
+        preg_match_all($pattern, $css, $matches, PREG_SET_ORDER);
+
+        // Process each matched @font-face block
+        foreach ($matches as $match) {
+            $fontKey    = $match[1]; // cyrillic-ext, cyrillic, etc.
+            $properties = $match[2];
+
+            // Parse properties in each @font-face block
+            preg_match_all('/([a-z\-]+)\s*:\s*([^;]+);/', $properties, $propMatches, PREG_SET_ORDER);
+
+            // Initialize array to store the properties of this font
+            $fontData = [];
+
+            foreach ($propMatches as $prop) {
+                $propKey   = trim($prop[1]);
+                $propValue = trim($prop[2]);
+
+                // Remove quotes from font-family if they exist
+                if ($propKey == 'font-family') {
+                    $propValue = trim($propValue, '\'\"');
+                }
+                if ('src' === $propKey) {
+                    $propValue = substr($propValue, 4, strlen($propValue) - 21);
+                }
+
+                // Add to the array
+                $fontData[$propKey] = $propValue;
+            }
+
+            // Add to fonts array
+            if (in_array($fontKey, $subsets)) {
+                $fontData['subset'] = $fontKey;
+                $fonts[]            = $fontData;
+            }
+        }
+        return $fonts;
     }
 }
