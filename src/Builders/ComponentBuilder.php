@@ -169,6 +169,14 @@ class ComponentBuilder
         if (method_exists($component, 'addSiteData')) {
             $component->addSiteData($this->siteData);
         }
+
+        $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
+        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
+
+        if ($options['parentDataSource']) {
+            $data = $component->applyData($data, $options['parentDataSource'] ?? []);
+        }
+
         // Handle nav stuff
         if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
             $options['navState'] = ['active' => false, 'exact' => false];
@@ -181,12 +189,10 @@ class ComponentBuilder
             }
         }
 
-        $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
-        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
-
-        if ($options['parentDataSource']) {
-            $data = $component->applyData($data, $options['parentDataSource'] ?? []);
+        if (count($options['navState'] ?? [])) {
+            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
+
         $data = $component->normalize($data);
 
         if (isset($data['_options']['render'])) {
@@ -203,10 +209,6 @@ class ComponentBuilder
 
         if ($data['_isEmpty'] ?? false) {
             return null;
-        }
-
-        if (count($options['navState'] ?? [])) {
-            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
         }
 
         if ($this->plugins) {
