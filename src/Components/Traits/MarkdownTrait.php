@@ -9,6 +9,7 @@ trait MarkdownTrait
 
     private function getMarkdownLine(string $text, array $style, string $appearance) : string
     {
+        $text      = strip_tags($text);
         $parsedown = new \Parsedown();
         $text      = str_replace("\n", ' ', $text);
         $text      = trim($text);
