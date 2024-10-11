@@ -311,6 +311,6 @@ final class Richtext extends AbstractGroup
                     }
             }
         }
-        return implode(' ', $markdown);
+        return implode('', $markdown);
     }
 }
