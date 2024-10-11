@@ -147,6 +147,12 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function setRender(bool $render) : self
+    {
+        $this->render = $render;
+        return $this;
+    }
+
     public function appendContent(string $content): self
     {
         $this->cache = null;

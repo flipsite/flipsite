@@ -279,6 +279,10 @@ class ComponentBuilder
         }
         $component->setAttribute('_original', null);
         $component->build($data, $style ?? [], $options);
+
+        if ($this->plugins) {
+            $component = $this->plugins->run('afterComponentBuild', $component);
+        }
         return $component;
     }
 

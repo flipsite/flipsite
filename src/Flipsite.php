@@ -74,11 +74,31 @@ class OpenToggleCallback extends AbstractDocumentCallback
 
 final class Flipsite
 {
-    private array $callbacks = [];
+    private array $callbacks     = [];
+    private array $renderOptions = [
+        'meta'         => true,
+        'scripts'      => true,
+        'favicon'      => true,
+        'fonts'        => true,
+        'preload'      => true,
+        'style'        => true,
+        'svg'          => true,
+        'integrations' => true,
+        'customCode'   => true,
+    ];
 
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
     {
         $this->callbacks[] = new OpenToggleCallback();
+    }
+
+    public function setRenderOptions(array $options)
+    {
+        foreach ($options as $setting => $value) {
+            if (array_key_exists($setting, $this->renderOptions)) {
+                $this->renderOptions[$setting] = !!$value;
+            }
+        }
     }
 
     public function getDocument(string $rawPath): Document
@@ -151,28 +171,43 @@ final class Flipsite
             $document->getChild('body')->addChild($section);
         }
 
-        $document = $svgBuilder->getDocument($document);
-        $document = $metaBuilder->getDocument($document);
-        $document = $faviconBuilder->getDocument($document);
-        $document = $perloadBuilder->getDocument($document);
-        $fonts    = $this->siteData->getFonts();
-        if ($fonts) {
-            $fontBuilder = new FontBuilder($fonts);
-            $document    = $fontBuilder->getDocument($document);
+        if ($this->renderOptions['svg']) {
+            $document = $svgBuilder->getDocument($document);
         }
-        $document = $styleBuilder->getDocument($document);
+        if ($this->renderOptions['meta']) {
+            $document = $metaBuilder->getDocument($document);
+        }
+        if ($this->renderOptions['favicon']) {
+            $document = $faviconBuilder->getDocument($document);
+        }
+        if ($this->renderOptions['preload']) {
+            $document = $perloadBuilder->getDocument($document);
+        }
+
+        if ($this->renderOptions['fonts']) {
+            $fonts    = $this->siteData->getFonts();
+            if ($fonts) {
+                $fontBuilder = new FontBuilder($fonts);
+                $document    = $fontBuilder->getDocument($document);
+            }
+        }
+        if ($this->renderOptions['style']) {
+            $document = $styleBuilder->getDocument($document);
+        }
 
         // Integrations
         $integrations = $this->siteData->getIntegrations();
-        if (null !== $integrations) {
+        if (null !== $integrations && $this->renderOptions['integrations']) {
             $analyticsBuilder = new IntegrationsBuilder($this->environment->isProduction(), $integrations);
             $document         = $analyticsBuilder->getDocument($document);
         }
 
         // Custom HTML
-        $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
-        $document          = $customCodeBuilder->getDocument($document);
-        $document          = $scriptBuilder->getDocument($document);
+        if ($this->renderOptions['customCode']) {
+            $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
+            $document          = $customCodeBuilder->getDocument($document);
+            $document          = $scriptBuilder->getDocument($document);
+        }
 
         // Cleanup
         foreach ($this->callbacks as $callback) {
