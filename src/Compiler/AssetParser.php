@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Compiler;
 
 class AssetParser
@@ -76,7 +77,7 @@ class AssetParser
             } elseif ('apple-touch-icon' === $tag->getAttribute('rel')) {
                 $url      = $tag->getAttribute('href');
             }
-            if (!str_starts_with($url, 'data:')) {
+            if (isset($url) && !str_starts_with($url, 'data:')) {
                 $assets[] = $url;
             }
         }
