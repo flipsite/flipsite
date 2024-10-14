@@ -26,7 +26,7 @@ abstract class AbstractComponent extends AbstractElement
                 foreach ($matches[0] as $match) {
                     $var   = trim($match, '{}');
                     if (isset($dataSource[$var])) {
-                        $value = str_replace($match, $dataSource[$var] ?? null, $value);
+                        $value = str_replace($match, (string)$dataSource[$var], (string)$value);
                     } else {
                         $value = null;
                     }
