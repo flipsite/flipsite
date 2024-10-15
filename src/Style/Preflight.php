@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Symfony\Component\Yaml\Yaml;
@@ -25,6 +24,17 @@ final class Preflight
             if (count($forElements)) {
                 $css .= implode(',', $forElements).'{'.$this->rules($block).'}';
             }
+        }
+        return $css;
+    }
+
+    public function getAll() : string
+    {
+        $css = '';
+        foreach ($this->styles as $block) {
+            $for = is_string($block['for']) ? [$block['for']] : $block['for'];
+            unset($block['for']);
+            $css .= implode(',', $for).'{'.$this->rules($block).'}';
         }
         return $css;
     }

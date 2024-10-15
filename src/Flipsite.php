@@ -76,15 +76,16 @@ final class Flipsite
 {
     private array $callbacks     = [];
     private array $renderOptions = [
-        'meta'         => true,
-        'scripts'      => true,
-        'favicon'      => true,
-        'fonts'        => true,
-        'preload'      => true,
-        'style'        => true,
-        'svg'          => true,
-        'integrations' => true,
-        'customCode'   => true,
+        'meta'            => true,
+        'scripts'         => true,
+        'favicon'         => true,
+        'fonts'           => true,
+        'preload'         => true,
+        'style'           => true,
+        'style.preflight' => true,
+        'svg'             => true,
+        'integrations'    => true,
+        'customCode'      => true,
     ];
 
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
@@ -140,7 +141,8 @@ final class Flipsite
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
-            $this->environment->minimizeCss()
+            $this->environment->minimizeCss(),
+            $this->renderOptions['style.preflight']
         );
 
         $svgBuilder = new SvgBuilder();

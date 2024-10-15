@@ -17,7 +17,7 @@ class StyleBuilder implements BuilderInterface
 {
     private array $dataAttributesWithClasses = ['data-toggle', 'data-animate', 'data-selected'];
 
-    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false)
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false, private bool $preflight = true)
     {
     }
 
@@ -61,7 +61,7 @@ class StyleBuilder implements BuilderInterface
             $config['fontFamily'][$type] = $font;
         }
 
-        $tailwind = new Tailwind($config, $this->themeSettings);
+        $tailwind = new Tailwind($config, $this->themeSettings, $this->preflight);
         $tailwind->addCallback('size', new UnitCallback());
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));

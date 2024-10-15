@@ -13,7 +13,7 @@ final class Tailwind implements CallbackInterface
     private array $variants  = [];
     private array $callbacks = [];
 
-    public function __construct(private array $config, private array $themeSettings = [])
+    public function __construct(private array $config, private array $themeSettings = [], private bool $preflight = true)
     {
         $this->rules  = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
     }
@@ -273,13 +273,17 @@ final class Tailwind implements CallbackInterface
     private function getPreflight(array $elements, ?array $sansFonts = null, ?array $monoFonts = null, bool $hasBorders = false, ?string $borderColor = null, ?string $borderWidth = null)
     {
         $css = '*,::before,::after{box-sizing:border-box;';
-        if ($hasBorders) {
+        if (!$this->preflight || $hasBorders) {
             $css .= 'border-width:0;border-style:solid;';
             $css .= 'border-color:'.$borderColor;
         }
         $css .= '}';
         $preflight = new Preflight();
-        $css .= $preflight->getCss($elements);
+        if ($this->preflight) {
+            $css .= $preflight->getCss($elements);
+        } else {
+            $css .= $preflight->getAll();
+        }
         $css = str_replace('fontFamily.sans', implode(',', $sansFonts), $css);
         $css = str_replace('fontFamily.mono', implode(',', $monoFonts), $css);
         if ($hasBorders) {
