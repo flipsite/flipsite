@@ -134,10 +134,12 @@ abstract class AbstractElement
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent(?string $content): self
     {
         $this->cache   = null;
-        $this->content = $content;
+        if (is_string($content)) {
+            $this->content = $content;
+        }
         return $this;
     }
 
