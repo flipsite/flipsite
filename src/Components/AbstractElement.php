@@ -192,6 +192,15 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function removeChild(?string $name = null): self
+    {
+        if (null === $name) {
+            return $this;
+        }
+        unset($this->children[$name]);
+        return $this;
+    }
+
     public function replaceChildren(array $children): self
     {
         $this->cache    = null;
