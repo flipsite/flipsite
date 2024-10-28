@@ -63,7 +63,7 @@ final class Youtube extends AbstractGroup
             $iframe->setAttribute('data-youtube-play', $src);
             $iframe->setAttribute('style', 'pointer-events:none');
             $this->addChild($iframe);
-            $icon = $this->builder->build('svg', ['value' => $data['icon']], $style['icon'] ?? [], $options);
+            $icon = $this->builder->build('svg', ['value' => $data['playIcon']], $style['playIcon'] ?? [], $options);
             $this->setAttribute('data-youtube-play', true);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));
             $this->addChild($icon);
