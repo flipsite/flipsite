@@ -13,9 +13,11 @@ use Flipsite\Style\Callbacks\UnitCallback;
 use Flipsite\Style\Callbacks\ScreenWidthCallback;
 use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
 
-class StyleBuilder implements BuilderInterface
+class StyleBuilder implements BuilderInterface, EventListenerInterface
 {
     private array $dataAttributesWithClasses = ['data-toggle', 'data-animate', 'data-selected'];
+
+    private array $customCss = [];
 
     public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false, private bool $preflight = true)
     {
@@ -69,6 +71,8 @@ class StyleBuilder implements BuilderInterface
         $css        = $tailwind->getCss($elements, $classes);
         $newClasses = [];
 
+        $css .= $this->addCustomClasses();
+
         if ($this->minmizeClasses) {
             $css = $this->minmizeClasses($css, $classes, $newClasses);
             $this->replaceClasses($document, $newClasses);
@@ -91,6 +95,38 @@ class StyleBuilder implements BuilderInterface
         foreach ($this->listeners as $listener) {
             $listener->handleEvent($event);
         }
+    }
+
+    public function handleEvent(Event $event) : void
+    {
+        if ('background-image' === $event->getType()) {
+            foreach ($event->getData() as $mediaQuery => $declarations) {
+                $this->customCss[$mediaQuery] ??= [];
+                foreach ($declarations as $selector => $styles) {
+                    $this->customCss[$mediaQuery][$selector] ??= [];
+                    foreach ($styles as $property => $value) {
+                        $this->customCss[$mediaQuery][$selector][$property] = $value;
+                    }
+                }
+            }
+        }
+    }
+
+    private function addCustomClasses() : string
+    {
+        $css = '';
+        foreach ($this->customCss as $mediaQuery => $declarations) {
+            $css .= '@media '.$mediaQuery.' {';
+            foreach ($declarations as $selector => $styles) {
+                $css .= $selector.' {';
+                foreach ($styles as $property => $value) {
+                    $css .= $property.':'.$value.';';
+                }
+                $css .= '}';
+            }
+            $css .= '}';
+        }
+        return $css;
     }
 
     private function getElementsAndClasses(AbstractElement $element, array &$elements, array &$classes)

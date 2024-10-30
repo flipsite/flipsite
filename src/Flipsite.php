@@ -151,6 +151,7 @@ final class Flipsite
         $componentBuilder->addListener($svgBuilder);
         $componentBuilder->addListener($scriptBuilder);
         $componentBuilder->addListener($perloadBuilder);
+        $componentBuilder->addListener($styleBuilder);
         $styleBuilder->addListener($scriptBuilder);
 
         $document = $documentBuilder->getDocument();

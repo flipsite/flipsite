@@ -528,34 +528,57 @@ class ComponentBuilder
         $gradient = $this->parseThemeColors($style['gradient'] ?? '');
         $options  = $style['options'] ?? [];
         $options['loading'] ??= 'lazy';
-        $options['width'] ??= 512;
         $options['srcset'] ??= ['1x', '2x'];
         $options['webp'] ??= true;
-
-        if ($src) {
-            $style['position'] ??= 'bg-center';
-            $style['size'] ??= 'bg-cover';
-            $style['repeat'] ??= 'bg-no-repeat';
-        }
         unset($style['src'],$style['gradient'],$style['options']);
         if ($src) {
-            $imageAttributes = $this->assets->getImageAttributes($src, $options);
-            if (strlen($gradient)) {
-                $gradient .= ',';
-            }
-            // SVG
-            if (str_ends_with($src, '.svg')) {
-                $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
-            } elseif ($imageAttributes && $srcset = $imageAttributes->getSrcset('url')) {
-                if ('eager' === $options['loading']) {
-                    $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
-                } else {
-                    $element->setAttribute('data-lazybg', $gradient . '-webkit-image-set(' . $srcset . ')');
-                    $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/dist/lazybg.min.js')));
+            if (isset($options['resolutions'])) {
+                $mediaQueries = [
+                    'portrait'  => '(max-width: 600px) and (orientation: portrait)',
+                    'landscape' => '(max-width: 900px) and (orientation: landscape)',
+                    'laptop'    => '(min-width: 901px) and (max-width: 1200px)',
+                    'desktop'   => '(min-width: 1201px) and (-webkit-min-device-pixel-ratio: 2), (min-width: 1201px) and (min-resolution: 192dpi)',
+                ];
+                $bgClass = 'bgimg-'.substr(md5($src), 0, 6);
+                $element->addStyle(['bgClass'=>$bgClass]);
+                $resolutions = json_decode($options['resolutions'], true);
+                foreach ($resolutions as $type => $size) {
+                    $media       = $mediaQueries[$type] ?? false;
+                    $css[$media] = ['.'.$bgClass => []];
+                    if ($media) {
+                        $imageAttributes                               = $this->assets->getImageAttributes($src, ['width' => intval($size['w']), 'height' => intval($size['h'])]);
+                        $resSrc                                        = $imageAttributes->getSrc();
+                        $css[$media]['.'.$bgClass]['background-image'] = 'url(' .$resSrc. ')';
+                        if ($options['loading'] === 'eager') {
+                            $this->dispatch(new Event('preload', 'custom', [
+                                'as'    => 'image',
+                                'href'  => $resSrc,
+                                'media' => $media,
+                            ]));
+                        }
+                    }
                 }
-            }
-            if ($options['loading'] === 'eager') {
-                $this->dispatch(new Event('preload', 'background', $imageAttributes));
+                $this->dispatch(new Event('background-image', '', $css));
+            } else {
+                $options['width'] ??= 512;
+                $imageAttributes = $this->assets->getImageAttributes($src, $options);
+                if (strlen($gradient)) {
+                    $gradient .= ',';
+                }
+                // SVG
+                if (str_ends_with($src, '.svg')) {
+                    $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
+                } elseif ($imageAttributes && $srcset = $imageAttributes->getSrcset('url')) {
+                    if ('eager' === $options['loading']) {
+                        $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
+                    } else {
+                        $element->setAttribute('data-lazybg', $gradient . '-webkit-image-set(' . $srcset . ')');
+                        $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/dist/lazybg.min.js')));
+                    }
+                }
+                if ($options['loading'] === 'eager') {
+                    $this->dispatch(new Event('preload', 'background', $imageAttributes));
+                }
             }
         } elseif ($gradient) {
             $element->setAttribute('style', 'background-image:' . $gradient);
