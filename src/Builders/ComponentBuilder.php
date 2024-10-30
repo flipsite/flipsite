@@ -543,15 +543,18 @@ class ComponentBuilder
                 $element->addStyle(['bgClass'=>$bgClass]);
                 $resolutions = json_decode($options['resolutions'], true);
                 $css         = ['global' => []];
+                if (strlen($gradient)) {
+                    $gradient .= ',';
+                }
                 foreach ($resolutions as $type => $size) {
                     $media       = $mediaQueries[$type] ?? false;
                     $css[$media] = ['.'.$bgClass => []];
                     if ($media) {
                         $imageAttributes                               = $this->assets->getImageAttributes($src, ['width' => intval($size['w']), 'height' => intval($size['h'])]);
                         $resSrc                                        = $imageAttributes->getSrc();
-                        $css[$media]['.'.$bgClass]['background-image'] = 'url(' .$resSrc. ')';
+                        $css[$media]['.'.$bgClass]['background-image'] = $gradient.'url(' .$resSrc. ')';
                         if ($type === 'laptop') {
-                            $css['global']['.'.$bgClass]['background-image'] = 'url(' .$resSrc. ')';
+                            $css['global']['.'.$bgClass]['background-image'] = $gradient.'url(' .$resSrc. ')';
                         }
                         if ($options['loading'] === 'eager') {
                             $this->dispatch(new Event('preload', 'custom', [
