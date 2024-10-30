@@ -116,15 +116,19 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
     {
         $css = '';
         foreach ($this->customCss as $mediaQuery => $declarations) {
-            $css .= '@media '.$mediaQuery.' {';
+            if ('global' !== $mediaQuery) {
+                $css .= '@media '.$mediaQuery.' {';
+            }
             foreach ($declarations as $selector => $styles) {
-                $css .= $selector.' {';
+                $css .= $selector.'{';
                 foreach ($styles as $property => $value) {
                     $css .= $property.':'.$value.';';
                 }
                 $css .= '}';
             }
-            $css .= '}';
+            if ('global' !== $mediaQuery) {
+                $css .= '}'."\n";
+            }
         }
         return $css;
     }

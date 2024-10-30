@@ -542,6 +542,7 @@ class ComponentBuilder
                 $bgClass = 'bgimg-'.substr(md5($src), 0, 6);
                 $element->addStyle(['bgClass'=>$bgClass]);
                 $resolutions = json_decode($options['resolutions'], true);
+                $css         = ['global' => []];
                 foreach ($resolutions as $type => $size) {
                     $media       = $mediaQueries[$type] ?? false;
                     $css[$media] = ['.'.$bgClass => []];
@@ -549,6 +550,9 @@ class ComponentBuilder
                         $imageAttributes                               = $this->assets->getImageAttributes($src, ['width' => intval($size['w']), 'height' => intval($size['h'])]);
                         $resSrc                                        = $imageAttributes->getSrc();
                         $css[$media]['.'.$bgClass]['background-image'] = 'url(' .$resSrc. ')';
+                        if ($type === 'laptop') {
+                            $css['global']['.'.$bgClass]['background-image'] = 'url(' .$resSrc. ')';
+                        }
                         if ($options['loading'] === 'eager') {
                             $this->dispatch(new Event('preload', 'custom', [
                                 'as'    => 'image',
