@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 class Collection implements \JsonSerializable
@@ -14,6 +15,9 @@ class Collection implements \JsonSerializable
     {
         $this->name = $rawSchema['_name'] ?? $id;
         $this->icon = $rawSchema['_icon'] ?? null;
+        $this->icon = lcfirst(strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $this->icon)));
+        $this->icon = str_replace('icon-', '', $this->icon);
+
         unset($rawSchema['_name'], $rawSchema['_icon']);
 
         $this->schema = new Schema($rawSchema);
@@ -25,12 +29,12 @@ class Collection implements \JsonSerializable
         }
     }
 
-    public function getId() : string
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getItems(bool $onlyPublished = false) : array
+    public function getItems(bool $onlyPublished = false): array
     {
         $publishedFieldId = $this->schema->getPublishedField();
 
@@ -42,24 +46,24 @@ class Collection implements \JsonSerializable
         return $this->items;
     }
 
-    public function getItemsArray(bool $onlyPublished = false) : array
+    public function getItemsArray(bool $onlyPublished = false): array
     {
         $items = $this->getItems($onlyPublished);
         return json_decode(json_encode($items), true);
     }
 
-    public function getItem(?int $itemId = null) : ?Item
+    public function getItem(?int $itemId = null): ?Item
     {
         $item = $this->items[$itemId ?? -1] ?? null;
         return $item;
     }
 
-    public function getSlugField() : ?string
+    public function getSlugField(): ?string
     {
         return $this->schema->getSlugField();
     }
 
-    public function addField(array $rawField) : bool
+    public function addField(array $rawField): bool
     {
         if (!$rawField['name'] || $this->schema->hasField($rawField['name'])) {
             return false;
@@ -72,7 +76,7 @@ class Collection implements \JsonSerializable
         return true;
     }
 
-    public function editField(string $fieldId, array $delta) : bool
+    public function editField(string $fieldId, array $delta): bool
     {
         if (isset($delta['name']) && $this->schema->hasField($delta['name'])) {
             return false;
@@ -88,7 +92,7 @@ class Collection implements \JsonSerializable
         return true;
     }
 
-    public function addItem(array $rawItem, ?int $index = null) : Item
+    public function addItem(array $rawItem, ?int $index = null): Item
     {
         if (!isset($rawItem['_id'])) {
             $nextId = 0;
