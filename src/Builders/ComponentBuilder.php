@@ -534,9 +534,9 @@ class ComponentBuilder
         if ($src) {
             if (isset($options['resolutions'])) {
                 $mediaQueries = [
-                    'portrait'  => '(max-width: 600px) and (orientation: portrait)',
-                    'landscape' => '(max-width: 900px) and (orientation: landscape)',
-                    'laptop'    => '(min-width: 901px) and (max-width: 1200px)',
+                    'portrait'  => '(max-width: 800px) and (orientation: portrait)',
+                    'landscape' => '(max-width: 800px) and (orientation: landscape)',
+                    'laptop'    => '(min-width: 801px) and (max-width: 1200px)',
                     'desktop'   => '(min-width: 1201px) and (-webkit-min-device-pixel-ratio: 2), (min-width: 1201px) and (min-resolution: 192dpi)',
                 ];
                 $bgClass = 'bgimg-'.substr(md5($src), 0, 6);
