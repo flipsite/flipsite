@@ -9,6 +9,8 @@ use Flipsite\Assets\Sources\AbstractAssetInfo;
 
 class SvgAttributes implements ImageAttributesInterface
 {
+    private ?int $width = null;
+    private ?int $height = null;
     public function __construct(private AbstractAssetInfo $assetInfo, private AssetSourcesInterface $assetSources)
     {
     }
@@ -16,7 +18,7 @@ class SvgAttributes implements ImageAttributesInterface
     public function getSrc(): string
     {
         $src = $this->assetInfo->getFilename();
-        $src = str_replace('.svg', '.'.$this->assetInfo->getHash().'.svg',$src);
+        $src = str_replace('.svg', '.'.$this->assetInfo->getHash().'.svg', $src);
         return $this->assetSources->addBasePath($this->assetInfo->getType(), $src);
     }
 
@@ -27,11 +29,23 @@ class SvgAttributes implements ImageAttributesInterface
 
     public function getWidth(): ?int
     {
-        return null;
+        if (null === $this->width) {
+            $this->loadSize();
+        }
+        return $this->width;
     }
 
     public function getHeight(): ?int
     {
-        return null;
+        if (null === $this->height) {
+            $this->loadSize();
+        }
+        return $this->height;
+    }
+    private function loadSize()
+    {
+        $data = new \Flipsite\Utils\SvgData($this->assetInfo->getContents());
+        $this->width = $data->getWidth();
+        $this->height = $data->getHeight();
     }
 }
