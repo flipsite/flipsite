@@ -15,8 +15,10 @@ class Collection implements \JsonSerializable
     {
         $this->name = $rawSchema['_name'] ?? $id;
         $this->icon = $rawSchema['_icon'] ?? null;
-        $this->icon = lcfirst(strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $this->icon)));
-        $this->icon = str_replace('icon-', '', $this->icon);
+        if ($this->icon) {
+            $this->icon = lcfirst(strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $this->icon)));
+            $this->icon = str_replace('icon-', '', $this->icon);
+        }
 
         unset($rawSchema['_name'], $rawSchema['_icon']);
 
