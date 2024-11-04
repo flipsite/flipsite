@@ -1,12 +1,19 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 final class Plugins
 {
     public function __construct(private array $callbacks)
     {
+    }
+
+    public function add(string $type, callable $callback): void
+    {
+        $this->callbacks[$type] ??= [];
+        $this->callbacks[$type][] = $callback;
     }
 
     public function has(string $type): bool
