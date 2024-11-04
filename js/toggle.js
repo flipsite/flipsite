@@ -1,5 +1,5 @@
 
-function toggle(self,force, minScreenWidth) {
+function toggle(self,force,minScreenWidth) {
   if (minScreenWidth !== undefined && minScreenWidth > window.innerWidth) return;
   const findParentWithAttributeOrRoot = function(node, attributeName) {
     if (node.hasAttribute(attributeName)) {
@@ -13,17 +13,11 @@ function toggle(self,force, minScreenWidth) {
     }
     return node;
   }
-  e = window.event;
-  e.preventDefault();
   self.setAttribute('aria-expanded','false' == self.getAttribute('aria-expanded') ? 'true' : 'false');
-
   const target = findParentWithAttributeOrRoot(self,'data-toggle-target');
-
-  
   if (target.getAttribute('data-toggle-state') === null) {
     target.setAttribute('data-toggle-state',0);
   }
-
   if (force !== undefined) {
     if (parseInt(target.getAttribute('data-toggle-state')) === 0 && !force) return;
     if (parseInt(target.getAttribute('data-toggle-state')) === 1 && force) return;
@@ -35,7 +29,6 @@ function toggle(self,force, minScreenWidth) {
       });
     }
   }
-
   toggleClasses(target);
   target.setAttribute('data-toggle-state',parseInt(target.getAttribute('data-toggle-state')) === 1 ? 0 : 1);
   target.querySelectorAll('[data-toggle]').forEach((el)=>{

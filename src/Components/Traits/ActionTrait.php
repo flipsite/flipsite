@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -9,7 +10,7 @@ trait ActionTrait
     use EnvironmentTrait;
     use SiteDataTrait;
 
-    private function getActionAttributes(array $data) : array
+    private function getActionAttributes(array $data): array
     {
         if ('auto' === $data['_action']) {
             $auto            = $this->handleAuto($data['_target'] ?? '');
@@ -112,10 +113,13 @@ trait ActionTrait
                 $attributes['href'] .= '#'.$data['_fragment'];
             }
         }
+        if ('toggle' === ($data['_onclick'] ?? '') && str_starts_with($attributes['href'], '#')) {
+            $attributes['onclick'] = 'javascript:toggle(this)';
+        }
         return $attributes;
     }
 
-    private function handleAuto(string $target) : array
+    private function handleAuto(string $target): array
     {
         $action = 'none';
         $target = str_replace('mailto:', '', $target);
