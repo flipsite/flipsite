@@ -3,18 +3,7 @@
 
 # Flipsite
 
-> Flipsite is a static compiler and middleware for serving lighting fast websites
-
-[Flipsite](https://flipsite.io) is **NOT** your typical CMS or static website compiler – but it happens to work as that too. It lets you build your websites fast, without writing any HTML yourself, by concentrating on the structure of your site. It then automatically serves beautiful DOM structures and optimized images with lazy loading and that are responsive and screen reader friendly.
-
-## Requirements
-
-- [PHP8](https://www.php.net/)
-- [Composer](https://getcomposer.org/)
-
-## Getting Started
-
-Create a new site with [Composer](https://getcomposer.org/) and define [flipsite/flipsite](https://packagist.org/packages/flipsite/flipsite) as a dependency. You can do it during the init or when it's complete using `composer require flipsite/flipsite`
+[Flipsite](https://flipsite.io) is a static compiler for lighting fast websites
 
 ## Contributing
 
