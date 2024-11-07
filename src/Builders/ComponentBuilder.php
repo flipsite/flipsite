@@ -213,6 +213,10 @@ class ComponentBuilder
 
         if ($this->plugins) {
             $data = $this->plugins->run('beforeComponentBuild', $data, $options);
+            if (isset($data['__options'])) {
+                $options = $data['__options'];
+                unset($data['__options']);
+            }
         }
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
