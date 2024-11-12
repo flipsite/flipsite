@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -22,6 +23,8 @@ final class Youtube extends AbstractGroup
 
     public function build(array $data, array $style, array $options): void
     {
+        $title = $this->getAttribute('title') ?? 'Youtube Video';
+        $this->setAttribute('title', null);
         $iframe = $this;
         if ('onclick' === $data['loading'] ?? 'onclick') {
             $this->tag      = 'div';
@@ -35,6 +38,7 @@ final class Youtube extends AbstractGroup
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', true);
         $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        $iframe->setAttribute('title', $title);
 
         $src = $data['privacy'] ?? false ?
             'https://www.youtube-nocookie.com/embed/' :
