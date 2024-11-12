@@ -113,7 +113,7 @@ trait ActionTrait
                 $attributes['href'] .= '#'.$data['_fragment'];
             }
         }
-        if ('toggle' === ($data['_onclick'] ?? '') && str_starts_with($attributes['href'], '#')) {
+        if ('toggle' === ($data['_onclick'] ?? '')) {
             $attributes['onclick'] = 'javascript:toggle(this)';
         }
         return $attributes;
