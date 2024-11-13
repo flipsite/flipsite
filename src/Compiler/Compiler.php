@@ -74,9 +74,15 @@ class Compiler implements LoggerAwareInterface
             } else {
                 $filepath = $page.'/index.html';
             }
+            $fileAssets = AssetParser::parse($html, $compileOptions['domain']);
+            foreach ($fileAssets as $fileAsset) {
+                $optimizedAsset = $this->getOptimizedAsset($fileAsset);
+                $html           = str_replace($fileAsset, $optimizedAsset, $html);
+            }
+
             $this->writeFile($this->targetDir, $filepath, $html);
             $allFiles[] = $filepath;
-            $assetList  = array_merge($assetList, AssetParser::parse($html, $compileOptions['domain']));
+            $assetList  = array_merge($assetList, $fileAssets);
         }
 
         // Get list of unique assets
@@ -87,11 +93,11 @@ class Compiler implements LoggerAwareInterface
             if ($basePath && $basePath !== '/') {
                 $asset      = str_replace($basePath, '', $asset);
             }
-            $allFiles[] = $asset;
+            $allFiles[] = $this->getOptimizedAsset($asset);
         }
 
-        $notDeleted = $this->deleteAssets($this->targetDir, $assetList);
-        $assetList  = array_values(array_diff($assetList, $notDeleted));
+        $this->deleteAssets($this->targetDir);
+
         $assetList  = json_decode(json_encode($assetList));
 
         $assets = new Assets($this->environment->getAssetSources());
@@ -99,6 +105,7 @@ class Compiler implements LoggerAwareInterface
             $filename = false;
             if (str_starts_with($asset, '/img/')) {
                 $filename = substr($asset, 5);
+                $asset    = $this->getOptimizedAsset($asset);
             } elseif (str_starts_with($asset, '/videos/')) {
                 $filename = substr($asset, 8);
             } elseif (str_starts_with($asset, '/files/')) {
@@ -159,6 +166,15 @@ class Compiler implements LoggerAwareInterface
         }
 
         $this->removeEmptyFolders($this->targetDir);
+    }
+
+    private function getOptimizedAsset(string $asset):string
+    {
+        $pathinfo = pathinfo($asset);
+        $hash     = substr(md5($pathinfo['basename']), 0, 6);
+        $parts    = explode('@', $pathinfo['filename']);
+        $filename = $parts[0].'-'.$hash.'.'.$pathinfo['extension'];
+        return $pathinfo['dirname'].'/'.strtolower($filename);
     }
 
     private function removeEmptyFolders(string $dir)
@@ -235,70 +251,12 @@ class Compiler implements LoggerAwareInterface
         }
     }
 
-    private function deleteAssets(string $targetDir, array $assetList): array
+    private function deleteAssets(string $targetDir)
     {
-        $notDeleted = [];
         $filesystem = new Filesystem();
-        $images     = $this->getDirContents($targetDir.'/img');
-        $dirs       = [];
-        foreach ($images as $image) {
-            if (is_dir($image)) {
-                $dirs[] = $image;
-                continue;
-            }
-            $asset    = str_replace($targetDir, '', $image);
-            $mime     = mime_content_type($image);
-            $pathinfo = pathinfo($asset);
-
-            if ($mime === 'image/jpeg') {
-                $mime = 'image/jpg';
-            }
-            if (in_array($asset, $assetList) && strpos($mime, $pathinfo['extension']) !== false) {
-                $notDeleted[] = $asset;
-            } else {
-                $filesystem->remove($image);
-            }
-        }
-        $videos = $this->getDirContents($targetDir.'/videos');
-        foreach ($videos as $video) {
-            if (is_dir($video)) {
-                $dirs[] = $video;
-                continue;
-            }
-            $asset = str_replace($targetDir, '', $video);
-            if (in_array($asset, $assetList)) {
-                $notDeleted[] = $asset;
-            } else {
-                $filesystem->remove($video);
-            }
-        }
-        foreach ($dirs as $dir) {
-            if (file_exists($dir) && count(scandir($dir)) == 2) {
-                $filesystem->remove($dir);
-            }
-        }
-
-        $files = $this->getDirContents($targetDir.'/files');
-
-        foreach ($files as $video) {
-            if (is_dir($video)) {
-                $dirs[] = $video;
-                continue;
-            }
-            $asset = str_replace($targetDir, '', $video);
-            if (in_array($asset, $assetList)) {
-                $notDeleted[] = $asset;
-            } else {
-                $filesystem->remove($video);
-            }
-        }
-
-        foreach ($dirs as $dir) {
-            if (file_exists($dir) && count(scandir($dir)) == 2) {
-                $filesystem->remove($dir);
-            }
-        }
-        return array_values(array_filter($notDeleted));
+        $filesystem->remove($targetDir.'/img');
+        $filesystem->remove($targetDir.'/videos');
+        $filesystem->remove($targetDir.'/files');
     }
 
     private function getDirContents(string $dir, &$results = []): array
