@@ -29,6 +29,9 @@ final class Slugs
             if (!$this->isAlreadySlug($page)) {
                 $this->slugs[$page]                    = [];
                 $this->slugs[$page][(string) $default] = self::HOME === $page ? '' : $page;
+                if ('404' === $page) {
+                    continue;
+                }
                 foreach ($this->languages as $language) {
                     if ((string) $language === (string) $default) {
                         continue;
@@ -80,6 +83,9 @@ final class Slugs
 
     public function getSlug(string $page, Language $language = null, bool $fallback = true): ?string
     {
+        if ($page === '404') {
+            return '404';
+        }
         if (count($this->languages) === 1) {
             return $page;
         }

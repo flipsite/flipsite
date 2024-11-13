@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -28,14 +27,16 @@ class MetaBuilder implements BuilderInterface
         $language = $this->path->getLanguage();
         $page     = $this->path->getPage();
         $slug     = $this->siteData->getSlugs()->getSlug($page, $language);
+        error_log($slug);
 
         if (!$page) {
             return $document;
         }
 
-        if ($slug === 'home') {
+        if ($slug === 'home' || $slug === '404') {
             $slug = '';
         }
+
         $canonical = $this->environment->getAbsoluteUrl($slug);
 
         $elements[] = $this->meta('canonical', $canonical);
@@ -112,8 +113,8 @@ class MetaBuilder implements BuilderInterface
         $assetsBasePath = $this->environment->getAssetsBasePath();
         if (str_starts_with($assetsBasePath, 'http')) {
             $pathinfo = pathinfo($assetsBasePath);
-            $url = $pathinfo['dirname'];
-            $link = new Element('link', true, true);
+            $url      = $pathinfo['dirname'];
+            $link     = new Element('link', true, true);
             $link->setAttribute('rel', 'preconnect');
             $link->setAttribute('href', $url);
             $link->setAttribute('crossorigin', true);
@@ -123,7 +124,6 @@ class MetaBuilder implements BuilderInterface
             $link->setAttribute('rel', 'dns-prefetch');
             $link->setAttribute('href', $url);
             $elements[] = $link;
-
         }
 
         foreach ($elements as $el) {
