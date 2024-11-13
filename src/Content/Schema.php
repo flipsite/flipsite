@@ -32,6 +32,9 @@ class Schema implements \JsonSerializable
     public function addField(array $rawField)
     {
         $field = $rawField['name'];
+        if (!preg_match('/^[a-z][a-z0-9_]*$/', $field)) {
+            return null;
+        }
         unset($rawField['name']);
         $this->fields[$field] = new SchemaField($field, $rawField);
     }
@@ -39,6 +42,9 @@ class Schema implements \JsonSerializable
     public function editField(string $fieldId, array $delta) : ?string
     {
         $newName = $delta['name'] ?? null;
+        if (!preg_match('/^[a-z][a-z0-9_]*$/', $newName)) {
+            $newName = null;
+        }
         unset($delta['name']);
         $this->fields[$fieldId]->appendDelta($delta);
         if ($newName) {
