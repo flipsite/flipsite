@@ -32,7 +32,7 @@ final class Dots extends AbstractGroup
             $bgStyle['size'] ??= 'bg-cover';
             $bgStyle['repeat'] ??= 'bg-no-repeat';
 
-            $style['dot'] = ArrayHelper::merge($style['dot'], $bgStyle);
+            $style['dot'] = ArrayHelper::merge($style['dot'] ?? [], $bgStyle);
 
             $backgrounds = [];
             $key         = $data['cmsField'] ?? 'image';

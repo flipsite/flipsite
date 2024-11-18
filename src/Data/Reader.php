@@ -420,7 +420,7 @@ final class Reader implements SiteDataInterface
     {
         $default = Yaml::parseFile(__DIR__ . '/placeholders.yaml');
         $site    = $this->data['placeholders'] ?? [];
-        return $site ? ArrayHelper::merge($default, $site) : $default;
+        return ArrayHelper::merge($default, $site);
     }
 
     private function expandPagesAndSlugs(): void
