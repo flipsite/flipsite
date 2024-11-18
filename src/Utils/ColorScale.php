@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -9,7 +12,7 @@ use SSNepenthe\ColorUtils\Transformers\Saturate;
 
 class ColorScale
 {
-    public function getLight(Color $color, int $index) : Color
+    public function getLight(Color $color, int $index): Color
     {
         $targetColor = ColorFactory::fromString('#ffffff');
         switch ($index) {
@@ -33,13 +36,13 @@ class ColorScale
                 return $this->lightHover($color, 19, 6);
             case 9: return $color;
             case 10: return $this->lightHover($color, 6, 5);
-            case 11: return $this->increaseAndDarken($color, $targetColor, 4.6);
+            case 11: return $this->increaseAndDarken($color, $targetColor, 5);
             case 12: return $this->increaseAndDarken($color, $targetColor, 14);
         }
         return $targetColor;
     }
 
-    public function getDark(Color $color, int $index) : Color
+    public function getDark(Color $color, int $index): Color
     {
         $targetColor = ColorFactory::fromString('#222');
         switch ($index) {
@@ -63,7 +66,7 @@ class ColorScale
                 return $this->darkHover($color, 19, 6);
             case 9: return $color;
             case 10: return $this->darkHover($color, 3, 4);
-            case 11: return $this->increaseAndLighten($color, $targetColor, 7);
+            case 11: return $this->increaseAndLighten($color, $targetColor, 11);
             case 12: return $this->increaseAndLighten($color, $targetColor, 15);
         }
         return $targetColor;
@@ -98,7 +101,7 @@ class ColorScale
         return $color;
     }
 
-    private function increaseAndDarken(Color $color, Color $targetColor, float $targetRatio) : Color
+    private function increaseAndDarken(Color $color, Color $targetColor, float $targetRatio): Color
     {
         $contrastRatio     = $color->calculateContrastRatioWith($targetColor);
         $darken            = new Darken(1);
@@ -115,7 +118,7 @@ class ColorScale
         return $color;
     }
 
-    private function increaseAndLighten(Color $color, Color $targetColor, float $targetRatio) : Color
+    private function increaseAndLighten(Color $color, Color $targetColor, float $targetRatio): Color
     {
         $contrastRatio     = $color->calculateContrastRatioWith($targetColor);
         $darken            = new Lighten(1);
@@ -132,7 +135,7 @@ class ColorScale
         return $color;
     }
 
-    private function decreaseAndLighten(Color $color, Color $targetColor, float $targetRatio) : Color
+    private function decreaseAndLighten(Color $color, Color $targetColor, float $targetRatio): Color
     {
         $contrastRatio     = $color->calculateContrastRatioWith($targetColor);
         $lighten           = new Lighten(1);
@@ -149,7 +152,7 @@ class ColorScale
         return $color;
     }
 
-    private function decreaseAndDarken(Color $color, Color $targetColor, float $targetRatio) : Color
+    private function decreaseAndDarken(Color $color, Color $targetColor, float $targetRatio): Color
     {
         $contrastRatio     = $color->calculateContrastRatioWith($targetColor);
         $darken            = new Darken(1);

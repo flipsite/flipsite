@@ -5,6 +5,7 @@ button:
   contact: "Contact Us"
   cta: "Start Building"
   form: "Send"
+  learnMore: "Learn More"
 hero:
   heading: "Create the Fastest Website in the World!"
   shortText: "Static HTML, SEO-tailored content, and accessible designs for the best performance."

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -8,19 +9,22 @@ use SSNepenthe\ColorUtils\Colors\ColorFactory;
 use SSNepenthe\ColorUtils\Transformers\Darken;
 use SSNepenthe\ColorUtils\Transformers\Lighten;
 use SSNepenthe\ColorUtils\Transformers\Desaturate;
+use SSNepenthe\ColorUtils\Transformers\Mix;
 
 class ColorHelper
 {
     public static function getGray(?string $colorString, int $desaturate = 90, int $minBrightness = 60): string
     {
-        $color     = ColorFactory::fromString($colorString ?? '#121212');
+        $baseColor     = ColorFactory::fromString($colorString ?? '#121212');
         $transform = new Desaturate($desaturate);
-        $color     = $transform->transform($color);
+        $color     = $transform->transform($baseColor);
         $transform = new Darken(1);
         $i         = 0;
         while ($color->calculatePerceivedBrightness() > $minBrightness && $i < 100) {
             $color = $transform->transform($color);
         }
+        $mix = new Mix($baseColor, 8);
+        $color =  $mix->transform($color);
         return sprintf('#%02x%02x%02x', $color->getRed(), $color->getGreen(), $color->getBlue());
     }
 
