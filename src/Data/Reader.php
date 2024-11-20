@@ -15,7 +15,7 @@ use Flipsite\Utils\CustomHtmlParser;
 use Flipsite\Content\Collection;
 use Adbar\Dot;
 
-final class Reader implements SiteDataInterface
+class Reader implements SiteDataInterface
 {
     /**
      * @var array<Language>
@@ -177,7 +177,7 @@ final class Reader implements SiteDataInterface
 
     public function getSocial(): array
     {
-        return $this->get('social');
+        return $this->get('social') ?? [];
     }
 
     public function getFavicon(): null|string|array
