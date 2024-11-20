@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -98,7 +99,7 @@ abstract class AbstractGroup extends AbstractComponent
             $data = $this->normalizeRepeat($data, $repeat);
             if (isset($data['_attr']['id'])) {
                 $id = $data['_attr']['id'];
-                $this->builder->shareData($id, $data['_repeatData']);
+                $this->builder->shareData($id, $data['_repeatData'] ?? []);
             }
         }
         $data['_repeatCollectionId'] = $repeatCollectionId;
