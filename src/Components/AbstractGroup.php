@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -50,30 +49,31 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['_repeatTpl'], $data['_repeatData']);
             $children = [];
             $total    = count($repeatData);
-
-            foreach ($repeatData as $i => $repeatDataItem) {
+            $index    = 0;
+            foreach ($repeatData as $repeatDataItem) {
                 foreach ($repeatTpl as $type => $repeatTplComponent) {
                     if (!is_array($repeatTplComponent)) {
                         $repeatTplComponent = ['value' => $repeatTplComponent];
                     }
                     $repeatTplComponent['_dataSource']       = $repeatDataItem;
                     $repeatTplComponent['_repeatIndex']      = $repeatDataItem['index'];
-                    $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $i, $total);
+                    $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $index, $total);
                     if (isset($optimizedStyle['background'])) {
-                        $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $i, $total);
+                        $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
                     }
                     $children[] = $this->builder->build($type, $repeatTplComponent, $optimizedStyle, $options);
+                    $index++;
                 }
             }
             $this->addChildren($children);
         } else {
             $children = [];
-            $i        = 0;
+            $index    = 0;
             $total    = count($data);
             foreach ($data as $type => $componentData) {
-                $componentStyle = $this->optimizeStyle($style[$type] ?? [], $i, $total);
+                $componentStyle = $this->optimizeStyle($style[$type] ?? [], $index, $total);
                 $children[]     = $this->builder->build($type, $componentData ?? [], $componentStyle, $options);
-                $i++;
+                $index++;
             }
 
             $this->addChildren($children);

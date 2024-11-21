@@ -16,20 +16,29 @@ final class Social extends AbstractGroup
         $dataSourceList = $this->applyCustom($dataSourceList, $data);
 
         $filter     = ArrayHelper::decodeJsonOrCsv($data['filter'] ?? null);
+        $filterType = $data['filterType'] ?? 'or';
         $sort       = ArrayHelper::decodeJsonOrCsv($data['sort'] ?? null);
 
-        unset($data['filter'],$data['phoneFormat'],$data['phoneValue'], $data['phoneIcon'],$data['emailIcon'],$data['mapsIcon'],$data['openIcon']);
+        unset($data['filter'],$data['filterType'],$data['phoneFormat'],$data['phoneValue'], $data['phoneIcon'],$data['emailIcon'],$data['mapsIcon'],$data['openIcon']);
 
         $data = $this->normalizeRepeat($data, $dataSourceList);
         if ($filter) {
             $repeatData = [];
-            foreach ($data['_repeatData'] as $item) {
+            foreach ($data['_repeatData'] ?? [] as $item) {
                 $repeatData[$item['type']] = $item;
             }
             $data['_repeatData'] = [];
-            foreach ($filter as $type) {
-                if (isset($repeatData[$type])) {
-                    $data['_repeatData'][] = $repeatData[$type];
+            if ('or' === $filterType) {
+                foreach ($filter as $type) {
+                    if (isset($repeatData[$type])) {
+                        $data['_repeatData'][] = $repeatData[$type];
+                    }
+                }
+            } elseif ('not' === $filterType) {
+                foreach ($repeatData as $type => $item) {
+                    if (!in_array($type, $filter)) {
+                        $data['_repeatData'][] = $item;
+                    }
                 }
             }
         }

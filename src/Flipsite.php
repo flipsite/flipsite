@@ -305,7 +305,7 @@ final class Flipsite
             }
         }
         unset($globalVars['meta.content']);
-        foreach ($social as $type => $handle) {
+        foreach ($social ?? [] as $type => $handle) {
             $globalVars['social.'.$type] = $handle;
         }
         foreach ($this->siteData->getPlaceholders() as $var => $value) {
