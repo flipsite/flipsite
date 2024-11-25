@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -32,6 +31,10 @@ trait ActionTrait
                 ];
                 break;
             case 'page':
+
+                if (!isset($data['_target'])) {
+                    return ['tag' => 'a', 'href' => '#'];
+                }
                 $tmp             = explode('#', $data['_target']);
                 $data['_target'] = $tmp[0];
                 if (isset($tmp[1])) {
