@@ -14,6 +14,10 @@ about:
   heading: "User-friendly Website Builder"
   shortText: "Figma-like drag-and-drop editor with full design freedom."
   longText: "Design beautiful websites with full flexibility. Edit, change, and perfect your designs effortlessly. Use AI to enhance content creation."
+team:
+  heading: "Meet Our Team"
+  shortText: "A diverse group of experts ready to bring your vision to life."
+  longText: "Our team consists of skilled professionals from various fields, including design, development, and AI. Each member brings a unique perspective, ensuring we deliver creative, high-quality solutions that exceed expectations."
 logos:
   heading: "Trusted by Leading Businesses"
   shortText: "Our platform is trusted by top companies for its speed and ease of use."
