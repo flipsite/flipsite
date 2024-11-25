@@ -416,13 +416,6 @@ class Reader implements SiteDataInterface
         return $hidden;
     }
 
-    public function getPlaceholders(): array
-    {
-        $default = Yaml::parseFile(__DIR__ . '/placeholders.yaml');
-        $site    = $this->data['placeholders'] ?? [];
-        return ArrayHelper::merge($default, $site);
-    }
-
     private function expandPagesAndSlugs(): void
     {
         $pages    = $this->data['pages'] ?? [];

@@ -42,7 +42,7 @@ class Schema implements \JsonSerializable
     public function editField(string $fieldId, array $delta) : ?string
     {
         $newName = $delta['name'] ?? null;
-        if (!preg_match('/^[a-z][a-z0-9_]*$/', $newName)) {
+        if (is_string($newName) && !preg_match('/^[a-z][a-z0-9_]*$/', $newName)) {
             $newName = null;
         }
         unset($delta['name']);

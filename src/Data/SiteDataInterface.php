@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -72,6 +71,4 @@ interface SiteDataInterface
     public function getCollection(string $collectionId, ?Language $language = null): ?Collection;
 
     public function getModifiedTimestamp(): int;
-
-    public function getPlaceholders(): array;
 }

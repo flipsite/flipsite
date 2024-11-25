@@ -17,10 +17,9 @@ class SchemaField implements \JsonSerializable
         'icon',
         'image',
         'list',
-        'long',
+        'markdown',
         'phone',
         'published',
-        'richtext',
         'slug',
         'svg',
         'text',
@@ -41,8 +40,8 @@ class SchemaField implements \JsonSerializable
         if ('boolean' === $this->type) {
             $this->type = 'published';
         }
-        if ('markdown' === $this->type) {
-            $this->type = 'richtext';
+        if ('long' === $this->type) {
+            $this->type = 'text';
         }
         if ('url' === $this->type) {
             $this->type = 'slug';
