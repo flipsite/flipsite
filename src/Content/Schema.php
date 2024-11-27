@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 class Schema implements \JsonSerializable
@@ -14,7 +15,7 @@ class Schema implements \JsonSerializable
         }
     }
 
-    public function getSlugField() : ?string
+    public function getSlugField(): ?string
     {
         foreach ($this->fields as $fieldId => $val) {
             if ('slug' === ($val->getType() ?? '')) {
@@ -24,7 +25,7 @@ class Schema implements \JsonSerializable
         return null;
     }
 
-    public function hasField(string $fieldId) : bool
+    public function hasField(string $fieldId): bool
     {
         return array_key_exists($fieldId, $this->fields);
     }
@@ -39,7 +40,7 @@ class Schema implements \JsonSerializable
         $this->fields[$field] = new SchemaField($field, $rawField);
     }
 
-    public function editField(string $fieldId, array $delta) : ?string
+    public function editField(string $fieldId, array $delta): ?string
     {
         $newName = $delta['name'] ?? null;
         if (is_string($newName) && !preg_match('/^[a-z][a-z0-9_]*$/', $newName)) {
@@ -54,12 +55,12 @@ class Schema implements \JsonSerializable
         return $newName;
     }
 
-    public function getField(string $field) : ?SchemaField
+    public function getField(string $field): ?SchemaField
     {
         return $this->fields[$field] ?? null;
     }
 
-    public function getPublishedField() : string|bool
+    public function getPublishedField(): string|bool
     {
         foreach ($this->fields as $fieldId => $field) {
             if ('published' === $field->getType()) {
@@ -69,7 +70,7 @@ class Schema implements \JsonSerializable
         return false;
     }
 
-    public function validate(array $rawData, bool $setDefault = false) : array
+    public function validate(array $rawData, bool $setDefault = false): array
     {
         $data = [];
         foreach ($this->fields as $field => $schemaField) {

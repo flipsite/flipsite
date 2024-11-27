@@ -1,25 +1,33 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 abstract class AbstractComponent extends AbstractElement
 {
     use \Flipsite\Traits\ComponentTypeTrait;
 
-    abstract public function build(array $data, array $style, array $options) : void;
+    abstract public function build(array $data, array $style, array $options): void;
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(string|int|bool|array $data): array
     {
         return is_array($data) ? $data : ['value' => $data];
     }
 
-    public function applyData(array $data, array $dataSource) : array
+    public function applyData(array $data, array $dataSource): array
     {
         foreach ($data as $key => &$value) {
             $isComponent = !!$this->getComponentType($key);
             if ($isComponent) {
             } elseif (is_string($value) && strpos($value, '{') !== false) {
+                // Dont apply data on JSON
+                if (str_starts_with($value, '[{"')) {
+                    $json = json_decode($value, true);
+                    if (is_array($json)) {
+                        continue;
+                    }
+                }
                 $matches = [];
                 preg_match_all('/\{[^{}]+\}/', $value, $matches);
                 $original = $value;

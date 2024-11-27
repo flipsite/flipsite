@@ -1,9 +1,10 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
-use \Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\ArrayHelper;
 
 class SchemaField implements \JsonSerializable
 {
@@ -73,7 +74,7 @@ class SchemaField implements \JsonSerializable
         $this->localizable = $rawField['localizable'] ?? false;
     }
 
-    public function getType() : string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -100,7 +101,7 @@ class SchemaField implements \JsonSerializable
         }
     }
 
-    public function getDefault() : null|string|bool
+    public function getDefault(): null|string|bool
     {
         if (null === $this->default && 'enum' === $this->type) {
             $options = ArrayHelper::decodeJsonOrCsv($this->options);
@@ -109,13 +110,20 @@ class SchemaField implements \JsonSerializable
         return $this->default;
     }
 
-    public function isRequired() : bool
+    public function isRequired(): bool
     {
         return $this->required ?? false;
     }
 
-    public function validate(string|bool $value) : string|bool
+    public function validate(string|bool $value): string|bool
     {
+        if ('richtext' === $this->type) {
+            if (json_decode($value)) {
+                return $value;
+            } else {
+                return '';
+            }
+        }
         if ('published' === $this->type) {
             return (bool) $value;
         }
