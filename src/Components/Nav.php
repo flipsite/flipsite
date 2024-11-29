@@ -91,6 +91,13 @@ final class Nav extends AbstractGroup
             });
         }
 
+        if (isset($data['_options']['sort'])) {
+            $data['_options']['sortBy'] = 'name';
+        }
+        if (isset($data['_options']['filter'])) {
+            $data['_options']['filterField'] = 'slug';
+        }
+
         $data = $this->normalizeRepeat($data, $repeat);
 
         return $data;
