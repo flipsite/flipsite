@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Paragraph extends AbstractComponent
@@ -14,7 +15,7 @@ final class Paragraph extends AbstractComponent
     public function build(array $data, array $style, array $options): void
     {
         $html  = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $html  = $this->addClassesToHtml($html, ['a', 'strong'], $style, $options['appearance']);
+        $html  = $this->addClassesToHtml($html, ['a', 'strong','em','code'], $style, $options['appearance']);
         $this->setContent((string)$html);
         $this->addStyle($style);
     }

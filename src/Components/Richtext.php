@@ -40,6 +40,7 @@ final class Richtext extends AbstractGroup
         if (!($data['value'] ?? false)) {
             return;
         }
+
         $items = $data['value'] ?? [];
         unset($data['value']);
         foreach ($items as $index => $item) {
@@ -124,7 +125,7 @@ class RichtextItem
         $this->type = $rawData['type'] ?? '';
         $this->data = $rawData['data'] ?? '';
     }
-    public function getComponentType(): string
+    public function getComponentType(): ?string
     {
         switch ($this->type) {
             case 'h1':
@@ -137,6 +138,7 @@ class RichtextItem
             case 'img':
                 return 'image';
         }
+        return null;
     }
     public function getData(): string|array
     {
@@ -145,7 +147,7 @@ class RichtextItem
     public function getStyle($allStyle): array
     {
         $componentStyle = [];
-        switch ($this->getComponentType()) {
+        switch ($this->type) {
             case 'h1':
             case 'h2':
             case 'h3':
@@ -153,6 +155,12 @@ class RichtextItem
                 $componentStyle = ['tag' => $this->type];
                 break;
             case 'p':
+                $componentStyle = [
+                    'a'      => $allStyle['a'] ?? [],
+                    'strong' => $allStyle['strong'] ?? [],
+                    'em' => $allStyle['em'] ?? [],
+                    'code' => $allStyle['code'] ?? [],
+                ];
                 break;
         }
         return ArrayHelper::merge($allStyle[$this->type] ?? [], $componentStyle);
