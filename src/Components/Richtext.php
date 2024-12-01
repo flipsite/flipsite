@@ -22,7 +22,7 @@ final class Richtext extends AbstractGroup
             $json = json_decode($data['value'] ?? '', true);
             if (is_array($json)) {
                 foreach ($json as $item) {
-                    $items[] = new RichtextItem($item);
+                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null);
                 }
             }
         } catch (\Exception $e) {
@@ -32,6 +32,7 @@ final class Richtext extends AbstractGroup
         } else {
             unset($data['value']);
         }
+        unset($data['liIcon']);
         return $data;
     }
 
@@ -45,7 +46,7 @@ final class Richtext extends AbstractGroup
         unset($data['value']);
         foreach ($items as $index => $item) {
             $componentId = $item->getComponentType().':'.$index;
-            $data[$componentId] = $item->getData();
+            $data[$componentId] = $item->getData($style);
             $data[$componentId]['_style'] = $item->getStyle($style);
         }
         /*foreach ($data['value'] as $index => $component) {
@@ -120,7 +121,7 @@ class RichtextItem
 {
     private $type;
     private $data;
-    public function __construct(array $rawData)
+    public function __construct(array $rawData, private ?array $icon = null)
     {
         $this->type = $rawData['type'] ?? '';
         $this->data = $rawData['data'] ?? '';
@@ -137,14 +138,30 @@ class RichtextItem
                 return 'paragraph';
             case 'img':
                 return 'image';
+            case 'ol':
+            case 'ul':
+                return 'ul';
         }
         return null;
     }
-    public function getData(): string|array
+    public function getData(array $allStyle): string|array
     {
+        switch ($this->type) {
+            case 'ol':
+            case 'ul':
+                return [
+                    '_repeat' => $this->data,
+                    'li' => [
+                        'icon' => ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]),
+                        'value' => '{item}',
+                        '_style' => $allStyle['li']
+                    ],
+
+                ];
+        }
         return ['value' => $this->data];
     }
-    public function getStyle($allStyle): array
+    public function getStyle(array $allStyle): array
     {
         $componentStyle = [];
         switch ($this->type) {
@@ -161,6 +178,10 @@ class RichtextItem
                     'em' => $allStyle['em'] ?? [],
                     'code' => $allStyle['code'] ?? [],
                 ];
+                break;
+            case 'ul':
+            case 'ol':
+                $componentStyle = ['tag' => $this->type];
                 break;
         }
         return ArrayHelper::merge($allStyle[$this->type] ?? [], $componentStyle);
