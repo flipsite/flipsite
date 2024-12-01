@@ -22,7 +22,7 @@ final class Richtext extends AbstractGroup
             $json = json_decode($data['value'] ?? '', true);
             if (is_array($json)) {
                 foreach ($json as $item) {
-                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null);
+                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null);
                 }
             }
         } catch (\Exception $e) {
@@ -49,70 +49,6 @@ final class Richtext extends AbstractGroup
             $data[$componentId] = $item->getData($style);
             $data[$componentId]['_style'] = $item->getStyle($style);
         }
-        /*foreach ($data['value'] as $index => $component) {
-            $tag         = $component['tag'];
-            $componentId = null;
-            switch ($tag) {
-                case 'h1':
-                case 'h2':
-                case 'h3':
-                case 'h4':
-                case 'h5':
-                case 'h6':
-                    $data['heading:'.$index] = [
-                        'value'  => $component['value'],
-                        '_style' => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag])
-                    ];
-                    break;
-                case 'ul':
-                case 'ol':
-                    $data['ul:'.$index] = [
-
-                        '_repeat'   => $component['value'],
-                        '_style'    => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag]),
-                        'paragraph' => [
-                            'value'  => '{item}',
-                            '_style' => ArrayHelper::merge(['tag' => 'li'], [
-                                'a'      => $style['a'] ?? [],
-                                'strong' => $style['strong'] ?? [],
-                            ])
-                        ]
-                    ];
-                    break;
-                case 'img':
-                    $data['image:'.$index] = [
-                        'value'  => $component['value'],
-                        '_style' => ArrayHelper::merge($style[$tag] ?? [], ['tag' => $tag])
-                    ];
-                    break;
-                case 'p':
-                    $data['paragraph:'.$index] = [
-                        'value'  => $component['value'],
-                        '_style' => ArrayHelper::merge(['tag' => $tag], [
-                            'a'      => $style['a'] ?? [],
-                            'strong' => $style['strong'] ?? [],
-                        ])
-                    ];
-                    break;
-                case 'table':
-                    $data['table:'.$index] = [
-                        'th'      => $component['th'] ?? [],
-                        'td'      => $component['td'] ?? [],
-                        '_style'  => ArrayHelper::merge($style['tbl'] ?? [], [
-                            'th' => $style['th'] ?? [],
-                            'td' => $style['td'] ?? [],
-                        ])
-                    ];
-                    break;
-                case 'youtube':
-                    $data['youtube:'.$index] = [
-                        'value'  => $component['value'],
-                        '_style' => $style['youtube'] ?? [],
-                    ];
-                    break;
-            }
-        }
-            */
         parent::build($data, $style, $options);
     }
 }
@@ -121,7 +57,7 @@ class RichtextItem
 {
     private $type;
     private $data;
-    public function __construct(array $rawData, private ?array $icon = null)
+    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null)
     {
         $this->type = $rawData['type'] ?? '';
         $this->data = $rawData['data'] ?? '';
@@ -146,15 +82,31 @@ class RichtextItem
     }
     public function getData(array $allStyle): string|array
     {
+        $markdown = [
+            'a'      => $allStyle['a'] ?? [],
+            'strong' => $allStyle['strong'] ?? [],
+            'em' => $allStyle['em'] ?? [],
+            'code' => $allStyle['code'] ?? [],
+        ];
         switch ($this->type) {
             case 'ol':
+                return [
+                    '_repeat' => $this->data,
+                    'li' => [
+                        'number' => $this->number ?
+                        ArrayHelper::merge($this->number, ['value' => '{index}', '_style' => $allStyle['liNumber'] ?? []]) : null,
+                        'value' => '{item}',
+                        '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
+                    ],
+
+                ];
             case 'ul':
                 return [
                     '_repeat' => $this->data,
                     'li' => [
-                        'icon' => ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]),
+                        'icon' => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
                         'value' => '{item}',
-                        '_style' => $allStyle['li']
+                        '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
                     ],
 
                 ];
@@ -180,6 +132,12 @@ class RichtextItem
                 ];
                 break;
             case 'ul':
+                $componentStyle = ['tag' => $this->type];
+                if (!$this->icon) {
+                    $componentStyle['listStylePosition'] = 'list-inside';
+                    $componentStyle['listStyleType'] = 'list-disc';
+                }
+                break;
             case 'ol':
                 $componentStyle = ['tag' => $this->type];
                 break;

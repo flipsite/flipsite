@@ -20,6 +20,13 @@ final class Li extends AbstractComponent
             unset($data['icon']);
             $this->addChild($icon);
         }
+
+        if (isset($data['number'])) {
+            $data['number']['value'] = intval($data['_repeatIndex']);
+            $number = $this->builder->build('number', $data['number'], $style['number'] ?? [], $options);
+            unset($data['number']);
+            $this->addChild($number);
+        }
         $html = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
         $html = $this->addClassesToHtml($html, ['a', 'strong','em','code'], $style, $options['appearance']);
 

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Number extends AbstractComponent
@@ -10,7 +11,7 @@ final class Number extends AbstractComponent
 
     protected string $tag  = 'div';
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(array $data, array $style, array $options): void
     {
         $value = (string)($data['value'] ?? 1);
         // If , as decimal separator, replace with .
@@ -33,7 +34,7 @@ final class Number extends AbstractComponent
                 'space'     => ' ',
                 'comma'     => ',',
                 'period'    => '.',
-                'apostrophe'=> '\'',
+                'apostrophe' => '\'',
             ];
             $decimals           = intval($data['decimals'] ?? 0);
             $decimalSeparator   = $data['decimalSeparator'] ?? 'period';
@@ -58,7 +59,7 @@ final class Number extends AbstractComponent
         }
     }
 
-    private function numberToFormat(int $number, string $format = '1') : string
+    private function numberToFormat(int $number, string $format = '1'): string
     {
         if ($number < 1 || $number > 26) {
             return (string)$number;
