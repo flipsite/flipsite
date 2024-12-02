@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -116,7 +117,7 @@ class RichtextItem
 
                 ];
             case 'img':
-                $image = ['value' => $this->data['value'], 'alt' => $this->data['alt'] ?? null];
+                $image = ['value' => $this->data['value'] ?? null, 'alt' => $this->data['alt'] ?? null];
                 if (isset($this->data['figcaption'])) {
                     return [
                         'image'     => $image,
