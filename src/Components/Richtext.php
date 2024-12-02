@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -45,8 +44,8 @@ final class Richtext extends AbstractGroup
         $items = $data['value'] ?? [];
         unset($data['value']);
         foreach ($items as $index => $item) {
-            $componentId = $item->getComponentType().':'.$index;
-            $data[$componentId] = $item->getData($style);
+            $componentId                  = $item->getComponentType().':'.$index;
+            $data[$componentId]           = $item->getData($style);
             $data[$componentId]['_style'] = $item->getStyle($style);
         }
         parent::build($data, $style, $options);
@@ -57,11 +56,13 @@ class RichtextItem
 {
     private $type;
     private $data;
+
     public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null)
     {
         $this->type = $rawData['type'] ?? '';
         $this->data = $rawData['data'] ?? '';
     }
+
     public function getComponentType(): ?string
     {
         switch ($this->type) {
@@ -73,6 +74,9 @@ class RichtextItem
             case 'p':
                 return 'paragraph';
             case 'img':
+                if (isset($this->data['figcaption'])) {
+                    return 'group';
+                }
                 return 'image';
             case 'ol':
             case 'ul':
@@ -80,22 +84,23 @@ class RichtextItem
         }
         return null;
     }
+
     public function getData(array $allStyle): string|array
     {
         $markdown = [
             'a'      => $allStyle['a'] ?? [],
             'strong' => $allStyle['strong'] ?? [],
-            'em' => $allStyle['em'] ?? [],
-            'code' => $allStyle['code'] ?? [],
+            'em'     => $allStyle['em'] ?? [],
+            'code'   => $allStyle['code'] ?? [],
         ];
         switch ($this->type) {
             case 'ol':
                 return [
                     '_repeat' => $this->data,
-                    'li' => [
+                    'li'      => [
                         'number' => $this->number ?
                         ArrayHelper::merge($this->number, ['value' => '{index}', '_style' => $allStyle['liNumber'] ?? []]) : null,
-                        'value' => '{item}',
+                        'value'  => '{item}',
                         '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
                     ],
 
@@ -103,16 +108,26 @@ class RichtextItem
             case 'ul':
                 return [
                     '_repeat' => $this->data,
-                    'li' => [
-                        'icon' => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
-                        'value' => '{item}',
+                    'li'      => [
+                        'icon'   => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
+                        'value'  => '{item}',
                         '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
                     ],
 
                 ];
+            case 'img':
+                $image = ['value' => $this->data['value'], 'alt' => $this->data['alt'] ?? null];
+                if (isset($this->data['figcaption'])) {
+                    return [
+                        'image'     => $image,
+                        'paragraph' => ['value' => $this->data['figcaption'], '_style' => ArrayHelper::merge($allStyle['figcaption'] ?? [], ['tag' => 'figcaption'])]
+                    ];
+                }
+                return $image;
         }
         return ['value' => $this->data];
     }
+
     public function getStyle(array $allStyle): array
     {
         $componentStyle = [];
@@ -127,19 +142,46 @@ class RichtextItem
                 $componentStyle = [
                     'a'      => $allStyle['a'] ?? [],
                     'strong' => $allStyle['strong'] ?? [],
-                    'em' => $allStyle['em'] ?? [],
-                    'code' => $allStyle['code'] ?? [],
+                    'em'     => $allStyle['em'] ?? [],
+                    'code'   => $allStyle['code'] ?? [],
                 ];
                 break;
             case 'ul':
                 $componentStyle = ['tag' => $this->type];
                 if (!$this->icon) {
                     $componentStyle['listStylePosition'] = 'list-inside';
-                    $componentStyle['listStyleType'] = 'list-disc';
+                    $componentStyle['listStyleType']     = 'list-disc';
                 }
                 break;
             case 'ol':
                 $componentStyle = ['tag' => $this->type];
+                break;
+            case 'img':
+                if (isset($this->data['figcaption'])) {
+                    $imageStyle     = $allStyle[$this->type] ?? [];
+                    $componentStyle = ['tag' => 'figure'];
+                    $unset          = [];
+                    $moveToWrapper  = ['margin', 'padding'];
+                    $copyWrapper    = ['idth', 'eight'];
+                    foreach ($imageStyle as $key => $val) {
+                        foreach ($moveToWrapper as $move) {
+                            if (str_starts_with($key, $move)) {
+                                $unset[]              = $key;
+                                $componentStyle[$key] = $val;
+                            }
+                        }
+                        foreach ($copyWrapper as $copy) {
+                            if (str_ends_with($key, $copy)) {
+                                $componentStyle[$key] = $val;
+                            }
+                        }
+                    }
+                    foreach ($unset as $key) {
+                        unset($imageStyle[$key]);
+                    }
+                    $componentStyle['image'] = $imageStyle;
+                    return $componentStyle;
+                }
                 break;
         }
         return ArrayHelper::merge($allStyle[$this->type] ?? [], $componentStyle);
