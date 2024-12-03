@@ -86,6 +86,7 @@ final class Flipsite
         'svg'             => true,
         'integrations'    => true,
         'customCode'      => true,
+        'watermark'       => true
     ];
 
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
@@ -172,6 +173,15 @@ final class Flipsite
             unset($sectionData['_pageDataSource']);
             $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => $appearance, 'parentDataSource' => $parentDataSource]);
             $document->getChild('body')->addChild($section);
+        }
+
+        // Watermark
+        if ($this->environment->watermark() && $this->renderOptions['watermark']) {
+            $watermark = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/watermark.yaml');
+            if ($watermark) {
+                $section = $componentBuilder->build('group', $watermark, [], ['appearance' => 'light', 'parentDataSource' => []]);
+                $document->getChild('body')->addChild($section);
+            }
         }
 
         if ($this->renderOptions['svg']) {

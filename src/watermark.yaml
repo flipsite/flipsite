@@ -1,0 +1,32 @@
+container:
+  text: "Made in"
+  svg: flipsite-watermark.svg
+  _action: url-blank
+  _target: "https://flipsite.io/"
+_style:
+  position: relative
+  height: h-0
+  width: w-full
+  container:
+    display: flex
+    flexDirection: flex-row
+    justifyContent: justify-center
+    alignItems: items-center
+    textSize: text-3
+    lineHeight: leading-none
+    position: absolute
+    right: right-3
+    bottom: bottom-3
+    background:
+      color: "bg-[#ffffff]"
+    textColor: "text-gray-l12 hover:text-primary-l9"
+    appearance: light
+    borderRadius: rounded-box-md
+    boxShadow: shadow
+    boxShadowColor: shadow-gray-l12/50
+    gap: gap-1.5
+    svg:
+      height: h-3
+      translateY: translate-y-0.25
+    paddingX: px-3
+    paddingY: py-2
