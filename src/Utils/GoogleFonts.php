@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 class GoogleFonts
@@ -9,7 +10,7 @@ class GoogleFonts
     {
     }
 
-    public function download(string $targetDir, string $fontDir, string $basePath, array $subsets = ['latin', 'math', 'symbols']) : array
+    public function download(string $targetDir, string $fontDir, string $basePath, array $subsets = ['latin', 'math', 'symbols']): array
     {
         $url = $this->getUrl();
         if (!$url) {
@@ -52,7 +53,7 @@ class GoogleFonts
         return $fonts;
     }
 
-    public function getUrl() : ?string
+    public function getUrl(): ?string
     {
         $fonts = array_filter($this->fonts, function ($value, $key) {
             return is_array($value) && 'google' === trim(mb_strtolower($value['provider'] ?? ''));
@@ -87,15 +88,15 @@ class GoogleFonts
         return 'https://fonts.googleapis.com/css2?family='.implode('&family=', $families).'&display=swap';
     }
 
-    private function normalizeGoogleFont(array $font) : array
+    private function normalizeGoogleFont(array $font): array
     {
         $font['family'] = urlencode(trim($font['family']));
-        $font['normal'] = $this->toIntArray($font['normal'] ?? []);
-        $font['italic'] = $this->toIntArray($font['italic'] ?? $font['italics'] ?? []);
+        $font['normal'] = array_unique($this->toIntArray($font['normal'] ?? []));
+        $font['italic'] = array_unique($this->toIntArray($font['italic'] ?? $font['italics'] ?? []));
         return $font;
     }
 
-    private function toIntArray($data) : array
+    private function toIntArray($data): array
     {
         if (is_int($data)) {
             return [$data];
