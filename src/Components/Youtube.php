@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -26,7 +25,7 @@ final class Youtube extends AbstractGroup
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);
         $iframe = $this;
-        if ('onclick' === $data['loading'] ?? 'onclick') {
+        if ('onclick' === ($data['loading'] ?? 'onclick')) {
             $this->tag      = 'div';
             $this->oneline  = false;
             $iframe         = new Element('iframe', true);
@@ -63,7 +62,7 @@ final class Youtube extends AbstractGroup
         if (count($query)) {
             $src .= '?'.http_build_query($query);
         }
-        if ('onclick' === $data['loading'] ?? 'onclick') {
+        if ('onclick' === ($data['loading'] ?? 'onclick')) {
             $iframe->setAttribute('data-youtube-play', $src);
             $iframe->setAttribute('style', 'pointer-events:none');
             $this->addChild($iframe);

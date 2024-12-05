@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -55,13 +54,14 @@ final class Richtext extends AbstractGroup
 
 class RichtextItem
 {
-    private $type;
-    private $data;
+    private string $type;
+    private array $data;
 
     public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null)
     {
         $this->type = $rawData['type'] ?? '';
-        $this->data = $rawData['data'] ?? '';
+        unset($rawData['type']);
+        $this->data = $rawData;
     }
 
     public function getComponentType(): ?string
@@ -83,7 +83,7 @@ class RichtextItem
             case 'ul':
                 return 'ul';
         }
-        return null;
+        return $this->type;
     }
 
     public function getData(array $allStyle): string|array
@@ -97,7 +97,7 @@ class RichtextItem
         switch ($this->type) {
             case 'ol':
                 return [
-                    '_repeat' => $this->data,
+                    '_repeat' => $this->data['value'],
                     'li'      => [
                         'number' => $this->number ?
                         ArrayHelper::merge($this->number, ['value' => '{index}', '_style' => $allStyle['liNumber'] ?? []]) : null,
@@ -108,7 +108,7 @@ class RichtextItem
                 ];
             case 'ul':
                 return [
-                    '_repeat' => $this->data,
+                    '_repeat' => $this->data['value'],
                     'li'      => [
                         'icon'   => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
                         'value'  => '{item}',
@@ -125,8 +125,16 @@ class RichtextItem
                     ];
                 }
                 return $image;
+            case 'youtube':
+                $data  = $this->data;
+                $title = $data['title'] ?? 'Youtube Video';
+                unset($data['title']);
+                $data['_attr']   = ['title' => $title];
+                $data['loading'] = 'lazy';
+
+                return $data;
         }
-        return ['value' => $this->data];
+        return $this->data;
     }
 
     public function getStyle(array $allStyle): array

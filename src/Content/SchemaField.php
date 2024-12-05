@@ -117,19 +117,7 @@ class SchemaField implements \JsonSerializable
     public function validate(string|bool $value): string|bool
     {
         if ('richtext' === $this->type) {
-            if (json_decode($value)) {
-                return $value;
-            } else {
-                $items = explode('</p>', $value);
-                $json  = [];
-                foreach ($items as $item) {
-                    $json[] = [
-                        'type'  => 'p',
-                        'data'  => strip_tags($item)
-                    ];
-                }
-                return json_encode($json);
-            }
+            return $this->validateRichtext($value);
         }
         if ('published' === $this->type) {
             return (bool) $value;
@@ -141,6 +129,37 @@ class SchemaField implements \JsonSerializable
             }
         }
         return $value;
+    }
+
+    private function validateRichtext(string $value): string
+    {
+        $json = json_decode($value, true);
+        if (!$json) {
+            $items = explode('</p>', $value);
+            $json  = [];
+            foreach ($items as $item) {
+                $val = trim(strip_tags($item));
+                if ($val) {
+                    $json[] = [
+                        'type'   => 'p',
+                        'value'  => $val
+                    ];
+                }
+            }
+        }
+        foreach ($json as &$item) {
+            if (isset($item['data'])) {
+                if (is_array($item['data']) && ArrayHelper::isAssociative($item['data'])) {
+                    foreach ($item['data'] as $key => $val) {
+                        $item[$key] = $val;
+                    }
+                } else {
+                    $item['value'] = $item['data'];
+                }
+                unset($item['data']);
+            }
+        }
+        return json_encode($json);
     }
 
     public function jsonSerialize(): mixed
