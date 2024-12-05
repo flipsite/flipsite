@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -121,7 +120,15 @@ class SchemaField implements \JsonSerializable
             if (json_decode($value)) {
                 return $value;
             } else {
-                return '';
+                $items = explode('</p>', $value);
+                $json  = [];
+                foreach ($items as $item) {
+                    $json[] = [
+                        'type'  => 'p',
+                        'data'  => strip_tags($item)
+                    ];
+                }
+                return json_encode($json);
             }
         }
         if ('published' === $this->type) {
