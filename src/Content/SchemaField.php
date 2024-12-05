@@ -133,19 +133,12 @@ class SchemaField implements \JsonSerializable
 
     private function validateRichtext(string $value): string
     {
+        if (!$value) {
+            return '[]';
+        }
         $json = json_decode($value, true);
         if (!$json) {
-            $items = explode('</p>', $value);
-            $json  = [];
-            foreach ($items as $item) {
-                $val = trim(strip_tags($item));
-                if ($val) {
-                    $json[] = [
-                        'type'   => 'p',
-                        'value'  => $val
-                    ];
-                }
-            }
+            $json = \Flipsite\Utils\RichtextHelper::fallbackFromString($value);
         }
         foreach ($json as &$item) {
             if (isset($item['data'])) {

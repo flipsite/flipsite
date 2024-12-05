@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\RichtextHelper;
 
 final class Richtext extends AbstractGroup
 {
@@ -13,12 +14,16 @@ final class Richtext extends AbstractGroup
 
     public function normalize(string|int|bool|array $data): array
     {
-        if (!is_array($data)) {
-            $data = ['value' => (string)$data];
-        }
         $items = [];
         try {
-            $json = json_decode($data['value'] ?? '', true);
+            if (is_string($data['value'])) {
+                $json = json_decode($data['value'] ?? '', true);
+                if (!$json) {
+                    $json = RichtextHelper::fallbackFromString($data['value']);
+                }
+            } else {
+                $json = $data['value'];
+            }
             if (is_array($json)) {
                 foreach ($json as $item) {
                     $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null);
