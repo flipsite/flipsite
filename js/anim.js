@@ -74,6 +74,11 @@ ready(() => {
       });
     } else {
       const onscreenStyle = getStyle(window.getComputedStyle(el));
+      let transitionDuration = null;
+      if (onscreenStyle['transition-duration'] !== '0s') {
+        transitionDuration = onscreenStyle['transition-duration'];
+        el.style.transitionDuration = '0s';
+      }
       offscreenClasses.forEach((className) => {
         el.classList.toggle(className)
       });
@@ -94,6 +99,9 @@ ready(() => {
         lp: 0,
         st: false
       });
+      if (transitionDuration) {
+        el.style.transitionDuration = transitionDuration;
+      }
     }
     return;
   });
@@ -138,8 +146,7 @@ ready(() => {
       }
     }
   };
-
-  const updateAnimations = () => { 
+  const updateAnimations = (event) => { 
     appearAnimations.forEach(anim => {
       const progress = getProgress(anim.tr, anim.ev, anim.sp, anim.ep);
       if ((progress && !anim.st) || (!progress && anim.st)) {
