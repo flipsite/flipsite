@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets;
 
 use Flipsite\Assets\Sources\AssetSourcesInterface;
@@ -134,23 +135,20 @@ class Assets
         return null;
     }
 
-    public function upload(string $asset, string $filepath) : string|bool
+    public function upload(string $asset, string $filepath, bool $overwrite = false): string|bool
     {
         $assetInfo = $this->assetSources->getInfo($asset);
-        if ($assetInfo) {
+        if ($assetInfo && !$overwrite) {
             return false;
         }
-
         $asset = $this->cleanupAssetFilename($asset);
-
-        if ($this->assetExists($asset)) {
+        if ($this->assetExists($asset) && !$overwrite) {
             return false;
         }
-
         return $this->assetSources->upload(AssetType::fromMimetype(mime_content_type($filepath)), $asset, $filepath) ? $asset : null;
     }
 
-    public function rename(string $asset, string $newFilename) : string|bool
+    public function rename(string $asset, string $newFilename): string|bool
     {
         $assetInfo = $this->assetSources->getInfo($asset);
         if (!$assetInfo) {
@@ -170,7 +168,7 @@ class Assets
         return $this->assetSources->rename($assetInfo->getType(), $asset, $newFilename) ? $newFilename : false;
     }
 
-    public function delete(string $asset) : bool
+    public function delete(string $asset): bool
     {
         $assetInfo = $this->assetSources->getInfo($asset);
         if (!$assetInfo) {
@@ -195,7 +193,7 @@ class Assets
         return $asset;
     }
 
-    private function assetExists(string $asset) : bool
+    private function assetExists(string $asset): bool
     {
         return !!($this->assetSources->getInfo($asset));
     }
