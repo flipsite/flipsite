@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -15,6 +16,7 @@ final class Richtext extends AbstractGroup
     public function normalize(string|int|bool|array $data): array
     {
         $items = [];
+        $data['value'] ??= '';
         try {
             if (is_string($data['value'])) {
                 $json = json_decode($data['value'] ?? '', true);
