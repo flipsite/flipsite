@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
 use Flipsite\Utils\Filter;
+use Flipsite\Content\Collection;
 
 abstract class AbstractGroup extends AbstractComponent
 {
@@ -88,13 +90,18 @@ abstract class AbstractGroup extends AbstractComponent
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
 
-        $repeatCollectionId = null;
+
+        $repeatCollectionName = null;
         if (isset($data['_repeat'])) {
             $repeat = $data['_repeat'];
             unset($data['_repeat']);
             if (is_string($repeat)) {
                 $repeatCollectionId = $repeat;
-                $repeat             = $this->getCollection($repeat, true);
+                $collection = $this->getCollection($repeat, true);
+                if ($collection) {
+                    $repeat = $collection->getItemsArray(true);
+                    $repeatCollectionName = $collection->getName();
+                }
             }
             $data = $this->normalizeRepeat($data, $repeat);
             if (isset($data['_attr']['id'])) {
@@ -102,7 +109,9 @@ abstract class AbstractGroup extends AbstractComponent
                 $this->builder->shareData($id, $data['_repeatData'] ?? []);
             }
         }
-        $data['_repeatCollectionId'] = $repeatCollectionId;
+        if ($repeatCollectionName) {
+            $data['_repeatCollectionName'] = $repeatCollectionName;
+        }
         return $data;
     }
 
@@ -206,7 +215,7 @@ abstract class AbstractGroup extends AbstractComponent
         return $data;
     }
 
-    private function getCollection(string $collectionId): array
+    private function getCollection(string $collectionId): ?Collection
     {
         // Old YAML style reference
         if (str_starts_with($collectionId, '${content.')) {
@@ -214,8 +223,8 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {
-            return [];
+            return undefined;
         }
-        return $collection->getItemsArray(true);
+        return $collection;
     }
 }

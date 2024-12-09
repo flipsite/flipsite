@@ -36,6 +36,11 @@ class Collection implements \JsonSerializable
         return $this->id;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
     public function getItems(bool $onlyPublished = false): array
     {
         $publishedFieldId = $this->schema->getPublishedField();
