@@ -101,6 +101,8 @@ abstract class AbstractGroup extends AbstractComponent
                 if ($collection) {
                     $repeat = $collection->getItemsArray(true);
                     $repeatCollectionName = $collection->getName();
+                } else {
+                    $repeat = [];
                 }
             }
             $data = $this->normalizeRepeat($data, $repeat);
