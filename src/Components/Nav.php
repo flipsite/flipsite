@@ -32,7 +32,7 @@ final class Nav extends AbstractGroup
             foreach ($pages as $page) {
                 $pageItemData = $this->getPageItemData($page);
                 if ($pageItemData) {
-                    $repeat[] = $pageItemData;
+                    $repeat[]                      = $pageItemData;
                 } else {
                     $name     = null;
                     $fragment = null;
@@ -54,8 +54,7 @@ final class Nav extends AbstractGroup
                             if ($fragment) {
                                 $pageItemData['slug'] .= '#'.$fragment;
                             }
-
-                            $repeat[] = $pageItemData;
+                            $repeat[]                      = $pageItemData;
                             continue;
                         }
                     } elseif ($fragment) {
@@ -140,8 +139,8 @@ final class Nav extends AbstractGroup
             preg_match($pattern, $page, $matches);
             if (count($matches) === 3) {
                 return [
-                    'slug'  => $matches[2],
-                    'name'  => $matches[1]
+                    'slug'          => $matches[2],
+                    'name'          => $matches[1]
                 ];
             } else {
                 return null;
@@ -158,8 +157,10 @@ final class Nav extends AbstractGroup
             return null;
         }
         return [
-            'slug'  => $page,
-            'name'  => $this->siteData->getPageName($page, $this->path->getLanguage()),
+            '_collectionId' => '_pages',
+            '_id'           => $page,
+            'slug'          => $page,
+            'name'          => $this->siteData->getPageName($page, $this->path->getLanguage()),
             ...$pageMeta
         ];
     }
