@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -276,12 +277,12 @@ class ComponentBuilder
             }
             unset($data['_attr']);
         }
-        if (isset($options['original'])) {
-            if (is_string($options['original'])) {
-                $options['original'] = ['value' => $options['original']];
-            }
-        }
-        $component->setAttribute('_original', null);
+        // if (isset($options['_original'])) {
+        //     if (is_string($options['_original'])) {
+        //         $options['original'] = ['value' => $options['original']];
+        //     }
+        // }
+        // $component->setAttribute('_original', null);
         $component->build($data, $style ?? [], $options);
 
         if ($this->plugins) {
@@ -544,7 +545,7 @@ class ComponentBuilder
                     'desktop'   => '(min-width: 1201px) and (-webkit-min-device-pixel-ratio: 2), (min-width: 1201px) and (min-resolution: 192dpi)',
                 ];
                 $bgClass = 'bgimg-'.substr(md5($src), 0, 6);
-                $element->addStyle(['bgClass'=>$bgClass]);
+                $element->addStyle(['bgClass' => $bgClass]);
                 $resolutions = json_decode($options['resolutions'], true);
                 $css         = ['global' => []];
                 if (strlen($gradient)) {

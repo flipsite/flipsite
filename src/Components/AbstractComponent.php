@@ -39,7 +39,7 @@ abstract class AbstractComponent extends AbstractElement
                         $value = null;
                     }
                 }
-                if (count($matches[0]) === 1) {
+                if ($original !== $value) {
                     $data['_original'] ??= [];
                     $data['_original'][$key] = $original;
                 };
