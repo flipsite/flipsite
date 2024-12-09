@@ -223,7 +223,7 @@ abstract class AbstractGroup extends AbstractComponent
         }
         $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {
-            return undefined;
+            return null;
         }
         return $collection;
     }
