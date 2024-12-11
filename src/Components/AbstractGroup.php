@@ -162,8 +162,13 @@ abstract class AbstractGroup extends AbstractComponent
         }
 
         if (isset($data['_options']['filterField']) && (isset($data['_options']['filter']) || isset($data['_options']['filterType']) || isset($data['_options']['filterPattern']))) {
+            $field = $data['_options']['filterField'];
+            if (strpos($field, '|') !== false) {
+                $parts = explode('|', $field);
+                $field = $parts[1];
+            }
             $filter = new Filter($data['_options']['filterType'] ?? 'or', $data['_options']['filter'] ?? null, $data['_options']['filterPattern'] ?? null);
-            $repeat = $filter->filterList($repeat, $data['_options']['filterField'] ?? null);
+            $repeat = $filter->filterList($repeat, $field);
         }
 
         if (isset($data['_options']['sortBy'])) {
