@@ -52,6 +52,11 @@ class MetaBuilder implements BuilderInterface
             }
         }
 
+        $hidden = $this->siteData->getHiddenPages();
+        if (in_array($slug, $hidden)) {
+            $elements[] = $this->meta('robots', 'noindex');
+        }
+
         $name  = $this->siteData->getName();
         $meta  = $this->siteData->getMeta($this->path->getPage(), $language);
 
