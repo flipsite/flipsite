@@ -1,6 +1,9 @@
 container:
   text: "Made in"
-  svg: flipsite-watermark.svg
+  svg:
+    value: flipsite-watermark.svg
+    _attr:
+      title: "Flipsite"
   _action: url-blank
   _target: "https://flipsite.io/"
 _style:
@@ -12,7 +15,7 @@ _style:
     flexDirection: flex-row
     justifyContent: justify-center
     alignItems: items-center
-    textSize: text-3
+    textSize: text-[11px]
     lineHeight: leading-none
     position: absolute
     right: right-3

@@ -76,17 +76,17 @@ final class Flipsite
 {
     private array $callbacks     = [];
     private array $renderOptions = [
-        'meta'            => true,
-        'scripts'         => true,
-        'favicon'         => true,
-        'fonts'           => true,
-        'preload'         => true,
-        'style'           => true,
-        'style.preflight' => true,
-        'svg'             => true,
-        'integrations'    => true,
-        'customCode'      => true,
-        'watermark'       => true
+        'meta'              => true,
+        'scripts'           => true,
+        'favicon'           => true,
+        'fonts'             => true,
+        'preload'           => true,
+        'style'             => true,
+        'style.preflight'   => true,
+        'svg'               => true,
+        'integrations'      => true,
+        'customCode'        => true,
+        'attribution'       => true
     ];
 
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
@@ -175,11 +175,11 @@ final class Flipsite
             $document->getChild('body')->addChild($section);
         }
 
-        // Watermark
-        if ($this->environment->watermark() && $this->renderOptions['watermark']) {
-            $watermark = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/watermark.yaml');
-            if ($watermark) {
-                $section = $componentBuilder->build('group', $watermark, [], ['appearance' => 'light', 'parentDataSource' => []]);
+        // Made in Flipsite
+        if ($this->environment->showAttribution() && $this->renderOptions['attribution']) {
+            $attribution = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/attribution.yaml');
+            if ($attribution) {
+                $section = $componentBuilder->build('group', $attribution, [], ['appearance' => 'light', 'parentDataSource' => []]);
                 $document->getChild('body')->addChild($section);
             }
         }

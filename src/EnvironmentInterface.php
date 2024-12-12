@@ -29,7 +29,7 @@ interface EnvironmentInterface
 
     public function compileTimestamp(): bool;
 
-    public function watermark(): bool;
+    public function showAttribution(): bool;
 
     public function downloadFonts(): bool;
 }
