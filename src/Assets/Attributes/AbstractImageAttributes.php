@@ -3,12 +3,10 @@
 declare(strict_types=1);
 namespace Flipsite\Assets\Attributes;
 
-use Flipsite\Assets\Sources\ImageInfoInterface;
-
 abstract class AbstractImageAttributes implements ImageAttributesInterface
 {
     protected string $src;
-    protected ?array $srcset = null;
+    protected ?array $srcset  = null;
     protected ?int $width     = null;
     protected ?int $height    = null;
 
@@ -34,7 +32,7 @@ abstract class AbstractImageAttributes implements ImageAttributesInterface
 
     protected function setSize(array $options, int $realWidth, int $realHeight)
     {
-        $width  = isset($options['width']) ? intval($options['width']) : null;
+        $width   = isset($options['width']) ? intval($options['width']) : null;
         $height  = isset($options['height']) ? intval($options['height']) : null;
 
         if (isset($options['aspectRatio'])) {
@@ -51,8 +49,17 @@ abstract class AbstractImageAttributes implements ImageAttributesInterface
 
         if (null === $width || null === $height) {
             if (null === $width && null === $height) {
-                $width  = $realWidth;
-                $height = $realHeight;
+                $max = 1024;
+                if ($realWidth <= $max || $realHeight <= $max) {
+                    $width  = $realWidth;
+                    $height = $realHeight;
+                } elseif ($realWidth > $realHeight) {
+                    $width  = $max;
+                    $height = intval(round($max / $realWidth * $realHeight));
+                } else {
+                    $height = $max;
+                    $width  = intval(round($max / $realHeight * $realWidth));
+                }
             } elseif (null === $height) {
                 $height = intval(round($width / $realWidth * $realHeight));
             } elseif (null === $width) {
