@@ -14,6 +14,7 @@ class Compiler implements LoggerAwareInterface
 {
     use \Psr\Log\LoggerAwareTrait;
     private string $targetDir;
+    private array $optimizeExtensions = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
 
     public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, string $targetDir)
     {
@@ -171,6 +172,9 @@ class Compiler implements LoggerAwareInterface
     private function getOptimizedAsset(string $asset):string
     {
         $pathinfo = pathinfo($asset);
+        if (!in_array($pathinfo['extension'], $this->optimizeExtensions)) {
+            return $asset;
+        }
         $hash     = substr(md5($pathinfo['basename']), 0, 6);
         $parts    = explode('@', $pathinfo['filename']);
         $filename = $parts[0].'-'.$hash.'.'.$pathinfo['extension'];
