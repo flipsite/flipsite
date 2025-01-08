@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -63,7 +64,7 @@ class RichtextItem
     private string $type;
     private array $data;
 
-    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null)
+    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null, private ?string $theme = null)
     {
         $this->type = $rawData['type'] ?? '';
         unset($rawData['type']);
@@ -88,6 +89,8 @@ class RichtextItem
             case 'ol':
             case 'ul':
                 return 'ul';
+            case 'codeBlock':
+                return 'code';
         }
         return $this->type;
     }
@@ -137,7 +140,12 @@ class RichtextItem
                 unset($data['title']);
                 $data['_attr']   = ['title' => $title];
                 $data['loading'] = 'lazy';
-
+                return $data;
+            case 'code':
+                $data = $this->data;
+                if ($this->theme) {
+                    $data['theme'] = $this->theme;
+                }
                 return $data;
         }
         return $this->data;
