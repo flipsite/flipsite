@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -175,7 +174,11 @@ class ComponentBuilder
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
 
         if ($options['parentDataSource']) {
-            $data = $component->applyData($data, $options['parentDataSource'] ?? []);
+            $replaced = [];
+            $data     = $component->applyData($data, $options['parentDataSource'] ?? [], $replaced);
+            if (in_array('{copyright.year}', $replaced)) {
+                $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
+            }
         }
 
         // Handle nav stuff

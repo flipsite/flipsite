@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 abstract class AbstractComponent extends AbstractElement
@@ -15,7 +14,7 @@ abstract class AbstractComponent extends AbstractElement
         return is_array($data) ? $data : ['value' => $data];
     }
 
-    public function applyData(array $data, array $dataSource): array
+    public function applyData(array $data, array $dataSource, array &$replaced): array
     {
         foreach ($data as $key => &$value) {
             $isComponent = !!$this->getComponentType($key);
@@ -34,7 +33,8 @@ abstract class AbstractComponent extends AbstractElement
                 foreach ($matches[0] as $match) {
                     $var   = trim($match, '{}');
                     if (isset($dataSource[$var])) {
-                        $value = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        $value      = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        $replaced[] = $match;
                     } else {
                         $value = null;
                     }
@@ -44,7 +44,7 @@ abstract class AbstractComponent extends AbstractElement
                     $data['_original'][$key] = $original;
                 };
             } elseif (is_array($value) && in_array($key, ['_attr', '_options', 'render'])) {
-                $value = $this->applyData($value, $dataSource);
+                $value = $this->applyData($value, $dataSource, $replaced);
             }
         }
         return $data;
