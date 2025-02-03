@@ -7,7 +7,9 @@ container:
   _action: url-blank
   _target: "https://flipsite.io/"
 _style:
-  position: relative
+  position: absolute
+  bottom: bottom-0
+  right: right-0
   height: h-0
   width: w-full
   container:

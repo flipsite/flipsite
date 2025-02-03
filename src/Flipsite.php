@@ -181,6 +181,7 @@ final class Flipsite
             if ($attribution) {
                 $section = $componentBuilder->build('group', $attribution, [], ['appearance' => 'light', 'parentDataSource' => []]);
                 $document->getChild('body')->addChild($section);
+                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
             }
         }
 
