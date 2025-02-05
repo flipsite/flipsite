@@ -264,7 +264,10 @@ class Reader implements SiteDataInterface
     {
         $style = $this->data['theme']['components']['body'] ?? [];
         unset($style['bgColor'], $style['dark']['bgColor']);
-
+        $settings = $this->getThemeSettings();
+        if ($settings['textScale'] !== 1.0) {
+            $style['textSize'] = 'text-['.intval($settings['textScale'] * 100).'%]';
+        }
         return $style;
     }
 
