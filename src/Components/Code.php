@@ -11,7 +11,7 @@ final class Code extends AbstractComponent
     use Traits\BuilderTrait;
     protected string $tag  = 'pre';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $this->oneline = true;
         $this->setContent($data['value']);

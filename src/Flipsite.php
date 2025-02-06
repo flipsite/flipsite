@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -59,7 +60,7 @@ class OpenToggleCallback extends AbstractDocumentCallback
         return $element;
     }
 
-    private function hasDataToggle(AbstractElement $element) : bool
+    private function hasDataToggle(AbstractElement $element): bool
     {
         if ($element->hasAttribute('data-toggle')) {
             return true;
@@ -171,9 +172,10 @@ final class Flipsite
             // if ($this->plugins) {
             //     $sectionData = $this->plugins->run('section', $sectionData);
             // }
-            // $parentDataSource = array_merge($sectionData['_pageDataSource'] ?? [], $globalVars);
-            // unset($sectionData['_pageDataSource']);
-            $section = $componentBuilder->build($sectionData, new InheritedComponentData($appearance, $globalVars));
+            $inheritedData = new InheritedComponentData($appearance, $globalVars);
+            $inheritedData->addDataSource($sectionData->getDataValue('_pageDataSource', true) ?? []);
+
+            $section = $componentBuilder->build($sectionData, $inheritedData);
             $document->getChild('body')->addChild($section);
         }
 

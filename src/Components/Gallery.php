@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -9,7 +10,7 @@ final class Gallery extends AbstractGroup
 {
     protected string $tag   = 'div';
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         $repeat = [];
         if (isset($data['_repeat'])) {

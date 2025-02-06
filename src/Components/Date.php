@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Date extends AbstractComponent
 {
     use Traits\PathTrait;
     protected string $tag  = 'time';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $this->addStyle($style);
+        $data = $component->getData();
         $timestamp = isset($data['value']) ? strtotime($data['value']) : time();
         $format = \IntlDateFormatter::FULL;
         switch ($data['format'] ?? '') {

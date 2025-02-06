@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 final class Counter extends AbstractComponent
@@ -8,7 +9,7 @@ final class Counter extends AbstractComponent
     use Traits\BuilderTrait;
     protected string $tag  = 'div';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $this->addStyle($style);
         $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/dist/counter.min.js')));

@@ -1,14 +1,19 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
+
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Form extends AbstractGroup
 {
     protected string $tag  = 'form';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data = $component->getData();
         if (isset($data['honeypot'])) {
             $honeypotInput = new Element('input', true, true);
             $honeypotInput->setAttribute('name', $data['honeypot']);
@@ -19,6 +24,7 @@ final class Form extends AbstractGroup
             $this->addChild($honeypotInput);
         }
         unset($data['honeypot']);
-        parent::build($data, $style, $options);
+        $component->setData($data);
+        parent::build($component, $inherited);
     }
 }

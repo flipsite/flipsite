@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -15,7 +16,7 @@ final class DidYouMean extends AbstractComponent
 
     protected string $tag = 'p';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $value     = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
         $value     = $this->addClassesToHtml($value, ['a', 'strong'], $style, $options['appearance']);
@@ -38,13 +39,6 @@ final class DidYouMean extends AbstractComponent
         $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/didYouMean.min.js')));
     }
 
-    public function normalize(string|int|bool|array $data): array
-    {
-        if (is_string($data)) {
-            return ['value' => $data];
-        }
-        return $data;
-    }
 
     public function getDefaultStyle(): array
     {

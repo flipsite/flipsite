@@ -1,16 +1,16 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 class Languages extends AbstractGroup
 {
-    protected string $tag  = 'nav';
-
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
+    protected string $tag  = 'nav';
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         $repeat    = [];
         $languages = $this->siteData->getLanguages();

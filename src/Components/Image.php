@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -35,7 +36,6 @@ final class Image extends AbstractComponent
         $style = $component->getStyle();
         if (isset($data['base64'])) {
             $this->setAttribute('alt', (string)($data['alt'] ?? ''));
-            $this->addStyle($style);
             $this->setAttribute('src', $data['base64']);
             return;
         }
@@ -53,7 +53,6 @@ final class Image extends AbstractComponent
             unset($style['options']['loading']);
         }
         $this->setAttribute('alt', (string)($data['alt'] ?? ''));
-        $this->addStyle($style);
 
         $imageAttributes = $this->assets->getImageAttributes($src, $style['options'] ?? []);
         if ($imageAttributes) {

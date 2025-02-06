@@ -44,6 +44,15 @@ abstract class AbstractComponentData
         return $this->data;
     }
 
+    public function getDataValue(string $attribute, bool $remove = null): array|string|bool|int|null
+    {
+        $value = $this->data[$attribute] ?? null;
+        if ($remove) {
+            unset($this->data[$attribute]);
+        }
+        return $value;
+    }
+
     public function setData(array $data): void
     {
         $this->data = $data;

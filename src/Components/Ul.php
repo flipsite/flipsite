@@ -10,7 +10,7 @@ final class Ul extends AbstractGroup
 {
     protected string $tag   = 'ul';
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         if (!is_array($data)) {
             $data = ['value' => $data];

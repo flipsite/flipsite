@@ -13,7 +13,7 @@ final class Richtext extends AbstractGroup
     use Traits\ActionTrait;
     protected string $tag = 'div';
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         $items = [];
         $data['value'] ??= '';
@@ -42,7 +42,7 @@ final class Richtext extends AbstractGroup
         return $data;
     }
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         if (!($data['value'] ?? false)) {
             return;

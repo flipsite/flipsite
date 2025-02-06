@@ -11,7 +11,7 @@ final class Number extends AbstractComponent
 
     protected string $tag  = 'div';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $value = (string)($data['value'] ?? 1);
         // If , as decimal separator, replace with .

@@ -13,7 +13,7 @@ final class Li extends AbstractComponent
 
     protected string $tag = 'li';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         if (isset($data['icon'])) {
             $icon = $this->builder->build('icon', $data['icon'], $style['icon'] ?? [], $options);
@@ -35,7 +35,7 @@ final class Li extends AbstractComponent
         $this->addStyle($style);
     }
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         if (is_string($data)) {
             return ['value' => $data];

@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Select extends AbstractComponent
 {
     protected string $tag   = 'select';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $this->addStyle($style);
         $options = ArrayHelper::decodeJsonOrCsv($data['options']);
         $selected = $data['selected'] ?? '';
         foreach ($options as $value) {
@@ -26,7 +27,7 @@ final class Select extends AbstractComponent
         }
     }
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         if (!is_array($data)) {
             $data = ['options' => [$data]];

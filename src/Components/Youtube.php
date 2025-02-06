@@ -1,9 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Youtube extends AbstractGroup
 {
@@ -12,7 +15,7 @@ final class Youtube extends AbstractGroup
     protected bool $oneline = true;
     protected string $tag   = 'iframe';
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         if (!is_array($data)) {
             return ['value' => $data];
@@ -20,7 +23,7 @@ final class Youtube extends AbstractGroup
         return $data;
     }
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);

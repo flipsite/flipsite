@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -11,7 +12,7 @@ final class Script extends AbstractComponent
     protected string $tag   = 'script';
     protected bool $oneline = true;
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
         if (!is_array($data)) {
             $data = ['value' => $data];
