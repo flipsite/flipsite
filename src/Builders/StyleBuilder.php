@@ -172,7 +172,6 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         });
         $escape = ['/', '|', '.', ':', '%', '[', ']', '#'];
         foreach ($classes as $i => $class) {
-            $orginal = $class;
             $tmp     = explode(':', $class);
             $prefix  = false;
             if (count($tmp) > 1) {

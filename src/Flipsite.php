@@ -17,6 +17,7 @@ use Flipsite\Builders\StyleBuilder;
 use Flipsite\Builders\SvgBuilder;
 use Flipsite\Components\Document;
 use Flipsite\Data\SiteDataInterface;
+use Flipsite\Data\InheritedComponentData;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\Plugins;
 use Flipsite\Utils\Robots;
@@ -166,24 +167,25 @@ final class Flipsite
         $globalVars = $this->getGlobalVars($this->siteData->getSocial(), $path);
 
         foreach ($sections as $sectionId => $sectionData) {
-            if ($this->plugins) {
-                $sectionData = $this->plugins->run('section', $sectionData);
-            }
-            $parentDataSource = array_merge($sectionData['_pageDataSource'] ?? [], $globalVars);
-            unset($sectionData['_pageDataSource']);
-            $section = $componentBuilder->build('group', $sectionData, [], ['appearance' => $appearance, 'parentDataSource' => $parentDataSource]);
+            // TODO
+            // if ($this->plugins) {
+            //     $sectionData = $this->plugins->run('section', $sectionData);
+            // }
+            // $parentDataSource = array_merge($sectionData['_pageDataSource'] ?? [], $globalVars);
+            // unset($sectionData['_pageDataSource']);
+            $section = $componentBuilder->build($sectionData, new InheritedComponentData($appearance, $globalVars));
             $document->getChild('body')->addChild($section);
         }
 
-        // Made in Flipsite
-        if ($this->environment->showAttribution() && $this->renderOptions['attribution']) {
-            $attribution = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/attribution.yaml');
-            if ($attribution) {
-                $section = $componentBuilder->build('group', $attribution, [], ['appearance' => 'light', 'parentDataSource' => []]);
-                $document->getChild('body')->addChild($section);
-                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
-            }
-        }
+        // // Made in Flipsite
+        // if ($this->environment->showAttribution() && $this->renderOptions['attribution']) {
+        //     $attribution = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/attribution.yaml');
+        //     if ($attribution) {
+        //         $section = $componentBuilder->build('group', $attribution, [], ['appearance' => 'light', 'parentDataSource' => []]);
+        //         $document->getChild('body')->addChild($section);
+        //         $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
+        //     }
+        // }
 
         if ($this->renderOptions['svg']) {
             $document = $svgBuilder->getDocument($document);

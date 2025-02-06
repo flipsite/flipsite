@@ -3,14 +3,17 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Phone extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected string $tag  = 'span';
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $this->addStyle($style);
+        $data      = $component->getData();
         $value     = $data['value'] ?? '+358501234567';
         $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
         try {
@@ -41,15 +44,17 @@ final class Phone extends AbstractComponent
             $string = $number;
         }
 
+        $style = $component->getStyle();
         if ($data['flag'] ?? false) {
             // Get the country code
-            $countryCode = $phoneNumber->getCountryCode();
-            $regionCode  = $phoneUtil->getRegionCodeForNumber($phoneNumber);
-            $country     = strtolower($regionCode);
-            $flag        = $this->builder->build('svg', ['value' => 'flag-icons-4x3/'.$country.'.svg'], $style['flag'] ?? [], $options);
-            $this->addChild($flag);
-            $text = $this->builder->build('text', ['value' => $number], [], $options);
-            $this->addChild($text);
+            // TODO
+            // $countryCode = $phoneNumber->getCountryCode();
+            // $regionCode  = $phoneUtil->getRegionCodeForNumber($phoneNumber);
+            // $country     = strtolower($regionCode);
+            // $flag        = $this->builder->build('svg', ['value' => 'flag-icons-4x3/'.$country.'.svg'], $style['flag'] ?? [], $options);
+            // $this->addChild($flag);
+            // $text = $this->builder->build('text', ['value' => $number], [], $options);
+            // $this->addChild($text);
         } else {
             $this->setContent($string);
         }

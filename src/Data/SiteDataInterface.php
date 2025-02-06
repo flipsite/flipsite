@@ -54,7 +54,9 @@ interface SiteDataInterface
 
     public function getBodyStyle(?string $page = null): array;
 
-    public function getComponentStyle(string $component): array;
+    public function getComponentStyle(int|string $componentId): array;
+
+    public function getInheritedStyle(int|string $componentId): array;
 
     public function getMeta(string $page, ?Language $language = null): ?array;
 

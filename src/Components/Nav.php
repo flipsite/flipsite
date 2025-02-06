@@ -12,11 +12,8 @@ final class Nav extends AbstractGroup
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
-        if (!is_array($data)) {
-            $data = ['value' => $data];
-        }
         $repeat = [];
         if (!isset($data['_options']['pages'])) {
             $level           = 0;
@@ -97,9 +94,7 @@ final class Nav extends AbstractGroup
             $data['_options']['filterField'] = 'slug';
         }
 
-        $data = $this->normalizeRepeat($data, $repeat);
-
-        return $data;
+        return  $this->normalizeRepeat($data, $repeat);
     }
 
     private function getPages(int $level, ?string $parentPage = null): array

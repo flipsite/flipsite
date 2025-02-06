@@ -6,11 +6,11 @@ namespace Flipsite\Components;
 final class Video extends AbstractComponent
 {
     use Traits\AssetsTrait;
-    
+
     protected string $tag = 'video';
 
     public function normalize(string|int|bool|array $data) : array
-    {   
+    {
         if (!is_array($data)) {
             return ['value'=>$data];
         }
@@ -20,7 +20,7 @@ final class Video extends AbstractComponent
     public function build(array $data, array $style, array $options) : void
     {
         if (isset($data['base64bg'])) {
-            $this->setAttribute('style','background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
+            $this->setAttribute('style', 'background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
         if (isset($data['poster'])) {
             $imageAttributes = $this->assets->getImageAttributes($data['poster'], $style['poster']['options'] ?? []);

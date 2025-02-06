@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 class Svg extends AbstractComponent
 {
@@ -13,11 +15,8 @@ class Svg extends AbstractComponent
     protected string $tag   = 'svg';
     protected bool $oneline = true;
 
-    public function normalize(string|int|bool|array $data) : array
+    public function normalize(array $data): array
     {
-        if (!is_array($data)) {
-            $data = ['src' => $data];
-        }
         if (isset($data['value'])) {
             $data['src'] = $data['value'];
             unset($data['value']);
@@ -34,15 +33,15 @@ class Svg extends AbstractComponent
         return ['fill' => 'fill-current'];
     }
 
-    public function build(array $data, array $style, array $options) : void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data = $component->getData();
         try {
             $svg = $this->assets->getSvg($data['src'] ?? '');
         } catch (\Exception $e) {
             return;
         }
         $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        $this->addStyle($style);
         if ($svg) {
             $this->setAttribute('viewBox', $svg->getViewbox());
             $this->setContent('<use xlink:href="#'.$svg->getHash().'"></use>');

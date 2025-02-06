@@ -3,6 +3,9 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Heading extends AbstractComponent
 {
     use Traits\MarkdownTrait;
@@ -11,11 +14,11 @@ final class Heading extends AbstractComponent
     protected bool $oneline = true;
     protected string $tag   = 'h2';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $html  = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $html  = $this->addClassesToHtml($html, ['a', 'strong'], $style, $options['appearance']);
-        $this->addStyle($style);
+        $data     = $component->getData();
+        $html     = $this->getMarkdownLine($data['value'] ?? '');
+        $html     = $this->addClassesToHtml($html, ['a', 'strong'], $component->getStyle(), $inherited->getAppearance());
         if (isset($data['anchor'])) {
             $a = new Element('a');
             $a->setContent($html);
@@ -24,14 +27,6 @@ final class Heading extends AbstractComponent
         } else {
             $this->setContent($html);
         }
-    }
-
-    public function normalize(string|int|bool|array $data): array
-    {
-        if (!is_array($data)) {
-            return ['value' => (string)$data];
-        }
-        return $data;
     }
 
     public function getDefaultStyle(): array

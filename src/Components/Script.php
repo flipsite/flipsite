@@ -1,8 +1,10 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
+
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Script extends AbstractComponent
 {
@@ -15,16 +17,16 @@ final class Script extends AbstractComponent
             $data = ['value' => $data];
         }
         if (isset($data['value'])) {
-            unset($data['_attr']['src']);
-            unset($data['_attr']['defer']);
+            unset($data['_attr']['src'], $data['_attr']['defer']);
         }
         return $data;
     }
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        if (isset($data['value'])) {
-            $this->setContent($data['value']);
-        }
+        //print_r($component);
+        // if (isset($data['value'])) {
+        //     $this->setContent($data['value']);
+        // }
     }
 }

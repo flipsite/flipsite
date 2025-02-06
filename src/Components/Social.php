@@ -7,11 +7,8 @@ use Flipsite\Utils\ArrayHelper;
 
 final class Social extends AbstractGroup
 {
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
-        if (!is_array($data)) {
-            $data = ['value' => $data];
-        }
         $dataSourceList = $this->getSocial();
         $dataSourceList = $this->applyCustom($dataSourceList, $data);
 

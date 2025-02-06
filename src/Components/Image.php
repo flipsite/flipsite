@@ -1,9 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
+
 use Flipsite\Builders\Event;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Image extends AbstractComponent
 {
@@ -14,11 +16,9 @@ final class Image extends AbstractComponent
     protected bool $empty  = true;
     protected bool $online = true;
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
-        if (!is_array($data)) {
-            return ['src' => $data];
-        } elseif (isset($data['value'])) {
+        if (isset($data['value'])) {
             $data['src'] = $data['value'];
             unset($data['value']);
         }
@@ -29,12 +29,14 @@ final class Image extends AbstractComponent
         return $data;
     }
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data  = $component->getData();
+        $style = $component->getStyle();
         if (isset($data['base64'])) {
             $this->setAttribute('alt', (string)($data['alt'] ?? ''));
             $this->addStyle($style);
-            $this->setAttribute('src',$data['base64']);
+            $this->setAttribute('src', $data['base64']);
             return;
         }
 

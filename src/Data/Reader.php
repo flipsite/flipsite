@@ -13,10 +13,10 @@ use Flipsite\Utils\Plugins;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\CustomHtmlParser;
 use Flipsite\Content\Collection;
-use Adbar\Dot;
 
 class Reader implements SiteDataInterface
 {
+    use ComponentTypesTrait;
     /**
      * @var array<Language>
      */
@@ -43,6 +43,8 @@ class Reader implements SiteDataInterface
     private Localizer $localizer;
 
     private ?CustomHtmlParser $customParser = null;
+
+    private ?\Adbar\Dot $componentsStyles = null;
 
     public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
     {
@@ -271,24 +273,48 @@ class Reader implements SiteDataInterface
         return $style;
     }
 
-    public function getComponentStyle(string $component): array
+    public function getComponentStyle(int|string $componentId): array
     {
-        if (strpos($component, '.') !== false) {
-            $tmp   = explode('.', $component);
-            $style = $this->data['theme']['components'][array_shift($tmp)] ?? [];
-            $dot   = new Dot($style);
-            return $dot->get(implode('.', $tmp)) ?? [];
+        if (!$this->componentsStyles) {
+            $this->componentsStylesDot = new \Adbar\Dot($this->data['theme']['components']);
         }
-
-        if (in_array($component, ['heading', 'button', 'container', 'icon', 'link', 'nav', 'paragraph', 'question', 'social', 'svg', 'tagline', 'timer', 'toggle'])) {
-            return [];
+        $all   = $this->componentsStylesDot->get($componentId) ?? [];
+        $style = [];
+        foreach ($all as $attr => $value) {
+            if (!$this->isComponent($this->getType($attr))) {
+                $style[$attr] = $value;
+            }
         }
-
-        $style = $this->data['theme']['components'][$component] ?? [];
-        // if (in_array($component, ['social', 'nav'])) {
-        //     unset($style['type']);
-        // }
         return $style;
+    }
+
+    public function getInheritedStyle(int|string $componentId): array
+    {
+        $parts     = explode('.', $componentId);
+        $sectionId = $parts[0];
+        if (isset($this->data['theme']['components'][$sectionId]['inherit'])) {
+            $inheritId = $this->data['theme']['components'][$sectionId]['inherit'];
+            while ($inheritId) {
+                if (isset($this->data['theme']['components'][$inheritId]['inherit'])) {
+                    $inheritId = $this->data['theme']['components'][$inheritId]['inherit'];
+                } else {
+                    $parts[0] = $inheritId;
+                    return $this->getComponentStyle(implode('.', $parts));
+                }
+            }
+        }
+
+        return [];
+    }
+
+    private function getType(string $componentId): string
+    {
+        if (str_contains($componentId, '.') || str_contains($componentId, ':')) {
+            $tmp  = explode('.', $componentId);
+            $tmp2 = explode(':', $tmp[0]);
+            return $tmp2[0];
+        }
+        return $componentId;
     }
 
     /**
@@ -356,7 +382,16 @@ class Reader implements SiteDataInterface
         $sections = $this->localizer->localize($sections ?? [], $language) ?? [];
 
         $sections = $this->normalize($sections);
-        return $sections;
+
+        $componentDataList = [];
+
+        foreach ($sections as $section) {
+            $sectionId           = $section['_style'];
+            $section['_style']   = $this->data['theme']['components'][$sectionId];
+            $componentDataList[] = new YamlComponentData($sectionId, 'container', $section, $this, true);
+        }
+
+        return $componentDataList;
     }
 
     public function getMeta(string $page, ?Language $language = null): ?array

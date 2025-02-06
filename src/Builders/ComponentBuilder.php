@@ -9,6 +9,8 @@ use Flipsite\Components\AbstractElement;
 use Flipsite\Components\AbstractComponent;
 use Flipsite\Data\SiteDataInterface;
 use Flipsite\Data\Slugs;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 use Flipsite\EnvironmentInterface;
 use Flipsite\Assets\Assets;
 use Flipsite\Utils\ArrayHelper;
@@ -35,91 +37,66 @@ class ComponentBuilder
         $this->assets = new Assets($environment->getAssetSources());
     }
 
-    public function build(string $type, array|string|int|bool $data, array $parentStyle, array $options): ?AbstractComponent
+    public function build(AbstractComponentData $componentData, InheritedComponentData $inheritedData): ?AbstractComponent
     {
-        if (str_starts_with($type, '_')) {
-            return null;
-        }
-        if (($options['recursionDepth'] ?? 0) > 50) {
-            return null;
-        }
-        if (is_array($data)) {
-            if ($data['_options']['recursiveId'] ?? false) {
-                $recursiveId = $data['_options']['recursiveId'];
-                unset($data['_options']['recursiveId']);
-                $this->recursiveData[$recursiveId] = [
-                    'type'        => $type,
-                    'data'        => $data,
-                    'parentStyle' => $parentStyle
-                ];
-            };
-            if ($data['_options']['recursiveContent'] ?? false) {
-                $recursiveId = $data['_options']['recursiveContent'];
-                unset($data['_options']['recursiveContent']);
-                $recursive                   = $this->recursiveData[$recursiveId];
-                $recursiveType               = $recursive['type'];
-                $data[$recursiveType]        = $recursive['data'];
-                $parentStyle[$recursiveType] = $recursive['parentStyle'];
-                $options['recursionDepth'] ??= 0;
-                $options['recursionDepth']++;
-            }
-        } elseif (!is_array($data)) {
-            $data = ['value' => $data];
-        }
+        // if (($options['recursionDepth'] ?? 0) > 50) {
+        //     return null;
+        // }
+        // if (is_array($data)) {
+        //     if ($data['_options']['recursiveId'] ?? false) {
+        //         $recursiveId = $data['_options']['recursiveId'];
+        //         unset($data['_options']['recursiveId']);
+        //         $this->recursiveData[$recursiveId] = [
+        //             'type'        => $type,
+        //             'data'        => $data,
+        //             'parentStyle' => $parentStyle
+        //         ];
+        //     };
+        //     if ($data['_options']['recursiveContent'] ?? false) {
+        //         $recursiveId = $data['_options']['recursiveContent'];
+        //         unset($data['_options']['recursiveContent']);
+        //         $recursive                   = $this->recursiveData[$recursiveId];
+        //         $recursiveType               = $recursive['type'];
+        //         $data[$recursiveType]        = $recursive['data'];
+        //         $parentStyle[$recursiveType] = $recursive['parentStyle'];
+        //         $options['recursionDepth'] ??= 0;
+        //         $options['recursionDepth']++;
+        //     }
+        // } elseif (!is_array($data)) {
+        //     $data = ['value' => $data];
+        // }
 
-        if (isset($data['_script'])) {
-            $this->handleScripts($data['_script']);
-        }
+        // if (isset($data['_script'])) {
+        //     $this->handleScripts($data['_script']);
+        // }
 
-        $type = $this->getComponentType($type);
-        if (!$type) {
-            return null;
-        }
+        $type  = $this->getComponentType($componentData->getType());
         $class = 'Flipsite\\Components\\' . ucfirst($type);
 
-        $parentType = false;
-        if (isset($parentStyle['type']) && $parentStyle['type'] !== $type) {
-            $parentType = $parentStyle['type'];
-        }
+        $data  = $componentData->getData();
+        $style = $componentData->getStyle();
 
-        $style = $this->siteData->getComponentStyle($type);
-
-        $style = ArrayHelper::merge($style, $parentStyle);
-
-        if ($parentType) {
-            $parentTypeflags = explode(':', $parentType);
-            $parentType      = array_shift($parentTypeflags);
-            $parentTypeStyle = $this->siteData->getComponentStyle($parentType);
-            $style           = ArrayHelper::merge($parentTypeStyle, $style);
-        }
         if ($data['_options']['hidden'] ?? false) {
             return null;
         }
 
-        if (is_array($data) && isset($data['_style'])) {
-            // If string, => inherit
-            if (is_string($data['_style'])) {
-                $data['_style'] = ['inherit' => $data['_style']];
-            }
+        // Resolve inheritance
+        $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
+        $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
 
-            // Resolve inheritance
-            while (isset($data['_style']['inherit'])) {
-                $inheritType   = $data['_style']['inherit'];
-                unset($data['_style']['inherit']);
-                $data['_style'] = ArrayHelper::merge($this->siteData->getComponentStyle($inheritType), $data['_style']);
+        // Check if appearance changes
+        // TODO add default for texts etc.
+        if (isset($style['appearance']) && $style['appearance'] !== $inheritedData->getAppearance()) {
+            switch ($style['appearance']) {
+                case 'dark':
+                    if (!isset($style['textColor']['dark'])) {
+                        $style['textColor'] = 'text-white/80';
+                    }
+                    break;
             }
-
-            $style = ArrayHelper::merge($style, $data['_style']);
-            unset($data['_style']);
+            $inheritedData->setAppearance($style['appearance']);
         }
-
-        $options['appearance'] = $style['appearance'] ?? $options['appearance'];
         unset($style['appearance']);
-
-        if (is_array($style)) {
-            $type = $style['type'] ?? $type;
-            unset($style['type'],$style['section']);
-        }
 
         if (isset($data['_dataSource'])) {
             $dataSource = is_array($data['_dataSource']) ? $data['_dataSource'] : $this->getDataSource($data['_dataSource']);
@@ -128,6 +105,8 @@ class ComponentBuilder
                 $options['parentDataSource'][$key] = $value;
             }
         }
+
+        // Handle transition delay
 
         if (isset($style['transitionDelayStep']) && isset($data['_repeatIndex'])) {
             $multiplier = intval($data['_repeatIndex']);
@@ -171,15 +150,15 @@ class ComponentBuilder
         }
 
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
-        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $options['appearance']);
+        $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $inheritedData->getAppearance());
 
-        if ($options['parentDataSource']) {
-            $replaced = [];
-            $data     = $component->applyData($data, $options['parentDataSource'] ?? [], $replaced);
-            if (in_array('{copyright.year}', $replaced)) {
-                $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
-            }
-        }
+        // if ($options['parentDataSource']) {
+        //     $replaced = [];
+        //     $data     = $component->applyData($data, $options['parentDataSource'] ?? [], $replaced);
+        //     if (in_array('{copyright.year}', $replaced)) {
+        //         $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
+        //     }
+        // }
 
         // Handle nav stuff
         if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
@@ -193,9 +172,9 @@ class ComponentBuilder
             }
         }
 
-        if (count($options['navState'] ?? [])) {
-            $style = $this->handleNavStyle($style, $options['navState'] ?? []);
-        }
+        // if (count($options['navState'] ?? [])) {
+        //     $style = $this->handleNavStyle($style, $options['navState'] ?? []);
+        // }
 
         $data = $component->normalize($data);
 
@@ -240,13 +219,14 @@ class ComponentBuilder
         $style = $this->handleStyleStates($style, $data);
 
         if (isset($options['parentDataSource'])) {
-            $style = $this->handleApplyStyleData($style, $options['parentDataSource']);
+            $style = $this->handleApplyStyleData($style, $inheritedData->getDataSource());
         }
 
         if (isset($style['tag'])) {
             $component->setTag($style['tag']);
             unset($style['tag']);
         }
+
         unset($data['_meta'], $data['_name']);
 
         if (isset($data['_bg'])) {
@@ -265,13 +245,14 @@ class ComponentBuilder
             $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/dist/text-scale.min.js')));
         }
         unset($style['textScale']);
+
         if (isset($style['background'])) {
-            $style['background'] = $this->handleApplyStyleData($style['background'], $options['parentDataSource']);
+            $style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
             $style['background'] = $this->handleStyleStates($style['background'], $data);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
-        unset($options['navState']);
+        //unset($options['navState']);
         if (isset($data['_attr'])) {
             foreach ($data['_attr'] as $attr => $value) {
                 if (!is_string($value) || (!str_starts_with($value, '{') && !str_ends_with($value, '}'))) {
@@ -286,7 +267,11 @@ class ComponentBuilder
         //     }
         // }
         // $component->setAttribute('_original', null);
-        $component->build($data, $style ?? [], $options);
+
+        $component->addStyle($style);
+        $componentData->setData($data);
+
+        $component->build($componentData, $inheritedData);
 
         if ($this->plugins) {
             $component = $this->plugins->run('afterComponentBuild', $component);

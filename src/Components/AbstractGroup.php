@@ -1,12 +1,13 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
 use Flipsite\Utils\Filter;
 use Flipsite\Content\Collection;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 abstract class AbstractGroup extends AbstractComponent
 {
@@ -18,11 +19,9 @@ abstract class AbstractGroup extends AbstractComponent
 
     protected string $tag = 'div';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $this->tag ??= $style['tag'];
-        unset($style['tag']);
-
+        $data = $component->getData();
         if (isset($data['_action'])) {
             if ('tel' === $data['_action']) {
                 // handle tel replace
@@ -43,38 +42,37 @@ abstract class AbstractGroup extends AbstractComponent
             }
         }
 
-        $this->addStyle($style);
-
-        $repeatTpl   = $data['_repeatTpl'] ?? false;
         $repeatData  = $data['_repeatData'] ?? false;
-        if ($repeatTpl) {
-            unset($data['_repeatTpl'], $data['_repeatData']);
-            $children = [];
-            $total    = count($repeatData);
-            $index    = 0;
+        if ($repeatData) {
+            $childComponents = $component->getChildren();
+            $children        = [];
+            $total           = count($repeatData);
+
+            $index           = 0;
             foreach ($repeatData as $repeatDataItem) {
-                foreach ($repeatTpl as $type => $repeatTplComponent) {
-                    if (!is_array($repeatTplComponent)) {
-                        $repeatTplComponent = ['value' => $repeatTplComponent];
-                    }
-                    $repeatTplComponent['_dataSource']       = $repeatDataItem;
-                    $repeatTplComponent['_repeatIndex']      = $repeatDataItem['index'];
-                    $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $index, $total);
-                    if (isset($optimizedStyle['background'])) {
-                        $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
-                    }
-                    $children[] = $this->builder->build($type, $repeatTplComponent, $optimizedStyle, $options);
+                foreach ($childComponents as $childComponent) {
+                    // $repeatTplComponent['_dataSource']       = $repeatDataItem;
+                    // $repeatTplComponent['_repeatIndex']      = $repeatDataItem['index'];
+                    // $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $index, $total);
+                    // if (isset($optimizedStyle['background'])) {
+                    //     $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
+                    // }
+
+                    $children[] = $this->builder->build($childComponent, $inherited);
                     $index++;
                 }
             }
             $this->addChildren($children);
         } else {
-            $children = [];
-            $index    = 0;
-            $total    = count($data);
-            foreach ($data as $type => $componentData) {
-                $componentStyle = $this->optimizeStyle($style[$type] ?? [], $index, $total);
-                $children[]     = $this->builder->build($type, $componentData ?? [], $componentStyle, $options);
+            $children        = [];
+            $index           = 0;
+            $childComponents = $component->getChildren();
+            $total           = count($childComponents);
+
+            foreach ($childComponents as $childComponent) {
+                $componentStyle = $this->optimizeStyle($childComponent->getStyle(), $index, $total);
+                $childComponent->setStyle($componentStyle);
+                $children[]     = $this->builder->build($childComponent, $inherited);
                 $index++;
             }
 
@@ -82,14 +80,10 @@ abstract class AbstractGroup extends AbstractComponent
         }
     }
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
-        if (!is_array($data)) {
-            $data = ['value' => $data];
-        }
         $data = $this->normalizeAction($data);
         $data = $this->normalizeHover($data);
-
 
         $repeatCollectionName = null;
         if (isset($data['_repeat'])) {
@@ -97,9 +91,9 @@ abstract class AbstractGroup extends AbstractComponent
             unset($data['_repeat']);
             if (is_string($repeat)) {
                 $repeatCollectionId = $repeat;
-                $collection = $this->getCollection($repeat, true);
+                $collection         = $this->getCollection($repeat, true);
                 if ($collection) {
-                    $repeat = $collection->getItemsArray(true);
+                    $repeat               = $collection->getItemsArray(true);
                     $repeatCollectionName = $collection->getName();
                 } else {
                     $repeat = [];
@@ -196,11 +190,10 @@ abstract class AbstractGroup extends AbstractComponent
         foreach (array_keys($components) as $key) {
             unset($data[$key]);
         }
-        $data['_repeatTpl']  = $components;
         $data['_repeatData'] = $repeat ?? [];
 
         if (!is_array($repeat) || !count($repeat)) {
-            unset($data['_repeatTpl'], $data['_repeatData']);
+            unset($data['_repeatData']);
 
             $data['_isEmpty'] = true;
         } else {

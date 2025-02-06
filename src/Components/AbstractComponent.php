@@ -3,15 +3,18 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 abstract class AbstractComponent extends AbstractElement
 {
     use \Flipsite\Traits\ComponentTypeTrait;
 
-    abstract public function build(array $data, array $style, array $options): void;
+    abstract public function build(AbstractComponentData $component, InheritedComponentData $inherited): void;
 
-    public function normalize(string|int|bool|array $data): array
+    public function normalize(array $data): array
     {
-        return is_array($data) ? $data : ['value' => $data];
+        return $data;
     }
 
     public function applyData(array $data, array $dataSource, array &$replaced): array

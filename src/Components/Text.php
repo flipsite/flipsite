@@ -3,18 +3,14 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Text extends AbstractComponent
 {
-    public function normalize(string|int|bool|array $data) : array
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        if (!is_array($data)) {
-            $data = ['value' => (string)$data];
-        }
-        return $data;
-    }
-
-    public function build(array $data, array $style, array $options) : void
-    {
+        $data          = $component->getData();
         $this->content = $data['value'] ?? '';
     }
 

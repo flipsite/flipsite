@@ -3,6 +3,9 @@
 declare(strict_types=1);
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Paragraph extends AbstractComponent
 {
     use Traits\MarkdownTrait;
@@ -11,19 +14,11 @@ final class Paragraph extends AbstractComponent
 
     protected string $tag = 'p';
 
-    public function build(array $data, array $style, array $options): void
+    public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $html  = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $html  = $this->addClassesToHtml($html, ['a', 'strong', 'em', 'code'], $style, $options['appearance']);
+        $data  = $component->getData();
+        $html  = $this->getMarkdownLine($data['value'] ?? '');
+        $html  = $this->addClassesToHtml($html, ['a', 'strong', 'em', 'code'], $component->getStyle(), $inherited->getAppearance());
         $this->setContent((string)$html);
-        $this->addStyle($style);
-    }
-
-    public function normalize(string|int|bool|array $data): array
-    {
-        if (is_string($data)) {
-            return ['value' => $data];
-        }
-        return $data;
     }
 }
