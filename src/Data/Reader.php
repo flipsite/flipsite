@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -392,6 +393,7 @@ class Reader implements SiteDataInterface
         }
 
         return $componentDataList;
+        return array_splice($componentDataList, 0, 1);
     }
 
     public function getMeta(string $page, ?Language $language = null): ?array

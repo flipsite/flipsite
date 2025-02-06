@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -87,13 +88,13 @@ class ComponentBuilder
         // Check if appearance changes
         // TODO add default for texts etc.
         if (isset($style['appearance']) && $style['appearance'] !== $inheritedData->getAppearance()) {
-            switch ($style['appearance']) {
-                case 'dark':
-                    if (!isset($style['textColor']['dark'])) {
-                        $style['textColor'] = 'text-white/80';
-                    }
-                    break;
-            }
+            // switch ($style['appearance']) {
+            //     case 'dark':
+            //         if (!isset($style['textColor']['dark'])) {
+            //             $style['textColor'] = 'text-white/80';
+            //         }
+            //         break;
+            // }
             $inheritedData->setAppearance($style['appearance']);
         }
         unset($style['appearance']);
@@ -101,9 +102,7 @@ class ComponentBuilder
         if (isset($data['_dataSource'])) {
             $dataSource = is_array($data['_dataSource']) ? $data['_dataSource'] : $this->getDataSource($data['_dataSource']);
             unset($data['_dataSource']);
-            foreach ($dataSource as $key => $value) {
-                $options['parentDataSource'][$key] = $value;
-            }
+            $inheritedData->addDataSource($dataSource);
         }
 
         // Handle transition delay
@@ -152,13 +151,12 @@ class ComponentBuilder
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $inheritedData->getAppearance());
 
-        // if ($options['parentDataSource']) {
-        //     $replaced = [];
-        //     $data     = $component->applyData($data, $options['parentDataSource'] ?? [], $replaced);
-        //     if (in_array('{copyright.year}', $replaced)) {
-        //         $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
-        //     }
-        // }
+
+        $replaced = [];
+        $data     = $component->applyData($data, $inheritedData->getDataSource(), $replaced);
+        if (in_array('{copyright.year}', $replaced)) {
+            $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
+        }
 
         // Handle nav stuff
         if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
@@ -217,10 +215,7 @@ class ComponentBuilder
             unset($data['_attr']['_data']);
         }
         $style = $this->handleStyleStates($style, $data);
-
-        if (isset($options['parentDataSource'])) {
-            $style = $this->handleApplyStyleData($style, $inheritedData->getDataSource());
-        }
+        $style = $this->handleApplyStyleData($style, $inheritedData->getDataSource());
 
         if (isset($style['tag'])) {
             $component->setTag($style['tag']);

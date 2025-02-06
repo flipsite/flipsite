@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -44,22 +45,22 @@ abstract class AbstractGroup extends AbstractComponent
 
         $repeatData  = $data['_repeatData'] ?? false;
         if ($repeatData) {
-            $childComponents = $component->getChildren();
             $children        = [];
             $total           = count($repeatData);
-
             $index           = 0;
-            foreach ($repeatData as $repeatDataItem) {
-                foreach ($childComponents as $childComponent) {
-                    // $repeatTplComponent['_dataSource']       = $repeatDataItem;
-                    // $repeatTplComponent['_repeatIndex']      = $repeatDataItem['index'];
-                    // $optimizedStyle                          = $this->optimizeStyle($style[$type] ?? [], $index, $total);
-                    // if (isset($optimizedStyle['background'])) {
-                    //     $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
-                    // }
 
-                    $children[] = $this->builder->build($childComponent, $inherited);
-                    $index++;
+            foreach ($repeatData as $repeatDataItem) {
+                foreach ($component->getChildren() as $childComponent) {
+                    $clonedChildComponent = clone $childComponent;
+                    $clonedChildComponent->setDataValue('_dataSource', $repeatDataItem);
+                    $clonedChildComponent->setDataValue('_repeatIndex', $repeatDataItem['index']);
+                    $optimizedStyle = $this->optimizeStyle($clonedChildComponent->getStyle(), $index, $total);
+
+                    if (isset($optimizedStyle['background'])) {
+                        $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
+                    }
+                    $clonedChildComponent->setStyle($optimizedStyle);
+                    $children[] = $this->builder->build($clonedChildComponent, $inherited);
                 }
             }
             $this->addChildren($children);

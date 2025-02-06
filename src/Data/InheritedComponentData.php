@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 class InheritedComponentData
@@ -9,12 +10,12 @@ class InheritedComponentData
     {
     }
 
-    public function getAppearance() : string
+    public function getAppearance(): string
     {
         return $this->appearance;
     }
 
-    public function setAppearance(?string $appearance) : void
+    public function setAppearance(?string $appearance): void
     {
         if (!$appearance) {
             return;
@@ -22,8 +23,15 @@ class InheritedComponentData
         $this->appearance = $appearance;
     }
 
-    public function getDataSource() : array
+    public function getDataSource(): array
     {
         return $this->dataSource;
+    }
+
+    public function addDataSource(array $dataSource): void
+    {
+        foreach ($dataSource as $key => $value) {
+            $this->dataSource[$key] = $value;
+        }
     }
 }

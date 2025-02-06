@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -15,12 +16,20 @@ abstract class AbstractComponentData
      */
     protected array $children = [];
 
-    public function getId() : string
+    // Recursive deep clone
+    public function __clone()
+    {
+        foreach ($this->children as $key => $child) {
+            $this->children[$key] = clone $child;  // Recursively clone child nodes
+        }
+    }
+
+    public function getId(): string
     {
         return $this->id;
     }
 
-    public function getType() : string
+    public function getType(): string
     {
         switch ($this->type) {
             case 'button':
@@ -30,27 +39,32 @@ abstract class AbstractComponentData
         return $this->type;
     }
 
-    public function getData(bool $flatten = false) : array
+    public function getData(bool $flatten = false): array
     {
         return $this->data;
     }
 
-    public function setData(array $data) : void
+    public function setData(array $data): void
     {
         $this->data = $data;
     }
 
-    public function getStyle(bool $flatten = false) : array
+    public function setDataValue(string $attribute, string|array|bool|int $value): void
+    {
+        $this->data[$attribute] = $value;
+    }
+
+    public function getStyle(bool $flatten = false): array
     {
         return $this->style;
     }
 
-    public function setStyle(array $style) : void
+    public function setStyle(array $style): void
     {
         $this->style = $style;
     }
 
-    public function getStyleValue(string $setting, bool $remove = null) : ?string
+    public function getStyleValue(string $setting, bool $remove = null): ?string
     {
         $value = $this->style[$setting] ?? null;
         if ($remove) {
@@ -59,7 +73,7 @@ abstract class AbstractComponentData
         return $value;
     }
 
-    public function getChildren() : array
+    public function getChildren(): array
     {
         return $this->children;
     }
