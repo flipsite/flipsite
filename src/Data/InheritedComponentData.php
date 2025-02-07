@@ -5,6 +5,8 @@ namespace Flipsite\Data;
 
 class InheritedComponentData
 {
+    private ?string $navState = null;
+
     public function __construct(private string $appearance, private array $dataSource = [])
     {
     }
@@ -32,5 +34,15 @@ class InheritedComponentData
         foreach ($dataSource as $key => $value) {
             $this->dataSource[$key] = $value;
         }
+    }
+
+    public function getNavState(): ?string
+    {
+        return $this->navState;
+    }
+
+    public function setNavState(?string $navState = null): void
+    {
+        $this->navState = $navState;
     }
 }

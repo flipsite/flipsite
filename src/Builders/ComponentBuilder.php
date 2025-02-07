@@ -164,19 +164,19 @@ class ComponentBuilder
 
         // Handle nav stuff
         if (in_array($data['_action'] ?? '', ['page', 'auto']) && isset($data['_target'])) {
-            $options['navState'] = ['active' => false, 'exact' => false];
+            $inheritedData->setNavState(null);
             $page                = $this->path->getPage();
             if (str_starts_with($page, $data['_target'])) {
-                $options['navState']['active'] = true;
+                $inheritedData->setNavState('active');
             }
             if ($data['_target'] === $page) {
-                $options['navState']['exact'] = true;
+                $inheritedData->setNavState('exact');
             }
         }
 
-        // if (count($options['navState'] ?? [])) {
-        //     $style = $this->handleNavStyle($style, $options['navState'] ?? []);
-        // }
+        if ($inheritedData->getNavState()) {
+            $style = $this->handleNavStyle($style, $inheritedData->getNavState());
+        }
 
         $data = $component->normalize($data);
 
@@ -244,7 +244,7 @@ class ComponentBuilder
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
-        //unset($options['navState']);
+
         if (isset($data['_attr'])) {
             foreach ($data['_attr'] as $attr => $value) {
                 if (!is_string($value) || (!str_starts_with($value, '{') && !str_ends_with($value, '}'))) {
@@ -396,11 +396,9 @@ class ComponentBuilder
         return $style;
     }
 
-    private function handleNavStyle(array $style, array $types): array
+    private function handleNavStyle(array $style, string $navState): array
     {
-        $types['active'] ??= false;
-        $types['exact'] ??= false;
-        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($types) {
+        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($navState) {
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
             }
@@ -409,14 +407,14 @@ class ComponentBuilder
             foreach ($tmp as $cls) {
                 $active = strpos($cls, 'nav-active:') !== false;
                 $exact  = strpos($cls, 'nav-exact:') !== false;
-                if (!$types['active'] && !$types['exact'] && !$active && !$exact) {
+                if (!$navState) {
                     $res[] = $cls;
                 }
-                if ($types['active'] && $active) {
+                if ($active && $navState === 'active') {
                     $res[] = str_replace('nav-active:', '', $cls);
                 }
 
-                if ($types['exact'] && $exact) {
+                if ($exact && $navState === 'exact') {
                     $res[] = str_replace('nav-exact:', '', $cls);
                 }
             }
