@@ -196,13 +196,6 @@ class ComponentBuilder
             return null;
         }
 
-        if ($this->plugins) {
-            // $data = $this->plugins->run('beforeComponentBuild', $data, $options);
-            // if (isset($data['__options'])) {
-            //     $options = $data['__options'];
-            //     unset($data['__options']);
-            // }
-        }
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
             if (is_string($data['_attr']['_data'])) {
@@ -274,7 +267,7 @@ class ComponentBuilder
         $component->build($componentData, $inheritedData);
 
         if ($this->plugins) {
-            $component = $this->plugins->run('afterComponentBuild', $component);
+            $component = $this->plugins->run('afterComponentBuild', $component, $componentData, $inheritedData);
         }
         return $component;
     }
