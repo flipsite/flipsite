@@ -1,10 +1,8 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
-use Flipsite\Utils\ArrayHelper;
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\ComponentData;
 use Flipsite\Data\InheritedComponentData;
@@ -19,24 +17,38 @@ final class Breadcrumb extends AbstractGroup
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $style    = $component->getStyle();
         $page     = $this->path->getPage();
         $current  = $this->siteData->getPageName($page, $this->path->getLanguage());
         $links    = $this->getLinks($page);
+        $icon     = $component->getDataValue('separator', true);
 
         foreach ($links as $i => $link) {
-            // $linkComponentData = new ComponentData('group',);
-            // $link['_style']         = $style['links'] ?? [];
-            // $link['_style']['type'] = 'group';
-            // $data['group:'.$i]      = $link;
+            $textComponentData = new ComponentData(
+                $component->getId().'.text'.$i,
+                'text',
+                ['value' => $link['text']],
+            );
+            unset($link['text']);
+            $linkComponentData = new ComponentData(
+                $component->getId().'.link'.$i,
+                'container',
+                $link,
+                $style['links'] ?? []
+            );
+            $linkComponentData->addChild($textComponentData);
+            $component->addChild($linkComponentData);
 
-            // $data['svg:'.$i] = [
-            //     'value'  => $data['separator'] ?? [],
-            //     '_style' => $style['separator'] ?? []
-            // ];
+            $separatorComponentData = new ComponentData(
+                $component->getId().'.separator'.$i,
+                'svg',
+                ['value' => $icon],
+                $style['separator']
+            );
+            $component->addChild($separatorComponentData);
         }
-        //unset($data['separator'], $style['links'], $style['separator']);
 
-        //parent::build($data, $style, $options);
+        parent::build($component, $inherited);
 
         $span = new Element('span');
         $span->setContent($current);

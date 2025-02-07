@@ -1,10 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 class Iframe extends AbstractComponent
 {
@@ -13,6 +14,7 @@ class Iframe extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data  = $component->getData();
         $width = intval($data['width'] ?? 0);
         if ($width) {
             $this->setAttribute('width', $width);
@@ -25,6 +27,5 @@ class Iframe extends AbstractComponent
             $list = ArrayHelper::decodeJsonOrCsv($data['sandbox']);
             $this->setAttribute('sandbox', implode(' ', $list));
         }
-        $this->addStyle($style);
     }
 }

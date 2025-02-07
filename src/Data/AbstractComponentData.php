@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -85,5 +84,10 @@ abstract class AbstractComponentData
     public function getChildren(): array
     {
         return $this->children;
+    }
+
+    public function addChild(AbstractComponentData $child)
+    {
+        return $this->children[] = $child;
     }
 }
