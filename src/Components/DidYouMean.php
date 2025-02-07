@@ -1,10 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class DidYouMean extends AbstractComponent
 {
@@ -38,7 +39,6 @@ final class DidYouMean extends AbstractComponent
         $this->builder->dispatch(new Event('global-script', 'sitemap', 'const sitemap = '.json_encode($pages).';'));
         $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/didYouMean.min.js')));
     }
-
 
     public function getDefaultStyle(): array
     {

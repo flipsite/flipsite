@@ -386,13 +386,22 @@ class Reader implements SiteDataInterface
         $componentDataList = [];
 
         foreach ($sections as $section) {
-            $sectionId           = $section['_style'];
-            $section['_style']   = $this->data['theme']['components'][$sectionId];
-            $componentDataList[] = new YamlComponentData($sectionId, 'container', $section, $this, true);
+            $sectionId           = is_string($section['_style']) ? $section['_style'] : (string)time();
+            $before              = $section['_before'] ?? false;
+            $after               = $section['_after'] ?? false;
+            $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
+            unset($section['_before'], $section['_after']);
+            $componentData       = new YamlComponentData(null, $sectionId, 'container', $section, $this, true);
+            if ($before) {
+                $componentData->setMeta('before', true);
+            }
+            if ($after) {
+                $componentData->setMeta('after', true);
+            }
+            $componentDataList[] = $componentData;
         }
 
         return $componentDataList;
-        return array_splice($componentDataList, 0, 1);
     }
 
     public function getMeta(string $page, ?Language $language = null): ?array

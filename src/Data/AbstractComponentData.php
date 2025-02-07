@@ -5,10 +5,12 @@ namespace Flipsite\Data;
 
 abstract class AbstractComponentData
 {
+    protected null|int|string $parentId;
     protected int|string $id;
     protected string $type;
     protected array $data     = [];
     protected array $style    = [];
+    protected array $meta     = [];
 
     /**
      * @var array<AbstractComponentData>
@@ -23,23 +25,27 @@ abstract class AbstractComponentData
         }
     }
 
-    public function getId(): string
+    public function getParentId(): null|int|string
+    {
+        return $this->parentId;
+    }
+
+    public function getId(): int|string
     {
         return $this->id;
     }
 
     public function getType(): string
     {
-        switch ($this->type) {
-            case 'button':
-            case 'container':
-                return 'group';
-        }
         return $this->type;
     }
 
     public function getData(bool $flatten = false): array
     {
+        if ($flatten) {
+            $dot = new \Adbar\Dot($this->data);
+            return $dot->flatten();
+        }
         return $this->data;
     }
 
@@ -64,6 +70,10 @@ abstract class AbstractComponentData
 
     public function getStyle(bool $flatten = false): array
     {
+        if ($flatten) {
+            $dot = new \Adbar\Dot($this->style);
+            return $dot->flatten();
+        }
         return $this->style;
     }
 
@@ -89,5 +99,15 @@ abstract class AbstractComponentData
     public function addChild(AbstractComponentData $child)
     {
         return $this->children[] = $child;
+    }
+
+    public function setMeta(string $attribute, string|array|bool|int $value): void
+    {
+        $this->meta[$attribute] = $value;
+    }
+
+    public function getMetaValue(string $attribute): null|string|array|bool|int
+    {
+        return $this->meta[$attribute] ?? null;
     }
 }

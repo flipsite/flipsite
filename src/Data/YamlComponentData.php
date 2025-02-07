@@ -9,10 +9,12 @@ class YamlComponentData extends AbstractComponentData
 {
     use ComponentTypesTrait;
 
-    public function __construct(string $id, string $type, array $data, SiteDataInterface $siteData)
+    public function __construct(?string $parentId, string $id, string $type, array $data, SiteDataInterface $siteData)
     {
-        $this->id    = $id;
-        $this->type  = $type;
+        $this->parentId = $parentId;
+        $this->id       = $id;
+        $this->type     = $type;
+
         $style       = $data['_style'] ?? [];
         unset($data['_style']);
         foreach ($data as $attr => $value) {
@@ -30,7 +32,7 @@ class YamlComponentData extends AbstractComponentData
                     $value = ['value' => $value];
                 }
                 $value['_style']  = ArrayHelper::merge($style[$attr] ?? [], $value['_style'] ?? []);
-                $this->children[] = new YamlComponentData($id.'.'.$attr, $type, $value, $siteData);
+                $this->children[] = new YamlComponentData($id, $id.'.'.$attr, $type, $value, $siteData);
             }
         }
         foreach ($style as $attr => $value) {

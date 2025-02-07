@@ -85,7 +85,6 @@ class ComponentBuilder
         $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
 
         // Check if appearance changes
-        // TODO add default for texts etc.
         if (isset($style['appearance']) && $style['appearance'] !== $inheritedData->getAppearance()) {
             switch ($style['appearance']) {
                 case 'dark':
@@ -198,11 +197,11 @@ class ComponentBuilder
         }
 
         if ($this->plugins) {
-            $data = $this->plugins->run('beforeComponentBuild', $data, $options);
-            if (isset($data['__options'])) {
-                $options = $data['__options'];
-                unset($data['__options']);
-            }
+            // $data = $this->plugins->run('beforeComponentBuild', $data, $options);
+            // if (isset($data['__options'])) {
+            //     $options = $data['__options'];
+            //     unset($data['__options']);
+            // }
         }
         $data['_attr'] ??= [];
         if (isset($data['_attr']['_data'])) {
