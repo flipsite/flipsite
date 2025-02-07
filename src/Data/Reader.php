@@ -391,7 +391,7 @@ class Reader implements SiteDataInterface
             $after               = $section['_after'] ?? false;
             $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
             unset($section['_before'], $section['_after']);
-            $componentData       = new YamlComponentData(null, $sectionId, 'container', $section, $this, true);
+            $componentData       = new YamlComponentData(null, $sectionId, 'container', $section);
             if ($before) {
                 $componentData->setMeta('before', true);
             }
