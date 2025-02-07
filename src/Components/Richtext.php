@@ -1,11 +1,13 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\RichtextHelper;
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\YamlComponentData;
+use Flipsite\Data\InheritedComponentData;
 
 final class Richtext extends AbstractGroup
 {
@@ -44,18 +46,19 @@ final class Richtext extends AbstractGroup
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data = $component->getData();
         if (!($data['value'] ?? false)) {
             return;
         }
+        $style = $component->getStyle();
 
         $items = $data['value'] ?? [];
         unset($data['value']);
         foreach ($items as $index => $item) {
-            $componentId                  = $item->getComponentType().':'.$index;
-            $data[$componentId]           = $item->getData($style);
-            $data[$componentId]['_style'] = $item->getStyle($style);
+            $itemComponentData = new YamlComponentData($component->getId(), $component->getType().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
+            $component->addChild($itemComponentData);
         }
-        parent::build($data, $style, $options);
+        parent::build($component, $inherited);
     }
 }
 
@@ -71,7 +74,7 @@ class RichtextItem
         $this->data = $rawData;
     }
 
-    public function getComponentType(): ?string
+    public function getType(): ?string
     {
         switch ($this->type) {
             case 'h1':

@@ -167,10 +167,9 @@ final class Flipsite
         $globalVars = $this->getGlobalVars($this->siteData->getSocial(), $path);
 
         foreach ($sections as $sectionId => $sectionData) {
-            // TODO
-            // if ($this->plugins) {
-            //     $sectionData = $this->plugins->run('section', $sectionData);
-            // }
+            if ($this->plugins) {
+                $sectionData = $this->plugins->run('section', $sectionData);
+            }
             $inheritedData = new InheritedComponentData($appearance, $globalVars);
             $inheritedData->addDataSource($sectionData->getDataValue('_pageDataSource', true) ?? []);
 
