@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -179,15 +178,16 @@ final class Flipsite
             $document->getChild('body')->addChild($section);
         }
 
-        // // Made in Flipsite
-        // if ($this->environment->showAttribution() && $this->renderOptions['attribution']) {
-        //     $attribution = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/attribution.yaml');
-        //     if ($attribution) {
-        //         $section = $componentBuilder->build('group', $attribution, [], ['appearance' => 'light', 'parentDataSource' => []]);
-        //         $document->getChild('body')->addChild($section);
-        //         $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
-        //     }
-        // }
+        // Made in Flipsite
+        if ($this->environment->showAttribution() && $this->renderOptions['attribution']) {
+            $attribution = \Symfony\Component\Yaml\Yaml::parseFile(__DIR__.'/attribution.yaml');
+            if ($attribution) {
+                $attributionComponentData = new \Flipsite\Data\YamlComponentData(null, 'attribution', 'container', $attribution);
+                $section                  = $componentBuilder->build($attributionComponentData, new InheritedComponentData('light'));
+                $document->getChild('body')->addChild($section);
+                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
+            }
+        }
 
         if ($this->renderOptions['svg']) {
             $document = $svgBuilder->getDocument($document);

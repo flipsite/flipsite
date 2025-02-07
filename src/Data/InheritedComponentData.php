@@ -1,12 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 class InheritedComponentData
 {
-    public function __construct(private string $appearance, private array $dataSource)
+    public function __construct(private string $appearance, private array $dataSource = [])
     {
     }
 
