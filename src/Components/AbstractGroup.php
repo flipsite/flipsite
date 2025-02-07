@@ -59,7 +59,7 @@ abstract class AbstractGroup extends AbstractComponent
                         $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
                     }
                     $clonedChildComponent->setStyle($optimizedStyle);
-                    $children[] = $this->builder->build($clonedChildComponent, $inherited);
+                    $children[] = $this->builder->build($clonedChildComponent, clone $inherited);
                 }
             }
             $this->addChildren($children);
