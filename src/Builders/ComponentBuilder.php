@@ -87,13 +87,20 @@ class ComponentBuilder
         // Check if appearance changes
         // TODO add default for texts etc.
         if (isset($style['appearance']) && $style['appearance'] !== $inheritedData->getAppearance()) {
-            // switch ($style['appearance']) {
-            //     case 'dark':
-            //         if (!isset($style['textColor']['dark'])) {
-            //             $style['textColor'] = 'text-white/80';
-            //         }
-            //         break;
-            // }
+            switch ($style['appearance']) {
+                case 'dark':
+                    if (!isset($style['dark']['textColor'])) {
+                        $bodyStyle                  = $this->siteData->getBodyStyle();
+                        $style['dark']['textColor'] = $bodyStyle['dark']['textColor'] ?? null;
+                    }
+                    break;
+                case 'light':
+                    if (!isset($style['textColor'])) {
+                        $bodyStyle          = $this->siteData->getBodyStyle();
+                        $style['textColor'] = $bodyStyle['textColor'] ?? null;
+                    }
+                    break;
+            }
             $inheritedData->setAppearance($style['appearance']);
         }
         unset($style['appearance']);
