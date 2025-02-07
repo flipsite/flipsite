@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -43,7 +42,7 @@ abstract class AbstractGroup extends AbstractComponent
             }
         }
 
-        $repeatData  = $data['_repeatData'] ?? false;
+        $repeatData = $data['_repeatData'] ?? false;
         if ($repeatData) {
             $children        = [];
             $total           = count($repeatData);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -151,7 +150,6 @@ class ComponentBuilder
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $inheritedData->getAppearance());
 
-
         $replaced = [];
         $data     = $component->applyData($data, $inheritedData->getDataSource(), $replaced);
         if (in_array('{copyright.year}', $replaced)) {
@@ -265,6 +263,7 @@ class ComponentBuilder
 
         $component->addStyle($style);
         $componentData->setData($data);
+        $componentData->setStyle($style);
 
         $component->build($componentData, $inheritedData);
 
