@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -14,6 +15,7 @@ final class Code extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data = $component->getData();
         $this->oneline = true;
         $this->setContent($data['value']);
         $style['self'] = 'code';

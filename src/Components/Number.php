@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\InheritedComponentData;
+
 final class Number extends AbstractComponent
 {
     use Traits\MarkdownTrait;
@@ -13,6 +16,7 @@ final class Number extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data  = $component->getData();
         $value = (string)($data['value'] ?? 1);
         // If , as decimal separator, replace with .
         $value = str_replace(',', '.', $value);
@@ -48,11 +52,10 @@ final class Number extends AbstractComponent
                 }
             }
         }
-        $this->addStyle($style);
         if (isset($data['content'])) {
             $content = str_replace('[number]', (string)$value, $data['content']);
-            $content = $this->getMarkdownLine($content, [], $options['appearance']);
-            $content = $this->addClassesToHtml($content, ['strong'], $style, $options['appearance']);
+            $content = $this->getMarkdownLine($content, [], $inherited->getAppearance());
+            $content = $this->addClassesToHtml($content, ['strong'], $component->getStyle(), $inherited->getAppearance());
             $this->setContent($content);
         } else {
             $this->setContent($value);

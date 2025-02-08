@@ -1,12 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
 {
     protected null|int|string $parentId;
-    protected int|string $id;
+    protected null|int|string $id;
     protected string $type;
     protected array $data     = [];
     protected array $style    = [];
@@ -30,7 +31,7 @@ abstract class AbstractComponentData
         return $this->parentId;
     }
 
-    public function getId(): int|string
+    public function getId(): null|int|string
     {
         return $this->id;
     }

@@ -1,10 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
-use Flipsite\Data\ComponentData;
+use Flipsite\Data\YamlComponentData;
 use Flipsite\Data\InheritedComponentData;
 
 final class Breadcrumb extends AbstractGroup
@@ -24,25 +25,20 @@ final class Breadcrumb extends AbstractGroup
         $icon     = $component->getDataValue('separator', true);
 
         foreach ($links as $i => $link) {
-            $textComponentData = new ComponentData(
-                $component->getId().'.text'.$i,
-                'text',
-                ['value' => $link['text']],
-            );
-            unset($link['text']);
-            $linkComponentData = new ComponentData(
-                $component->getId().'.link'.$i,
+            $linkComponentData = new YamlComponentData(
+                null,
+                null,
                 'container',
                 $link,
                 $style['links'] ?? []
             );
-            $linkComponentData->addChild($textComponentData);
             $component->addChild($linkComponentData);
 
-            $separatorComponentData = new ComponentData(
-                $component->getId().'.separator'.$i,
+            $separatorComponentData = new YamlComponentData(
+                null,
+                null,
                 'svg',
-                ['value' => $icon],
+                ['src' => $icon],
                 $style['separator']
             );
             $component->addChild($separatorComponentData);

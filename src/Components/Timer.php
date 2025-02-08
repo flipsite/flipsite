@@ -16,6 +16,6 @@ final class Timer extends AbstractGroup
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $this->builder->dispatch(new Event('ready-script', 'timer', file_get_contents(__DIR__.'/../../js/dist/timer.min.js')));
-        parent::build($data, $style, $options);
+        parent::build($component, $inherited);
     }
 }

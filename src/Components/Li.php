@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Flipsite\Components;
 
-final class Li extends AbstractComponent
+use Flipsite\Data\AbstractComponentData;
+use Flipsite\Data\YamlComponentData;
+use Flipsite\Data\InheritedComponentData;
+
+final class Li extends AbstractGroup
 {
     use Traits\MarkdownTrait;
     use Traits\ClassesTrait;
@@ -15,45 +19,12 @@ final class Li extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        if (isset($data['icon'])) {
-            $icon = $this->builder->build('icon', $data['icon'], $style['icon'] ?? [], $options);
-            unset($data['icon']);
-            $this->addChild($icon);
-        }
+        $style = $component->getStyle();
+        $text = $component->getDataValue('value', true);
+        $html = $this->getMarkdownLine($text ?? '');
+        $html = $this->addClassesToHtml($html, ['a', 'strong','em','code'], $style, $inherited->getAppearance());
 
-        if (isset($data['number'])) {
-            $data['number']['value'] = intval($data['_repeatIndex']);
-            $number = $this->builder->build('number', $data['number'], $style['number'] ?? [], $options);
-            unset($data['number']);
-            $this->addChild($number);
-        }
-        $html = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $html = $this->addClassesToHtml($html, ['a', 'strong','em','code'], $style, $options['appearance']);
-
-        $text = $this->builder->build('text', ['value' => $html], [], $options);
-        $this->addChild($text);
-        $this->addStyle($style);
-    }
-
-    public function normalize(array $data): array
-    {
-        if (is_string($data)) {
-            return ['value' => $data];
-        }
-        return $data;
-    }
-
-    public function getDefaultStyle(): array
-    {
-        $style = [];
-        $bodyStyle = $this->siteData->getBodyStyle();
-        if (isset($bodyStyle['textColor'])) {
-            $style['textColor'] = $bodyStyle['textColor'];
-        }
-        if (isset($bodyStyle['dark']['textColor'])) {
-            $style['dark'] = [];
-            $style['dark']['textColor'] = $bodyStyle['dark']['textColor'];
-        }
-        return $style;
+        $component->addChild(new YamlComponentData(null, null, 'text', ['value' => $html]));
+        parent::build($component, $inherited);
     }
 }

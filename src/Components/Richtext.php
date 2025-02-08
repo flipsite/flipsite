@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -55,9 +56,7 @@ final class Richtext extends AbstractGroup
         $items = $data['value'] ?? [];
         unset($data['value']);
         foreach ($items as $index => $item) {
-            $itemData           = $item->getData($style);
-            $itemData['_style'] = $item->getStyle($style);
-            $itemComponentData  = new YamlComponentData($component->getId(), $component->getType().'.'.$index, $item->getType(), $itemData);
+            $itemComponentData  = new YamlComponentData($component->getId(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
             $component->addChild($itemComponentData);
         }
         parent::build($component, $inherited);

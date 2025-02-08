@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 trait ComponentTypesTrait
@@ -47,6 +48,7 @@ trait ComponentTypesTrait
             'iframe',
             'image',
             'input',
+            'li',
             'label',
             'languages',
             'link',
