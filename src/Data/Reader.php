@@ -393,10 +393,10 @@ class Reader implements SiteDataInterface
             unset($section['_before'], $section['_after']);
             $componentData       = new YamlComponentData(null, $sectionId, 'container', $section);
             if ($before) {
-                $componentData->setMeta('before', true);
+                $componentData->setMetaValue('before', true);
             }
             if ($after) {
-                $componentData->setMeta('after', true);
+                $componentData->setMetaValue('after', true);
             }
             $componentDataList[] = $componentData;
         }

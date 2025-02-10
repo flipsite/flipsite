@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -20,6 +19,7 @@ use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Style;
 use Flipsite\Utils\Filter;
 use Flipsite\Utils\Plugins;
+use Flipsite\Utils\StyleNthOptimizer;
 
 class ComponentBuilder
 {
@@ -178,6 +178,14 @@ class ComponentBuilder
             }
         }
 
+        $order = $componentData->getMetaValue('order');
+        if ($order) {
+            if ('flex-col md:even:flex-row md:odd:flex-row-reverse' === ($style['flexDirection'] ?? '')) {
+                $style = $this->optimizeStyle($style, $order['index'], $order['total']);
+            } else {
+                $style = $this->optimizeStyle($style, $order['index'], $order['total']);
+            }
+        }
         if ($inheritedData->getNavState()) {
             $style = $this->handleNavStyle($style, $inheritedData->getNavState());
         }
@@ -425,6 +433,26 @@ class ComponentBuilder
             $res = array_unique($res);
             return implode(' ', $res);
         });
+        return $style;
+    }
+
+    private function optimizeStyle(array $style, int $index, int $total) : array
+    {
+        $hasModifier = function (string $value):bool {
+            $keywords = ['even', 'odd', 'first', 'last'];
+            foreach ($keywords as $keyword) {
+                if (strpos($value, $keyword) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        foreach ($style as &$value) {
+            if (is_string($value) && $hasModifier($value)) {
+                $so    = new StyleNthOptimizer($value);
+                $value = $so->get($index, $total);
+            }
+        }
         return $style;
     }
 

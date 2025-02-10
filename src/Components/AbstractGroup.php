@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -13,7 +12,6 @@ use Flipsite\Data\InheritedComponentData;
 abstract class AbstractGroup extends AbstractComponent
 {
     use Traits\BuilderTrait;
-    use Traits\StyleOptimizerTrait;
     use Traits\ActionTrait;
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
@@ -53,14 +51,15 @@ abstract class AbstractGroup extends AbstractComponent
                 foreach ($component->getChildren() as $childComponent) {
                     $clonedChildComponent = clone $childComponent;
                     $clonedChildComponent->setDataValue('_dataSource', $repeatDataItem);
-                    $clonedChildComponent->setDataValue('_repeatIndex', $repeatDataItem['index']);
-                    $optimizedStyle = $this->optimizeStyle($clonedChildComponent->getStyle(), $index, $total);
-
-                    if (isset($optimizedStyle['background'])) {
-                        $optimizedStyle['background'] = $this->optimizeStyle($optimizedStyle['background'], $index, $total);
-                    }
-                    $clonedChildComponent->setStyle($optimizedStyle);
+                    $order = [
+                        'index' => $index,
+                        'total' => $total,
+                        'first' => 0 === $index,
+                        'last'  => $total - 1 === $index,
+                    ];
+                    $clonedChildComponent->setMetaValue('order', $order);
                     $children[] = $this->builder->build($clonedChildComponent, clone $inherited);
+                    $index++;
                 }
             }
             $this->addChildren($children);
@@ -70,11 +69,15 @@ abstract class AbstractGroup extends AbstractComponent
             $childComponents = $component->getChildren();
             $total           = count($childComponents);
 
-            foreach ($childComponents as $childComponent) {
-                $componentStyle = $this->optimizeStyle($childComponent->getStyle(), $index, $total);
-                $childComponent->setStyle($componentStyle);
+            foreach ($childComponents as $index => $childComponent) {
+                $order = [
+                    'index' => $index,
+                    'total' => $total,
+                    'first' => 0 === $index,
+                    'last'  => $total - 1 === $index,
+                ];
+                $childComponent->setMetaValue('order', $order);
                 $children[]     = $this->builder->build($childComponent, $inherited);
-                $index++;
             }
 
             $this->addChildren($children);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -102,7 +101,7 @@ abstract class AbstractComponentData
         return $this->children[] = $child;
     }
 
-    public function setMeta(string $attribute, string|array|bool|int $value): void
+    public function setMetaValue(string $attribute, string|array|bool|int $value): void
     {
         $this->meta[$attribute] = $value;
     }
