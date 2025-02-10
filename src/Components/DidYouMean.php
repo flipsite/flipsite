@@ -19,8 +19,10 @@ final class DidYouMean extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $value     = $this->getMarkdownLine($data['value'] ?? '', $style['value'] ?? [], $options['appearance']);
-        $value     = $this->addClassesToHtml($value, ['a', 'strong'], $style, $options['appearance']);
+        $data  = $component->getData();
+        $style = $component->getStyle();
+        $value = $this->getMarkdownLine($data['value'] ?? '');
+        $value = $this->addClassesToHtml($value, ['a', 'strong'], $style, $inherited->getAppearance());
         $this->setContent((string)$value);
         $this->addStyle($style);
 

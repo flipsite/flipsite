@@ -415,14 +415,16 @@ class Reader implements SiteDataInterface
                         $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
                         return new YamlComponentData(null, $componentId, 'container', $section);
                     } else {
-                        $dot  = new \Adbar\Dot($section);
-                        $data = $dot->get($componentId);
-                        if ($data) {
-                            $last           = array_pop($parts);
-                            $parentId       = $sectionId.'.'.implode('.', $parts);
-                            $data['_style'] = $this->getComponentStyle($componentId, $data['_style'] ?? []);
-                            return new YamlComponentData($parentId, $componentId, $data['type'], $data);
+                        $componentPathInSection = implode('.', $parts);
+                        $dot                    = new \Adbar\Dot($section);
+                        $data                   = $dot->get($componentPathInSection);
+                        if (!is_array($data)) {
+                            $data = ['value' => $data];
                         }
+                        $last           = array_pop($parts);
+                        $parentId       = $sectionId.'.'.implode('.', $parts);
+                        $data['_style'] = $this->getComponentStyle($componentId);
+                        return new YamlComponentData($parentId, $componentId, $this->getType($last), $data ?? ['value' => '']);
                     }
                 }
             }

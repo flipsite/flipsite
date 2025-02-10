@@ -180,11 +180,7 @@ class ComponentBuilder
 
         $order = $componentData->getMetaValue('order');
         if ($order) {
-            if ('flex-col md:even:flex-row md:odd:flex-row-reverse' === ($style['flexDirection'] ?? '')) {
-                $style = $this->optimizeStyle($style, $order['index'], $order['total']);
-            } else {
-                $style = $this->optimizeStyle($style, $order['index'], $order['total']);
-            }
+            $style = $this->optimizeStyle($style, $order['index'], $order['total']);
         }
         if ($inheritedData->getNavState()) {
             $style = $this->handleNavStyle($style, $inheritedData->getNavState());

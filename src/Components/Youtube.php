@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
+use Flipsite\Data\YamlComponentData;
 
 final class Youtube extends AbstractGroup
 {
@@ -15,16 +15,10 @@ final class Youtube extends AbstractGroup
     protected bool $oneline = true;
     protected string $tag   = 'iframe';
 
-    public function normalize(array $data): array
-    {
-        if (!is_array($data)) {
-            return ['value' => $data];
-        }
-        return $data;
-    }
-
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data  = $component->getData();
+        $style = $component->getStyle();
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);
         $iframe = $this;
@@ -69,11 +63,11 @@ final class Youtube extends AbstractGroup
             $iframe->setAttribute('data-youtube-play', $src);
             $iframe->setAttribute('style', 'pointer-events:none');
             $this->addChild($iframe);
-            $icon = $this->builder->build('svg', ['value' => $data['playIcon']], $style['playIcon'] ?? [], $options);
+            $iconComponentData = new YamlComponentData($component->getId(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']], $style['playIcon'] ?? []);
+            $icon              = $this->builder->build($iconComponentData, $inherited);
             $this->setAttribute('data-youtube-play', true);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));
             $this->addChild($icon);
-            $this->addStyle($style);
         } else {
             $iframe->setAttribute('data-lazyiframe', $src);
             $this->builder->dispatch(new Event('ready-script', 'lazyiframe', file_get_contents(__DIR__.'/../../js/dist/lazyiframe.min.js')));
