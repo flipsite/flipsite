@@ -404,6 +404,32 @@ class Reader implements SiteDataInterface
         return $componentDataList;
     }
 
+    public function getComponent(int|string $componentId): ?AbstractComponentData
+    {
+        $parts     = explode('.', $componentId);
+        $sectionId = array_shift($parts);
+        foreach ($this->data['pages'] as $sections) {
+            foreach ($sections as $section) {
+                if ($section['_style'] === $sectionId) {
+                    if (count($parts) === 0) {
+                        $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
+                        return new YamlComponentData(null, $componentId, 'container', $section);
+                    } else {
+                        $dot  = new \Adbar\Dot($section);
+                        $data = $dot->get($componentId);
+                        if ($data) {
+                            $last           = array_pop($parts);
+                            $parentId       = $sectionId.'.'.implode('.', $parts);
+                            $data['_style'] = $this->getComponentStyle($componentId, $data['_style'] ?? []);
+                            return new YamlComponentData($parentId, $componentId, $data['type'], $data);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public function getMeta(string $page, ?Language $language = null): ?array
     {
         $pageMeta    = $this->getPageMeta($page, $language) ?? [];

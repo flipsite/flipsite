@@ -40,7 +40,12 @@ interface SiteDataInterface
 
     public function getPublish(): ?array;
 
+    /**
+     * @return AbstractComponentData[]
+     */
     public function getSections(string $page, ?Language $language = null): array;
+
+    public function getComponent(int|string $componentId): ?AbstractComponentData;
 
     public function getColors(): array;
 
