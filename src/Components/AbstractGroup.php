@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -46,11 +47,14 @@ abstract class AbstractGroup extends AbstractComponent
             $children        = [];
             $total           = count($repeatData);
             $index           = 0;
-
             foreach ($repeatData as $repeatDataItem) {
+                $collectionId = $repeatDataItem['_collectionId'] ?? null;
+                $itemId = $repeatDataItem['_id'] ?? null;
+                unset($repeatDataItem['_collectionId'],$repeatDataItem['_id']);
                 foreach ($component->getChildren() as $childComponent) {
                     $clonedChildComponent = clone $childComponent;
                     $clonedChildComponent->setDataValue('_dataSource', $repeatDataItem);
+                    $clonedChildComponent->setMetaValue('isRepeated', true);
                     $order = [
                         'index' => $index,
                         'total' => $total,
@@ -58,7 +62,11 @@ abstract class AbstractGroup extends AbstractComponent
                         'last'  => $total - 1 === $index,
                     ];
                     $clonedChildComponent->setMetaValue('order', $order);
-                    $children[] = $this->builder->build($clonedChildComponent, clone $inherited);
+                    $clonedInherited = clone $inherited;
+                    if ($collectionId) {
+                        $clonedInherited->setRepeatItem($collectionId, $itemId);
+                    }
+                    $children[] = $this->builder->build($clonedChildComponent, clone $clonedInherited);
                     $index++;
                 }
             }

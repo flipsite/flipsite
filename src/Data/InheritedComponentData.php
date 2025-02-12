@@ -1,11 +1,16 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 class InheritedComponentData
 {
     private ?string $navState = null;
+    private string|int|null $parentId = null;
+    private string|null $parentType = null;
+    private string|int|null $collectionId = null;
+    private string|int|null $itemId = null;
 
     public function __construct(private string $appearance, private array $dataSource = [])
     {
@@ -44,5 +49,34 @@ class InheritedComponentData
     public function setNavState(?string $navState = null): void
     {
         $this->navState = $navState;
+    }
+
+    public function setParent(string|int $parentId, string $parentType): void
+    {
+        $this->parentId = $parentId;
+        $this->parentType = $parentType;
+    }
+
+    public function getParentId(): string|int|null
+    {
+        return $this->parentId;
+    }
+    public function getParentType(): string|null
+    {
+        return $this->parentType;
+    }
+
+    public function setRepeatItem(string|int $collectionId, string|int $itemId): void
+    {
+        $this->collectionId = $collectionId;
+        $this->itemId = $itemId;
+    }
+    public function getCollectionId(): string|int|null
+    {
+        return $this->collectionId;
+    }
+    public function getItemId(): string|int|null
+    {
+        return $this->itemId;
     }
 }

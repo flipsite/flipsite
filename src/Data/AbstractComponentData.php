@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -99,6 +100,11 @@ abstract class AbstractComponentData
     public function addChild(AbstractComponentData $child)
     {
         return $this->children[] = $child;
+    }
+
+    public function getMeta(): array
+    {
+        return $this->meta;
     }
 
     public function setMetaValue(string $attribute, string|array|bool|int $value): void
