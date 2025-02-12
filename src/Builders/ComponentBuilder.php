@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -109,9 +110,13 @@ class ComponentBuilder
         unset($style['appearance']);
 
         if (isset($data['_dataSource'])) {
-            $dataSource = is_array($data['_dataSource']) ? $data['_dataSource'] : $this->getDataSource($data['_dataSource']);
+            $repeatItem = [];
+            $dataSource = is_array($data['_dataSource']) ? $data['_dataSource'] : $this->getDataSource($data['_dataSource'], $repeatItem);
             unset($data['_dataSource']);
             $inheritedData->addDataSource($dataSource);
+            if (count($repeatItem) === 2) {
+                $inheritedData->setRepeatItem(...$repeatItem);
+            }
         }
 
         // Handle transition delay
@@ -164,6 +169,10 @@ class ComponentBuilder
         $data     = $component->applyData($data, $inheritedData->getDataSource(), $replaced);
         if (in_array('{copyright.year}', $replaced)) {
             $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
+        }
+        if (isset($data['_original'])) {
+            $componentData->setMetaValue('original', $data['_original']);
+            unset($data['_original']);
         }
 
         // Handle nav stuff
@@ -432,9 +441,9 @@ class ComponentBuilder
         return $style;
     }
 
-    private function optimizeStyle(array $style, int $index, int $total) : array
+    private function optimizeStyle(array $style, int $index, int $total): array
     {
-        $hasModifier = function (string $value):bool {
+        $hasModifier = function (string $value): bool {
             $keywords = ['even', 'odd', 'first', 'last'];
             foreach ($keywords as $keyword) {
                 if (strpos($value, $keyword) !== false) {
@@ -621,7 +630,7 @@ class ComponentBuilder
         return ColorHelper::parseAndReplace($gradient, $colors);
     }
 
-    private function getDataSource(string $dataSourceString): array
+    private function getDataSource(string $dataSourceString, array &$repeatItem): array
     {
         if (str_starts_with($dataSourceString, '${content.')) {
             $dataSourceString = substr($dataSourceString, 10, strlen($dataSourceString) - 11);
@@ -632,6 +641,8 @@ class ComponentBuilder
         }
         $collectionId = $tmp[0];
         $itemId       = intval($tmp[1]);
+
+        $repeatItem = [ $collectionId, $itemId];
 
         $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {
