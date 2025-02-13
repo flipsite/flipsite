@@ -401,6 +401,7 @@ transition-colors: color,background-color,border-color,text-decoration-color,fil
 transition-none: transition-property:none
 transition-opacity: transition-property:opacity
 transition-shadow: transition-property:box-shadow
+transition-size: transition-property:width,height
 transition-transform: transition-property:transform
 transition: transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;
 truncate: overflow:hidden;text-overflow:ellipsis;white-space:nowrap
