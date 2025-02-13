@@ -1,16 +1,19 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 class InheritedComponentData
 {
-    private ?string $navState = null;
-    private string|int|null $parentId = null;
-    private string|null $parentType = null;
+    private ?string $navState             = null;
+    private string|int|null $parentId     = null;
+    private string|null $parentType       = null;
+
+    private string|int|null $pageCollectionId = null;
+    private string|int|null $pageItemId       = null;
+
     private string|int|null $collectionId = null;
-    private string|int|null $itemId = null;
+    private string|int|null $itemId       = null;
 
     public function __construct(private string $appearance, private array $dataSource = [])
     {
@@ -53,7 +56,7 @@ class InheritedComponentData
 
     public function setParent(string|int $parentId, string $parentType): void
     {
-        $this->parentId = $parentId;
+        $this->parentId   = $parentId;
         $this->parentType = $parentType;
     }
 
@@ -61,20 +64,39 @@ class InheritedComponentData
     {
         return $this->parentId;
     }
+
     public function getParentType(): string|null
     {
         return $this->parentType;
     }
 
+    public function setPageItem(string|int $collectionId, string|int $itemId): void
+    {
+        $this->pageCollectionId = $collectionId;
+        $this->pageItemId       = $itemId;
+    }
+
+    public function getPageCollectionId(): string|int|null
+    {
+        return $this->pageCollectionId;
+    }
+
+    public function getPageItemId(): string|int|null
+    {
+        return $this->pageItemId;
+    }
+
     public function setRepeatItem(string|int $collectionId, string|int $itemId): void
     {
         $this->collectionId = $collectionId;
-        $this->itemId = $itemId;
+        $this->itemId       = $itemId;
     }
+
     public function getCollectionId(): string|int|null
     {
         return $this->collectionId;
     }
+
     public function getItemId(): string|int|null
     {
         return $this->itemId;

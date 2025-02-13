@@ -170,9 +170,13 @@ final class Flipsite
             if ($this->plugins) {
                 $sectionData = $this->plugins->run('section', $sectionData);
             }
-            $inheritedData = new InheritedComponentData($appearance, $globalVars);
-            $inheritedData->addDataSource($sectionData->getDataValue('_pageDataSource', true) ?? []);
-
+            $inheritedData  = new InheritedComponentData($appearance, $globalVars);
+            $pageDataSource = $sectionData->getDataValue('_pageDataSource', true) ?? [];
+            if ($pageDataSource) {
+                $inheritedData->setPageItem($pageDataSource['page._collectionId'], $pageDataSource['page._id']);
+                unset($pageDataSource['page._collectionId'], $pageDataSource['page._id']);
+            }
+            $inheritedData->addDataSource($pageDataSource);
             $section = $componentBuilder->build($sectionData, $inheritedData);
             $document->getChild('body')->addChild($section);
         }

@@ -57,8 +57,6 @@ final class Dots extends AbstractGroup
             '_attr'      => ['role' => 'listitem'],
             '_style'     => $style['dot'] ?? [],
         ]);
-        $dotComponentData->setMetaValue('componentChildId', 'dot');
-        $dotComponentData->setMetaValue('componentChildName', 'Dot');
         $dot = $this->builder->build($dotComponentData, $clonedInherited);
 
         $this->builder->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/dots.min.js')));

@@ -113,29 +113,35 @@ class RichtextItem
                 return [
                     '_repeat' => $this->data['value'],
                     'li'      => [
-                        'number' => $this->number ?
+                        'number'     => $this->number ?
                         ArrayHelper::merge($this->number, ['value' => '{index}', '_style' => $allStyle['liNumber'] ?? []]) : null,
-                        'value'  => '{item}',
-                        '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
+                        'value'   => '{item}',
+                        '_style'  => ArrayHelper::merge($allStyle['li'] ?? [], $markdown),
                     ],
 
                 ];
             case 'ul':
                 return [
                     '_repeat' => $this->data['value'],
+                    '_meta'   => [
+                        'componentChildId'   => 'ul',
+                        'componentChildName' => 'Lists'
+                    ],
                     'li'      => [
-                        'icon'   => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
-                        'value'  => '{item}',
-                        '_style' => ArrayHelper::merge($allStyle['li'] ?? [], $markdown)
+                        'icon'       => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
+                        'value'      => '{item}',
+                        '_style'     => ArrayHelper::merge($allStyle['li'] ?? [], $markdown),
                     ],
 
                 ];
             case 'img':
-                $image = ['value' => $this->data['value'] ?? null, 'alt' => $this->data['alt'] ?? null];
+                $image          = ['value' => $this->data['value'] ?? null, 'alt' => $this->data['alt'] ?? null];
                 if (isset($this->data['figcaption'])) {
                     return [
                         'image'     => $image,
-                        'paragraph' => ['value' => $this->data['figcaption'], '_style' => ArrayHelper::merge($allStyle['figcaption'] ?? [], ['tag' => 'figcaption'])]
+                        'paragraph' => [
+                            'value'      => $this->data['figcaption'],
+                            '_style'     => ArrayHelper::merge($allStyle['figcaption'] ?? [], ['tag' => 'figcaption'])]
                     ];
                 }
                 return $image;

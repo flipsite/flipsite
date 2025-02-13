@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -642,7 +641,7 @@ class ComponentBuilder
         $collectionId = $tmp[0];
         $itemId       = intval($tmp[1]);
 
-        $repeatItem = [ $collectionId, $itemId];
+        $repeatItem = [$collectionId, $itemId];
 
         $collection = $this->siteData->getCollection($collectionId, $this->path->getLanguage());
         if (!$collection) {

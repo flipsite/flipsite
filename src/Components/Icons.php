@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -29,9 +28,13 @@ final class Icons extends AbstractGroup
         $style = $component->getStyle();
 
         unset($data['total'], $data['count'], $data['src']);
+
         for ($i = 0; $i < $total; $i++) {
-            $iconComponentData = new YamlComponentData(null, $component->getId(), 'icon', ['src' => $src], $i < $count ? $style['icon'] ?? [] : $style['officon'] ?? []);
-            $component->addChild($iconComponentData);
+            $clonedInherited = clone $inherited;
+            $clonedInherited->setParent($component->getId(), $component->getType());
+            $dotComponentData  = new YamlComponentData($component->getId(), null, 'icon', ['src' => $src], $i < $count ? $style['icon'] ?? [] : $style['officon'] ?? []);
+            $icon              = $this->builder->build($dotComponentData, $clonedInherited);
+            $this->addChild($icon);
         }
 
         parent::build($component, $inherited);
