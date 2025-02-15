@@ -66,7 +66,7 @@ abstract class AbstractGroup extends AbstractComponent
                     if ($collectionId) {
                         $clonedInherited->setRepeatItem($collectionId, $itemId);
                     }
-                    $children[] = $this->builder->build($clonedChildComponent, clone $clonedInherited);
+                    $children[] = $this->builder->build($clonedChildComponent, $clonedInherited);
                     $index++;
                 }
             }
@@ -85,7 +85,7 @@ abstract class AbstractGroup extends AbstractComponent
                     'last'  => $total - 1 === $index,
                 ];
                 $childComponent->setMetaValue('order', $order);
-                $children[]     = $this->builder->build($childComponent, $inherited);
+                $children[]     = $this->builder->build($childComponent, clone $inherited);
             }
 
             $this->addChildren($children);

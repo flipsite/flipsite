@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -30,6 +31,9 @@ final class Richtext extends AbstractGroup
             }
             if (is_array($json)) {
                 foreach ($json as $item) {
+                    if ($item['value'] === '[]') {
+                        continue;
+                    }
                     $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null);
                 }
             }
@@ -47,9 +51,11 @@ final class Richtext extends AbstractGroup
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data = $component->getData();
-        if (!($data['value'] ?? false)) {
+        if (!isset($data['value']) || !$data['value']) {
+            $this->render = false;
             return;
         }
+
         $style = $component->getStyle();
 
         $items = $data['value'] ?? [];
