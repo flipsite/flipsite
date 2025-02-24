@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -152,7 +153,8 @@ class SchemaField implements \JsonSerializable
                 unset($item['data']);
             }
         }
-        return json_encode($json);
+
+        return json_encode($json, \JSON_UNESCAPED_UNICODE);
     }
 
     public function jsonSerialize(): mixed

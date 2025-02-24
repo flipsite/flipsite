@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -17,7 +18,7 @@ class Item implements \JsonSerializable
         $this->data['_collectionId'] = $rawData['_collectionId'];
     }
 
-    public function getId() : int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -41,7 +42,7 @@ class Item implements \JsonSerializable
         $this->data    = $this->schema->validate($dataWithDelta, $setDefault);
     }
 
-    public function get(string $field) : mixed
+    public function get(string $field): mixed
     {
         return $this->data[$field] ?? null;
     }
