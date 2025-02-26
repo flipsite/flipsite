@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -409,24 +408,30 @@ class Reader implements SiteDataInterface
     {
         $parts     = explode('.', $componentId);
         $sectionId = array_shift($parts);
-        foreach ($this->data['pages'] as $sections) {
-            foreach ($sections as $section) {
-                if ($section['_style'] === $sectionId) {
-                    if (count($parts) === 0) {
-                        $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
-                        return new YamlComponentData(null, $componentId, 'container', $section);
-                    } else {
-                        $componentPathInSection = implode('.', $parts);
-                        $dot                    = new \Adbar\Dot($section);
-                        $data                   = $dot->get($componentPathInSection);
-                        if (!is_array($data)) {
-                            $data = ['value' => $data];
-                        }
-                        $last           = array_pop($parts);
-                        $parentId       = $sectionId.'.'.implode('.', $parts);
-                        $data['_style'] = $this->getComponentStyle($componentId);
-                        return new YamlComponentData($parentId, $componentId, $this->getType($last), $data ?? ['value' => '']);
+
+        $sections = [];
+        foreach ($this->data['pages'] as $pageSections) {
+            $sections = array_merge($sections, $pageSections);
+        }
+        $sections = array_merge($sections, $this->data['before'] ?? []);
+        $sections = array_merge($sections, $this->data['after'] ?? []);
+
+        foreach ($sections as $section) {
+            if ($section['_style'] === $sectionId) {
+                if (count($parts) === 0) {
+                    $section['_style']   = $this->data['theme']['components'][$sectionId] ?? [];
+                    return new YamlComponentData(null, $componentId, 'container', $section);
+                } else {
+                    $componentPathInSection = implode('.', $parts);
+                    $dot                    = new \Adbar\Dot($section);
+                    $data                   = $dot->get($componentPathInSection);
+                    if (!is_array($data)) {
+                        $data = ['value' => $data];
                     }
+                    $last           = array_pop($parts);
+                    $parentId       = $sectionId.'.'.implode('.', $parts);
+                    $data['_style'] = $this->getComponentStyle($componentId);
+                    return new YamlComponentData($parentId, $componentId, $this->getType($last), $data ?? ['value' => '']);
                 }
             }
         }
