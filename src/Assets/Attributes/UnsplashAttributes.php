@@ -1,31 +1,44 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Attributes;
 
 class UnsplashAttributes extends AbstractImageAttributes
 {
     private string $srcTpl;
-    
+
     public function __construct(string $src, array $options)
     {
-        preg_match('/[?&]w=([^&]+)/', $src, $matchesW);
-        preg_match('/[?&]h=([^&]+)/', $src, $matchesH);
+        $url = parse_url($src);
+        $parts = explode('&', $url['query']);
+        $query = [];
+        foreach ($parts as $param => $value) {
+            $pair = explode('=', $value);
+            $query[$pair[0]] = $pair[1];
+        }
+        $this->setSize($options, intval($query['w']), intval($query['h']));
+        unset($query['w'],$query['h'],$query['color'],$query['blur_hash'],$query['user'],$query['name']);
 
-        $this->setSize($options, intval($matchesW[1]), intval($matchesH[1]));
-
-        $src = str_replace('&w='.$matchesW[1],'', $src);
-        $src = str_replace('&h='.$matchesH[1],'', $src);
 
         $this->srcset = $options['srcset'] ?? [];
 
-        $this->srcTpl = $src;
-        if (isset($options['aspectRatio'])) {
-            $this->srcTpl.='&fit=crop';
+        $this->srcTpl = $url['scheme'].'://'.$url['host'].$url['path'].'?';
+        $first = true;
+        foreach ($query as $param => $value) {
+            if ($first) {
+                $first = false;
+                $this->srcTpl .= '&';
+            }
+            $this->srcTpl .= $param.'='.$value;
         }
-        $this->srcTpl.='&auto=format';
-    
-        $this->src = $this->buildSrc($this->width,$this->height);
+
+        if (isset($options['aspectRatio'])) {
+            $this->srcTpl .= '&fit=crop';
+        }
+        $this->srcTpl .= '&auto=format';
+
+        $this->src = $this->buildSrc($this->width, $this->height);
     }
 
     public function getSrcset(?string $type = null): ?string
@@ -39,8 +52,10 @@ class UnsplashAttributes extends AbstractImageAttributes
             if (false !== mb_strpos($variant, 'x')) {
                 $factor = floatval(trim($variant, 'x'));
                 $srcset[] = new ImageSrcset(
-                    $this->buildSrc(intval($this->width*$factor),intval($this->height*$factor)), 
-                    $variant, $type);
+                    $this->buildSrc(intval($this->width * $factor), intval($this->height * $factor)),
+                    $variant,
+                    $type
+                );
             } else {
                 // TODO
                 // $width = floatval(trim($variant, 'w'));
@@ -53,12 +68,12 @@ class UnsplashAttributes extends AbstractImageAttributes
         }
         return implode(', ', $srcset);
     }
-    private function buildSrc(int $width, int $height) {
+    private function buildSrc(int $width, int $height)
+    {
         $src = $this->srcTpl;
-        $src.='&w='.$width;
-        $src.='&h='.$height;
+        $src .= '&w='.$width;
+        $src .= '&h='.$height;
         return $src;
-        
+
     }
 }
-
