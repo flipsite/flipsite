@@ -1,10 +1,16 @@
 ready(() => {
+  const findDotsTarget = function(element) {
+    let ancestor = element.closest('body > *');
+    if (!ancestor) return null;  
+    return ancestor.querySelector('[data-dots-target]') || null;
+  };
+
   document.querySelectorAll('[data-dots]').forEach((dots) => {
     dots.removeAttribute('data-dots');
-    const targetId = dots.getAttribute('data-target');
+    const dotsTarget = findDotsTarget(dots);
     const backgrounds = dots.hasAttribute('data-backgrounds') ? JSON.parse(dots.getAttribute('data-backgrounds')) : [];
     dots.removeAttribute('data-backgrounds');
-    const scrollDots = new ScrollDots(dots, backgrounds, document.getElementById(targetId));
+    const scrollDots = new ScrollDots(dots, backgrounds, dotsTarget);
     window.addEventListener('resize', function() {
       scrollDots.handleResize();
     });

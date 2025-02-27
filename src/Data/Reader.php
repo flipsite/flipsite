@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -437,6 +438,26 @@ class Reader implements SiteDataInterface
         }
         return null;
     }
+
+    public function findComponent(int|string $rootComponentId, string $attribute, string|bool $value): ?AbstractComponentData
+    {
+        $componentData = $this->getComponent($rootComponentId);
+
+        $dot = new \Adbar\Dot($componentData->getData());
+        $flat = $dot->flatten();
+        if (isset($flat[$attribute]) && $flat[$attribute] === $value) {
+            return $componentData;
+        }
+        foreach ($componentData->getChildren() as $childComponent) {
+            $result = $this->findComponent($childComponent->getId(), $attribute, $value);
+            if ($result) {
+                return $result;
+            }
+        }
+        return null;
+
+    }
+
 
     public function getMeta(string $page, ?Language $language = null): ?array
     {

@@ -20,11 +20,7 @@ final class Gallery extends AbstractGroup
             }
         }
         unset($data['_repeat']);
-        $data = $this->normalizeRepeat($data, $repeat);
-        if (isset($data['_attr']['id'])) {
-            $id = $data['_attr']['id'];
-            $this->builder->shareData($id, $data['_repeatData']);
-        }
-        return $data;
+        return $this->normalizeRepeat($data, $repeat);
     }
+
 }

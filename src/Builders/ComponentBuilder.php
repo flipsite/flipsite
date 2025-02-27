@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -31,7 +32,7 @@ class ComponentBuilder
     private array $localization = [];
     private Slugs $slugs;
     private array $recursiveData = [];
-    private array $sharedData    = [];
+    private AbstractComponentData $previousComponentData;
 
     public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, private Path $path, private ?Plugins $plugins = null)
     {
@@ -289,10 +290,17 @@ class ComponentBuilder
 
         $component->build($componentData, $inheritedData);
 
+        $this->previousComponentData = $componentData;
+
         if ($this->plugins) {
             $component = $this->plugins->run('afterComponentBuild', $component, $componentData, $inheritedData);
         }
         return $component;
+    }
+
+    public function getPreviousComponentData(): AbstractComponentData
+    {
+        return $this->previousComponentData;
     }
 
     public function addListener(EventListenerInterface $listener): void
@@ -305,16 +313,6 @@ class ComponentBuilder
         foreach ($this->listeners as $listener) {
             $listener->handleEvent($event);
         }
-    }
-
-    public function shareData(string $id, array $data): void
-    {
-        $this->sharedData[$id] = $data;
-    }
-
-    public function getSharedData(string $id): array
-    {
-        return $this->sharedData[$id] ?? [];
     }
 
     private function handleScripts(array $scripts)
