@@ -418,24 +418,13 @@ class ComponentBuilder
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
             }
-            $res = [];
-            $tmp = explode(' ', $str);
-            foreach ($tmp as $cls) {
-                $active = strpos($cls, 'nav-active:') !== false;
-                $exact  = strpos($cls, 'nav-exact:') !== false;
-                if (!$navState) {
-                    $res[] = $cls;
-                }
-                if ($active && $navState === 'active') {
-                    $res[] = str_replace('nav-active:', '', $cls);
-                }
-
-                if ($exact && $navState === 'exact') {
-                    $res[] = str_replace('nav-exact:', '', $cls);
-                }
+            $classes = \Flipsite\Utils\StyleHelper::decodeString($str, ['nav-active', 'nav-exact']);
+            if ('exact' === $navState) {
+                return $classes['nav-exact'] ?? $classes['nav-active'];
             }
-            $res = array_unique($res);
-            return implode(' ', $res);
+            if ('active' === $navState) {
+                return $classes['nav-active'];
+            }
         });
         return $style;
     }
