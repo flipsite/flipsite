@@ -418,12 +418,11 @@ class ComponentBuilder
             if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
                 return $str;
             }
-            $classes = \Flipsite\Utils\StyleHelper::decodeString($str, ['nav-active', 'nav-exact']);
-            if ('exact' === $navState) {
-                return $classes['nav-exact'] ?? $classes['nav-active'];
-            }
-            if ('active' === $navState) {
-                return $classes['nav-active'];
+            $style = new \Flipsite\Style\Style($str);
+            if ('exact' === $navState && $style->hasVariant('nav-exact')) {
+                return $style->getValue('nav-exact');
+            } elseif ($style->hasVariant('nav-active')) {
+                return $style->getValue('nav-active');
             }
         });
         return $style;
