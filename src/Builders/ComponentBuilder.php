@@ -72,6 +72,9 @@ class ComponentBuilder
         // }
 
         $type  = $this->getComponentType($componentData->getType());
+        if (!$type) {
+            return null;
+        }
         $class = 'Flipsite\\Components\\' . ucfirst($type);
 
         $data  = $componentData->getData();
@@ -169,6 +172,7 @@ class ComponentBuilder
 
         $replaced = [];
         $data     = $component->applyData($data, $inheritedData->getDataSource(), $replaced);
+
         if (in_array('{copyright.year}', $replaced)) {
             $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));
         }

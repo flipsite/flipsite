@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -89,6 +88,8 @@ class RichtextItem
             case 'h2':
             case 'h3':
             case 'h4':
+            case 'h5':
+            case 'h6':
                 return 'heading';
             case 'p':
                 return 'paragraph';
@@ -176,6 +177,8 @@ class RichtextItem
             case 'h2':
             case 'h3':
             case 'h4':
+            case 'h5':
+            case 'h6':
                 $componentStyle = ['tag' => $this->type];
                 break;
             case 'p':
