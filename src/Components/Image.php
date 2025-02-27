@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -22,10 +21,13 @@ final class Image extends AbstractComponent
         if (isset($data['value'])) {
             $data['src'] = $data['value'];
             unset($data['value']);
-        }
-        if (isset($data['external']) && !isset($data['src'])) {
+        } elseif (isset($data['external'])) {
             $data['src'] = $data['external'];
             unset($data['external']);
+        }
+        if (isset($data['fallback']) && !isset($data['src'])) {
+            $data['src'] = $data['fallback'];
+            unset($data['fallback']);
         }
         return $data;
     }
