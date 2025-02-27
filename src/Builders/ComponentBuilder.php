@@ -131,7 +131,6 @@ class ComponentBuilder
             $variants     = $delay->getVariants();
             foreach ($variants as $variant) {
                 $value = $initialDelay + $multiplier * intval($step->getValue($variant));
-                echo $value."\n";
                 $delay->setValue($variant, $value);
             }
             $style['transitionDelay'] = $delay->encode();
