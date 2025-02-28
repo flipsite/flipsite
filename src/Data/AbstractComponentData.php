@@ -1,12 +1,14 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
 {
-    protected null|int|string $parentId;
+    /**
+     * @param null|int|string[] $path
+     */
+    protected ?array $path;
     protected null|int|string $id;
     protected string $type;
     protected array $data     = [];
@@ -28,7 +30,16 @@ abstract class AbstractComponentData
 
     public function getParentId(): null|int|string
     {
-        return $this->parentId;
+        if (!$this->path || count($this->path) < 2) {
+            return null;
+        }
+
+        return $this->path[count($this->path) - 1];
+    }
+
+    public function getPath(): ?array
+    {
+        return $this->path;
     }
 
     public function getId(): null|int|string
@@ -100,6 +111,11 @@ abstract class AbstractComponentData
     public function addChild(AbstractComponentData $child)
     {
         return $this->children[] = $child;
+    }
+
+    public function purgeChildren(): void
+    {
+        $this->children = [];
     }
 
     public function getMeta(): array

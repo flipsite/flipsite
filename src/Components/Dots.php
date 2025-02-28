@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -43,7 +42,8 @@ final class Dots extends AbstractGroup
             $backgrounds = [];
             $key         = $data['cmsField'] ?? 'image';
 
-            $images = $this->getImages($inherited, 'banan', $key);
+            $path   = $component->getPath();
+            $images = $this->getImages($inherited, $path[0], $key);
             foreach ($images as $image) {
                 $bgAttributes     = $this->assets->getImageAttributes($image, $bgOptions);
                 if ($bgAttributes) {
@@ -55,7 +55,7 @@ final class Dots extends AbstractGroup
 
         $clonedInherited = clone $inherited;
         $clonedInherited->setParent($component->getId(), $component->getType());
-        $dotComponentData = new YamlComponentData($component->getId(), null, 'div', [
+        $dotComponentData = new YamlComponentData($component->getPath(), null, 'div', [
             '_noContent' => true,
             '_attr'      => ['role' => 'listitem'],
             '_style'     => $style['dot'] ?? [],
@@ -73,11 +73,11 @@ final class Dots extends AbstractGroup
         }
         $dotsTargetComponentData->purgeChildren();
 
-        $component = $this->builder->build($dotsTargetComponentData, $inherited);
+        $component         = $this->builder->build($dotsTargetComponentData, $inherited);
         $lastComponentData = $this->builder->getPreviousComponentData();
 
         $repeatData = $lastComponentData->getDataValue('_repeatData');
-        $images = [];
+        $images     = [];
 
         foreach ($repeatData as $item) {
             $images[] = $item[$key] ?? $item['image'] ?? null;

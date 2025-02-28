@@ -9,9 +9,10 @@ class YamlComponentData extends AbstractComponentData
 {
     use ComponentTypesTrait;
 
-    public function __construct(?string $parentId, ?string $id, string $type, array $data, ?array $style = null)
+    public function __construct(?array $path, ?string $id, string $type, array $data, ?array $style = null)
     {
-        $this->parentId   = $parentId;
+        $this->path       = $path ?? [];
+        $this->path[]     = $id;
         $this->id         = $id;
         $this->type       = $type;
         $style            = $data['_style'] ?? $style ?? [];
@@ -37,7 +38,7 @@ class YamlComponentData extends AbstractComponentData
                 }
                 $componentsInData[] = $attr;
                 $value['_style']    = ArrayHelper::merge($style[$attr] ?? [], $value['_style'] ?? []);
-                $this->children[]   = new YamlComponentData($id, null === $id ? null : $id.'.'.$attr, $type, $value);
+                $this->children[]   = new YamlComponentData($this->path, null === $id ? null : $id.'.'.$attr, $type, $value);
             }
         }
         // Remove style for components in data

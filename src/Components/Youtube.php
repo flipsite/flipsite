@@ -63,7 +63,7 @@ final class Youtube extends AbstractGroup
             $iframe->setAttribute('data-youtube-play', $src);
             $iframe->setAttribute('style', 'pointer-events:none');
             $this->addChild($iframe);
-            $iconComponentData = new YamlComponentData($component->getId(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']], $style['playIcon'] ?? []);
+            $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']], $style['playIcon'] ?? []);
             $icon              = $this->builder->build($iconComponentData, $inherited);
             $this->setAttribute('data-youtube-play', true);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));

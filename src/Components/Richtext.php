@@ -62,7 +62,7 @@ final class Richtext extends AbstractGroup
 
         $inherited->setParent($component->getId(), $component->getType());
         foreach ($items as $index => $item) {
-            $itemComponentData  = new YamlComponentData($component->getId(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
+            $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
             $component->addChild($itemComponentData);
         }
         parent::build($component, $inherited);

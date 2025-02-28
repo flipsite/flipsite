@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -430,9 +429,16 @@ class Reader implements SiteDataInterface
                         $data = ['value' => $data];
                     }
                     $last           = array_pop($parts);
-                    $parentId       = $sectionId.'.'.implode('.', $parts);
+                    $parts          = array_merge([$sectionId], $parts);
+                    $path           = [];
+                    while (count($parts)) {
+                        $path[] = implode('.', $parts);
+                        array_pop($parts);
+                    }
+                    $path = array_reverse($path);
+
                     $data['_style'] = $this->getComponentStyle($componentId);
-                    return new YamlComponentData($parentId, $componentId, $this->getType($last), $data ?? ['value' => '']);
+                    return new YamlComponentData($path, $componentId, $this->getType($last), $data ?? ['value' => '']);
                 }
             }
         }
@@ -442,8 +448,11 @@ class Reader implements SiteDataInterface
     public function findComponent(int|string $rootComponentId, string $attribute, string|bool $value): ?AbstractComponentData
     {
         $componentData = $this->getComponent($rootComponentId);
+        if (!$componentData) {
+            return null;
+        }
 
-        $dot = new \Adbar\Dot($componentData->getData());
+        $dot  = new \Adbar\Dot($componentData->getData());
         $flat = $dot->flatten();
         if (isset($flat[$attribute]) && $flat[$attribute] === $value) {
             return $componentData;
@@ -455,9 +464,7 @@ class Reader implements SiteDataInterface
             }
         }
         return null;
-
     }
-
 
     public function getMeta(string $page, ?Language $language = null): ?array
     {
