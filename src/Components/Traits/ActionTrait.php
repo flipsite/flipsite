@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -16,6 +17,7 @@ trait ActionTrait
             $data['_action'] = $auto['_action'];
             $data['_target'] = $auto['_target'] ?? null;
         }
+
         $attributes = [];
         switch ($data['_action']) {
             case 'tel':
@@ -92,11 +94,18 @@ trait ActionTrait
                     'href' => isset($data['_target']) ? '#'.trim($data['_target'], '#') : '#',
                 ];
                 break;
+            case 'scrollX':
             case 'scrollLeft':
             case 'scrollRight':
+                $direction = $data['_target'] ?? 'left';
+                if ('scrollLeft' === $data['_action']) {
+                    $direction = 'left';
+                } elseif ('scrollRight' === $data['_action']) {
+                    $direction = 'right';
+                }
                 return [
                     'tag'     => 'button',
-                    'onclick' => "javascript:scrollX('".trim($data['_target'] ?? '')."','".($data['_action'] === 'scrollLeft' ? 'left' : 'right')."')",
+                    'onclick' => "javascript:scrollX(this,'".$direction."')",
                 ];
             case 'submit':
                 return [
@@ -108,6 +117,9 @@ trait ActionTrait
                     'tag'     => 'button',
                     'onclick' => 'javascript:toggle(this)',
                 ];
+        }
+        if (isset($attributes['href']) && ($data['_blank'] ?? false)) {
+            $attributes['target'] = '_blank';
         }
         if (isset($attributes['href']) && isset($data['_fragment']) && substr($data['_fragment'], 0, 1) !== '{' && substr($data['_fragment'], -1) !== '}' && !!trim($data['_fragment'])) {
             if (str_contains($attributes['href'], '#')) {

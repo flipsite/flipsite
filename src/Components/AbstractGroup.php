@@ -23,13 +23,7 @@ abstract class AbstractGroup extends AbstractComponent
     {
         $data = $component->getData();
         if (isset($data['_action'])) {
-            if ('tel' === $data['_action']) {
-                // handle tel replace
-            }
-            if ('mailto' === $data['_action']) {
-                // handle tel replace
-            }
-            if ('scrollLeft' === $data['_action'] || 'scrollRight' === $data['_action']) {
+            if ('scrollX' === $data['_action'] || 'scrollLeft' === $data['_action'] || 'scrollRight' === $data['_action']) {
                 $this->builder->dispatch(new Event('global-script', 'scrollX', file_get_contents(__DIR__ . '/../../js/dist/scrollX.min.js')));
             }
             $actionAttributes = $this->getActionAttributes($data);
@@ -110,10 +104,6 @@ abstract class AbstractGroup extends AbstractComponent
                 }
             }
             $data = $this->normalizeRepeat($data, $repeat);
-            if (isset($data['_attr']['id'])) {
-                $id = $data['_attr']['id'];
-                $this->builder->shareData($id, $data['_repeatData'] ?? []);
-            }
         }
         return $data;
     }
@@ -125,7 +115,7 @@ abstract class AbstractGroup extends AbstractComponent
             $data['_target'] = $data['_page'];
             unset($data['_page']);
         }
-        if (isset($data['_params'])) {
+        if (isset($data['_params']) && isset($data['_target'])) {
             $expanded        = $this->siteData->getExpanded($data['_target']);
             $data['_target'] = str_replace(':slug', $data['_params'], $expanded[(string)$this->path->getLanguage()] ?? $data['_target']);
             unset($data['_params']);
