@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -43,7 +42,7 @@ abstract class AbstractGroup extends AbstractComponent
             $index           = 0;
             foreach ($repeatData as $repeatDataItem) {
                 $collectionId = $repeatDataItem['_collectionId'] ?? null;
-                $itemId = $repeatDataItem['_id'] ?? null;
+                $itemId       = $repeatDataItem['_id'] ?? null;
                 unset($repeatDataItem['_collectionId'],$repeatDataItem['_id']);
                 foreach ($component->getChildren() as $childComponent) {
                     $clonedChildComponent = clone $childComponent;
@@ -174,10 +173,12 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
             $repeat = array_reverse($repeat);
         }
-
         if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
             $offset = intval($data['_options']['offset'] ?? 0);
             $length = intval($data['_options']['length'] ?? 999999);
+            if (!$length) {
+                $length = 999999;
+            }
             $repeat = array_splice($repeat, $offset, $length);
         }
 
