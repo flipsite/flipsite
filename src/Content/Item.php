@@ -51,4 +51,13 @@ class Item implements \JsonSerializable
     {
         return array_merge(['_id' => $this->id], $this->data);
     }
+
+    public function getArray(): array
+    {
+        $values = [];
+        foreach ($this->schema->getFields() as $field) {
+            $values[$field] = $this->data[$field] ?? null;
+        }
+        return $values;
+    }
 }

@@ -36,6 +36,11 @@ class Collection implements \JsonSerializable
         return $this->id;
     }
 
+    public function getSchema(): Schema
+    {
+        return $this->schema;
+    }
+
     public function getName(): string
     {
         return $this->name;

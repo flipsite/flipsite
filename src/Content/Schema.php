@@ -55,6 +55,10 @@ class Schema implements \JsonSerializable
         return $newName;
     }
 
+    public function getFields(): array
+    {
+        return array_keys($this->fields);
+    }
     public function getField(string $field): ?SchemaField
     {
         return $this->fields[$field] ?? null;
