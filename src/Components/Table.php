@@ -29,12 +29,20 @@ final class Table extends AbstractComponent
             $collection = $this->siteData->getCollection($data['collectionId']);
             $data['td'] = [];
             foreach ($collection->getItems() as $item) {
-                $data['td'][] = $item->getArray();
+                $data['td'][] = array_values($item->getArray());
             }
             if ($data['header'] ?? false) {
                 $data['th'] = $collection->getSchema()->getFields();
             }
             unset($data['collectionId']);
+        }
+
+        if (!isset($data['td'])) {
+            $data['th']   = ['Col1', 'Col2', 'Col2'];
+            $data['td']   = [];
+            $data['td'][] = ['Cell 1,1', 'Cell 2,1', 'Cell 3,1'];
+            $data['td'][] = ['Cell 1,2', 'Cell 2,2', 'Cell 3,2'];
+            $data['td'][] = ['Cell 1,3', 'Cell 2,3', 'Cell 3,3'];
         }
 
         return $data;
@@ -44,7 +52,7 @@ final class Table extends AbstractComponent
     {
         $data         = $component->getData();
         $style        = $component->getStyle();
-        $columnsCount = count($data['td'][0]);
+        $columnsCount = isset($data['td'][0]) ? count($data['td'][0]) : 0;
 
         if (($data['th'] ?? false) && count($data['th'])) {
             $thead = new Element('thead');
@@ -81,8 +89,11 @@ final class Table extends AbstractComponent
                         $this->builder->handleBackground($td, $styleTd['background']);
                     }
                     $td->addStyle($styleTd);
-                    $html  = $this->getMarkdownLine(trim($cell));
-                    $html  = $this->addClassesToHtml($html, ['a', 'strong', 'em', 'code'], $component->getStyle(), $inherited->getAppearance());
+                    $html = '';
+                    if (is_string($cell)) {
+                        $html  = $this->getMarkdownLine(trim($cell));
+                        $html  = $this->addClassesToHtml($html, ['a', 'strong', 'em', 'code'], $component->getStyle(), $inherited->getAppearance());
+                    }
                     $td->setContent($html);
                     $tr->addChild($td);
                 }
