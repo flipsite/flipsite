@@ -24,6 +24,8 @@ class SchemaField implements \JsonSerializable
         'slug',
         'svg',
         'text',
+        'file',
+        'video',
     ];
 
     private string $type;
@@ -51,7 +53,7 @@ class SchemaField implements \JsonSerializable
             $this->type = 'phone';
         }
         if (!in_array($this->type, self::TYPES)) {
-            throw new \Exception('Invalid field type '.$this->type);
+            throw new \Exception('Invalid field type ('.$this->type.')');
         }
         $this->default  = $rawField['default'] ?? null;
         $this->required = $rawField['required'] ?? null;
