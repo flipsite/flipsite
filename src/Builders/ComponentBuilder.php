@@ -19,7 +19,6 @@ use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Style;
 use Flipsite\Utils\Filter;
 use Flipsite\Utils\Plugins;
-use Flipsite\Utils\StyleNthOptimizer;
 
 class ComponentBuilder
 {
@@ -432,10 +431,10 @@ class ComponentBuilder
         return $style;
     }
 
-    private function optimizeStyle(array $style, int $index, int $total): array
+    public function optimizeStyle(array $style, int $index, int $total): array
     {
         $hasModifier = function (string $value): bool {
-            $keywords = ['even', 'odd', 'first', 'last'];
+            $keywords = ['first', 'last', 'even', 'odd'];
             foreach ($keywords as $keyword) {
                 if (strpos($value, $keyword) !== false) {
                     return true;
@@ -443,10 +442,20 @@ class ComponentBuilder
             }
             return false;
         };
-        foreach ($style as &$value) {
-            if (is_string($value) && $hasModifier($value)) {
-                $so    = new StyleNthOptimizer($value);
-                $value = $so->get($index, $total);
+        foreach ($style as $attr => &$value) {
+            if (is_array($value) && 'background' === $attr) {
+                $value = $this->optimizeStyle($value, $index, $total);
+            } elseif (is_string($value) && $hasModifier($value)) {
+                $setting = new Style($value);
+                if ($index === 0) {
+                    $value = $setting->getValue('first') ?? $setting->getValue('even') ?? $setting->getValue();
+                } elseif ($index === $total - 1) {
+                    $value = $setting->getValue('last') ?? $setting->getValue('odd') ?? $setting->getValue();
+                } elseif ($index % 2 === 0) {
+                    $value = $setting->getValue('even') ?? $setting->getValue();
+                } else {
+                    $value = $setting->getValue('odd') ?? $setting->getValue();
+                }
             }
         }
         return $style;
