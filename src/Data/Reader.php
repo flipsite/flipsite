@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -208,6 +209,11 @@ class Reader implements SiteDataInterface
             $colors['gray'] = \Flipsite\Utils\ColorHelper::getGray($colors['primary']);
         }
         return $colors;
+    }
+
+    public function getGlobalVars(): array
+    {
+        return $this->data['global'] ?? [];
     }
 
     public function getFonts(): array

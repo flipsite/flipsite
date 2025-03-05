@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -315,6 +316,10 @@ final class Flipsite
             'site.image'            => $this->siteData->getShare(),
             'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
         ];
+        $customGlobalVars = $this->siteData->getGlobalVars();
+        if ($customGlobalVars) {
+            $globalVars = array_merge($globalVars, $customGlobalVars);
+        }
         $globalVars['meta.name'] = $this->siteData->getPageName($path->getPage(), $path->getLanguage());
         $meta                    = $this->siteData->getPageMeta($path->getPage(), $path->getLanguage());
         foreach ($meta ?? [] as $key => $value) {
