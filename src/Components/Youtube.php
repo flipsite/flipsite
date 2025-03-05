@@ -34,6 +34,7 @@ final class Youtube extends AbstractGroup
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', true);
         $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        $iframe->setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         $iframe->setAttribute('title', $title);
 
         $src = $data['privacy'] ?? false ?
@@ -57,7 +58,8 @@ final class Youtube extends AbstractGroup
         }
 
         if (count($query)) {
-            $src .= '?'.http_build_query($query);
+            strpos($src, '?') ? $src .= '&' : $src .= '?';
+            $src .= http_build_query($query);
         }
         if ('onclick' === ($data['loading'] ?? 'onclick')) {
             $iframe->setAttribute('data-youtube-play', $src);
