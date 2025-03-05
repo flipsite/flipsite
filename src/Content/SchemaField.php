@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -29,6 +28,7 @@ class SchemaField implements \JsonSerializable
     ];
 
     private string $type;
+    private ?string $name      = null;
     private ?bool $required    = null;
     private ?string $default   = null;
     private ?string $options   = null;
@@ -36,6 +36,7 @@ class SchemaField implements \JsonSerializable
 
     public function __construct(private string $id, private array $rawField)
     {
+        $this->name = $rawField['_name'] ?? null;
         $type       = $rawField['type'];
         $format     = $rawField['format'] ?? null;
         $this->type = $format ? $format : $type;
@@ -81,6 +82,11 @@ class SchemaField implements \JsonSerializable
         return $this->type;
     }
 
+    public function getName(): string
+    {
+        return $this->name ?? $this->type;
+    }
+
     public function appendDelta(array $delta)
     {
         if (array_key_exists('type', $delta)) {
@@ -100,6 +106,9 @@ class SchemaField implements \JsonSerializable
         }
         if (array_key_exists('localizable', $delta)) {
             $this->localizable = !!$delta['localizable'];
+        }
+        if (array_key_exists('_name', $delta)) {
+            $this->name = $delta['_name'];
         }
     }
 
@@ -164,6 +173,9 @@ class SchemaField implements \JsonSerializable
         $json = [
             'type' => $this->type,
         ];
+        if ($this->name) {
+            $json['_name'] = $this->name;
+        }
         if ($this->default) {
             $json['default'] = $this->default;
         }
