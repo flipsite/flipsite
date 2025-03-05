@@ -84,7 +84,7 @@ class SchemaField implements \JsonSerializable
 
     public function getName(): string
     {
-        return $this->name ?? $this->type;
+        return $this->name ?? ucfirst($this->id);
     }
 
     public function appendDelta(array $delta)

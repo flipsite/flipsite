@@ -32,7 +32,11 @@ final class Table extends AbstractComponent
                 $data['td'][] = array_values($item->getArray());
             }
             if ($data['header'] ?? false) {
-                $data['th'] = $collection->getSchema()->getFields();
+                $data['th'] = [];
+                foreach ($collection->getSchema()->getFields() as $fieldId) {
+                    $field        = $collection->getSchema()->getField($fieldId);
+                    $data['th'][] = $field->getName();
+                }
             }
             unset($data['collectionId']);
         }
