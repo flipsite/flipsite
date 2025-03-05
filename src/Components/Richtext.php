@@ -33,7 +33,7 @@ final class Richtext extends AbstractGroup
                     if ($item['value'] === '[]') {
                         continue;
                     }
-                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null);
+                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['codeBlock']['theme'] ?? null);
                 }
             }
         } catch (\Exception $e) {
@@ -159,7 +159,7 @@ class RichtextItem
                 $data['_attr']   = ['title' => $title];
                 $data['loading'] = 'lazy';
                 return $data;
-            case 'code':
+            case 'codeBlock':
                 $data = $this->data;
                 if ($this->theme) {
                     $data['theme'] = $this->theme;
