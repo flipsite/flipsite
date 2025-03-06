@@ -30,7 +30,7 @@ final class Richtext extends AbstractGroup
             }
             if (is_array($json)) {
                 foreach ($json as $item) {
-                    if ($item['value'] === '[]') {
+                    if (($item['value'] ?? '') === '[]') {
                         continue;
                     }
                     $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['codeBlock']['theme'] ?? null);
