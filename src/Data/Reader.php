@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -213,7 +212,7 @@ class Reader implements SiteDataInterface
 
     public function getGlobalVars(): array
     {
-        return $this->data['global'] ?? [];
+        return $this->data['globalVars'] ?? [];
     }
 
     public function getFonts(): array
