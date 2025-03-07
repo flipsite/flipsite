@@ -52,6 +52,16 @@ final class Table extends AbstractComponent
         return $data;
     }
 
+    public function getDefaultStyle(): array
+    {
+        $htmlStyle                 = $this->siteData->getHtmlStyle();
+        $style                     = [];
+        $style['th']               = $htmlStyle['heading'] ?? [];
+        $style['th']['fontFamily'] = 'font-headings';
+        unset($style['th']['textSize']);
+        return $style;
+    }
+
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data         = $component->getData();
