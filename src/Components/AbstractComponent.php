@@ -39,7 +39,7 @@ abstract class AbstractComponent extends AbstractElement
                     if (isset($dataSource[$var])) {
                         $value      = str_replace($match, (string)$dataSource[$var], (string)$value);
                         $replaced[] = $match;
-                    } else {
+                    } elseif ($match === $value) {
                         $value = null;
                     }
                 }
