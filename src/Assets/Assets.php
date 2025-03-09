@@ -9,6 +9,7 @@ use Flipsite\Assets\Sources\AbstractAssetInfo;
 use Flipsite\Assets\Sources\AssetType;
 use Flipsite\Assets\Attributes\ImageAttributesInterface;
 use Flipsite\Assets\Attributes\UnsplashAttributes;
+use Flipsite\Assets\Attributes\ExternalImageAttributes;
 use Flipsite\Assets\Attributes\ImageAttributes;
 use Flipsite\Assets\Attributes\SvgAttributes;
 use Flipsite\Assets\Attributes\VideoAttributesInterface;

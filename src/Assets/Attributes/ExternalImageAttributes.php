@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flipsite\Assets\Attributes;
 
-class ExternalAttributes implements ImageAttributesInterface
+class ExternalImageAttributes implements ImageAttributesInterface
 {
     public function __construct(private string $src)
     {
