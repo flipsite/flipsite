@@ -151,12 +151,14 @@ final class Nav extends AbstractGroup
         if (isset($pageMeta['unpublished']) && $pageMeta['unpublished']) {
             return null;
         }
-        return [
+        unset($pageMeta['name']);
+        $pageItemData = [
             '_collectionId' => '_pages',
             '_id'           => $page,
             'slug'          => $page,
             'name'          => $this->siteData->getPageName($page, $this->path->getLanguage()),
             ...$pageMeta
         ];
+        return $pageItemData;
     }
 }

@@ -45,7 +45,7 @@ class MetaNameResolver implements PageNameResolverInterface
     public function __construct(array $meta, private array $languages)
     {
         foreach ($meta as $page => $metaData) {
-            if (isset($metaData['name'])) {
+            if ($metaData['name'] ?? false) {
                 $this->names[$page] = $metaData['name'];
             }
         }
@@ -54,9 +54,12 @@ class MetaNameResolver implements PageNameResolverInterface
     public function getName(string $page, Language $language): ?string
     {
         if (isset($this->names[$page])) {
-            $name = $this->names[$page];
-            $localization = new Localization($this->languages, $name);
-            return $localization->getValue($language) ?? null;
+            $name          = $this->names[$page];
+            $localization  = new Localization($this->languages, $name);
+            $localizedName = $localization->getValue($language);
+            if ($localizedName) {
+                return $localizedName;
+            }
         }
         return null;
     }
@@ -87,7 +90,7 @@ class SlugNameResolver implements PageNameResolverInterface
     {
         $slug = $this->slugs->getSlug($page, $language);
         if (null === $slug) {
-            return null;
+            return $page;
         }
         $slug = explode('/', $slug);
         $last = array_pop($slug);
