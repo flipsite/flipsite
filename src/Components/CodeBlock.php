@@ -1,21 +1,20 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
 
-final class Code extends AbstractComponent
+final class CodeBlock extends AbstractComponent
 {
     use Traits\BuilderTrait;
     protected string $tag  = 'pre';
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $data = $component->getData();
+        $data          = $component->getData();
         $this->oneline = true;
         $this->setContent($data['value']);
         $style['self'] = 'code';

@@ -101,8 +101,6 @@ class RichtextItem
             case 'ol':
             case 'ul':
                 return 'ul';
-            case 'codeBlock':
-                return 'code';
         }
         return $this->type;
     }
