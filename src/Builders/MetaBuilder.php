@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -37,12 +38,14 @@ class MetaBuilder implements BuilderInterface
         }
 
         $canonical = $this->environment->getAbsoluteUrl($slug);
-
-        $elements[] = $this->meta('canonical', $canonical);
+        $el = new Element('link', true, true);
+        $el->setAttribute('rel', 'canonical');
+        $el->setAttribute('href', $canonical);
+        $elements[] = $el;
         if (count($this->siteData->getLanguages()) > 1) {
             foreach ($this->siteData->getLanguages() as $l) {
                 if (!$language->isSame($l)) {
-                    $el = new Element('meta', true, true);
+                    $el = new Element('link', true, true);
                     $el->setAttribute('rel', 'alternate');
                     $slug = $this->siteData->getSlugs()->getSlug($page, $l);
                     $el->setAttribute('href', $this->environment->getAbsoluteUrl($slug));
