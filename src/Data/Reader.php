@@ -476,6 +476,7 @@ class Reader implements SiteDataInterface
         $pageMeta    = $this->getPageMeta($page, $language) ?? [];
 
         $description = $pageMeta['description'] ?? $this->get('description', $language);
+        $canonical   = $pageMeta['canonical'] ?? null;
         $share       = $pageMeta['share'] ?? $this->get('share') ?? null;
         $icon        = $pageMeta['icon'] ?? null;
 
@@ -504,12 +505,17 @@ class Reader implements SiteDataInterface
         if ($language && !$language->isSame($this->getDefaultLanguage())) {
             $title .= ' ('.$language->getInLanguage().')';
         }
-        return [
+        $meta = [
             'title'       => $title,
             'description' => $description,
             'share'       => $share,
             'icon'        => $icon
         ];
+        if ($canonical) {
+            $meta['canonical'] = $canonical;
+        }
+
+        return $meta;
     }
 
     public function getPageMeta(string $page, ?Language $language = null): ?array

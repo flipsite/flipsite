@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -37,20 +36,30 @@ class MetaBuilder implements BuilderInterface
             $slug = '';
         }
 
-        $canonical = $this->environment->getAbsoluteUrl($slug);
-        $el = new Element('link', true, true);
-        $el->setAttribute('rel', 'canonical');
-        $el->setAttribute('href', $canonical);
-        $elements[] = $el;
-        if (count($this->siteData->getLanguages()) > 1) {
-            foreach ($this->siteData->getLanguages() as $l) {
-                if (!$language->isSame($l)) {
-                    $el = new Element('link', true, true);
-                    $el->setAttribute('rel', 'alternate');
-                    $slug = $this->siteData->getSlugs()->getSlug($page, $l);
-                    $el->setAttribute('href', $this->environment->getAbsoluteUrl($slug));
-                    $el->setAttribute('hreflang', (string)$l);
-                    $elements[] = $el;
+        $name  = $this->siteData->getName();
+        $meta  = $this->siteData->getMeta($this->path->getPage(), $language);
+
+        if (isset($meta['canonical'])) {
+            $el        = new Element('link', true, true);
+            $el->setAttribute('rel', 'canonical');
+            $el->setAttribute('href', $meta['canonical']);
+            $elements[] = $el;
+        } else {
+            $canonical = $this->environment->getAbsoluteUrl($slug);
+            $el        = new Element('link', true, true);
+            $el->setAttribute('rel', 'canonical');
+            $el->setAttribute('href', $canonical);
+            $elements[] = $el;
+            if (count($this->siteData->getLanguages()) > 1) {
+                foreach ($this->siteData->getLanguages() as $l) {
+                    if (!$language->isSame($l)) {
+                        $el = new Element('link', true, true);
+                        $el->setAttribute('rel', 'alternate');
+                        $slug = $this->siteData->getSlugs()->getSlug($page, $l);
+                        $el->setAttribute('href', $this->environment->getAbsoluteUrl($slug));
+                        $el->setAttribute('hreflang', (string)$l);
+                        $elements[] = $el;
+                    }
                 }
             }
         }
@@ -59,9 +68,6 @@ class MetaBuilder implements BuilderInterface
         if (in_array($slug, $hidden)) {
             $elements[] = $this->meta('robots', 'noindex');
         }
-
-        $name  = $this->siteData->getName();
-        $meta  = $this->siteData->getMeta($this->path->getPage(), $language);
 
         $title = $meta['title'] ?? 'Flipsite';
 
