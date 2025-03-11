@@ -224,6 +224,10 @@ abstract class AbstractElement
         if ($this->cache) {
             return $this->cache;
         }
+
+        if (!$this->content && !count($this->children) && !$this->empty) {
+            $this->oneline = true;
+        }
         //$this->purgeInvalidAttributes();
         $html = '';
         $i    = str_repeat(' ', $indentation * $level);
