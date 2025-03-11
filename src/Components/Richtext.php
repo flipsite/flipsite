@@ -33,7 +33,7 @@ final class Richtext extends AbstractGroup
                     if (($item['value'] ?? '') === '[]') {
                         continue;
                     }
-                    $items[] = new RichtextItem($item, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['codeBlock']['theme'] ?? null);
+                    $items[] = $item;
                 }
             }
         } catch (\Exception $e) {
@@ -43,7 +43,6 @@ final class Richtext extends AbstractGroup
         } else {
             unset($data['value']);
         }
-        unset($data['liIcon']);
         return $data;
     }
 
@@ -54,14 +53,20 @@ final class Richtext extends AbstractGroup
             $this->render = false;
             return;
         }
-
         $style = $component->getStyle();
-
+        foreach ($component->getChildren() as $child) {
+            if ('codeBlock' === $child->getType()) {
+                $style['codeBlock'] = $child->getStyle();
+                $data['theme']      = $child->getData()['theme'] ?? null;
+            }
+        }
+        $component->purgeChildren();
         $items = $data['value'] ?? [];
         unset($data['value']);
 
         $inherited->setParent($component->getId(), $component->getType());
-        foreach ($items as $index => $item) {
+        foreach ($items as $index => $itemData) {
+            $item               = new RichtextItem($itemData, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['theme'] ?? null);
             $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
             $component->addChild($itemComponentData);
         }
@@ -196,6 +201,11 @@ class RichtextItem
                 break;
             case 'ol':
                 $componentStyle = ['tag' => $this->type];
+                if (!$this->number) {
+                    $componentStyle['listStylePosition'] = 'list-inside';
+                    $componentStyle['listStyleType']     = 'list-decimal';
+                }
+                $componentStyle = ArrayHelper::merge($componentStyle, $allStyle['ul']);
                 break;
             case 'img':
                 if (isset($this->data['figcaption'])) {

@@ -15,6 +15,10 @@ final class CodeBlock extends AbstractComponent
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data          = $component->getData();
+        if (!isset($data['value'])) {
+            $this->render = false;
+            return;
+        }
         $this->oneline = true;
         $this->setContent($data['value']);
         $style['self'] = 'code';
