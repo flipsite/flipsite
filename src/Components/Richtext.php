@@ -224,6 +224,16 @@ class RichtextItem
                     return $componentStyle;
                 }
                 break;
+            case 'table':
+                $componentStyle = [
+                    'th'      => $allStyle['th'] ?? [],
+                    'tr'      => $allStyle['tr'] ?? [],
+                    'td'      => $allStyle['td'] ?? [],
+                    'a'       => $allStyle['a'] ?? [],
+                    'strong'  => $allStyle['strong'] ?? [],
+                    'em'      => $allStyle['em'] ?? [],
+                    'code'    => $allStyle['code'] ?? []
+                ];
         }
         return ArrayHelper::merge($allStyle[$this->type] ?? [], $componentStyle);
     }

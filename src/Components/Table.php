@@ -77,6 +77,7 @@ final class Table extends AbstractComponent
                 if (isset($styleTh['background'])) {
                     $this->builder->handleBackground($tr, $styleTh['background']);
                 }
+                $styleTh = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTh, $inherited->getAppearance());
                 $th->addStyle($styleTh);
                 $th->setContent($thCell);
                 $tr->addChild($th);
@@ -94,6 +95,7 @@ final class Table extends AbstractComponent
                 if (isset($styleTr['background'])) {
                     $this->builder->handleBackground($tr, $styleTr['background']);
                 }
+                $styleTr = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTr, $inherited->getAppearance());
                 $tr->addStyle($styleTr);
                 foreach ($row as $columnIndex => $cell) {
                     $td = new Element('td', true);
@@ -102,6 +104,7 @@ final class Table extends AbstractComponent
                     if (isset($styleTd['background'])) {
                         $this->builder->handleBackground($td, $styleTd['background']);
                     }
+                    $styleTd = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTd, $inherited->getAppearance());
                     $td->addStyle($styleTd);
                     $html = '';
                     if (is_string($cell)) {
