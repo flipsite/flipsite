@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Compiler;
 
 class AssetParser
@@ -73,9 +72,9 @@ class AssetParser
         $linkTags = $doc->getElementsByTagName('link');
         foreach ($linkTags as $tag) {
             if ('icon' === $tag->getAttribute('rel')) {
-                $url      = $tag->getAttribute('href');
+                $url = $tag->getAttribute('href');
             } elseif ('apple-touch-icon' === $tag->getAttribute('rel')) {
-                $url      = $tag->getAttribute('href');
+                $url = $tag->getAttribute('href');
             }
             if (isset($url) && !str_starts_with($url, 'data:')) {
                 $assets[] = $url;

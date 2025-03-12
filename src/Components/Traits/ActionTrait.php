@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -77,15 +76,14 @@ trait ActionTrait
                 if (!isset($data['_target'])) {
                     return [
                         'tag'      => 'a',
-                        'href'     => '#',
-                        'download' => true
+                        'href'     => '#'
                     ];
                 }
                 $file       = $this->environment->getAssetSources()->addBasePath(\Flipsite\Assets\Sources\AssetType::FILE, $data['_target']);
                 $attributes = [
                     'tag'      => 'a',
                     'href'     => $file ?? '#',
-                    'download' => true
+                    'download' => $data['_filename'] ?? true
                 ];
                 break;
             case 'scroll':

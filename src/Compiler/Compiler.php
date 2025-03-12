@@ -171,6 +171,9 @@ class Compiler implements LoggerAwareInterface
 
     private function getOptimizedAsset(string $asset):string
     {
+        if (strpos($asset, '/files/') !== false) {
+            return $asset;
+        }
         $pathinfo = pathinfo($asset);
         if (!in_array($pathinfo['extension'], $this->optimizeExtensions)) {
             return $asset;
