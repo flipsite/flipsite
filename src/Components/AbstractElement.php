@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -19,7 +20,12 @@ abstract class AbstractElement
     private ?string $commentOut         = null;
     private ?string $commentBefore      = null;
     private ?string $commentAfter       = null;
+    private bool $wrap                 = true;
 
+    public function setWrap(bool $wrap): void
+    {
+        $this->wrap = $wrap;
+    }
     public function getStyle(): array
     {
         return $this->style;
@@ -78,7 +84,7 @@ abstract class AbstractElement
         return count($this->children);
     }
 
-    public function hasAttribute(string $attribute) : bool
+    public function hasAttribute(string $attribute): bool
     {
         return isset($this->attributes[$attribute]);
     }
@@ -143,13 +149,13 @@ abstract class AbstractElement
         return $this;
     }
 
-    public function setTag(string $tag) : self
+    public function setTag(string $tag): self
     {
         $this->tag = $tag;
         return $this;
     }
 
-    public function setRender(bool $render) : self
+    public function setRender(bool $render): self
     {
         $this->render = $render;
         return $this;
@@ -234,7 +240,7 @@ abstract class AbstractElement
         if ($this->commentBefore) {
             $html .= $i.'<!-- '.$this->commentBefore.' -->'."\n";
         }
-        if ('' === $this->tag) {
+        if ('' === $this->tag && $this->wrap) {
             $html .= $i.wordwrap($this->content, 80, $i."\n");
             $html .= "\n";
             return $html;
@@ -275,7 +281,11 @@ abstract class AbstractElement
     protected function renderContent(int $indentation, int $level, string $content): string
     {
         $i = str_repeat(' ', $indentation * $level);
-        return $i.wordwrap($content, 120, "\n".$i)."\n";
+        if ($this->wrap) {
+            return $i.wordwrap($content, 120, "\n".$i)."\n";
+        } else {
+            return $i.$content."\n";
+        }
     }
 
     public function renderAttributes(): string
