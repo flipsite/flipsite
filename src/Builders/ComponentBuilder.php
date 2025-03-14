@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -83,11 +84,17 @@ class ComponentBuilder
             return null;
         }
 
-        // Resolve inheritance
-        if ($componentData->getId()) {
-            $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
-            $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
-            unset($style['inherit']);
+        // Resolve alias inheritance
+        $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
+        $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
+
+        if (isset($style['inherits'])) {
+            $inherits = is_string($style['inherits']) ? [$style['inherits']] : $style['inherits'];
+            unset($style['inherits']);
+            foreach ($inherits as $inherit) {
+                $inheritedStyle = $this->siteData->getSharedStyle($inherit);
+                $style          = ArrayHelper::merge($inheritedStyle, $style);
+            }
         }
 
         // Check if appearance changes

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -310,6 +311,10 @@ class Reader implements SiteDataInterface
         }
 
         return [];
+    }
+    public function getSharedStyle(int|string $sharedStyleId): array
+    {
+        return $this->data['theme']['styles'][$sharedStyleId] ?? [];
     }
 
     private function getType(string $componentId): string
