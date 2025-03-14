@@ -54,8 +54,7 @@ final class Number extends AbstractComponent
         }
         if (isset($data['content'])) {
             $content = str_replace('[number]', (string)$value, $data['content']);
-            $content = $this->getMarkdownLine($content, [], $inherited->getAppearance());
-            $content = $this->addClassesToHtml($content, ['strong'], $component->getStyle(), $inherited->getAppearance());
+            $content = $this->getMarkdownLine($value, ['strong'], $style, $inherited->getAppearance());
             $this->setContent($content);
         } else {
             $this->setContent($value);

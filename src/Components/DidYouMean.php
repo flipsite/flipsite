@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -10,7 +11,6 @@ use Flipsite\Data\InheritedComponentData;
 final class DidYouMean extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\ClassesTrait;
     use Traits\SiteDataTrait;
     use Traits\BuilderTrait;
     use Traits\EnvironmentTrait;
@@ -21,8 +21,7 @@ final class DidYouMean extends AbstractComponent
     {
         $data  = $component->getData();
         $style = $component->getStyle();
-        $value = $this->getMarkdownLine($data['value'] ?? '');
-        $value = $this->addClassesToHtml($value, ['a', 'strong'], $style, $inherited->getAppearance());
+        $value = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance());
         $this->setContent((string)$value);
         $this->addStyle($style);
 
