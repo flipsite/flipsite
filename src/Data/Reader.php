@@ -255,6 +255,11 @@ class Reader implements SiteDataInterface
         return $settings;
     }
 
+    public function getThemeVars(): array
+    {
+        return $this->data['theme']['variables'] ?? [];
+    }
+
     public function getAppearance(?string $page = null): string
     {
         return $this->data['theme']['components']['html']['appearance'] ?? 'light';

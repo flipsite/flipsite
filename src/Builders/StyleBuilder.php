@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -19,7 +20,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
 
     private array $customCss = [];
 
-    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private bool $minmizeClasses = false, private bool $preflight = true)
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private array $themeVars = [], private bool $minmizeClasses = false, private bool $preflight = true)
     {
     }
 
@@ -32,6 +33,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         $classes  = array_values(array_unique($classes));
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
+        $config['variables'] = $this->themeVars;
 
         // Overwrite keyframe definitions instead of merge
         // foreach ($this->theme['keyframes'] ?? [] as $keyframe => $definition) {
@@ -97,7 +99,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         }
     }
 
-    public function handleEvent(Event $event) : void
+    public function handleEvent(Event $event): void
     {
         if ('background-image' === $event->getType()) {
             foreach ($event->getData() as $mediaQuery => $declarations) {
@@ -112,7 +114,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         }
     }
 
-    private function addCustomClasses() : string
+    private function addCustomClasses(): string
     {
         $css = '';
         foreach ($this->customCss as $mediaQuery => $declarations) {

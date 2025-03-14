@@ -32,7 +32,6 @@ colors:
   fuchsia: "#d946ef"
   pink: "#ec4899"
   rose: "#f43f5e"
-
 spacing:
   none: none
   auto: auto

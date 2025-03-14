@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -15,7 +16,7 @@ final class Tailwind implements CallbackInterface
 
     public function __construct(private array $config, private array $themeSettings = [], private bool $preflight = true)
     {
-        $this->rules  = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
+        $this->rules = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
     }
 
     public function call(string $property, array $args): ?string
@@ -240,6 +241,10 @@ final class Tailwind implements CallbackInterface
                 array_shift($args);
                 array_shift($args);
                 array_shift($args);
+                $var = implode('-', $args);
+                if (isset($this->config['variables'][$var])) {
+                    $args = explode('-', $this->config['variables'][$var]);
+                }
                 return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
             }
         }
@@ -249,12 +254,20 @@ final class Tailwind implements CallbackInterface
             if (class_exists($ruleClass)) {
                 array_shift($args);
                 array_shift($args);
+                $var = implode('-', $args);
+                if (isset($this->config['variables'][$var])) {
+                    $args = explode('-', $this->config['variables'][$var]);
+                }
                 return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
             }
         }
         $ruleClass = 'Flipsite\Style\Rules\Rule'.$first;
         if (class_exists($ruleClass)) {
             array_shift($args);
+            $var = implode('-', $args);
+            if (isset($this->config['variables'][$var])) {
+                $args = explode('-', $this->config['variables'][$var]);
+            }
             return new $ruleClass($args, $negative, $this->config, $this->themeSettings, $this);
         }
         return null;

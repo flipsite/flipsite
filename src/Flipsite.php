@@ -144,6 +144,7 @@ final class Flipsite
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
+            $this->siteData->getThemeVars(),
             $this->environment->minimizeCss(),
             $this->renderOptions['style.preflight']
         );
