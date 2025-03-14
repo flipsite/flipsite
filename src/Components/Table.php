@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -27,15 +28,17 @@ final class Table extends AbstractComponent
             unset($data['file']);
         } elseif (isset($data['collectionId'])) {
             $collection = $this->siteData->getCollection($data['collectionId']);
-            $data['td'] = [];
-            foreach ($collection->getItems() as $item) {
-                $data['td'][] = array_values($item->getArray());
-            }
-            if ($data['header'] ?? false) {
-                $data['th'] = [];
-                foreach ($collection->getSchema()->getFields() as $fieldId) {
-                    $field        = $collection->getSchema()->getField($fieldId);
-                    $data['th'][] = $field->getName();
+            if ($collection) {
+                $data['td'] = [];
+                foreach ($collection->getItems() as $item) {
+                    $data['td'][] = array_values($item->getArray());
+                }
+                if ($data['header'] ?? false) {
+                    $data['th'] = [];
+                    foreach ($collection->getSchema()->getFields() as $fieldId) {
+                        $field        = $collection->getSchema()->getField($fieldId);
+                        $data['th'][] = $field->getName();
+                    }
                 }
             }
             unset($data['collectionId']);
