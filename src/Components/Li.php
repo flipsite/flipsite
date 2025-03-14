@@ -11,7 +11,6 @@ use Flipsite\Data\InheritedComponentData;
 final class Li extends AbstractGroup
 {
     use Traits\MarkdownTrait;
-    use Traits\ClassesTrait;
     use Traits\SiteDataTrait;
     use Traits\BuilderTrait;
 

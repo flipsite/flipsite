@@ -13,7 +13,6 @@ final class Table extends AbstractComponent
     use Traits\AssetsTrait;
     use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
-    use Traits\ClassesTrait;
     protected string $tag = 'table';
 
     public function normalize(string|int|bool|array $data): array

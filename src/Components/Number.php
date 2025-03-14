@@ -10,7 +10,6 @@ use Flipsite\Data\InheritedComponentData;
 final class Number extends AbstractComponent
 {
     use Traits\MarkdownTrait;
-    use Traits\ClassesTrait;
 
     protected string $tag  = 'div';
 
@@ -54,7 +53,7 @@ final class Number extends AbstractComponent
         }
         if (isset($data['content'])) {
             $content = str_replace('[number]', (string)$value, $data['content']);
-            $content = $this->getMarkdownLine($value, ['strong'], $style, $inherited->getAppearance());
+            $content = $this->getMarkdownLine($content, ['strong'], $style, $inherited->getAppearance());
             $this->setContent($content);
         } else {
             $this->setContent($value);

@@ -9,10 +9,13 @@ use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use Flipsite\Utils\StyleAppearanceHelper;
+use Flipsite\Components\Element;
 
 trait MarkdownTrait
 {
     use ActionTrait;
+    use BuilderTrait;
+
 
     private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance): string
     {
@@ -20,10 +23,13 @@ trait MarkdownTrait
         $environment = new Environment();
         $environment->addExtension(new CommonMarkCoreExtension());
         $environment->addExtension(new InlinesOnlyExtension());
-        $environment->addExtension(new AttributesExtension());
 
         $converter = new CommonMarkConverter([], $environment);
-        $html = $converter->convert($markdown);
+        $html = (string)$converter->convert($markdown);
+        $html = preg_replace('/^<p>(.*)<\/p>$/s', '$1', trim($html));
+
+        $html = $this->addClassesToHtml($html, $tags, $style, $appearance);
+
         $html = $this->fixUrlsInHtml($html);
         return $html;
     }
@@ -35,5 +41,27 @@ trait MarkdownTrait
             '[$1](mailto:$1)',
             $markdown
         );
+    }
+
+    private function addClassesToHtml(string $html, array $tags, array $style, string $appearance): string
+    {
+        foreach ($tags as $tag) {
+            if (isset($style[$tag])) {
+                $tag      = $tag === 'tbl' ? 'table' : $tag;
+                $tagStyle = StyleAppearanceHelper::apply($style[$tag], $appearance);
+                if (!$tagStyle) {
+                    continue;
+                }
+                $element = new Element('div');
+                if (isset($tagStyle['background'])) {
+                    $this->builder->handleBackground($element, $tagStyle['background']);
+                    unset($tagStyle['background']);
+                }
+                $element->addStyle($tagStyle);
+                $attributes = $element->renderAttributes();
+                $html       = str_replace('<' . $tag, '<' . $tag . $attributes, $html);
+            }
+        }
+        return $html;
     }
 }

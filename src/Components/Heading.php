@@ -16,8 +16,9 @@ final class Heading extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $data     = $component->getData();
-        $value = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance());
+        $data  = $component->getData();
+        $style = $component->getStyle();
+        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance());
         if (isset($data['anchor'])) {
             $a = new Element('a');
             $a->setContent($html);
