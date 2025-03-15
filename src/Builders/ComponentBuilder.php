@@ -18,6 +18,7 @@ use Flipsite\Utils\ArrayHelper;
 use Flipsite\Utils\Path;
 use Flipsite\Utils\ColorHelper;
 use Flipsite\Style\Style;
+use Flipsite\Style\OrderStyle;
 use Flipsite\Utils\Filter;
 use Flipsite\Utils\Plugins;
 
@@ -455,15 +456,15 @@ class ComponentBuilder
             if (is_array($value) && 'background' === $attr) {
                 $value = $this->optimizeStyle($value, $index, $total);
             } elseif (is_string($value) && $hasModifier($value)) {
-                $setting = new Style($value);
+                $setting = new OrderStyle($value);
                 if ($index === 0) {
-                    $value = $setting->getOrderValue('first') ?? $setting->getOrderValue('even') ?? $setting->getValue();
+                    $value = $setting->getValue('first') ?? $setting->getValue('even') ?? $setting->getValue();
                 } elseif ($index === $total - 1) {
-                    $value = $setting->getOrderValue('last') ?? $setting->getOrderValue('odd') ?? $setting->getValue();
+                    $value = $setting->getValue('last') ?? $setting->getValue('odd') ?? $setting->getValue();
                 } elseif ($index % 2 === 0) {
-                    $value = $setting->getOrderValue('even') ?? $setting->getValue();
+                    $value = $setting->getValue('even') ?? $setting->getValue();
                 } else {
-                    $value = $setting->getOrderValue('odd') ?? $setting->getValue();
+                    $value = $setting->getValue('odd') ?? $setting->getValue();
                 }
             }
         }

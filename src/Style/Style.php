@@ -6,7 +6,7 @@ namespace Flipsite\Style;
 
 final class Style
 {
-    private array $values = ['' => ''];
+    private array $values = [];
 
     public function __construct(?string $encoded, private string $prefix = '')
     {
@@ -15,9 +15,16 @@ final class Style
         foreach ($encodedVariants as $encodedVariant) {
             $parts                  = explode(':', $encodedVariant);
             $value                  = array_pop($parts);
-            $variant                = trim(implode(':', $parts));
-            $this->values[$variant] = $value;
+            $variant                = trim(implode(':', $parts), ':');
+            if ($value) {
+                $this->values[$variant] = $value;
+            }
         }
+    }
+
+    public function getValues(): array
+    {
+        return $this->values;
     }
 
     public function getVariants(): array
@@ -34,36 +41,6 @@ final class Style
     {
 
         return $this->values[$variant] ?? null;
-    }
-    public function getOrderValue(string $variant): ?string
-    {
-        $values = [];
-        $found = false;
-        $base = null;
-        foreach ($this->values as $key => $value) {
-            if (!$key) {
-                $base = $value;
-            } elseif (strpos($key, $variant) !== false) {
-                $found = true;
-                $key = str_replace($variant, '', $key);
-                $key = trim($key, ':');
-                $values[] = $key ? $key.':'.$value : $key;
-            }
-        }
-        if (!$found) {
-            return null;
-        }
-        $needsBase = false;
-        foreach ($values as $value) {
-            if (false !== strpos($value, ':')) {
-                $needsBase = true;
-                break;
-            }
-        }
-        if ($needsBase && $base) {
-            array_unshift($values, $base);
-        }
-        return implode(' ', $values);
     }
 
     public function removeValue(string $variant): ?string
