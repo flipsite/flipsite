@@ -54,6 +54,8 @@ interface SiteDataInterface
 
     public function getThemeSettings(): array;
 
+    public function getThemeVars(): array;
+
     public function getAppearance(?string $page = null): string;
 
     public function getHtmlStyle(?string $page = null): array;

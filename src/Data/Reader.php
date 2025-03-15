@@ -257,7 +257,11 @@ class Reader implements SiteDataInterface
 
     public function getThemeVars(): array
     {
-        return $this->data['theme']['variables'] ?? [];
+        $vars = $this->data['theme']['variables'] ?? [];
+        $vars['theme-section-x'] = '3.75|12.5';
+        $vars['theme-section-y'] = '20|30';
+        $vars['theme-section-gap'] = '15|20';
+        return $vars;
     }
 
     public function getAppearance(?string $page = null): string

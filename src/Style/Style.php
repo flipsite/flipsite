@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 final class Style
@@ -31,7 +32,38 @@ final class Style
 
     public function getValue(string $variant = ''): ?string
     {
+
         return $this->values[$variant] ?? null;
+    }
+    public function getOrderValue(string $variant): ?string
+    {
+        $values = [];
+        $found = false;
+        $base = null;
+        foreach ($this->values as $key => $value) {
+            if (!$key) {
+                $base = $value;
+            } elseif (strpos($key, $variant) !== false) {
+                $found = true;
+                $key = str_replace($variant, '', $key);
+                $key = trim($key, ':');
+                $values[] = $key ? $key.':'.$value : $key;
+            }
+        }
+        if (!$found) {
+            return null;
+        }
+        $needsBase = false;
+        foreach ($values as $value) {
+            if (false !== strpos($value, ':')) {
+                $needsBase = true;
+                break;
+            }
+        }
+        if ($needsBase && $base) {
+            array_unshift($values, $base);
+        }
+        return implode(' ', $values);
     }
 
     public function removeValue(string $variant): ?string

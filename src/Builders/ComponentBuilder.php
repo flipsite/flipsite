@@ -85,8 +85,10 @@ class ComponentBuilder
         }
 
         // Resolve alias inheritance
-        $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
-        $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
+        if ($componentData->getId()) {
+            $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
+            $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
+        }
 
         if (isset($style['inherits'])) {
             $inherits = is_string($style['inherits']) ? [$style['inherits']] : $style['inherits'];
@@ -455,13 +457,13 @@ class ComponentBuilder
             } elseif (is_string($value) && $hasModifier($value)) {
                 $setting = new Style($value);
                 if ($index === 0) {
-                    $value = $setting->getValue('first') ?? $setting->getValue('even') ?? $setting->getValue();
+                    $value = $setting->getOrderValue('first') ?? $setting->getOrderValue('even') ?? $setting->getValue();
                 } elseif ($index === $total - 1) {
-                    $value = $setting->getValue('last') ?? $setting->getValue('odd') ?? $setting->getValue();
+                    $value = $setting->getOrderValue('last') ?? $setting->getOrderValue('odd') ?? $setting->getValue();
                 } elseif ($index % 2 === 0) {
-                    $value = $setting->getValue('even') ?? $setting->getValue();
+                    $value = $setting->getOrderValue('even') ?? $setting->getValue();
                 } else {
-                    $value = $setting->getValue('odd') ?? $setting->getValue();
+                    $value = $setting->getOrderValue('odd') ?? $setting->getValue();
                 }
             }
         }
