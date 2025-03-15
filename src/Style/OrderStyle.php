@@ -40,13 +40,10 @@ final class OrderStyle
         $baseValues = isset($this->styles['']) ? $this->styles['']->getValues() : [];
 
         $values = ArrayHelper::merge($baseValues, $values);
-        $encoded = '';
+        $encoded = $values[''] ?? '';
+        unset($values['']);
         foreach ($values as $key => $value) {
-            if (!$key) {
-                $encoded .= $value;
-            } else {
-                $encoded .= ' '.$key.':'.$value;
-            }
+            $encoded .= ' '.$key.':'.$value;
         }
         return $encoded;
     }
