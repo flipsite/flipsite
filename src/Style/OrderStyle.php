@@ -14,21 +14,25 @@ final class OrderStyle
     {
         $encodedVariants = explode(' ', str_replace($prefix, '', $encoded));
 
+        $variants = [];
         $orders = ['first', 'last', 'odd', 'even'];
         foreach ($encodedVariants as $variant) {
             $found = false;
             foreach ($orders as $order) {
                 if (strpos($variant, $order) !== false) {
-                    $variantWithoutOrder = str_replace($order.':', '', $variant);
-                    $this->styles[$order] = new Style($variantWithoutOrder);
+                    $variants[$order] ??= '';
+                    $variants[$order] .= ' '.str_replace($order.':', '', $variant);
                     $found = true;
                 }
             }
             if (!$found) {
-                $this->styles[''] = new Style($variant);
+                $variants[''] ??= '';
+                $variants[''] .= ' '.$variant;
             }
         }
-
+        foreach ($variants as $order => $variant) {
+            $this->styles[$order] = new Style($variant);
+        }
     }
 
     public function getValue(?string $variant = null): ?string
@@ -38,8 +42,8 @@ final class OrderStyle
         }
         $values = $this->styles[$variant]->getValues();
         $baseValues = isset($this->styles['']) ? $this->styles['']->getValues() : [];
-
         $values = ArrayHelper::merge($baseValues, $values);
+
         $encoded = $values[''] ?? '';
         unset($values['']);
         foreach ($values as $key => $value) {
