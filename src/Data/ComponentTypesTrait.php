@@ -32,6 +32,7 @@ trait ComponentTypesTrait
         return in_array($componentType, [
             'breadcrumb',
             'button',
+            'checkbox',
             'codeBlock',
             'container',
             'counter',

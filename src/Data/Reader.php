@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -257,15 +256,15 @@ class Reader implements SiteDataInterface
 
     public function getThemeVars(): array
     {
-        $vars = $this->data['theme']['variables'] ?? [];
-        $vars['theme-section-x'] = '3.75|12.5';
-        $vars['theme-section-y'] = '20|30';
+        $vars                      = $this->data['theme']['variables'] ?? [];
+        $vars['theme-section-x']   = '3.75|12.5';
+        $vars['theme-section-y']   = '20|30';
         $vars['theme-section-gap'] = '15|20';
 
-        $vars['theme-content-gap-lg'] = '7.5';
-        $vars['theme-content-gap-md'] = '5';
-        $vars['theme-content-gap-sm'] = '3.5';
-        $vars['theme-content-gap-xs'] = '2';
+        $vars['theme-gap-lg'] = '7.5';
+        $vars['theme-gap-md'] = '5';
+        $vars['theme-gap-sm'] = '3.5';
+        $vars['theme-gap-xs'] = '2';
 
         return $vars;
     }
@@ -327,6 +326,7 @@ class Reader implements SiteDataInterface
 
         return [];
     }
+
     public function getSharedStyle(int|string $sharedStyleId): array
     {
         return $this->data['theme']['styles'][$sharedStyleId] ?? [];
