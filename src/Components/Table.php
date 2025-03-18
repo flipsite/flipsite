@@ -41,8 +41,8 @@ final class Table extends AbstractComponent
                 }
             }
             unset($data['collectionId']);
-        } elseif (isset($data['td']) && is_string($data['td'])) {
-            $td = json_decode($data['td'], true);
+        } elseif (isset($data['td'])) {
+            $td = $data['td'];
             if ($data['header'] ?? false) {
                 $data['th'] = $td[0];
                 $data['td'] = array_slice($td, 1);
