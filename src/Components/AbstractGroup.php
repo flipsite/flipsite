@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -29,6 +30,17 @@ abstract class AbstractGroup extends AbstractComponent
             if (isset($actionAttributes['tag'])) {
                 $this->tag = $actionAttributes['tag'];
                 unset($actionAttributes['tag']);
+            }
+            if ($inherited->hasATag()) {
+                $this->tag = 'span';
+                if (isset($actionAttributes['href'])) {
+                    $this->setAttribute('data-href', $actionAttributes['href']);
+                    unset($actionAttributes['href']);
+                }
+            }
+            // A tags can't be nested
+            if ($this->tag === 'a') {
+                $inherited->setATag(true);
             }
             foreach ($actionAttributes as $attr => $val) {
                 $this->setAttribute($attr, $val);

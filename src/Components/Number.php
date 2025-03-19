@@ -53,7 +53,7 @@ final class Number extends AbstractComponent
         }
         if (isset($data['content'])) {
             $content = str_replace('[number]', (string)$value, $data['content']);
-            $content = $this->getMarkdownLine($content, ['strong'], $style, $inherited->getAppearance());
+            $content = $this->getMarkdownLine($content, ['strong'], $style, $inherited->getAppearance(), $inherited->hasATag());
             $this->setContent($content);
         } else {
             $this->setContent($value);

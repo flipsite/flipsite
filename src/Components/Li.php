@@ -20,7 +20,7 @@ final class Li extends AbstractGroup
     {
         $style = $component->getStyle();
         $value  = $component->getDataValue('value', true);
-        $value = $this->getMarkdownLine($value, ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance());
+        $value = $this->getMarkdownLine($value, ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag());
         $component->addChild(new YamlComponentData(null, null, 'text', ['value' => $value, '_meta' => $component->getMeta()]));
         parent::build($component, $inherited);
     }

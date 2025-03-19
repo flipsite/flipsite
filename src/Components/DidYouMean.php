@@ -21,7 +21,7 @@ final class DidYouMean extends AbstractComponent
     {
         $data  = $component->getData();
         $style = $component->getStyle();
-        $value = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance());
+        $value = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance(), $inherited->hasATag());
         $this->setContent((string)$value);
         $this->addStyle($style);
 

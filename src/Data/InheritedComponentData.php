@@ -16,6 +16,8 @@ class InheritedComponentData
     private string|int|null $collectionId = null;
     private string|int|null $itemId       = null;
 
+    private bool $aTag = false;
+
     public function __construct(private string $appearance, private array $dataSource = [])
     {
     }
@@ -112,5 +114,15 @@ class InheritedComponentData
     public function getItemId(): string|int|null
     {
         return $this->itemId;
+    }
+
+    public function setATag(bool $value): void
+    {
+        $this->aTag = $value;
+    }
+
+    public function hasATag(): bool
+    {
+        return $this->aTag;
     }
 }

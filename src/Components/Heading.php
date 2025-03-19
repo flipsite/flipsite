@@ -18,7 +18,7 @@ final class Heading extends AbstractComponent
     {
         $data  = $component->getData();
         $style = $component->getStyle();
-        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance());
+        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance(), $inherited->hasATag());
         if (isset($data['anchor'])) {
             $a = new Element('a');
             $a->setContent($html);

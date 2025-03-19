@@ -17,7 +17,7 @@ trait MarkdownTrait
     use BuilderTrait;
 
 
-    private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance): string
+    private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance, bool $removeLinks = false): string
     {
         $markdown = $this->emailsToLinks($markdown);
         $environment = new Environment();
@@ -27,6 +27,14 @@ trait MarkdownTrait
         $converter = new CommonMarkConverter([], $environment);
         $html = (string)$converter->convert($markdown);
         $html = preg_replace('/^<p>(.*)<\/p>$/s', '$1', trim($html));
+
+        if ($removeLinks) {
+            $html = str_replace('<a href="', '<span data-href="', $html);
+            $html = str_replace('</a>', '</span>', $html);
+            $style['span'] = $style['a'] ?? [];
+            unset($style['a']);
+            $tags[] = 'span';
+        }
 
         $html = $this->addClassesToHtml($html, $tags, $style, $appearance);
 
@@ -47,7 +55,6 @@ trait MarkdownTrait
     {
         foreach ($tags as $tag) {
             if (isset($style[$tag])) {
-                $tag      = $tag === 'tbl' ? 'table' : $tag;
                 $tagStyle = StyleAppearanceHelper::apply($style[$tag], $appearance);
                 if (!$tagStyle) {
                     continue;

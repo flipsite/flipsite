@@ -117,7 +117,7 @@ final class Table extends AbstractComponent
                     $td->addStyle($styleTd);
                     $html = '';
                     if (is_string($cell)) {
-                        $html = $this->getMarkdownLine(trim($cell), ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance());
+                        $html = $this->getMarkdownLine(trim($cell), ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag());
                     }
                     $td->setContent($html);
                     $tr->addChild($td);
