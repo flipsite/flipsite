@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 class InheritedComponentData
@@ -40,6 +41,17 @@ class InheritedComponentData
     public function addDataSource(array $dataSource): void
     {
         foreach ($dataSource as $key => $value) {
+            if (is_string($value) && strpos($value, '{') !== false) {
+                $matches = [];
+                preg_match_all('/\{[^{}]+\}/', $value, $matches);
+                foreach ($matches[0] as $match) {
+                    $var   = trim($match, '{}');
+                    if (isset($this->dataSource[$var])) {
+                        $value      = str_replace($match, (string)$this->dataSource[$var], (string)$value);
+                        $replaced[] = $match;
+                    }
+                }
+            }
             $this->dataSource[$key] = $value;
         }
     }
