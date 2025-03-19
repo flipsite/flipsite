@@ -31,7 +31,8 @@ final class Paragraph extends AbstractComponent
             $data['value'] = $this->parsePhonw($data['value'], $data['formatPhone']);
         }
         $style = $component->getStyle();
-        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag());
+        $magicLinks = $data['magicLinks'] ?? false;
+        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
         $this->setContent((string)$html);
     }
 }

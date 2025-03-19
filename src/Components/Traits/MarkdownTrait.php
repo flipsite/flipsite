@@ -17,9 +17,11 @@ trait MarkdownTrait
     use BuilderTrait;
 
 
-    private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance, bool $removeLinks = false): string
+    private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance, bool $removeLinks = false, bool $magicLinks = false): string
     {
-        $markdown = $this->emailsToLinks($markdown);
+        if ($magicLinks) {
+            $markdown = $this->urlsToLinks($markdown);
+        }
         $environment = new Environment();
         $environment->addExtension(new CommonMarkCoreExtension());
         $environment->addExtension(new InlinesOnlyExtension());
@@ -49,6 +51,40 @@ trait MarkdownTrait
             '[$1](mailto:$1)',
             $markdown
         );
+    }
+
+    private function urlsToLinks(string $text): string
+    {
+        // Step 1: Temporarily replace existing markdown links with placeholders
+        $placeholders = [];
+        $text = preg_replace_callback(
+            '/\[[^\]]+\]\([^\)]+\)/',
+            function ($match) use (&$placeholders) {
+                $placeholder = "__PLACEHOLDER_" . count($placeholders) . "__";
+                $placeholders[$placeholder] = $match[0]; // Store original markdown link
+                return $placeholder;
+            },
+            $text
+        );
+
+        // Step 2: Convert standalone emails to markdown links (that are not already inside markdown)
+        $text = preg_replace(
+            '/(?<!\[)(?<!\()\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b(?!\))/',
+            '[$1](mailto:$1)',
+            $text
+        );
+
+        // Step 3: Convert standalone URLs to markdown links (that are not already inside markdown)
+        $text = preg_replace(
+            '/(?<!\[)\b(https?:\/\/[^\s<]+[^\s.,;:<])\b(?!\))/',
+            '[$1]($1)',
+            $text
+        );
+
+        // Step 4: Restore original markdown links from placeholders
+        $text = str_replace(array_keys($placeholders), array_values($placeholders), $text);
+
+        return $text;
     }
 
     private function addClassesToHtml(string $html, array $tags, array $style, string $appearance): string

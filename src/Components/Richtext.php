@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -66,7 +67,7 @@ final class Richtext extends AbstractGroup
 
         $inherited->setParent($component->getId(), $component->getType());
         foreach ($items as $index => $itemData) {
-            $item               = new RichtextItem($itemData, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['theme'] ?? null);
+            $item               = new RichtextItem($itemData, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['theme'] ?? null, $data['magicLinks'] ?? false);
             $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
             $component->addChild($itemComponentData);
         }
@@ -79,7 +80,7 @@ class RichtextItem
     private string $type;
     private array $data;
 
-    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null, private ?string $theme = null)
+    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null, private ?string $theme = null, private bool $magicLinks = false)
     {
         $this->type = $rawData['type'] ?? '';
         unset($rawData['type']);
@@ -119,6 +120,13 @@ class RichtextItem
             'code'   => $allStyle['code'] ?? [],
         ];
         switch ($this->type) {
+            case 'table':
+            case 'p':
+                $data = $this->data;
+                if ($this->magicLinks) {
+                    $data['magicLinks'] = $this->magicLinks;
+                }
+                return $data;
             case 'ol':
                 return [
                     '_repeat' => $this->data['value'],
