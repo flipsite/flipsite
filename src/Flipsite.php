@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -311,10 +310,20 @@ final class Flipsite
 
     private function getGlobalVars(?array $social, Path $path): array
     {
+        $compile    = $this->siteData->getCompile();
+        $compileUrl = null;
+        if (isset($compile['domain'])) {
+            $compileUrl = $compile['https'] ?? false ? 'https://' : 'http://';
+            $compileUrl .= $compile['domain'];
+            if (isset($compile['basePath'])) {
+                $compileUrl .= $compile['basePath'];
+            }
+        }
         $globalVars = [
             'site.name'             => $this->siteData->getName(),
             'site.description'      => $this->siteData->getDescription(),
             'site.image'            => $this->siteData->getShare(),
+            'site.url'              => $compileUrl ?? $this->environment->getAbsoluteUrl(''),
             'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
         ];
         $customGlobalVars = $this->siteData->getGlobalVars();
