@@ -90,6 +90,7 @@ class ComponentBuilder
             $inheritedStyleFromParent = $this->siteData->getInheritedStyle($componentData->getId());
             $style                    = ArrayHelper::merge($inheritedStyleFromParent, $style);
         }
+        unset($style['inherit']);
 
         if (isset($style['inherits'])) {
             $inherits = is_string($style['inherits']) ? [$style['inherits']] : $style['inherits'];
