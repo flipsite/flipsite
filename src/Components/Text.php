@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -8,13 +9,25 @@ use Flipsite\Data\InheritedComponentData;
 
 final class Text extends AbstractComponent
 {
+    use Traits\DateFilterTrait;
+    use Traits\PhoneFilterTrait;
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data          = $component->getData();
-        $this->content = $data['value'] ?? '';
+        $this->content = $data['value'] ?? $data['fallback'] ?? '';
+        if (!$this->content) {
+            $this->render = false;
+            return;
+        }
+        if (isset($data['formatDate'])) {
+            $this->content = $this->parseDate($this->content, $data['formatDate']);
+        }
+        if (isset($data['formatPhone'])) {
+            $this->content = $this->parsePhone($this->content, $data['formatPhone']);
+        }
     }
 
-    public function render(int $indentation = 2, int $level = 0, bool $oneline = false) : string
+    public function render(int $indentation = 2, int $level = 0, bool $oneline = false): string
     {
         $i    = str_repeat(' ', $indentation * $level);
         $html = $i;
