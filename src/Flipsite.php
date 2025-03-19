@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -326,6 +327,12 @@ final class Flipsite
             'site.url'              => $compileUrl ?? $this->environment->getAbsoluteUrl(''),
             'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
         ];
+        if (isset($social['phone'])) {
+            $globalVars['site.phone'] = $social['phone'];
+        }
+        if (isset($social['email'])) {
+            $globalVars['site.email'] = $social['email'];
+        }
         $customGlobalVars = $this->siteData->getGlobalVars();
         if ($customGlobalVars) {
             $globalVars = array_merge($globalVars, $customGlobalVars);
