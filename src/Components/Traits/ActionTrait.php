@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -134,7 +135,7 @@ trait ActionTrait
 
     private function handleAuto(string $target): array
     {
-        $action = 'none';
+        $action = null;
         $target = str_replace('mailto:', '', $target);
         $target = str_replace('tel:', '', $target);
 
@@ -145,6 +146,9 @@ trait ActionTrait
             $action = 'download';
         } elseif ($page) {
             $action = 'page';
+            if ($target === '') {
+                $action = null;
+            }
         } elseif (str_starts_with($target, 'http')) {
             $action = 'url-blank';
         } elseif (filter_var($target, FILTER_VALIDATE_EMAIL)) {
