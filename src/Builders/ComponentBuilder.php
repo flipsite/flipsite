@@ -146,6 +146,9 @@ class ComponentBuilder
                 $delay->setValue($variant, $value);
             }
             $style['transitionDelay'] = $delay->encode();
+            if (!$style['transitionDelay']) {
+                unset($style['transitionDelay']);
+            }
             unset($style['transitionDelayStep']);
         }
 

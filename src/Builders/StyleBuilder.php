@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -31,6 +30,9 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         $this->getElementsAndClasses($document, $elements, $classes);
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
+        $classes  = array_filter($classes, function ($value) {
+            return !empty($value);
+        });
 
         $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
         $config['variables'] = $this->themeVars;
