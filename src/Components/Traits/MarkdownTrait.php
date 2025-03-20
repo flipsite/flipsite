@@ -22,6 +22,7 @@ trait MarkdownTrait
         if ($magicLinks) {
             $markdown = $this->urlsToLinks($markdown);
         }
+        $markdown = $this->fixInvalidMarkdown($markdown);
         $environment = new Environment();
         $environment->addExtension(new CommonMarkCoreExtension());
         $environment->addExtension(new InlinesOnlyExtension());
@@ -106,5 +107,15 @@ trait MarkdownTrait
             }
         }
         return $html;
+    }
+
+    private function fixInvalidMarkdown(string $markdown): string
+    {
+        $markdown = preg_replace('/\s*\*\*\s*([^*]+?)\s*\*\*\s*/', ' **$1** ', $markdown);
+        $markdown = str_replace('**', '___BOLD___', $markdown);
+        $markdown = preg_replace('/\s*\*\s*([^*]+?)\s*\*\s*/', ' *$1* ', $markdown);
+        $markdown = str_replace('___BOLD___', '**', $markdown);
+        $markdown = preg_replace('/\s*`\s*([^`]+?)\s*`\s*/', ' `$1` ', $markdown);
+        return preg_replace('/\s+/', ' ', trim($markdown));
     }
 }
