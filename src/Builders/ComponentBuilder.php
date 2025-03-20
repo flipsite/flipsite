@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -279,6 +278,7 @@ class ComponentBuilder
         }
 
         if (isset($data['_attr'])) {
+            unset($data['_attr']['_original']);
             foreach ($data['_attr'] as $attr => $value) {
                 if (!is_string($value) || (!str_starts_with($value, '{') && !str_ends_with($value, '}'))) {
                     $component->setAttribute($attr, $value);
@@ -286,12 +286,6 @@ class ComponentBuilder
             }
             unset($data['_attr']);
         }
-        // if (isset($options['_original'])) {
-        //     if (is_string($options['_original'])) {
-        //         $options['original'] = ['value' => $options['original']];
-        //     }
-        // }
-        // $component->setAttribute('_original', null);
 
         $component->addStyle($style);
         $componentData->setData($data);
