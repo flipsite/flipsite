@@ -65,8 +65,8 @@ class MetaBuilder implements BuilderInterface
         }
 
         $hidden = $this->siteData->getHiddenPages();
-        if (in_array($slug, $hidden)) {
-            $elements[] = $this->meta('robots', 'noindex');
+        if (!$this->environment->isProduction() || in_array($slug, $hidden)) {
+            $elements[] = $this->meta('robots', 'noindex, nofollow');
         }
 
         $title = $meta['title'] ?? 'Flipsite';
