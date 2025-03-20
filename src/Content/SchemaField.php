@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -10,14 +11,12 @@ class SchemaField implements \JsonSerializable
     private const TYPES = [
         'color',
         'date',
-        'email',
         'enum',
         'gallery',
         'gradient',
         'icon',
         'image',
         'list',
-        'phone',
         'published',
         'richtext',
         'slug',
@@ -44,14 +43,20 @@ class SchemaField implements \JsonSerializable
         if ('boolean' === $this->type) {
             $this->type = 'published';
         }
-        if ('long' === $this->type) {
-            $this->type = 'text';
-        }
         if ('url' === $this->type) {
             $this->type = 'slug';
         }
+        if ('long' === $this->type) {
+            $this->type = 'text';
+        }
         if ('tel' === $this->type) {
-            $this->type = 'phone';
+            $this->type = 'text';
+        }
+        if ('phone' === $this->type) {
+            $this->type = 'text';
+        }
+        if ('email' === $this->type) {
+            $this->type = 'text';
         }
         if (!in_array($this->type, self::TYPES)) {
             throw new \Exception('Invalid field type ('.$this->type.')');
