@@ -1,12 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 final class Plugins
 {
-    public function __construct(private array $callbacks)
+    public function __construct(private array $callbacks = [])
     {
     }
 
