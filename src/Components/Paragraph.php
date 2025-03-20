@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -28,11 +27,11 @@ final class Paragraph extends AbstractComponent
             $data['value'] = $this->parseDate($data['value'], $data['formatDate']);
         }
         if (isset($data['formatPhone'])) {
-            $data['value'] = $this->parsePhonw($data['value'], $data['formatPhone']);
+            $data['value'] = $this->parsePhone($data['value'], $data['formatPhone']);
         }
-        $style = $component->getStyle();
+        $style      = $component->getStyle();
         $magicLinks = $data['magicLinks'] ?? false;
-        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
+        $html       = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
         $this->setContent((string)$html);
     }
 }
