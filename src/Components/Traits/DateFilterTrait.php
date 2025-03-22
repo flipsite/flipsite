@@ -24,7 +24,7 @@ trait DateFilterTrait
     {
         list($year, $month, $day) = explode('-', $date);
         if (!checkdate((int)$month, (int)$day, (int)$year)) {
-            return $date;
+            return date('Y-m-d');
         }
         $timestamp = strtotime($date);
         $pattern = null;

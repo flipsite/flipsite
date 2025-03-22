@@ -38,7 +38,10 @@ final class Date extends AbstractComponent
             null,
             $data['pattern'] ?? null
         );
-        $date = $dateFormatter->format($timestamp) ?? 'Invalid date';
+        $date = $dateFormatter->format($timestamp);
+        if (!$date) {
+            $date = 'Ivalid date';
+        }
         if (isset($data['content'])) {
             $this->setContent(str_replace('[date]', $date, $data['content']));
         } else {
