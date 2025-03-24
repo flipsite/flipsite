@@ -203,7 +203,7 @@ class Reader implements SiteDataInterface
 
     public function getColors(): array
     {
-        $colors = $this->data['theme']['colors'];
+        $colors = $this->data['theme']['colors'] ?? ['primary' => '#3E64DE'];
         if (!isset($colors['gray'])) {
             $colors['gray'] = \Flipsite\Utils\ColorHelper::getGray($colors['primary']);
         }
