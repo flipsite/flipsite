@@ -141,10 +141,6 @@ class RichtextItem
             case 'ul':
                 return [
                     '_repeat' => $this->data['value'],
-                    '_meta'   => [
-                        'componentChildId'   => 'ul',
-                        'componentChildName' => 'Lists'
-                    ],
                     'li'      => [
                         'icon'       => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
                         'value'      => '{item}',

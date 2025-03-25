@@ -37,13 +37,13 @@ final class Breadcrumb extends AbstractGroup
             $separatorComponentData = new YamlComponentData(
                 null,
                 null,
-                'svg',
+                'icon',
                 ['src' => $icon],
                 $style['separator']
             );
             $component->addChild($separatorComponentData);
         }
-
+        $inherited->setParent($component->getId(), $component->getType());
         parent::build($component, $inherited);
 
         $span = new Element('span');
