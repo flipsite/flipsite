@@ -207,7 +207,7 @@ class Compiler implements LoggerAwareInterface
                     // Check if the directory is empty after recursive call
                     $filesAfter = array_diff(scandir($path), array('.', '..'));
                     if (empty($filesAfter)) {
-                        rmdir($directory);
+                        rmdir($path);
                     }
                 }
             }
