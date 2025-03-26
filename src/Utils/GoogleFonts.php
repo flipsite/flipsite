@@ -31,6 +31,9 @@ class GoogleFonts
             }
             file_put_contents($targetDir.'/'.$filename, $binaryData);
 
+            if ($basePath !== '/') {
+                $basePath = '/'.trim($basePath, '/').'/';
+            }
             $url    = $basePath.$filename;
             $file   = [
                 'style'         => $fontFace['font-style'],

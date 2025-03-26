@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Compiler;
 
 use Flipsite\EnvironmentInterface;
@@ -169,7 +170,7 @@ class Compiler implements LoggerAwareInterface
         $this->removeEmptyFolders($this->targetDir);
     }
 
-    private function getOptimizedAsset(string $asset):string
+    private function getOptimizedAsset(string $asset): string
     {
         if (strpos($asset, '/files/') !== false) {
             return $asset;
@@ -204,8 +205,9 @@ class Compiler implements LoggerAwareInterface
                 if (is_dir($path)) {
                     $this->removeEmptyFolders($path);
                     // Check if the directory is empty after recursive call
-                    if (count(glob($path . '/*')) === 0) {
-                        rmdir($path); // Remove the empty directory
+                    $filesAfter = array_diff(scandir($path), array('.', '..'));
+                    if (empty($filesAfter)) {
+                        rmdir($directory);
                     }
                 }
             }
