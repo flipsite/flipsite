@@ -11,10 +11,13 @@ final class Text extends AbstractComponent
 {
     use Traits\DateFilterTrait;
     use Traits\PhoneFilterTrait;
+    use Traits\CheckTextTrait;
+
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data          = $component->getData();
         $this->content = $data['value'] ?? $data['fallback'] ?? '';
+        $this->content = $this->checkText($this->content, 'Plain text');
         if (!$this->content) {
             $this->render = false;
             return;

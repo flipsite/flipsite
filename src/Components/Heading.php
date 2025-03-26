@@ -10,6 +10,7 @@ use Flipsite\Data\InheritedComponentData;
 final class Heading extends AbstractComponent
 {
     use Traits\MarkdownTrait;
+    use Traits\CheckTextTrait;
 
     protected bool $oneline = true;
     protected string $tag   = 'h2';
@@ -18,7 +19,13 @@ final class Heading extends AbstractComponent
     {
         $data  = $component->getData();
         $style = $component->getStyle();
-        $html = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong'], $style, $inherited->getAppearance(), $inherited->hasATag());
+        $text = $data['value'] ?? '';
+        $text = $this->checkText($text, 'Heading');
+        if (!$text) {
+            $this->render = false;
+            return;
+        }
+        $html = $this->getMarkdownLine($text, ['a', 'strong'], $style, $inherited->getAppearance(), $inherited->hasATag());
         if (isset($data['anchor'])) {
             $a = new Element('a');
             $a->setContent($html);

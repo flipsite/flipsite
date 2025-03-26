@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -12,6 +13,7 @@ final class Paragraph extends AbstractComponent
     use Traits\SiteDataTrait;
     use Traits\DateFilterTrait;
     use Traits\PhoneFilterTrait;
+    use Traits\CheckTextTrait;
 
     protected string $tag = 'p';
 
@@ -23,6 +25,7 @@ final class Paragraph extends AbstractComponent
             $this->render = false;
             return;
         }
+        $data['value'] = $this->checkText($data['value'], 'Paragraph');
         if (isset($data['formatDate'])) {
             $data['value'] = $this->parseDate($data['value'], $data['formatDate']);
         }
