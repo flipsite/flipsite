@@ -30,7 +30,10 @@ class Compiler implements LoggerAwareInterface
     {
         $compileOptions = $this->siteData->getCompile();
         $compileOptions['domain'] ??= 'flipsite.io';
-        $basePath = $compileOptions['basePath'] ?? '/';
+        $basePath = $compileOptions['basePath']  ?? '/';
+        if ('/' !== $basePath) {
+            $basePath = '/'.trim($basePath, '/').'/';
+        }
 
         $assetList = [];
         $allFiles  = [];
@@ -52,7 +55,13 @@ class Compiler implements LoggerAwareInterface
             $this->siteData->setFonts($localFonts);
             foreach ($localFonts as $font) {
                 foreach ($font['files'] ?? [] as $file) {
-                    $allFiles[] = $propValue = substr($file['src'], 5, strlen($file['src']) - 22);
+                    $fontFile = substr($file['src'], 4, strlen($file['src']) - 21);
+                    if (str_starts_with($fontFile, $basePath)) {
+                        $fontFile = substr($fontFile, strlen($basePath));
+                    }
+                    if (!in_array($fontFile, $allFiles)) {
+                        $allFiles[] = $fontFile;
+                    }
                 }
             }
         }
@@ -74,7 +83,7 @@ class Compiler implements LoggerAwareInterface
             if ('404' == $page) {
                 $filepath = '404.html';
             } else {
-                $filepath = $page.'/index.html';
+                $filepath = trim($page.'/index.html', '/');
             }
             $fileAssets = AssetParser::parse($html, $compileOptions['domain']);
             foreach ($fileAssets as $fileAsset) {
@@ -92,8 +101,9 @@ class Compiler implements LoggerAwareInterface
 
         // Remove base path
         foreach ($assetList as &$asset) {
-            if ($basePath && $basePath !== '/') {
-                $asset      = str_replace($basePath, '', $asset);
+
+            if (str_starts_with($asset, $basePath)) {
+                $asset = substr($asset, strlen($basePath));
             }
             $allFiles[] = $this->getOptimizedAsset($asset);
         }
@@ -105,16 +115,16 @@ class Compiler implements LoggerAwareInterface
         $assets = new Assets($this->environment->getAssetSources());
         foreach ($assetList as $asset) {
             $filename = false;
-            if (str_starts_with($asset, '/img/')) {
-                $filename = substr($asset, 5);
+            if (str_starts_with($asset, 'img/')) {
+                $filename = substr($asset, 4);
                 $asset    = $this->getOptimizedAsset($asset);
-            } elseif (str_starts_with($asset, '/videos/')) {
-                $filename = substr($asset, 8);
-            } elseif (str_starts_with($asset, '/files/')) {
+            } elseif (str_starts_with($asset, 'videos/')) {
                 $filename = substr($asset, 7);
+            } elseif (str_starts_with($asset, 'files/')) {
+                $filename = substr($asset, 6);
             }
             if ($filename) {
-                $target   = $this->targetDir.$asset;
+                $target   = $this->targetDir.'/'.$asset;
                 $pathinfo = pathinfo($target);
                 if (!file_exists($pathinfo['dirname'])) {
                     mkdir($pathinfo['dirname'], 0777, true);
@@ -155,9 +165,11 @@ class Compiler implements LoggerAwareInterface
             foreach ($allFiles as $newFile) {
                 if (str_ends_with($currentFile, $newFile)) {
                     $delete = false;
+                } else {
+                    error_log($currentFile.' does not end with '.$newFile);
                 }
             }
-            if ($delete) {
+            if ($delete && !in_array($currentFile, $deleteFiles)) {
                 $deleteFiles[] = $currentFile;
             }
         }
