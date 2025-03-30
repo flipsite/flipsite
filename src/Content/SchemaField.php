@@ -19,6 +19,7 @@ class SchemaField implements \JsonSerializable
         'list',
         'published',
         'richtext',
+        'page',
         'slug',
         'svg',
         'text',
