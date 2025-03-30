@@ -28,6 +28,7 @@ class SchemaField implements \JsonSerializable
 
     private string $type;
     private ?string $name      = null;
+    private bool $hidden      = false;
     private ?bool $required    = null;
     private ?string $default   = null;
     private ?string $options   = null;
@@ -36,6 +37,7 @@ class SchemaField implements \JsonSerializable
     public function __construct(private string $id, private array $rawField)
     {
         $this->name = $rawField['_name'] ?? null;
+        $this->hidden = $rawField['_hidden'] ?? false;
         $type       = $rawField['type'];
         $format     = $rawField['format'] ?? null;
         $this->type = $format ? $format : $type;
@@ -115,6 +117,9 @@ class SchemaField implements \JsonSerializable
         if (array_key_exists('_name', $delta)) {
             $this->name = $delta['_name'];
         }
+        if (array_key_exists('_hidden', $delta)) {
+            $this->hidden = !!$delta['_hidden'];
+        }
     }
 
     public function getDefault(): null|string|bool
@@ -181,6 +186,7 @@ class SchemaField implements \JsonSerializable
         if ($this->name) {
             $json['_name'] = $this->name;
         }
+        $json['_hidden'] = $this->hidden ?? false;
         if ($this->default) {
             $json['default'] = $this->default;
         }
