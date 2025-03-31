@@ -13,6 +13,7 @@ class Collection implements \JsonSerializable
 
     public function __construct(private string $id, private array $rawSchema, private ?array $rawItems)
     {
+        $this->name     = $rawSchema['_name'] ?? $id;
         $this->icon     = $rawSchema['_icon'] ?? null;
         $this->internal = $rawSchema['_internal'] ?? false;
         if ($this->icon) {
@@ -20,7 +21,7 @@ class Collection implements \JsonSerializable
             $this->icon = str_replace('icon-', '', $this->icon);
         }
 
-        unset($rawSchema['_icon'], $rawSchema['_internal']);
+        unset($rawSchema['_name'], $rawSchema['_icon'], $rawSchema['_internal']);
 
         $this->schema = new Schema($rawSchema);
         if ($this->rawItems) {
@@ -149,6 +150,7 @@ class Collection implements \JsonSerializable
     {
         $json = [
             'id'       => $this->id,
+            'name'     => $this->name,
             'internal' => $this->internal,
             'icon'     => $this->icon,
             'schema'   => $this->schema,
