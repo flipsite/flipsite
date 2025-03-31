@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 class Schema implements \JsonSerializable
@@ -59,6 +58,7 @@ class Schema implements \JsonSerializable
     {
         return array_keys($this->fields);
     }
+
     public function getField(string $field): ?SchemaField
     {
         return $this->fields[$field] ?? null;
