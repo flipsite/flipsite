@@ -1,13 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 class Collection implements \JsonSerializable
 {
     private string $name;
     private ?string $icon;
-    private bool $internal = false;
     private Schema $schema;
     private array $items = [];
 
@@ -15,13 +15,12 @@ class Collection implements \JsonSerializable
     {
         $this->name     = $rawSchema['_name'] ?? $id;
         $this->icon     = $rawSchema['_icon'] ?? null;
-        $this->internal = $rawSchema['_internal'] ?? false;
         if ($this->icon) {
             $this->icon = lcfirst(strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $this->icon)));
             $this->icon = str_replace('icon-', '', $this->icon);
         }
 
-        unset($rawSchema['_name'], $rawSchema['_icon'], $rawSchema['_internal']);
+        unset($rawSchema['_name'], $rawSchema['_icon']);
 
         $this->schema = new Schema($rawSchema);
         if ($this->rawItems) {
@@ -151,14 +150,10 @@ class Collection implements \JsonSerializable
         $json = [
             'id'       => $this->id,
             'name'     => $this->name,
-            'internal' => $this->internal,
             'icon'     => $this->icon,
             'schema'   => $this->schema,
             'items'    => array_values($this->items)
         ];
-        if (!$this->internal) {
-            unset($json['internal']);
-        }
         if (!$this->icon) {
             unset($json['icon']);
         }
