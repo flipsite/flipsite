@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 class Collection implements \JsonSerializable
@@ -20,7 +19,7 @@ class Collection implements \JsonSerializable
             $this->icon = str_replace('icon-', '', $this->icon);
         }
 
-        unset($rawSchema['_name'], $rawSchema['_icon']);
+        unset($rawSchema['_name'], $rawSchema['_icon'], $rawSchema['_internal']);
 
         $this->schema = new Schema($rawSchema);
         if ($this->rawItems) {
