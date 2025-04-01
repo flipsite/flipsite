@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -30,11 +29,15 @@ final class Richtext extends AbstractGroup
                 $json = $data['value'];
             }
             if (is_array($json)) {
-                foreach ($json as $item) {
-                    if (($item['value'] ?? '') === '[]') {
-                        continue;
+                if (!ArrayHelper::isAssociative($json)) {
+                    $items = [['type'=>'ul', 'value'=>$json]];
+                } else {
+                    foreach ($json as $item) {
+                        if (($item['value'] ?? '') === '[]') {
+                            continue;
+                        }
+                        $items[] = $item;
                     }
-                    $items[] = $item;
                 }
             }
         } catch (\Exception $e) {
