@@ -29,7 +29,7 @@ final class Richtext extends AbstractGroup
                 $json = $data['value'];
             }
             if (is_array($json)) {
-                if (!ArrayHelper::isAssociative($json)) {
+                if (!isset($json[0]['type'])) {
                     $items = [['type'=>'ul', 'value'=>$json]];
                 } else {
                     foreach ($json as $item) {
