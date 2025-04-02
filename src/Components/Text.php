@@ -13,6 +13,8 @@ final class Text extends AbstractComponent
     use Traits\PhoneFilterTrait;
     use Traits\CheckTextTrait;
 
+    protected string $tag   = '';
+
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data          = $component->getData();
@@ -29,15 +31,18 @@ final class Text extends AbstractComponent
             $this->content = $this->parsePhone($this->content, $data['formatPhone']);
         }
     }
-
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false): string
     {
-        $i    = str_repeat(' ', $indentation * $level);
-        $html = $i;
-        $html .= $this->content;
-        if (!$this->oneline && !$oneline) {
-            $html .= "\n";
+        if ($this->tag === '') {
+            $i    = str_repeat(' ', $indentation * $level);
+            $html = $i;
+            $html .= $this->content;
+            if (!$this->oneline && !$oneline) {
+                $html .= "\n";
+            }
+            return $html;
+        } else {
+            return parent::render($indentation, $level, $oneline);
         }
-        return $html;
     }
 }
