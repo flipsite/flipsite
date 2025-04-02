@@ -322,7 +322,7 @@ final class Flipsite
         }
         $globalVars = [
             'site.name'             => $this->siteData->getName(),
-            'site.description'      => $this->siteData->getDescription(),
+            'site.description'      => $this->siteData->getDescription($path->getLanguage()),
             'site.image'            => $this->siteData->getShare(),
             'site.url'              => $compileUrl ?? $this->environment->getAbsoluteUrl(''),
             'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
