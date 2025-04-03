@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -19,8 +18,8 @@ final class Heading extends AbstractComponent
     {
         $data  = $component->getData();
         $style = $component->getStyle();
-        $text = $data['value'] ?? '';
-        $text = $this->checkText($text, 'Heading');
+        $text  = $data['value'] ?? '';
+        $text  = $this->checkText($text, 'Heading');
         if (!$text) {
             $this->render = false;
             return;
@@ -34,13 +33,5 @@ final class Heading extends AbstractComponent
         } else {
             $this->setContent($html);
         }
-    }
-
-    public function getDefaultStyle(): array
-    {
-        $htmlStyle            = $this->siteData->getHtmlStyle();
-        $style                = $htmlStyle['heading'] ?? [];
-        $style['font-family'] = 'font-headings';
-        return $style;
     }
 }

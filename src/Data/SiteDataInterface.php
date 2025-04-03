@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Utils\Language;
@@ -66,7 +65,7 @@ interface SiteDataInterface
 
     public function getInheritedStyle(int|string $componentId): array;
 
-    public function getSharedStyle(int|string $componentId): array;
+    public function getSharedStyle(int|string|null $sharedStyleId = null): array;
 
     public function getMeta(string $page, ?Language $language = null): ?array;
 

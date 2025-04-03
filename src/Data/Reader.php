@@ -327,8 +327,11 @@ class Reader implements SiteDataInterface
         return [];
     }
 
-    public function getSharedStyle(int|string $sharedStyleId): array
+    public function getSharedStyle(int|string|null $sharedStyleId = null): array
     {
+        if (null === $sharedStyleId) {
+            return $this->data['theme']['styles'];
+        }
         return $this->data['theme']['styles'][$sharedStyleId] ?? [];
     }
 
