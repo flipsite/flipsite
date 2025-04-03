@@ -330,9 +330,9 @@ class Reader implements SiteDataInterface
     public function getSharedStyle(int|string|null $sharedStyleId = null): array
     {
         if (null === $sharedStyleId) {
-            return $this->data['theme']['styles'];
+            return $this->data['theme']['shared'] ?? [];
         }
-        return $this->data['theme']['styles'][$sharedStyleId] ?? [];
+        return $this->data['theme']['shared'][$sharedStyleId] ?? [];
     }
 
     private function getType(string $componentId): string
@@ -732,6 +732,22 @@ class Reader implements SiteDataInterface
             unset($theme['components']['heading'], $theme['components']['button'], $theme['components']['container'], $theme['components']['form'], $theme['components']['icon'], $theme['components']['input'], $theme['components']['link'], $theme['components']['logo'], $theme['components']['question'], $theme['components']['label'], $theme['components']['nav'], $theme['components']['paragraph'], $theme['components']['social'], $theme['components']['svg'], $theme['components']['tagline'], $theme['components']['textarea'], $theme['components']['toggle']);
 
             $theme['_version'] = 1;
+            error_log('Repaired theme.yaml');
+            $this->dumpYaml($theme, $sourcePath);
+        }
+        if (($theme['_version'] ?? 0) < 2) {
+            if (isset($theme['components']['html']['heading'])) {
+                $theme['shared'] ??= [];
+                $theme['shared']['heading'] = $theme['components']['html']['heading'];
+                unset($theme['components']['html']['heading']);
+                $theme['components'] = ArrayHelper::applyArrayCallback($theme['components'], function (array $value, string $attribute): array {
+                    if (is_string($attribute) && ($attribute === 'heading' || str_starts_with($attribute, 'heading:'))) {
+                        $value['inherits'] = 'heading';
+                    }
+                    return $value;
+                });
+            }
+            $theme['_version'] = 2;
             error_log('Repaired theme.yaml');
             $this->dumpYaml($theme, $sourcePath);
         }

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -130,7 +129,7 @@ final class ArrayHelper
     {
         foreach ($data as $key => &$value) {
             if (is_array($value)) {
-                $value = $callback(self::applyArrayCallback($value, $callback));
+                $value = $callback(self::applyArrayCallback($value, $callback), $key);
             }
         }
         return $data;
