@@ -1,18 +1,19 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
 use League\Csv\Reader;
+use Flipsite\Utils\ArrayHelper;
 
 final class Table extends AbstractComponent
 {
     use Traits\AssetsTrait;
     use Traits\BuilderTrait;
     use Traits\MarkdownTrait;
+    use Traits\SiteDataTrait;
     protected string $tag = 'table';
 
     public function normalize(string|int|bool|array $data): array
@@ -61,16 +62,6 @@ final class Table extends AbstractComponent
         return $data;
     }
 
-    public function getDefaultStyle(): array
-    {
-        $htmlStyle                 = $this->siteData->getHtmlStyle();
-        $style                     = [];
-        $style['th']               = $htmlStyle['heading'] ?? [];
-        $style['th']['fontFamily'] = 'font-headings';
-        unset($style['th']['textSize']);
-        return $style;
-    }
-
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data         = $component->getData();
@@ -78,11 +69,18 @@ final class Table extends AbstractComponent
         $columnsCount = isset($data['td'][0]) ? count($data['td'][0]) : 0;
 
         if (($data['th'] ?? false) && count($data['th'])) {
-            $thead = new Element('thead');
-            $tr    = new Element('tr');
+            $thead       = new Element('thead');
+            $tr          = new Element('tr');
+            $thead       = new Element('thead');
+            $tr          = new Element('tr');
+            $styleThBase = $style['th'] ?? [];
+            if (isset($styleThBase['inherits'])) {
+                $styleThBase = ArrayHelper::merge($this->siteData->getSharedStyle($styleThBase['inherits']), $styleThBase);
+                unset($styleThBase['inherits']);
+            }
             foreach ($data['th'] as $columnIndex => $thCell) {
                 $th          = new Element('th');
-                $styleTh     = $this->builder->optimizeStyle($style['th'] ?? [], $columnIndex, $columnsCount);
+                $styleTh     = $this->builder->optimizeStyle($styleThBase, $columnIndex, $columnsCount);
                 if (isset($styleTh['background'])) {
                     $this->builder->handleBackground($tr, $styleTh['background']);
                 }
@@ -98,6 +96,12 @@ final class Table extends AbstractComponent
         if (($data['td'] ?? false)) {
             $tbody       = new Element('tbody');
             $rowsCount   = count($data['td']);
+            $styleTdBase = $style['td'] ?? [];
+            if (isset($styleTdBase['inherits'])) {
+                $styleTdBase = ArrayHelper::merge($this->siteData->getSharedStyle($styleTdBase['inherits']), $styleTdBase);
+                unset($styleTdBase['inherits']);
+            }
+
             foreach ($data['td'] as $rowIndex => $row) {
                 $tr          = new Element('tr');
                 $styleTr     = $this->builder->optimizeStyle($style['tr'] ?? [], $rowIndex, $rowsCount);
@@ -109,7 +113,7 @@ final class Table extends AbstractComponent
                 foreach ($row as $columnIndex => $cell) {
                     $td = new Element('td', true);
 
-                    $styleTd     = $this->builder->optimizeStyle($style['td'] ?? [], $columnIndex, $columnsCount);
+                    $styleTd     = $this->builder->optimizeStyle($styleTdBase ?? [], $columnIndex, $columnsCount);
                     if (isset($styleTd['background'])) {
                         $this->builder->handleBackground($td, $styleTd['background']);
                     }
@@ -117,7 +121,7 @@ final class Table extends AbstractComponent
                     $td->addStyle($styleTd);
                     $html = '';
                     if (is_string($cell)) {
-                        $html = $this->getMarkdownLine(trim($cell), ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $data['magicLinks'] ?? false);
+                        $html = $this->getMarkdownLine(trim($cell), ['a', 'strong', 'em', 'code'], $styleTd, $inherited->getAppearance(), $inherited->hasATag(), $data['magicLinks'] ?? false);
                     }
                     $td->setContent($html);
                     $tr->addChild($td);

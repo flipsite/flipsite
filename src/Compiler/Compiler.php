@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Compiler;
 
 use Flipsite\EnvironmentInterface;
@@ -30,7 +29,7 @@ class Compiler implements LoggerAwareInterface
     {
         $compileOptions = $this->siteData->getCompile();
         $compileOptions['domain'] ??= 'flipsite.io';
-        $basePath = $compileOptions['basePath']  ?? '/';
+        $basePath = $compileOptions['basePath'] ?? '/';
         if ('/' !== $basePath) {
             $basePath = '/'.trim($basePath, '/').'/';
         }
@@ -101,7 +100,6 @@ class Compiler implements LoggerAwareInterface
 
         // Remove base path
         foreach ($assetList as &$asset) {
-
             if (str_starts_with($asset, $basePath)) {
                 $asset = substr($asset, strlen($basePath));
             }
@@ -165,8 +163,6 @@ class Compiler implements LoggerAwareInterface
             foreach ($allFiles as $newFile) {
                 if (str_ends_with($currentFile, $newFile)) {
                     $delete = false;
-                } else {
-                    error_log($currentFile.' does not end with '.$newFile);
                 }
             }
             if ($delete && !in_array($currentFile, $deleteFiles)) {
@@ -217,7 +213,7 @@ class Compiler implements LoggerAwareInterface
                 if (is_dir($path)) {
                     $this->removeEmptyFolders($path);
                     // Check if the directory is empty after recursive call
-                    $filesAfter = array_diff(scandir($path), array('.', '..'));
+                    $filesAfter = array_diff(scandir($path), ['.', '..']);
                     if (empty($filesAfter)) {
                         rmdir($path);
                     }
