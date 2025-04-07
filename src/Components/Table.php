@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -54,8 +55,8 @@ final class Table extends AbstractComponent
         if (!isset($data['td'])) {
             $data['th']   = ['Col1', 'Col2', 'Col2'];
             $data['td']   = [];
-            $data['td'][] = ['Cell 1,1', 'Cell 2,1', 'Cell 3,1'];
-            $data['td'][] = ['Cell 1,2', 'Cell 2,2', 'Cell 3,2'];
+            $data['td'][] = ['Cell 1,1', '**Cell 2,1**', '*Cell 3,1*'];
+            $data['td'][] = ['[Cell 1,2](#)', 'Cell 2,2', 'Cell 3,2'];
             $data['td'][] = ['Cell 1,3', 'Cell 2,3', 'Cell 3,3'];
         }
 

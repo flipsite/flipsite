@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -30,7 +31,7 @@ final class Richtext extends AbstractGroup
             }
             if (is_array($json)) {
                 if (!isset($json[0]['type'])) {
-                    $items = [['type'=>'ul', 'value'=>$json]];
+                    $items = [['type' => 'ul', 'value' => $json]];
                 } else {
                     foreach ($json as $item) {
                         if (($item['value'] ?? '') === '[]') {
@@ -117,10 +118,10 @@ class RichtextItem
     public function getData(array $allStyle): string|array
     {
         $markdown = [
-            'a'      => $allStyle['a'] ?? [],
-            'strong' => $allStyle['strong'] ?? [],
-            'em'     => $allStyle['em'] ?? [],
-            'code'   => $allStyle['code'] ?? [],
+            'a'      => $allStyle['p']['a'] ?? [],
+            'strong' => $allStyle['p']['strong'] ?? [],
+            'em'     => $allStyle['p']['em'] ?? [],
+            'code'   => $allStyle['p']['code'] ?? [],
         ];
         switch ($this->type) {
             case 'table':
