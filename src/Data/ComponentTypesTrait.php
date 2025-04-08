@@ -86,6 +86,7 @@ trait ComponentTypesTrait
             'social',
             'timer',
             'ul',
+            'li',
         ]);
     }
 }

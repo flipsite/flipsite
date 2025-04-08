@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -58,201 +57,190 @@ final class Richtext extends AbstractGroup
             $this->render = false;
             return;
         }
-        $style = $component->getStyle();
-        foreach ($component->getChildren() as $child) {
-            if ('codeBlock' === $child->getType()) {
-                $style['codeBlock'] = $child->getStyle();
-                $data['theme']      = $child->getData()['theme'] ?? null;
-            }
-        }
+        $items    = $data['value'] ?? [];
         $component->purgeChildren();
-        $items = $data['value'] ?? [];
-        unset($data['value']);
-
         $inherited->setParent($component->getId(), $component->getType());
         foreach ($items as $index => $itemData) {
-            $item               = new RichtextItem($itemData, $data['liIcon'] ?? null, $data['liNumber'] ?? null, $data['theme'] ?? null, $data['magicLinks'] ?? false);
-            $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData($style), $item->getStyle($style));
-            $component->addChild($itemComponentData);
+            $item = $this->getItem($itemData, $data, $component->getStyle());
+            if ($item) {
+                $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData(), $item->getStyle());
+                $component->addChild($itemComponentData);
+            }
         }
         parent::build($component, $inherited);
     }
-}
 
-class RichtextItem
-{
-    private string $type;
-    private array $data;
-
-    public function __construct(array $rawData, private ?array $icon = null, private ?array $number = null, private ?string $theme = null, private bool $magicLinks = false)
+    private function getItem(array $itemData, array $componentData, array $componentStyle) : ?AbstractRichtextItem
     {
-        $this->type = $rawData['type'] ?? '';
-        unset($rawData['type']);
-        $this->data = $rawData;
-    }
-
-    public function getType(): ?string
-    {
-        switch ($this->type) {
+        $type = $itemData['type'] ?? null;
+        switch ($type) {
             case 'h1':
             case 'h2':
             case 'h3':
             case 'h4':
             case 'h5':
             case 'h6':
-                return 'heading';
+                $tagStyle        = $componentStyle[$type] ?? [];
+                $tagStyle['tag'] = $type;
+                return new RichtextItemHeading($itemData['value'], $componentStyle['h'] ?? [], $tagStyle);
             case 'p':
-                return 'paragraph';
+                return new RichtextItemParagraph($itemData['value'], $componentStyle['p'] ?? [], $itemData['magiclinks'] ?? false);
             case 'img':
-                if (isset($this->data['figcaption'])) {
-                    return 'group';
-                }
-                return 'image';
-            case 'ol':
+                return new RichtextItemImage($itemData, $componentStyle['img'] ?? []);
             case 'ul':
-                return 'ul';
+            case 'ol':
+                return new RichtextItemList($type, $itemData, $componentData['ul']['li']['icon']['value'] ?? null, $componentData['ul']['li']['number']['format'] ?? null, $componentStyle['ul'] ?? [], $componentStyle['p'] ?? []);
+            case 'table':
+                return new RichtextItemTable($itemData, $componentStyle['table']);
+            case 'youtube':
+                return new RichtextItemYoutube($itemData, $componentStyle['youtube'] ?? []);
         }
+        return null;
+    }
+}
+
+class AbstractRichtextItem
+{
+    protected string $type;
+    protected array $data;
+    protected array $style;
+
+    public function getType(): string
+    {
         return $this->type;
     }
 
-    public function getData(array $allStyle): string|array
+    public function getData(): array
     {
-        $markdown = [
-            'a'      => $allStyle['p']['a'] ?? [],
-            'strong' => $allStyle['p']['strong'] ?? [],
-            'em'     => $allStyle['p']['em'] ?? [],
-            'code'   => $allStyle['p']['code'] ?? [],
-        ];
-        switch ($this->type) {
-            case 'table':
-            case 'p':
-                $data = $this->data;
-                if ($this->magicLinks) {
-                    $data['magicLinks'] = $this->magicLinks;
-                }
-                return $data;
-            case 'ol':
-                return [
-                    '_repeat' => $this->data['value'],
-                    'li'      => [
-                        'number'     => $this->number ?
-                        ArrayHelper::merge($this->number, ['value' => '{index}', '_style' => $allStyle['liNumber'] ?? []]) : null,
-                        'value'   => '{item}',
-                        '_style'  => ArrayHelper::merge($allStyle['li'] ?? [], $markdown),
-                    ],
-
-                ];
-            case 'ul':
-                return [
-                    '_repeat' => $this->data['value'],
-                    'li'      => [
-                        'icon'       => $this->icon ? ArrayHelper::merge($this->icon ?? [], ['_style' => $allStyle['liIcon'] ?? []]) : null,
-                        'value'      => '{item}',
-                        '_style'     => ArrayHelper::merge($allStyle['li'] ?? [], $markdown),
-                    ],
-
-                ];
-            case 'img':
-                $image          = ['value' => $this->data['value'] ?? null, 'alt' => $this->data['alt'] ?? null];
-                if (isset($this->data['figcaption'])) {
-                    return [
-                        'image'     => $image,
-                        'paragraph' => [
-                            'value'      => $this->data['figcaption'],
-                            '_style'     => ArrayHelper::merge($allStyle['figcaption'] ?? [], ['tag' => 'figcaption'])]
-                    ];
-                }
-                return $image;
-            case 'youtube':
-                $data  = $this->data;
-                $title = $data['title'] ?? 'Youtube Video';
-                unset($data['title']);
-                $data['_attr']   = ['title' => $title];
-                $data['loading'] = 'lazy';
-                return $data;
-            case 'codeBlock':
-                $data = $this->data;
-                if ($this->theme) {
-                    $data['theme'] = $this->theme;
-                }
-                return $data;
-        }
         return $this->data;
     }
 
-    public function getStyle(array $allStyle): array
+    public function getStyle(): array
     {
-        $componentStyle = [];
-        switch ($this->type) {
-            case 'h1':
-            case 'h2':
-            case 'h3':
-            case 'h4':
-            case 'h5':
-            case 'h6':
-                $componentStyle = ['tag' => $this->type];
-                break;
-            case 'p':
-                $componentStyle = [
-                    'a'      => $allStyle['a'] ?? [],
-                    'strong' => $allStyle['strong'] ?? [],
-                    'em'     => $allStyle['em'] ?? [],
-                    'code'   => $allStyle['code'] ?? [],
-                ];
-                break;
-            case 'ul':
-                $componentStyle = ['tag' => $this->type];
-                if (!$this->icon) {
-                    $componentStyle['listStylePosition'] = 'list-inside';
-                    $componentStyle['listStyleType']     = 'list-disc';
-                }
-                break;
-            case 'ol':
-                $componentStyle = ['tag' => $this->type];
-                if (!$this->number) {
-                    $componentStyle['listStylePosition'] = 'list-inside';
-                    $componentStyle['listStyleType']     = 'list-decimal';
-                }
-                $componentStyle = ArrayHelper::merge($componentStyle, $allStyle['ul']);
-                break;
-            case 'img':
-                if (isset($this->data['figcaption'])) {
-                    $imageStyle     = $allStyle[$this->type] ?? [];
-                    $componentStyle = ['tag' => 'figure'];
-                    $unset          = [];
-                    $moveToWrapper  = ['margin', 'padding'];
-                    $copyWrapper    = ['idth', 'eight'];
-                    foreach ($imageStyle as $key => $val) {
-                        foreach ($moveToWrapper as $move) {
-                            if (str_starts_with($key, $move)) {
-                                $unset[]              = $key;
-                                $componentStyle[$key] = $val;
-                            }
-                        }
-                        foreach ($copyWrapper as $copy) {
-                            if (str_ends_with($key, $copy)) {
-                                $componentStyle[$key] = $val;
-                            }
-                        }
-                    }
-                    foreach ($unset as $key) {
-                        unset($imageStyle[$key]);
-                    }
-                    $componentStyle['image'] = $imageStyle;
-                    return $componentStyle;
-                }
-                break;
-            case 'table':
-                $componentStyle = [
-                    'th'      => $allStyle['th'] ?? [],
-                    'tr'      => $allStyle['tr'] ?? [],
-                    'td'      => $allStyle['td'] ?? [],
-                    'a'       => $allStyle['a'] ?? [],
-                    'strong'  => $allStyle['strong'] ?? [],
-                    'em'      => $allStyle['em'] ?? [],
-                    'code'    => $allStyle['code'] ?? []
-                ];
+        return $this->style;
+    }
+}
+
+class RichtextItemHeading extends AbstractRichtextItem
+{
+    protected string $type = 'heading';
+
+    public function __construct(string $value, array $style, array $tagStyle)
+    {
+        $this->data['value'] = $value;
+        $this->style         = ArrayHelper::merge($style, $tagStyle);
+    }
+}
+
+class RichtextItemParagraph extends AbstractRichtextItem
+{
+    protected string $type = 'paragraph';
+
+    public function __construct(string $value, array $style, bool $magiclinks = false)
+    {
+        $this->data['value'] = $value;
+        if ($magiclinks) {
+            $this->data['magicLinks'] = $magiclinks;
         }
-        return ArrayHelper::merge($allStyle[$this->type] ?? [], $componentStyle);
+        $this->style         = $style;
+    }
+}
+
+class RichtextItemImage extends AbstractRichtextItem
+{
+    protected string $type = 'image';
+
+    public function __construct(array $value, array $style)
+    {
+        $image          = [];
+        $image['value'] = $value['value'];
+        if (isset($value['alt'])) {
+            $image['alt'] = $value['alt'];
+        }
+
+        if (isset($value['figcaption'])) {
+            $this->type = 'group';
+            $this->data = [
+                'image'     => $image,
+                'paragraph' => [
+                    'value'      => $value['figcaption'],
+                    '_style'     => ArrayHelper::merge($style['figcaption'] ?? [], ['tag' => 'figcaption'])
+                ]
+            ];
+
+            $componentStyle = ['tag' => 'figure'];
+            $unset          = [];
+            $moveToWrapper  = ['margin', 'padding'];
+            $copyWrapper    = ['idth', 'eight'];
+            foreach ($style as $key => $val) {
+                foreach ($moveToWrapper as $move) {
+                    if (str_starts_with($key, $move)) {
+                        $unset[]              = $key;
+                        $componentStyle[$key] = $val;
+                    }
+                }
+                foreach ($copyWrapper as $copy) {
+                    if (str_ends_with($key, $copy)) {
+                        $componentStyle[$key] = $val;
+                    }
+                }
+            }
+            foreach ($unset as $key) {
+                unset($style[$key]);
+            }
+            $componentStyle['image'] = $style;
+            $this->style             = $componentStyle;
+        } else {
+            $this->value = $image;
+            $this->style = $style;
+        }
+    }
+}
+
+class RichtextItemList extends AbstractRichtextItem
+{
+    protected string $type = 'ul';
+
+    public function __construct(string $type, array $value, ?string $icon, ?string $number, array $style)
+    {
+        $this->data['_repeat'] = $value['value'];
+        $li                    = [];
+        if ('ul' === $type && $icon) {
+            $li['icon'] = $icon;
+        }
+        if ('ol' === $type && $number) {
+            $li['number'] = [
+                'format'  => $number,
+                'value'   => '{index}',
+                '_style'  => ArrayHelper::merge($style['li']['icon'] ?? [])
+            ];
+        }
+        $li['value']      = '{item}';
+        $this->data['li'] = $li;
+        $this->style      = $style;
+    }
+}
+
+class RichtextItemTable extends AbstractRichtextItem
+{
+    protected string $type = 'table';
+
+    public function __construct(array $value, array $style)
+    {
+        $this->data  = $value;
+        $this->style = $style;
+    }
+}
+
+class RichtextItemYoutube extends AbstractRichtextItem
+{
+    protected string $type = 'youtube';
+
+    public function __construct(array $value, array $style)
+    {
+        $this->data['value']    = $value['value'];
+        $this->data['_attr']    = ['title' => $value['title'] ?? 'Youtube Video ('.$value['value'].')'];
+        $this->data['loading']  = 'lazy';
+        $this->style            = $style;
     }
 }

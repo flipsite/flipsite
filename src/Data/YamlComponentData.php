@@ -36,9 +36,13 @@ class YamlComponentData extends AbstractComponentData
                 if (!is_array($value)) {
                     $value = ['value' => $value];
                 }
-                $componentsInData[] = $attr;
-                $value['_style']    = ArrayHelper::merge($style[$attr] ?? [], $value['_style'] ?? []);
-                $this->children[]   = new YamlComponentData($this->path, null === $id ? null : $id.'.'.$attr, $type, $value);
+                if ($this->isContainer($this->type)) {
+                    $componentsInData[] = $attr;
+                    $value['_style']    = ArrayHelper::merge($style[$attr] ?? [], $value['_style'] ?? []);
+                    $this->children[]   = new YamlComponentData($this->path, null === $id ? null : $id.'.'.$attr, $type, $value);
+                } else {
+                    $this->data[$attr] = $value;
+                }
             }
         }
         // Remove style for components in data

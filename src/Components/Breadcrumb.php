@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -22,7 +21,11 @@ final class Breadcrumb extends AbstractGroup
         $page     = $this->path->getPage();
         $current  = $this->siteData->getPageName($page, $this->path->getLanguage());
         $links    = $this->getLinks($page);
+
         $icon     = $component->getDataValue('separator', true);
+        if (is_string($icon)) {
+            $icon = ['value' => $icon];
+        }
 
         foreach ($links as $i => $link) {
             $linkComponentData = new YamlComponentData(
@@ -38,7 +41,7 @@ final class Breadcrumb extends AbstractGroup
                 null,
                 null,
                 'icon',
-                ['src' => $icon],
+                $icon,
                 $style['separator']
             );
             $component->addChild($separatorComponentData);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -18,9 +17,9 @@ final class Li extends AbstractGroup
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $style = $component->getStyle();
+        $style  = $component->getStyle();
         $value  = $component->getDataValue('value', true);
-        $value = $this->getMarkdownLine($value, ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag());
+        $value  = $this->getMarkdownLine($value, ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag());
         $component->addChild(new YamlComponentData(null, null, 'text', ['value' => $value, '_meta' => $component->getMeta()]));
         parent::build($component, $inherited);
     }
