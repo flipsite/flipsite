@@ -8,6 +8,7 @@ ready(() => {
   document.querySelectorAll('[data-dots]').forEach((dots) => {
     dots.removeAttribute('data-dots');
     const dotsTarget = findDotsTarget(dots);
+    if (!dotsTarget) return;
     const backgrounds = dots.hasAttribute('data-backgrounds') ? JSON.parse(dots.getAttribute('data-backgrounds')) : [];
     dots.removeAttribute('data-backgrounds');
     const scrollDots = new ScrollDots(dots, backgrounds, dotsTarget);
