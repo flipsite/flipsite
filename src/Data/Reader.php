@@ -738,7 +738,8 @@ class Reader implements SiteDataInterface
         if (($theme['_version'] ?? 0) < 2) {
             if (isset($theme['components']['html']['heading'])) {
                 $theme['shared'] ??= [];
-                $theme['shared']['heading'] = $theme['components']['html']['heading'];
+                $theme['shared']['heading']         = $theme['components']['html']['heading'];
+                $theme['shared']['heading']['type'] = 'text';
                 unset($theme['components']['html']['heading']);
                 $theme['components'] = ArrayHelper::applyArrayCallback($theme['components'], function (array $value, string $attribute): array {
                     if (is_string($attribute) && ($attribute === 'heading' || str_starts_with($attribute, 'heading:'))) {
