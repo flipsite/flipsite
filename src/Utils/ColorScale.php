@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use SSNepenthe\ColorUtils\Colors\Color;
@@ -66,7 +65,7 @@ class ColorScale
                 return $this->darkHover($color, 19, 6);
             case 9: return $color;
             case 10: return $this->darkHover($color, 3, 4);
-            case 11: return $this->increaseAndLighten($color, $targetColor, 11);
+            case 11: return $this->increaseAndLighten($color, $targetColor, 7);
             case 12: return $this->increaseAndLighten($color, $targetColor, 15);
         }
         return $targetColor;

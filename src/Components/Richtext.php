@@ -73,6 +73,7 @@ final class Richtext extends AbstractGroup
     private function getItem(array $itemData, array $componentData, array $componentStyle) : ?AbstractRichtextItem
     {
         $type = $itemData['type'] ?? null;
+
         switch ($type) {
             case 'h1':
             case 'h2':
@@ -191,7 +192,7 @@ class RichtextItemImage extends AbstractRichtextItem
             $componentStyle['image'] = $style;
             $this->style             = $componentStyle;
         } else {
-            $this->value = $image;
+            $this->data  = $image;
             $this->style = $style;
         }
     }
@@ -207,13 +208,19 @@ class RichtextItemList extends AbstractRichtextItem
         $li                    = [];
         if ('ul' === $type && $icon) {
             $li['icon'] = $icon;
+        } elseif ('ul' === $type) {
+            $style['listStylePosition'] = 'list-inside';
+            $style['listStyleType']     = 'list-disc';
         }
         if ('ol' === $type && $number) {
             $li['number'] = [
                 'format'  => $number,
                 'value'   => '{index}',
-                '_style'  => ArrayHelper::merge($style['li']['icon'] ?? [])
+                '_style'  => ArrayHelper::merge($style['li']['number'] ?? [])
             ];
+        } elseif ('ol' === $type) {
+            $style['listStylePosition'] = 'list-inside';
+            $style['listStyleType']     = 'list-decimal';
         }
         $li['value']      = '{item}';
         $this->data['li'] = $li;
