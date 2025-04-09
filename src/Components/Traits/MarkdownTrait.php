@@ -31,6 +31,7 @@ trait MarkdownTrait
         $html = (string)$converter->convert($markdown);
         $html = preg_replace('/^<p>(.*)<\/p>$/s', '$1', trim($html));
 
+
         if ($removeLinks) {
             $html = str_replace('<a href="', '<span data-href="', $html);
             $html = str_replace('</a>', '</span>', $html);
@@ -40,7 +41,6 @@ trait MarkdownTrait
         }
 
         $html = $this->addClassesToHtml($html, $tags, $style, $appearance);
-
         $html = $this->fixUrlsInHtml($html);
         return $html;
     }
@@ -111,11 +111,11 @@ trait MarkdownTrait
 
     private function fixInvalidMarkdown(string $markdown): string
     {
-        $markdown = preg_replace('/\s*\*\*\s*([^*]+?)\s*\*\*\s*/', ' **$1** ', $markdown);
+        $markdown = preg_replace('/\s*\*\*\s*([^*]+?)\s*\*\*\s+/', ' **$1** ', $markdown);
         $markdown = str_replace('**', '___BOLD___', $markdown);
-        $markdown = preg_replace('/\s*\*\s*([^*]+?)\s*\*\s*/', ' *$1* ', $markdown);
+        $markdown = preg_replace('/\s*\*\s*([^*]+?)\s*\*\s+/', ' *$1* ', $markdown);
         $markdown = str_replace('___BOLD___', '**', $markdown);
-        $markdown = preg_replace('/\s*`\s*([^`]+?)\s*`\s*/', ' `$1` ', $markdown);
+        $markdown = preg_replace('/\s*`\s*([^`]+?)\s*`\s+/', ' `$1` ', $markdown);
         return preg_replace('/\s+/', ' ', trim($markdown));
     }
 }
