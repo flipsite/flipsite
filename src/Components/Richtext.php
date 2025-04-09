@@ -81,7 +81,7 @@ final class Richtext extends AbstractGroup
             case 'h4':
             case 'h5':
             case 'h6':
-                $tagStyle        = $componentStyle[$type] ?? [];
+                $tagStyle        = $componentStyle['h'][$type] ?? [];
                 $tagStyle['tag'] = $type;
                 return new RichtextItemHeading($itemData['value'], $componentStyle['h'] ?? [], $tagStyle);
             case 'p':
