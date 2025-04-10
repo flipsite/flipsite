@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -13,9 +12,10 @@ trait ActionTrait
     private function getActionAttributes(array $data): array
     {
         if ('auto' === $data['_action']) {
-            $auto            = $this->handleAuto($data['_target'] ?? '');
-            $data['_action'] = $auto['_action'];
-            $data['_target'] = $auto['_target'] ?? null;
+            $auto              = $this->handleAuto($data['_target'] ?? '');
+            $data['_action']   = $auto['_action'];
+            $data['_target']   = $auto['_target'] ?? null;
+            $data['_fragment'] = $auto['_fragment'] ?? null;
         }
 
         $attributes = [];
@@ -139,6 +139,10 @@ trait ActionTrait
         $target = str_replace('mailto:', '', $target);
         $target = str_replace('tel:', '', $target);
 
+        $parts    = explode('#', $target);
+        $target   = $parts[0];
+        $fragment = $parts[1] ?? null;
+
         $page = $this->siteData->getSlugs()->getPage($target);
         $file = $this->environment->getAssetSources()->getInfo($target);
 
@@ -161,8 +165,9 @@ trait ActionTrait
             }
         }
         return [
-            '_action' => $action,
-            '_target' => $target,
+            '_action'   => $action,
+            '_target'   => $target,
+            '_fragment' => $fragment
         ];
     }
 
