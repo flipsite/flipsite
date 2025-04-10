@@ -266,7 +266,7 @@ class Reader implements SiteDataInterface
             'theme-gap-xs'      => '2'
         ];
         $vars = $this->data['theme']['variables'] ?? [];
-        return ArrayHelper::merge($vars, $fallback);
+        return ArrayHelper::merge($fallback, $vars);
     }
 
     public function getAppearance(?string $page = null): string
