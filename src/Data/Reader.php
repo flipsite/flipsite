@@ -256,17 +256,17 @@ class Reader implements SiteDataInterface
 
     public function getThemeVars(): array
     {
-        $vars                      = $this->data['theme']['variables'] ?? [];
-        $vars['theme-section-x']   = '3.75|12.5';
-        $vars['theme-section-y']   = '20|30';
-        $vars['theme-section-gap'] = '15|20';
-
-        $vars['theme-gap-lg'] = '7.5';
-        $vars['theme-gap-md'] = '5';
-        $vars['theme-gap-sm'] = '3.5';
-        $vars['theme-gap-xs'] = '2';
-
-        return $vars;
+        $fallback = [
+            'theme-section-x'   => '3.75|12.5',
+            'theme-section-y'   => '20|30',
+            'theme-section-gap' => '15|20',
+            'theme-gap-lg'      => '7.5',
+            'theme-gap-md'      => '5',
+            'theme-gap-sm'      => '3.5',
+            'theme-gap-xs'      => '2'
+        ];
+        $vars = $this->data['theme']['variables'] ?? [];
+        return ArrayHelper::merge($vars, $fallback);
     }
 
     public function getAppearance(?string $page = null): string

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -31,6 +30,7 @@ final class Text extends AbstractComponent
             $this->content = $this->parsePhone($this->content, $data['formatPhone']);
         }
     }
+
     public function render(int $indentation = 2, int $level = 0, bool $oneline = false): string
     {
         if ($this->tag === '') {
@@ -42,7 +42,7 @@ final class Text extends AbstractComponent
             }
             return $html;
         } else {
-            return parent::render($indentation, $level, $oneline);
+            return parent::render($indentation, $level, $oneline) ?? '';
         }
     }
 }
