@@ -535,8 +535,8 @@ class ComponentBuilder
                 $options['filterFieldValue'] = null;
             }
             $filter = new Filter($options['filterType'] ?? 'or', $options['filter'] ?? null, $options['filterPattern'] ?? null);
-            if ('empty' === $options['filterType'] || 'notEmpty' === $options['filterType']) {
-                $options['filterFieldValue'] = $options['filter'];
+            if (isset($options['filterType']) && ('empty' === $options['filterType'] || 'notEmpty' === $options['filterType'])) {
+                $options['filterFieldValue'] = $options['filter'] ?? null;
             }
             return $filter->filterValue($options['filterFieldValue']);
         }
