@@ -85,7 +85,7 @@ final class Richtext extends AbstractGroup
                 $tagStyle['tag'] = $type;
                 return new RichtextItemHeading($itemData['value'], $componentStyle['h'] ?? [], $tagStyle);
             case 'p':
-                return new RichtextItemParagraph($itemData['value'], $componentStyle['p'] ?? [], $itemData['magiclinks'] ?? false);
+                return new RichtextItemParagraph($itemData['value'], $componentStyle['p'] ?? [], $componentData['magicLinks'] ?? false);
             case 'img':
                 return new RichtextItemImage($itemData, $componentStyle['img'] ?? []);
             case 'ul':
@@ -137,11 +137,11 @@ class RichtextItemParagraph extends AbstractRichtextItem
 {
     protected string $type = 'paragraph';
 
-    public function __construct(string $value, array $style, bool $magiclinks = false)
+    public function __construct(string $value, array $style, bool $magicLinks = false)
     {
         $this->data['value'] = $value;
-        if ($magiclinks) {
-            $this->data['magicLinks'] = $magiclinks;
+        if ($magicLinks) {
+            $this->data['magicLinks'] = $magicLinks;
         }
         $this->style         = $style;
     }
