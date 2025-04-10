@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 final class Style
@@ -16,7 +15,7 @@ final class Style
             $parts                  = explode(':', $encodedVariant);
             $value                  = array_pop($parts);
             $variant                = trim(implode(':', $parts), ':');
-            if ($value) {
+            if ($value !== null) {
                 $this->values[$variant] = $value;
             }
         }
@@ -39,7 +38,6 @@ final class Style
 
     public function getValue(string $variant = ''): ?string
     {
-
         return $this->values[$variant] ?? null;
     }
 
