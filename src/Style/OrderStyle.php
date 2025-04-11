@@ -40,7 +40,7 @@ final class OrderStyle
         if (!isset($this->styles[$variant])) {
             return null;
         }
-        $values = $this->styles[$variant]->getValues();
+        $values = array_filter($this->styles[$variant]->getValues());
         $baseValues = isset($this->styles['']) ? $this->styles['']->getValues() : [];
         $values = ArrayHelper::merge($baseValues, $values);
 
