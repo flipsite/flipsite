@@ -263,7 +263,9 @@ class Reader implements SiteDataInterface
             'theme-gap-lg'      => '7.5',
             'theme-gap-md'      => '5',
             'theme-gap-sm'      => '3.5',
-            'theme-gap-xs'      => '2'
+            'theme-gap-xs'      => '2',
+            'theme-text-sm'     => '3.5',
+            'theme-text-lg'     => '4.5|5',
         ];
         $vars = $this->data['theme']['variables'] ?? [];
         return ArrayHelper::merge($fallback, $vars);
@@ -439,7 +441,7 @@ class Reader implements SiteDataInterface
 
         $sections = [];
         foreach ($this->data['pages'] as $pageSections) {
-            $sections = array_merge($sections, $pageSections);
+            $sections = array_merge($sections, $pageSections ?? []);
         }
         $sections = array_merge($sections, $this->data['before'] ?? []);
         $sections = array_merge($sections, $this->data['after'] ?? []);

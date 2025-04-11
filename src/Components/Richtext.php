@@ -92,7 +92,7 @@ final class Richtext extends AbstractGroup
             case 'ol':
                 return new RichtextItemList($type, $itemData, $componentData['ul']['li']['icon']['value'] ?? null, $componentData['ul']['li']['number']['format'] ?? null, $componentStyle['ul'] ?? [], $componentStyle['p'] ?? []);
             case 'table':
-                return new RichtextItemTable($itemData, $componentStyle['table']);
+                return new RichtextItemTable($itemData, $componentStyle['table'] ?? []);
             case 'youtube':
                 return new RichtextItemYoutube($itemData, $componentStyle['youtube'] ?? []);
         }
