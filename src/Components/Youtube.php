@@ -19,6 +19,12 @@ final class Youtube extends AbstractGroup
     {
         $data  = $component->getData();
         $style = $component->getStyle();
+        $width = $height = null;
+        if (isset($data['dimensions'])) {
+            $parts  = explode('x', $data['dimensions']);
+            $width  = $parts[0] ?? null;
+            $height = $parts[1] ?? null;
+        }
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);
         $iframe = $this;
@@ -36,6 +42,9 @@ final class Youtube extends AbstractGroup
         $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
         $iframe->setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         $iframe->setAttribute('title', $title);
+        if ($width && $height && !isset($style['aspectRatio'])) {
+            $style['aspectRatio'] = 'aspect-'.$width.'/'.$height;
+        }
 
         $src = $data['privacy'] ?? false ?
             'https://www.youtube-nocookie.com/embed/' :
@@ -65,7 +74,10 @@ final class Youtube extends AbstractGroup
             $iframe->setAttribute('data-youtube-play', $src);
             $iframe->setAttribute('style', 'pointer-events:none');
             $this->addChild($iframe);
-            $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon'] ?? 'simpleicons/youtube'], $style['playIcon'] ?? []);
+            if (isset($style['aspectRatio'])) {
+                $this->addStyle(['aspectRatio' => $style['aspectRatio']]);
+            }
+            $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']['value'] ?? 'simpleicons/youtube'], $style['playIcon'] ?? []);
             $icon              = $this->builder->build($iconComponentData, $inherited);
             $this->setAttribute('data-youtube-play', true);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));

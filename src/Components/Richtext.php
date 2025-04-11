@@ -245,9 +245,12 @@ class RichtextItemYoutube extends AbstractRichtextItem
 
     public function __construct(array $value, array $style)
     {
-        $this->data['value']    = $value['value'];
-        $this->data['_attr']    = ['title' => $value['title'] ?? 'Youtube Video ('.$value['value'].')'];
-        $this->data['loading']  = 'lazy';
-        $this->style            = $style;
+        $this->data['value']      = $value['value'];
+        $this->data['_attr']      = ['title' => $value['title'] ?? 'Youtube Video ('.$value['value'].')'];
+        $this->data['loading']    = 'lazy';
+        $width                    = $value['width'] ?? '560';
+        $height                   = $value['height'] ?? '315';
+        $this->data['dimensions'] = $width.'x'.$height;
+        $this->style              = $style;
     }
 }
