@@ -158,9 +158,9 @@ abstract class AbstractGroup extends AbstractComponent
             $data['_options']['filterField'] = $data['_options']['filterBy'];
             unset($data['_options']['filterBy']);
         }
-        // Unclear if this is used anymore
-        if (isset($data['_options']['filter']) && is_string($data['_options']['filter']) && strpos($data['_options']['filter'], 'this.slug')) {
-            // Do something
+
+        if ($data['_options']['shuffle'] ?? false) {
+            shuffle($repeat);
         }
 
         if (isset($data['_options']['filterField']) && (isset($data['_options']['filter']) || isset($data['_options']['filterType']) || isset($data['_options']['filterPattern']))) {
