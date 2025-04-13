@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -70,7 +71,7 @@ final class Richtext extends AbstractGroup
         parent::build($component, $inherited);
     }
 
-    private function getItem(array $itemData, array $componentData, array $componentStyle) : ?AbstractRichtextItem
+    private function getItem(array $itemData, array $componentData, array $componentStyle): ?AbstractRichtextItem
     {
         $type = $itemData['type'] ?? null;
 
@@ -160,7 +161,7 @@ class RichtextItemImage extends AbstractRichtextItem
         }
 
         if (isset($value['figcaption'])) {
-            $this->type = 'group';
+            $this->type = 'container';
             $this->data = [
                 'image'     => $image,
                 'paragraph' => [
