@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -195,6 +194,22 @@ class RichtextItemImage extends AbstractRichtextItem
         } else {
             $this->data  = $image;
             $this->style = $style;
+        }
+        if (isset($value['width'])) {
+            $this->style['width'] = 'w-'.$value['width'];
+        }
+        if (isset($value['align'])) {
+            switch ($value['align']) {
+                case 'left':
+                    $this->style['alignSelf'] = 'self-start';
+                    break;
+                case 'center':
+                    $this->style['alignSelf'] = 'self-center';
+                    break;
+                case 'right':
+                    $this->style['alignSelf'] = 'self-end';
+                    break;
+            }
         }
     }
 }
