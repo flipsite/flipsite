@@ -185,7 +185,14 @@ abstract class AbstractGroup extends AbstractComponent
         if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
             $repeat = array_reverse($repeat);
         }
-        if (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
+        if ($data['_options']['shuffle'] ?? false && isset($data['_options']['length'])) {
+            $length = intval($data['_options']['length'] ?? 999999);
+            while ($length < count($repeat)) {
+                $removeIndex = rand(0, count($repeat) - 1);
+                unset($repeat[$removeIndex]);
+                $repeat = array_values($repeat);
+            }
+        } elseif (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
             $offset = intval($data['_options']['offset'] ?? 0);
             $length = intval($data['_options']['length'] ?? 999999);
             if (!$length) {
