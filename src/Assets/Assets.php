@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets;
 
 use Flipsite\Assets\Sources\AssetSourcesInterface;
@@ -166,6 +165,10 @@ class Assets
             return false;
         }
 
+        $newFilename = $this->cleanupAssetFilename($newFilename);
+        if ($this->assetExists($newFilename)) {
+            return false;
+        }
         return $this->assetSources->rename($assetInfo->getType(), $asset, $newFilename) ? $newFilename : false;
     }
 
@@ -186,8 +189,19 @@ class Assets
         // Replace spaces with underscores
         $asset = str_replace(' ', '_', $asset);
 
+        // Replace äåö etc.
+
+        $map = [
+            'å' => 'a', 'ä' => 'a', 'ö' => 'o',
+            'Å' => 'A', 'Ä' => 'A', 'Ö' => 'O',
+            'é' => 'e', 'è' => 'e', 'ê' => 'e',
+            'ü' => 'u', 'ß' => 'ss',
+        ];
+        $asset = strtr($asset, $map);
+
         // Remove all characters except letters, numbers, hyphens, underscores, and periods
         $asset = preg_replace('/[^A-Za-z0-9\-_.]/', '', $asset);
+        $asset = strtolower($asset);
 
         $asset = str_replace('.jpeg', '.jpg', $asset);
 
