@@ -31,7 +31,7 @@ class SchemaField implements \JsonSerializable
     private ?string $placeholder      = null;
     private bool $hidden              = false;
     private ?bool $required           = null;
-    private ?string $default          = null;
+    private string|bool|null $default = null;
     private ?string $options          = null;
     private ?bool $localizable        = null;
 
