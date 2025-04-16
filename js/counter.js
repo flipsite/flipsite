@@ -17,6 +17,7 @@ ready(() => {
                     from: parseInt(val.innerHTML),
                     to: parseInt(el.getAttribute('data-to')),
                     duration: parseInt(el.getAttribute('data-duration')),
+                    timing: el.getAttribute('data-timing') ?? 'ease-in-out',
                     start: Date.now()
                 };
                 update(anim);
@@ -28,12 +29,27 @@ ready(() => {
             anim.el.innerHTML = anim.to;
             return;
         }
-        var x = easeInOutSine((Date.now() - anim.start)/anim.duration);
-        var val = parseInt((anim.to-anim.from)*x + anim.from);
+        let x; 
+        switch (anim.timing) {
+            case 'ease-linear': x = linear((Date.now() - anim.start)/anim.duration); break;
+            case 'ease-in': x = easeInSine((Date.now() - anim.start)/anim.duration); break;
+            case 'ease-out': x = easeOutSine((Date.now() - anim.start)/anim.duration); break;
+            case 'ease-in-out': x = easeInOutSine((Date.now() - anim.start)/anim.duration); break;
+        }
+        let val = parseInt((anim.to-anim.from)*x + anim.from);
         anim.el.innerHTML = val;
         window.requestAnimationFrame(function(){update(anim)});
     }
+    function linear(x) {
+        return x;
+    }
+    function easeInSine(x) {
+        return 1 - Math.cos((x * Math.PI) / 2);
+    }
+    function easeOutSine(x) {
+        return Math.sin((x * Math.PI) / 2);
+    }
     function easeInOutSine(x)  {
-        return -(Math.cos(3.14159265359 * x) - 1) / 2;
+        return -(Math.cos(3.14159265359 * x) - 1) / 2; 
     }
 });
