@@ -14,6 +14,12 @@ final class Counter extends AbstractComponent
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data = $component->getData();
+        if (isset($data['value'])) {
+            $parts        = explode('|', $data['value']);
+            $data['from'] = (int)($parts[0] ?? 0);
+            $data['to']   = (int)($parts[1] ?? 100);
+            unset($data['value']);
+        }
         $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/dist/counter.min.js')));
         $this->setAttribute('data-counter', true);
         $this->setAttribute('data-timing', (string)($data['timing'] ?? 'ease-in-out'));
