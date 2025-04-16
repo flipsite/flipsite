@@ -16,8 +16,12 @@ final class Counter extends AbstractComponent
         $data = $component->getData();
         if (isset($data['value'])) {
             $parts        = explode('|', $data['value']);
-            $data['from'] = (int)($parts[0] ?? 0);
-            $data['to']   = (int)($parts[1] ?? 100);
+            if (count($parts) === 1) {
+                $data['to']   = (int)($parts[0] ?? 100);
+            } else {
+                $data['from'] = (int)($parts[0] ?? 0);
+                $data['to']   = (int)($parts[1] ?? 100);
+            }
             unset($data['value']);
         }
         $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/dist/counter.min.js')));
@@ -25,6 +29,9 @@ final class Counter extends AbstractComponent
         $this->setAttribute('data-timing', (string)($data['timing'] ?? 'ease-in-out'));
         $this->setAttribute('data-to', (string)($data['to'] ?? 100));
         $this->setAttribute('data-duration', (string)($data['duration'] ?? 500));
+        if (isset($data['thousandsSeparator'])) {
+            $this->setAttribute('data-thousands', (string)($data['thousandsSeparator']));
+        }
         $value = new Element('span', true);
         $value->setContent((string)($data['from'] ?? 0));
         $span = trim($value->render());

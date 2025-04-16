@@ -18,7 +18,8 @@ ready(() => {
                     to: parseInt(el.getAttribute('data-to')),
                     duration: parseInt(el.getAttribute('data-duration')),
                     timing: el.getAttribute('data-timing') ?? 'ease-in-out',
-                    start: Date.now()
+                    start: Date.now(),
+                    thousands: el.getAttribute('data-thousands') ?? 'none',
                 };
                 update(anim);
             }
@@ -26,7 +27,7 @@ ready(() => {
     }
     function update(anim) {
         if (anim.start + anim.duration < Date.now()) {
-            anim.el.innerHTML = anim.to;
+            anim.el.innerHTML = formatNumber(anim.to, anim.thousands);
             return;
         }
         let x; 
@@ -37,8 +38,17 @@ ready(() => {
             case 'ease-in-out': x = easeInOutSine((Date.now() - anim.start)/anim.duration); break;
         }
         let val = parseInt((anim.to-anim.from)*x + anim.from);
+        val = formatNumber(val, anim.thousands);
         anim.el.innerHTML = val;
         window.requestAnimationFrame(function(){update(anim)});
+    }
+    function formatNumber(num, thousands) {
+        switch (thousands) {
+            case 'space': return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp;");
+            case 'comma': return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            case 'period': return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        return num;
     }
     function linear(x) {
         return x;
