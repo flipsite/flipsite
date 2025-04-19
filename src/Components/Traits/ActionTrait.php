@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -127,8 +128,24 @@ trait ActionTrait
                 $attributes['href'] .= '#'.$data['_fragment'];
             }
         }
-        if ('toggle' === ($data['_onclick'] ?? '')) {
-            $attributes['onclick'] = 'javascript:toggle(this)';
+        if (isset($data['_onclick'])) {
+            try {
+                $onclick = json_decode($data['_onclick'], true);
+            } catch (\JsonException $e) {
+                $onclick = [];
+            }
+            $attributes['onclick'] = [];
+
+            if (in_array('toggle', $onclick)) {
+                $attributes['onclick'][] = 'toggle(this)';
+            }
+            if (in_array('remember', $onclick)) {
+                $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'remember', file_get_contents(__DIR__ . '/../../../js/dist/remember.min.js')));
+                $attributes['onclick'][] = 'remember(this)';
+            }
+            if (count($attributes['onclick'])) {
+                $attributes['onclick'] = 'javascript:'.implode(';', $attributes['onclick']);
+            }
         }
         return $attributes;
     }
