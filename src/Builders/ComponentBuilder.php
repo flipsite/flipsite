@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -455,15 +456,8 @@ class ComponentBuilder
                 $value = $this->optimizeStyle($value, $index, $total);
             } elseif (is_string($value) && $hasModifier($value)) {
                 $setting = new OrderStyle($value);
-                if ($index === 0) {
-                    $value = $setting->getValue('first') ?? $setting->getValue('even') ?? $setting->getValue();
-                } elseif ($index === $total - 1) {
-                    $value = $setting->getValue('last') ?? $setting->getValue('odd') ?? $setting->getValue();
-                } elseif ($index % 2 === 0) {
-                    $value = $setting->getValue('even') ?? $setting->getValue();
-                } else {
-                    $value = $setting->getValue('odd') ?? $setting->getValue();
-                }
+                $row = $index + 1;
+                $value = $setting->getValue($row, $total);
             }
         }
         return $style;

@@ -34,7 +34,8 @@
         "symfony/yaml": "^6.3"
     },
     "require-dev": {
-        "phpstan/phpstan": "^1.10.34"
+        "phpstan/phpstan": "^1.10.34",
+        "phpunit/phpunit": "^10.5"
     },
     "scripts": {
         "analyse": "./vendor/bin/phpstan analyse -l 4 -c phpstan.neon src"
