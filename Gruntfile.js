@@ -5,7 +5,10 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         mangle: true, // Shortens variable and function names
-        preserveComments: false
+        preserveComments: false,
+        compress: {
+          drop_console: false // Do NOT remove console.* functions
+        }
       },
       my_target: {
         files: [{
