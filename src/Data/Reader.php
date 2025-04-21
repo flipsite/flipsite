@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -337,7 +338,7 @@ class Reader implements SiteDataInterface
         return $this->data['theme']['shared'][$sharedStyleId] ?? [];
     }
 
-    private function getType(string $componentId): string
+    protected function getType(string $componentId): string
     {
         if (str_contains($componentId, '.') || str_contains($componentId, ':')) {
             $tmp  = explode('.', $componentId);
