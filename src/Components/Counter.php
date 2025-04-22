@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -35,8 +36,10 @@ final class Counter extends AbstractComponent
         $value = new Element('span', true);
         $value->setContent((string)($data['from'] ?? 0));
         $span = trim($value->render());
-        if (isset($data['content'])) {
-            $this->setContent(str_replace('[counter]', $span, $data['content']));
+        if (isset($data['prefix']) || isset($data['suffix'])) {
+            $prefix = $data['prefix'] ?? '';
+            $suffix = $data['suffix'] ?? '';
+            $this->setContent($prefix.$span.$suffix);
         } else {
             $this->setContent($span);
         }
