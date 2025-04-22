@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -379,6 +378,18 @@ class ComponentBuilder
                     }
                     $update = true;
                 }
+                if ($setting->hasVariant('stuck')) {
+                    $this->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/stuck.min.js')));
+                    $stuck    = $setting->removeValue('stuck');
+                    $notStuck = $setting->getValue();
+                    if (isset($data['_attr']['data-stuck'])) {
+                        $data['_attr']['data-stuck'] .= ' '.$stuck.' '.$notStuck;
+                    } else {
+                        $data['_attr'] ??= [];
+                        $data['_attr']['data-stuck'] = $stuck.' '.$notStuck;
+                    }
+                    $update = true;
+                }
                 foreach (['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as $bp) {
                     if ($setting->hasVariant($bp.':open')) {
                         $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
@@ -456,8 +467,8 @@ class ComponentBuilder
                 $value = $this->optimizeStyle($value, $index, $total);
             } elseif (is_string($value) && $hasModifier($value)) {
                 $setting = new OrderStyle($value);
-                $row = $index + 1;
-                $value = $setting->getValue($row, $total);
+                $row     = $index + 1;
+                $value   = $setting->getValue($row, $total);
             }
         }
         return $style;

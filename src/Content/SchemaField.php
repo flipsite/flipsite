@@ -11,29 +11,30 @@ class SchemaField implements \JsonSerializable
         'color',
         'date',
         'enum',
+        'file',
         'gallery',
         'gradient',
         'icon',
         'image',
         'list',
+        'number',
+        'page',
         'published',
         'richtext',
-        'page',
         'slug',
         'svg',
         'text',
-        'file',
         'video',
     ];
 
     private string $type;
-    private ?string $title            = null;
-    private ?string $placeholder      = null;
-    private bool $hidden              = false;
-    private ?bool $required           = null;
-    private string|bool|null $default = null;
-    private ?string $options          = null;
-    private ?bool $localizable        = null;
+    private ?string $title                = null;
+    private ?string $placeholder          = null;
+    private bool $hidden                  = false;
+    private ?bool $required               = null;
+    private string|bool|null|int $default = null;
+    private ?string $options              = null;
+    private ?bool $localizable            = null;
 
     public function __construct(private string $name, private array $rawField)
     {
@@ -66,6 +67,9 @@ class SchemaField implements \JsonSerializable
             throw new \Exception('Invalid field type ('.$this->type.')');
         }
         $this->default  = $rawField['default'] ?? null;
+        if ('number' === $this->type) {
+            $this->default = (int) $this->default;
+        }
         $this->required = $rawField['required'] ?? null;
         if ('enum' === $this->type) {
             if ($rawField['options']) {
@@ -106,6 +110,9 @@ class SchemaField implements \JsonSerializable
         }
         if (array_key_exists('default', $delta)) {
             $this->default = $delta['default'];
+            if ('number' === $this->type) {
+                $this->default = (int) $this->default;
+            }
         }
         if (array_key_exists('required', $delta)) {
             $this->required = !!$delta['required'];
@@ -127,7 +134,7 @@ class SchemaField implements \JsonSerializable
         }
     }
 
-    public function getDefault(): null|string|bool
+    public function getDefault(): null|string|bool|int
     {
         if (null === $this->default && 'enum' === $this->type) {
             $options = ArrayHelper::decodeJsonOrCsv($this->options);
