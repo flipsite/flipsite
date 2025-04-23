@@ -237,10 +237,12 @@ class ComponentBuilder
                 $tmp = ArrayHelper::decodeJsonOrCsv($data['_attr']['_data']);
                 foreach ($tmp as $pair) {
                     $tmp2 = explode('=', $pair);
+                    $attr = 'data-' . $tmp2[0];
                     if (count($tmp2) === 2) {
-                        $attr                 = 'data-' . $tmp2[0];
                         $val                  = $tmp2[1];
                         $data['_attr'][$attr] = $val;
+                    } elseif (count($tmp2) === 1) {
+                        $data['_attr'][$attr] = true;
                     }
                 }
             }
