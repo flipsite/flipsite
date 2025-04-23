@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Assets\Sources\AssetSourcesInterface;
@@ -28,6 +29,8 @@ interface EnvironmentInterface
     public function minimizeCss(): bool;
 
     public function compileTimestamp(): bool;
+
+    public function getVersion(): ?string;
 
     public function showAttribution(): bool;
 

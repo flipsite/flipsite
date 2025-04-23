@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -82,6 +83,9 @@ class MetaBuilder implements BuilderInterface
         if ($this->environment->compileTimestamp()) {
             $date       = new \DateTime('now', new \DateTimeZone('UTC'));
             $elements[] = $this->meta('compiled', $date->format("Y-m-d\TH:i:s\Z"));
+        }
+        if ($this->environment->getVersion()) {
+            $elements[] = $this->meta('version', $this->environment->getVersion());
         }
 
         // Facebook opengraph tags
