@@ -1,33 +1,35 @@
 ready(() => {
-  document.querySelectorAll('[data-stuck]').forEach((stickyEl) => {
-    const stuckClasses = stickyEl.getAttribute('data-stuck').split(' ');
-    const style = getComputedStyle(stickyEl);
-    const offsetTop = parseInt(style.top)
-    
-    // Create a sentinel just before the sticky element
-    const sentinel = document.createElement('div');
-    sentinel.style.position = 'absolute';
-    sentinel.style.height = '1px';
-    sentinel.style.width = '100%';
-    sentinel.style.background = 'pink'
-    stickyEl.parentNode.insertBefore(sentinel, stickyEl);
-    let isStuck = false;
-    
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isStuckNow = entry.boundingClientRect.y <= offsetTop;
-        console.log('STUCK NOW',isStuckNow)
-        if (isStuckNow === isStuck) return;
-        isStuck = isStuckNow;
-        stuckClasses.forEach(cls => {
-          console.log(cls)
-          stickyEl.classList.toggle(cls);
-        });
-      },
-      { threshold: [1] }
-    );
+  function throttle(fn, wait) {
+    let lastCall = 0;
+    return function (...args) {
+      const now = Date.now();
+      if (now - lastCall >= wait) {
+        lastCall = now;
+        fn(...args);
+      }
+    };
+  }
+
+  const stickyElements = [];
   
-    observer.observe(sentinel);
+  document.querySelectorAll('[data-stuck]').forEach((el) => {
+    const style = window.getComputedStyle(el);
+    const top = parseInt(style.top, 10) || 0;
+    const stuckClasses = el.getAttribute('data-stuck').split(' ');
+    stickyElements.push({ el, isStuck:el.getBoundingClientRect().top < top, top, stuckClasses });
   });
   
+  function determineStickyState() {
+    stickyElements.forEach((stickyElement) => {
+      const isStuck = stickyElement.el.getBoundingClientRect().top <= stickyElement.top;
+      if (stickyElement.isStuck === isStuck) return;
+      stickyElement.isStuck = isStuck;
+      stickyElement.stuckClasses.forEach(cls => {
+        stickyElement.el.classList.toggle(cls);
+      });
+    });
+  }
+  
+  window.addEventListener('scroll', throttle(determineStickyState, 100));
+
 });

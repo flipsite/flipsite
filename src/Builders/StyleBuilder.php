@@ -15,7 +15,7 @@ use Flipsite\Style\Callbacks\ResponsiveSizeCallback;
 
 class StyleBuilder implements BuilderInterface, EventListenerInterface
 {
-    private array $dataAttributesWithClasses = ['data-toggle', 'data-animate', 'data-selected'];
+    private array $dataAttributesWithClasses = ['data-toggle', 'data-animate', 'data-selected', 'data-stuck'];
 
     private array $customCss = [];
 
@@ -34,7 +34,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             return !empty($value);
         });
 
-        $config = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
+        $config              = Yaml::parse(file_get_contents(__DIR__.'/../Style/config.yaml'));
         $config['variables'] = $this->themeVars;
 
         // Overwrite keyframe definitions instead of merge
