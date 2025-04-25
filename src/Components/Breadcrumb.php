@@ -22,7 +22,15 @@ final class Breadcrumb extends AbstractGroup
         $current  = $this->siteData->getPageName($page, $this->path->getLanguage());
         $links    = $this->getLinks($page);
 
-        $icon     = $component->getDataValue('separator', true);
+        $homeIcon = $component->getDataValue('home', true);
+        if (isset($homeIcon['value'])) {
+            $links[0]['sr'] = $links[0]['text'];
+            unset($links[0]['text']);
+            $links[0]['icon']           = $homeIcon;
+            $links[0]['icon']['_style'] = $style['home'] ?? [];
+        }
+
+        $icon = $component->getDataValue('separator', true);
         if (is_string($icon)) {
             $icon = ['value' => $icon];
         }
@@ -50,7 +58,9 @@ final class Breadcrumb extends AbstractGroup
         parent::build($component, $inherited);
 
         $span = new Element('span');
+        $span->addStyle($style['current'] ?? []);
         $span->setContent($current);
+
         $this->addChild($span);
     }
 

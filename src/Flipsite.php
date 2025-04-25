@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -190,7 +189,7 @@ final class Flipsite
                 $attributionComponentData = new \Flipsite\Data\YamlComponentData(null, 'attribution', 'container', $attribution);
                 $section                  = $componentBuilder->build($attributionComponentData, new InheritedComponentData('light'));
                 $document->getChild('body')->addChild($section);
-                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh] relative']);
+                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh]', 'position' =>'relative']);
             }
         }
 
