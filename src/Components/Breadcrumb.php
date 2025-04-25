@@ -23,7 +23,7 @@ final class Breadcrumb extends AbstractGroup
         $links    = $this->getLinks($page);
 
         $homeIcon = $component->getDataValue('home', true);
-        if (isset($homeIcon['value'])) {
+        if (count($links) && isset($homeIcon['value'])) {
             $links[0]['sr'] = $links[0]['text'];
             unset($links[0]['text']);
             $links[0]['icon']           = $homeIcon;
@@ -54,14 +54,25 @@ final class Breadcrumb extends AbstractGroup
             );
             $component->addChild($separatorComponentData);
         }
+        if (count($links) === 0 && $homeIcon) {
+            $currentIconComponentData = new YamlComponentData(
+                null,
+                null,
+                'icon',
+                $homeIcon,
+                $style['home'] ?? []
+            );
+            $component->addChild($currentIconComponentData);
+        }
         $inherited->setParent($component->getId(), $component->getType());
         parent::build($component, $inherited);
 
-        $span = new Element('span');
-        $span->addStyle($style['current'] ?? []);
-        $span->setContent($current);
-
-        $this->addChild($span);
+        if (count($links) || !$homeIcon) {
+            $span = new Element('span');
+            $span->addStyle($style['current'] ?? []);
+            $span->setContent($current);
+            $this->addChild($span);
+        }
     }
 
     private function getLinks(string $page): array
