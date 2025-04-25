@@ -23,13 +23,13 @@ final class Nav extends AbstractGroup
             } elseif (isset($data['_repeat']) && str_starts_with($data['_repeat'], '_pages-')) {
                 $level = intval(str_replace('_pages-', '', $data['_repeat']));
             }
-            $repeat = $this->getPages($level, $parentPage);
+            $repeat = $this->getPages($level, $parentPage, !!($data['_options']['includeParent'] ?? false));
         } else {
             $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
             foreach ($pages as $page) {
                 $pageItemData = $this->getPageItemData($page);
                 if ($pageItemData) {
-                    $repeat[]                      = $pageItemData;
+                    $repeat[] = $pageItemData;
                 } else {
                     $name     = null;
                     $fragment = null;
@@ -97,7 +97,7 @@ final class Nav extends AbstractGroup
         return  $this->normalizeRepeat($data, $repeat);
     }
 
-    private function getPages(int $level, ?string $parentPage = null): array
+    private function getPages(int $level, ?string $parentPage = null, bool $includeParent = false): array
     {
         $pages      = [];
         $all        = $this->siteData->getSlugs()->getPages();
@@ -113,10 +113,12 @@ final class Nav extends AbstractGroup
             }
         } else {
             $parts           = explode('/', $parentPage ?? $this->path->getPage());
-            $startsWith      = implode('/', array_splice($parts, 0, $level)).'/';
+            $startsWith      = implode('/', array_splice($parts, 0, $level));
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');
-                if (str_starts_with((string)$page, $startsWith) && $count >= $level - 1 && $count <= $level && $pageItemData = $this->getPageItemData($page)) {
+                if ($includeParent && str_starts_with((string)$page, $startsWith) && $pageItemData = $this->getPageItemData($page)) {
+                    $pages[] = $pageItemData;
+                } elseif (str_starts_with((string)$page, $startsWith.'/') && $count >= $level - 1 && $count <= $level && $pageItemData = $this->getPageItemData($page)) {
                     $pages[] = $pageItemData;
                 }
             }
