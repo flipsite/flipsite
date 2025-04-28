@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -37,12 +36,14 @@ class SchemaField implements \JsonSerializable
     private string|bool|null|int $default = null;
     private ?string $options              = null;
     private ?bool $localizable            = null;
+    private ?string $json                 = null;
 
     public function __construct(private string $name, private array $rawField)
     {
         $this->title       = $rawField['_title'] ?? $rawField['_name'] ?? null;
         $this->hidden      = $rawField['_hidden'] ?? false;
         $this->placeholder = $rawField['_placeholder'] ?? null;
+        $this->json        = $rawField['json'] ?? null;
         $type              = $rawField['type'];
         $format            = $rawField['format'] ?? null;
         $this->type        = $format ? $format : $type;
@@ -134,6 +135,9 @@ class SchemaField implements \JsonSerializable
         if (array_key_exists('_hidden', $delta)) {
             $this->hidden = !!$delta['_hidden'];
         }
+        if (array_key_exists('json', $delta)) {
+            $this->json = $delta['json'];
+        }
     }
 
     public function getDefault(): null|string|bool|int
@@ -148,6 +152,11 @@ class SchemaField implements \JsonSerializable
     public function isRequired(): bool
     {
         return $this->required ?? false;
+    }
+
+    public function getJson(): array
+    {
+        return $this->json ? json_decode($this->json, true) : [];
     }
 
     public function validate(string|bool $value): string|bool
@@ -216,6 +225,9 @@ class SchemaField implements \JsonSerializable
         }
         if ($this->localizable) {
             $json['localizable'] = $this->localizable;
+        }
+        if ($this->json) {
+            $json['json'] = $this->json;
         }
         return $json;
     }

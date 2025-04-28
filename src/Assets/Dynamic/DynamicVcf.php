@@ -59,37 +59,39 @@ class DynamicVcf implements DynamicAssetsInterface
     private function createVcard(SchemaField $field, Item $item): string
     {
         $vcard   = [];
+
         // Name
-        $name       = explode(' ', $item->get('name'));
-        $vcard['N'] = [$name[1], $name[0], '', '', ''];
-        if ($item->get('phone')) {
-            $vcard['TEL'] = $item->get('phone');
-        }
-        if ($item->get('email')) {
-            $vcard['EMAIL'] = $item->get('email');
-        }
-        $global = $this->siteData->getGlobalVars();
-        if (isset($global['legal.company_name'])) {
-            $vcard['ORG'] = $global['legal.company_name'];
-        }
-        $vcard['URL'] = 'https://flipsite.io/';
+        // $name       = explode(' ', $item->get('name'));
+        // $vcard['N'] = [$name[1], $name[0], '', '', ''];
+        // if ($item->get('phone')) {
+        //     $vcard['TEL'] = $item->get('phone');
+        // }
+        // if ($item->get('email')) {
+        //     $vcard['EMAIL'] = $item->get('email');
+        // }
+        // $global = $this->siteData->getGlobalVars();
+        // if (isset($global['legal.company_name'])) {
+        //     $vcard['ORG'] = $global['legal.company_name'];
+        // }
+        // $vcard['URL'] = 'https://flipsite.io/';
 
-        $street  = 'Talldungevägen 30';
-        $city    = 'Gottby';
-        $state   = '';
-        $zip     = '22130';
-        $country = 'Finland';
+        // $street  = 'Talldungevägen 30';
+        // $city    = 'Gottby';
+        // $state   = '';
+        // $zip     = '22130';
+        // $country = 'Finland';
 
-        $vcard['ADR'] = ';;'.$street.';'.$city.';'.$state.';'.$zip.';'.$country;
-        $asset        = $this->assetSources->getInfo($item->get('image'));
-        if ($asset) {
-            $manager    = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-            $image      = $manager->read($asset->getContents());
-            $image->fit(320, 320);
-            $encoded                             = $image->toJpeg(90);
-            $base64                              = base64_encode((string)$encoded);
-            $vcard['PHOTO;ENCODING=b;TYPE=JPEG'] = $base64;
-        }
+        // $vcard['ADR'] = ';;'.$street.';'.$city.';'.$state.';'.$zip.';'.$country;
+        // $asset        = $this->assetSources->getInfo($item->get('image'));
+        // if ($asset) {
+        //     $manager    = new ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+        //     $image      = $manager->read($asset->getContents());
+        //     $image->fit(320, 320);
+        //     $encoded                             = $image->toJpeg(90);
+        //     $base64                              = base64_encode((string)$encoded);
+        //     $vcard['PHOTO;ENCODING=b;TYPE=JPEG'] = $base64;
+        // }
+
         $vcard['PRODID'] = '-//FlipSite//FlipSite v1.0//EN';
         $encoded         = "BEGIN:VCARD\nVERSION:3.0\n";
         foreach ($vcard as $key => $value) {
