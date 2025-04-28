@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -85,7 +86,7 @@ final class Richtext extends AbstractGroup
                 $tagStyle['tag'] = $type;
                 return new RichtextItemHeading($itemData['value'], $componentStyle['h'] ?? [], $tagStyle);
             case 'p':
-                return new RichtextItemParagraph($itemData['value'], $componentStyle['p'] ?? [], $componentData['magicLinks'] ?? false);
+                return new RichtextItemParagraph($itemData['value'] ?? '', $componentStyle['p'] ?? [], $componentData['magicLinks'] ?? false);
             case 'img':
                 return new RichtextItemImage($itemData, $componentStyle['img'] ?? []);
             case 'ul':
