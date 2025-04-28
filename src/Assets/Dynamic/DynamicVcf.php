@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Dynamic;
 
 use Flipsite\Data\SiteDataInterface;
@@ -75,11 +76,11 @@ class DynamicVcf implements DynamicAssetsInterface
         // }
         // $vcard['URL'] = 'https://flipsite.io/';
 
-        // $street  = 'Talldungevägen 30';
-        // $city    = 'Gottby';
+        // $street  = '';
+        // $city    = '';
         // $state   = '';
-        // $zip     = '22130';
-        // $country = 'Finland';
+        // $zip     = '';
+        // $country = '';
 
         // $vcard['ADR'] = ';;'.$street.';'.$city.';'.$state.';'.$zip.';'.$country;
         // $asset        = $this->assetSources->getInfo($item->get('image'));
