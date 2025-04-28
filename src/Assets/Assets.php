@@ -1,27 +1,34 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets;
 
-use Flipsite\Assets\Sources\AssetSourcesInterface;
-use Flipsite\Assets\Sources\AbstractAssetInfo;
-use Flipsite\Assets\Sources\AssetType;
-use Flipsite\Assets\Attributes\ImageAttributesInterface;
-use Flipsite\Assets\Attributes\UnsplashAttributes;
 use Flipsite\Assets\Attributes\ExternalImageAttributes;
-use Flipsite\Assets\Attributes\ImageAttributes;
-use Flipsite\Assets\Attributes\SvgAttributes;
-use Flipsite\Assets\Attributes\VideoAttributesInterface;
-use Flipsite\Assets\Attributes\VideoAttributes;
 use Flipsite\Assets\Attributes\ExternalVideoAttributes;
-use Flipsite\Assets\Options\RasterOptions;
+use Flipsite\Assets\Attributes\ImageAttributes;
+use Flipsite\Assets\Attributes\ImageAttributesInterface;
+use Flipsite\Assets\Attributes\SvgAttributes;
+use Flipsite\Assets\Attributes\UnsplashAttributes;
+use Flipsite\Assets\Attributes\VideoAttributes;
+use Flipsite\Assets\Attributes\VideoAttributesInterface;
+use Flipsite\Assets\Dynamic\DynamicAssets;
 use Flipsite\Assets\Editors\RasterEditor;
+use Flipsite\Assets\Options\RasterOptions;
+use Flipsite\Assets\Sources\AbstractAssetInfo;
+use Flipsite\Assets\Sources\AssetSourcesInterface;
+use Flipsite\Assets\Sources\AssetType;
+use Flipsite\Data\SiteDataInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class Assets
 {
-    public function __construct(protected AssetSourcesInterface $assetSources)
+    private ?DynamicAssets $dynamic = null;
+    public function __construct(protected AssetSourcesInterface $assetSources, ?SiteDataInterface $siteData = null)
     {
+        if ($siteData) {
+            $this->dynamic = new DynamicAssets($siteData);
+        }
     }
 
     public function getAssetSources(): AssetSourcesInterface
@@ -31,11 +38,13 @@ class Assets
 
     public function getContents(string $asset): string|bool
     {
+        if ($this->dynamic && $this->dynamic->isAsset($asset)) {
+            return $this->dynamic->getContents($asset);
+        }
         $assetInfo = $this->assetSources->getInfo($asset);
         if ($assetInfo) {
             return $assetInfo->getContents();
         }
-
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getCached($asset);
         }
@@ -48,14 +57,16 @@ class Assets
 
     public function getResponse(Response $response, string $asset): Response
     {
-        if ($this->assetSources->isOrginal($asset)) {
-            return $this->assetSources->getResponse($response, $asset);
+        if ($this->dynamic && $this->dynamic->isAsset($asset)) {
+            $body = $response->getBody();
+            $body->rewind();
+            $body->write($this->dynamic->getContents($asset));
+            return $response->withHeader('Content-type', $this->dynamic->getMimetype($asset));
         }
-        if ($this->assetSources->isCached($asset)) {
+        if ($this->assetSources->isOrginal($asset) || $this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
         $this->addToCache($asset);
-
         if ($this->assetSources->isCached($asset)) {
             return $this->assetSources->getResponse($response, $asset);
         }
@@ -70,6 +81,10 @@ class Assets
         $filename    = $tmp[0];
 
         $assetInfo = $this->assetSources->getInfo($filename.'.'.$pathinfo['extension']);
+
+        if (!$assetInfo) {
+            return;
+        }
 
         switch ($assetInfo->getType()) {
             case AssetType::IMAGE:

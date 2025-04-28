@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -24,6 +25,7 @@ class SchemaField implements \JsonSerializable
         'slug',
         'svg',
         'text',
+        'vcard',
         'video',
     ];
 
