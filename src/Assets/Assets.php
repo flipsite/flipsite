@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets;
 
 use Flipsite\Assets\Attributes\ExternalImageAttributes;
@@ -24,10 +23,11 @@ use Psr\Http\Message\ResponseInterface as Response;
 class Assets
 {
     private ?DynamicAssets $dynamic = null;
+
     public function __construct(protected AssetSourcesInterface $assetSources, ?SiteDataInterface $siteData = null)
     {
         if ($siteData) {
-            $this->dynamic = new DynamicAssets($siteData);
+            $this->dynamic = new DynamicAssets($siteData, $assetSources);
         }
     }
 

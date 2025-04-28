@@ -14,14 +14,18 @@ class Schema implements \JsonSerializable
         }
     }
 
-    public function getSlugField(): ?string
+    public function getFieldsOfType(array|string $types) : array
     {
-        foreach ($this->fields as $fieldId => $val) {
-            if ('slug' === ($val->getType() ?? '')) {
-                return $fieldId;
+        if (!is_array($types)) {
+            $types = [$types];
+        }
+        $fields = [];
+        foreach ($this->fields as $fieldId => $field) {
+            if (in_array($field->getType(), $types, true)) {
+                $fields[] = $fieldId;
             }
         }
-        return null;
+        return $fields;
     }
 
     public function hasField(string $fieldId): bool
@@ -62,16 +66,6 @@ class Schema implements \JsonSerializable
     public function getField(string $field): ?SchemaField
     {
         return $this->fields[$field] ?? null;
-    }
-
-    public function getPublishedField(): string|bool
-    {
-        foreach ($this->fields as $fieldId => $field) {
-            if ('published' === $field->getType()) {
-                return $fieldId;
-            }
-        }
-        return false;
     }
 
     public function validate(array $rawData, bool $setDefault = false): array
