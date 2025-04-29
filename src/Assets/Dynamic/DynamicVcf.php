@@ -69,7 +69,7 @@ class DynamicVcf implements DynamicAssetsInterface
         $vCardData = \Flipsite\Utils\DataHelper::applyData($field->getJson(), $dataSource, $replaced);
         unset($vCardData['_original']);
 
-        $name       = explode(' ', $vCardData['name'] ?? ['', '']);
+        $name       = explode(' ', $vCardData['name'] ?? ' ');
         $vcard['N'] = [$name[1], $name[0], '', '', ''];
         if (isset($vCardData['phone'])) {
             $vcard['TEL'] = $vCardData['phone'];
