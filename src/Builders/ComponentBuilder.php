@@ -20,10 +20,11 @@ use Flipsite\Style\Style;
 use Flipsite\Style\OrderStyle;
 use Flipsite\Utils\Filter;
 use Flipsite\Utils\Plugins;
+use Flipsite\Utils\DataHelper;
 
 class ComponentBuilder
 {
-    use \Flipsite\Traits\ComponentTypeTrait;
+    use \Flipsite\Data\ComponentTypesTrait;
     private ImageHandler $imageHandler;
     private VideoHandler $videoHandler;
     private array $listeners    = [];
@@ -71,10 +72,17 @@ class ComponentBuilder
         //     $this->handleScripts($data['_script']);
         // }
 
-        $type  = $this->getComponentType($componentData->getType());
-        if (!$type) {
+        // Fallback
+        $type     = $componentData->getType();
+        $fallback = ['container', 'logo', 'button', 'link', 'toggle', 'question'];
+        if (in_array($type, $fallback)) {
+            $type = 'group';
+        }
+        $class = 'Flipsite\\Components\\' . ucfirst($type);
+        if (!class_exists($class)) {
             return null;
         }
+
         $class = 'Flipsite\\Components\\' . ucfirst($type);
 
         $data  = $componentData->getData();
@@ -182,8 +190,12 @@ class ComponentBuilder
         $style = ArrayHelper::merge($component->getDefaultStyle(), $style);
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $inheritedData->getAppearance());
 
+        $that   = $this;
+        $filter = function (string $attribute) use ($that) :bool {
+            return $that::isComponent($attribute);
+        };
         $replaced = [];
-        $data     = $component->applyData($data, $inheritedData->getDataSource(), $replaced);
+        $data     = DataHelper::applyData($data, $inheritedData->getDataSource(), $replaced, $filter);
 
         if (in_array('{copyright.year}', $replaced)) {
             $this->dispatch(new Event('ready-script', 'copyright', file_get_contents(__DIR__.'/../../js/dist/copyright.min.js')));

@@ -610,9 +610,9 @@ class Reader implements SiteDataInterface
                         }
                         $expandedPages[$expandedPage] = $pageSections;
                         if (isset($meta[$page])) {
-                            $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem);
+                            $replaced                    = [];
+                            $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem, $replaced);
                         }
-
                         foreach ($languages as $language) {
                             $localizedSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
                             if ($localizedSlug) {
