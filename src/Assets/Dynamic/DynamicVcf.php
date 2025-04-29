@@ -70,7 +70,7 @@ class DynamicVcf implements DynamicAssetsInterface
         unset($vCardData['_original']);
 
         $name       = explode(' ', $vCardData['name'] ?? ' ');
-        $vcard['N'] = [$name[1], $name[0], '', '', ''];
+        $vcard['N'] = [$name[1] ?? '', $name[0] ?? '', '', '', ''];
         if (isset($vCardData['phone'])) {
             $vcard['TEL'] = $vCardData['phone'];
         }
