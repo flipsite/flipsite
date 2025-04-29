@@ -112,7 +112,7 @@ class AssetParser
             if (!isset($pathinfo['extension'])) {
                 continue;
             }
-            if (!in_array($pathinfo['extension'], ['webp', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'ogg', 'pdf', 'txt', 'csv', 'xls'])) {
+            if (!in_array($pathinfo['extension'], ['webp', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'ogg', 'pdf', 'txt', 'csv', 'xls', 'vcf', 'ics', 'txt', 'csv'])) {
                 continue;
             }
             if (str_starts_with($asset, 'http')) {

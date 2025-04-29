@@ -110,7 +110,7 @@ class Compiler implements LoggerAwareInterface
 
         $assetList  = json_decode(json_encode($assetList));
 
-        $assets = new Assets($this->environment->getAssetSources());
+        $assets = new Assets($this->environment->getAssetSources(), $this->siteData);
         foreach ($assetList as $asset) {
             $filename = false;
             if (str_starts_with($asset, 'img/')) {
@@ -127,7 +127,10 @@ class Compiler implements LoggerAwareInterface
                 if (!file_exists($pathinfo['dirname'])) {
                     mkdir($pathinfo['dirname'], 0777, true);
                 }
-                file_put_contents($target, $assets->getContents($filename));
+                $contents = $assets->getContents($filename);
+                if ($contents) {
+                    file_put_contents($target, $contents);
+                }
             }
         }
 
