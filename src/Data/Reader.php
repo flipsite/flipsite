@@ -295,12 +295,15 @@ class Reader implements SiteDataInterface
         return $style;
     }
 
-    public function getComponentStyle(int|string $componentId): array
+    public function getComponentStyle(int|string $componentId, bool $childStyles = false): array
     {
         if (!$this->componentsStyles) {
             $this->componentsStylesDot = new \Adbar\Dot($this->data['theme']['components']);
         }
         $all   = $this->componentsStylesDot->get($componentId) ?? [];
+        if ($childStyles) {
+            return $all;
+        }
         $style = [];
         foreach ($all as $attr => $value) {
             if (!$this->isComponent($this->getType($attr))) {
@@ -465,9 +468,9 @@ class Reader implements SiteDataInterface
                         $path[] = implode('.', $parts);
                         array_pop($parts);
                     }
-                    $path = array_reverse($path);
+                    $path           = array_reverse($path);
+                    $data['_style'] = $this->getComponentStyle($componentId, true);
 
-                    $data['_style'] = $this->getComponentStyle($componentId);
                     return new YamlComponentData($path, $componentId, $this->getType($last), $data ?? ['value' => '']);
                 }
             }

@@ -61,7 +61,7 @@ interface SiteDataInterface
 
     public function getBodyStyle(?string $page = null): array;
 
-    public function getComponentStyle(int|string $componentId): array;
+    public function getComponentStyle(int|string $componentId, bool $childStyles = false): array;
 
     public function getInheritedStyle(int|string $componentId): array;
 
