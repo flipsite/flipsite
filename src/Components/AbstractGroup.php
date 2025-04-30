@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -83,13 +82,16 @@ abstract class AbstractGroup extends AbstractComponent
             $total           = count($childComponents);
 
             foreach ($childComponents as $index => $childComponent) {
-                $order = [
-                    'index' => $index,
-                    'total' => $total,
-                    'first' => 0 === $index,
-                    'last'  => $total - 1 === $index,
-                ];
-                $childComponent->setMetaValue('order', $order);
+                // $order = [
+                //     'index' => $index,
+                //     'total' => $total,
+                //     'first' => 0 === $index,
+                //     'last'  => $total - 1 === $index,
+                // ];
+                $order = $component->getMetaValue('order');
+                if ($order) {
+                    $childComponent->setMetaValue('order', $component->getMetaValue('order'));
+                }
                 $children[]     = $this->builder->build($childComponent, clone $inherited);
             }
 
