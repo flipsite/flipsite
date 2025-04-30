@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -33,10 +32,10 @@ final class Number extends AbstractComponent
             $value = $this->numberToFormat(intval($value), $data['format'] ?? '1');
         } else {
             $separators = [
-                'none'      => '',
-                'space'     => ' ',
-                'comma'     => ',',
-                'period'    => '.',
+                'none'       => '',
+                'space'      => ' ',
+                'comma'      => ',',
+                'period'     => '.',
                 'apostrophe' => '\'',
             ];
             $decimals           = intval($data['decimals'] ?? 0);
@@ -50,6 +49,10 @@ final class Number extends AbstractComponent
                     $value = substr($value, 0, -1);
                 }
             }
+        }
+        if (isset($data['zeroPadding'])) {
+            $zeros = intval($data['zeroPadding']);
+            $value = str_pad($value, $zeros, '0', STR_PAD_LEFT);
         }
         if (isset($data['content'])) {
             $content = str_replace('[number]', (string)$value, $data['content']);
