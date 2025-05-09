@@ -313,7 +313,7 @@ class ComponentBuilder
         $this->previousComponentData = $componentData;
 
         if ($this->plugins) {
-            $component = $this->plugins->run('afterComponentBuild', $component, $componentData, $inheritedData);
+            $component = $this->plugins->run('afterComponentBuild', $component, $componentData, $inheritedData, $this->path);
         }
         return $component;
     }
