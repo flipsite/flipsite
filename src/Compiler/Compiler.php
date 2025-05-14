@@ -9,6 +9,7 @@ use Flipsite\Assets\Assets;
 use Flipsite\Data\SiteDataInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Psr\Log\LoggerAwareInterface;
+use Flipsite\Utils\Plugins;
 
 class Compiler implements LoggerAwareInterface
 {
@@ -16,7 +17,7 @@ class Compiler implements LoggerAwareInterface
     private string $targetDir;
     private array $optimizeExtensions = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
 
-    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, string $targetDir)
+    public function __construct(private EnvironmentInterface $environment, private SiteDataInterface $siteData, string $targetDir, private ?Plugins $plugins = null)
     {
         // Create target dir if it does not already exist
         if (!is_dir($targetDir)) {
@@ -37,7 +38,7 @@ class Compiler implements LoggerAwareInterface
         $assetList = [];
         $allFiles  = [];
 
-        $flipsite = new Flipsite($this->environment, $this->siteData);
+        $flipsite = new Flipsite($this->environment, $this->siteData, $this->plugins);
         // Remove all index.html files
         $this->deleteContent($this->targetDir);
 
