@@ -108,6 +108,11 @@ class Reader implements SiteDataInterface
         return $this->get('publish');
     }
 
+    public function getRaw(string $key): ?array
+    {
+        return $this->get($key) ?? null;
+    }
+
     private function loadSite(array $yaml, bool $expand)
     {
         $this->data = $yaml;

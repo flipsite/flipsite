@@ -40,6 +40,8 @@ interface SiteDataInterface
 
     public function getPublish(): ?array;
 
+    public function getRaw(string $key): ?array;
+
     /**
      * @return AbstractComponentData[]
      */
