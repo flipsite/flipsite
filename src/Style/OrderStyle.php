@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Utils\ArrayHelper;
@@ -15,13 +14,14 @@ final class OrderStyle
         $encodedVariants = explode(' ', str_replace($prefix, '', $encoded));
 
         $variants = [];
-        $orders = ['first', 'last', 'odd', 'even'];
+        $orders   = ['first:', 'last:', 'odd:', 'even:'];
         foreach ($encodedVariants as $variant) {
             $found = false;
             foreach ($orders as $order) {
                 if (strpos($variant, $order) !== false) {
-                    $variants[$order] ??= '';
-                    $variants[$order] .= ' '.str_replace($order.':', '', $variant);
+                    $orderVariant = str_replace(':', '', $order);
+                    $variants[$orderVariant] ??= '';
+                    $variants[$orderVariant] .= ' '.str_replace($order, '', $variant);
                     $found = true;
                 }
             }
@@ -33,16 +33,15 @@ final class OrderStyle
         foreach ($variants as $order => $variant) {
             $this->styles[$order] = new Style($variant);
         }
-
     }
 
     public function getValue(int $row, int $total): ?string
     {
-        $isEven = $row % 2 === 0;
-        $isOdd = !$isEven;
-        $isFirst = $row === 1;
+        $isEven     = $row % 2 === 0;
+        $isOdd      = !$isEven;
+        $isFirst    = $row === 1;
         $isLastEven = $row === $total && $total % 2 === 0;
-        $isLastOdd = $row === $total && $total % 2 === 1;
+        $isLastOdd  = $row === $total && $total % 2 === 1;
 
         $baseValues = isset($this->styles['']) ? $this->styles['']->getValues() : [];
         if ($isFirst) {
@@ -58,7 +57,7 @@ final class OrderStyle
         }
 
         $baseValues = isset($this->styles['']) ? $this->styles['']->getValues() : [];
-        $values = $values ? ArrayHelper::merge($baseValues, array_filter($values->getValues())) : $baseValues;
+        $values     = $values ? ArrayHelper::merge($baseValues, array_filter($values->getValues())) : $baseValues;
 
         $encoded = $values[''] ?? '';
         unset($values['']);
@@ -67,6 +66,4 @@ final class OrderStyle
         }
         return $encoded;
     }
-
-
 }
