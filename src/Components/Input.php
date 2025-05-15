@@ -14,5 +14,9 @@ class Input extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        if ('checkbox' === $this->getAttribute('type')) {
+            $name = $this->getAttribute('name');
+            $this->setAttribute('name', $name.'[]');
+        }
     }
 }
