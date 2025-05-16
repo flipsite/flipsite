@@ -304,6 +304,7 @@ class ComponentBuilder
             unset($data['_attr']);
         }
 
+        unset($style['type']);
         $component->addStyle($style);
         $componentData->setData($data);
         $componentData->setStyle($style);
