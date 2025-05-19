@@ -1,13 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
-use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
-use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
+use League\CommonMark\MarkdownConverter;
 use Flipsite\Utils\StyleAppearanceHelper;
 use Flipsite\Components\Element;
 
@@ -16,25 +14,27 @@ trait MarkdownTrait
     use ActionTrait;
     use BuilderTrait;
 
-
     private function getMarkdownLine(string $markdown, array $tags, array $style, string $appearance, bool $removeLinks = false, bool $magicLinks = false): string
     {
         if ($magicLinks) {
             $markdown = $this->urlsToLinks($markdown);
         }
-        $markdown = $this->fixInvalidMarkdown($markdown);
-        $environment = new Environment();
-        $environment->addExtension(new CommonMarkCoreExtension());
+        $markdown    = $this->fixInvalidMarkdown($markdown);
+
+        $config      = [];
+        $environment = new Environment($config);
+
         $environment->addExtension(new InlinesOnlyExtension());
 
-        $converter = new CommonMarkConverter([], $environment);
+        // Instantiate the converter engine and start converting some Markdown!
+        $converter = new MarkdownConverter($environment);
+
         $html = (string)$converter->convert($markdown);
         $html = preg_replace('/^<p>(.*)<\/p>$/s', '$1', trim($html));
 
-
         if ($removeLinks) {
-            $html = str_replace('<a href="', '<span data-href="', $html);
-            $html = str_replace('</a>', '</span>', $html);
+            $html          = str_replace('<a href="', '<span data-href="', $html);
+            $html          = str_replace('</a>', '</span>', $html);
             $style['span'] = $style['a'] ?? [];
             unset($style['a']);
             $tags[] = 'span';
@@ -58,10 +58,10 @@ trait MarkdownTrait
     {
         // Step 1: Temporarily replace existing markdown links with placeholders
         $placeholders = [];
-        $text = preg_replace_callback(
+        $text         = preg_replace_callback(
             '/\[[^\]]+\]\([^\)]+\)/',
             function ($match) use (&$placeholders) {
-                $placeholder = "__PLACEHOLDER_" . count($placeholders) . "__";
+                $placeholder                = '__PLACEHOLDER_' . count($placeholders) . '__';
                 $placeholders[$placeholder] = $match[0]; // Store original markdown link
                 return $placeholder;
             },
