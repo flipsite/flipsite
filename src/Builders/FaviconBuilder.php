@@ -46,8 +46,7 @@ class FaviconBuilder implements BuilderInterface
         //     $document->getChild('head')->addChild($el);
         // }
 
-        if (isset($favicon['svg'])) {
-            $image = $this->assets->getImageAttributes($favicon['svg']);
+        if (isset($favicon['svg']) && $image = $this->assets->getImageAttributes($favicon['svg'])) {
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
             $el->setAttribute('href', $image->getSrc());
@@ -55,8 +54,7 @@ class FaviconBuilder implements BuilderInterface
             $document->getChild('head')->addChild($el);
         }
 
-        if (isset($favicon['png'])) {
-            $image = $this->assets->getImageAttributes($favicon['png'], ['width' => 64, 'height' => 64]);
+        if (isset($favicon['png']) && $image = $this->assets->getImageAttributes($favicon['png'], ['width' => 64, 'height' => 64])) {
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'icon');
             $el->setAttribute('href', $image->getSrc());
@@ -64,8 +62,7 @@ class FaviconBuilder implements BuilderInterface
             $document->getChild('head')->addChild($el);
         }
 
-        if (isset($favicon['apple'])) {
-            $image = $this->assets->getImageAttributes($favicon['apple'], ['width' => 192, 'height' => 192]);
+        if (isset($favicon['apple']) && $image = $this->assets->getImageAttributes($favicon['apple'], ['width' => 192, 'height' => 192])) {
             $el    = new Element('link', true, true);
             $el->setAttribute('rel', 'apple-touch-icon');
             $el->setAttribute('href', $image->getSrc());
