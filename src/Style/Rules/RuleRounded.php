@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 final class RuleRounded extends AbstractRule
@@ -35,7 +34,7 @@ final class RuleRounded extends AbstractRule
         $value = null;
         if (!isset($args[0])) {
             $args[0] = '1';
-        } else if (in_array($args[0], ['box','btn'])) {
+        } elseif (in_array($args[0], ['box', 'btn'])) {
             $scale = $this->themeSettings['borderRadiusScale'] ?? 1.0;
             if ($scale < 0.5) {
                 return;
@@ -51,14 +50,18 @@ final class RuleRounded extends AbstractRule
             $this->setDeclaration($property, $value);
         }
     }
-    private function getScaledValue(float $scale, string $size) {
+
+    private function getScaledValue(float $scale, string $size)
+    {
         $radiusPx = [
-            'xs' => 2.25,
-            'sm' => 3,
-            'md' => 4.5,
-            'lg' => 6,
-            'xl' => 9,
+            'xs'  => 2.25,
+            'sm'  => 3,
+            'md'  => 4.5,
+            'lg'  => 6,
+            'xl'  => 9,
+            '2xl' => 12,
+            '3xl' => 16,
         ];
-        return  ($radiusPx[$size] * $scale / 16.0) . 'rem';        
+        return  ($radiusPx[$size] * $scale / 16.0) . 'rem';
     }
 }
