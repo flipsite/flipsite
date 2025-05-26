@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
 
 trait ActionTrait
@@ -207,7 +206,11 @@ trait ActionTrait
             $new = 'href="'.($actionAttributes['href'] ?? '#missing').'"';
             unset($actionAttributes['href']);
             foreach ($actionAttributes as $attr => $val) {
-                $new .= ' '.$attr.'="'.$val.'"';
+                if (is_bool($val)) {
+                    $new .= ' '.$attr;
+                } else {
+                    $new .= ' '.$attr.'="'.$val.'"';
+                }
             }
             $html = str_replace('href="'.$href.'"', $new, $html);
         }
