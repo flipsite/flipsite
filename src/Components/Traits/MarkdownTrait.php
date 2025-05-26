@@ -42,6 +42,7 @@ trait MarkdownTrait
 
         $html = $this->addClassesToHtml($html, $tags, $style, $appearance);
         $html = $this->fixUrlsInHtml($html);
+
         return $html;
     }
 
@@ -56,7 +57,6 @@ trait MarkdownTrait
 
     private function urlsToLinks(string $text): string
     {
-        // Step 1: Temporarily replace existing markdown links with placeholders
         $placeholders = [];
         $text         = preg_replace_callback(
             '/\[[^\]]+\]\([^\)]+\)/',
@@ -68,14 +68,18 @@ trait MarkdownTrait
             $text
         );
 
-        // Step 2: Convert standalone emails to markdown links (that are not already inside markdown)
         $text = preg_replace(
             '/(?<!\[)(?<!\()\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b(?!\))/',
             '[$1](mailto:$1)',
             $text
         );
 
-        // Step 3: Convert standalone URLs to markdown links (that are not already inside markdown)
+        $text = preg_replace(
+            '/(?<!\[)(?<!\]\()(?<!mailto:)(?<!tel:)(\+\d{7,15})(?!\))/i',
+            '[$1](tel:$1)',
+            $text
+        );
+
         $text = preg_replace(
             '/(?<!\[)\b(https?:\/\/[^\s<]+[^\s.,;:<])\b(?!\))/',
             '[$1]($1)',

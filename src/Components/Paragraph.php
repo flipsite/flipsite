@@ -32,15 +32,16 @@ final class Paragraph extends AbstractComponent
         }
 
         $data['value'] = $this->checkText($data['value'], 'Paragraph');
+        $style         = $component->getStyle();
+        $magicLinks    = $data['magicLinks'] ?? false;
+        $html          = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
+
         if (isset($data['formatDate'])) {
-            $data['value'] = $this->parseDate($data['value'], $data['formatDate']);
+            $html = $this->parseDate($html, $data['formatDate']);
         }
         if (isset($data['formatPhone'])) {
-            $data['value'] = $this->parsePhone($data['value'], $data['formatPhone']);
+            $html = $this->parsePhone($html, $data['formatPhone']);
         }
-        $style      = $component->getStyle();
-        $magicLinks = $data['magicLinks'] ?? false;
-        $html       = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
         $this->setContent((string)$html);
     }
 
