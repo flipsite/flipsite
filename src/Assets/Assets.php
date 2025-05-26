@@ -109,7 +109,7 @@ class Assets
     public function getSvg(string $svg): ?SvgInterface
     {
         $assetInfo = $this->assetSources->getInfo($svg);
-        if ($assetInfo) {
+        if ($assetInfo && 'image/svg+xml' === $assetInfo->getMimetype()) {
             return new \Flipsite\Utils\SvgData($assetInfo->getContents());
         }
         return null;
