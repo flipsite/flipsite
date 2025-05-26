@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -61,10 +60,15 @@ final class Richtext extends AbstractGroup
         $items    = $data['value'] ?? [];
         $component->purgeChildren();
         $inherited->setParent($component->getId(), $component->getType());
+        $lastIndex = count($items) - 1;
         foreach ($items as $index => $itemData) {
             $item = $this->getItem($itemData, $data, $component->getStyle());
             if ($item) {
-                $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData(), $item->getStyle());
+                $style = $item->getStyle();
+                if (($index === 0 || $index === $lastIndex) && $data['trimMargins'] ?? false) {
+                    $style = $this->trimMargins($style, $index === 0 ? 'top' : 'bottom');
+                }
+                $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData(), $style);
                 $component->addChild($itemComponentData);
             }
         }
@@ -98,6 +102,16 @@ final class Richtext extends AbstractGroup
                 return new RichtextItemYoutube($itemData, $componentStyle['youtube'] ?? []);
         }
         return null;
+    }
+
+    private function trimMargins(array $style, string $side): array
+    {
+        if ('top' === $side) {
+            unset($style['marginT'], $style['paddingT']);
+        } elseif ('bottom' === $side) {
+            unset($style['marginB'], $style['paddingB']);
+        }
+        return $style;
     }
 }
 
