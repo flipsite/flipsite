@@ -617,14 +617,22 @@ class Reader implements SiteDataInterface
                             $expandedMeta[$expandedPage] = DataHelper::applyData($meta[$page], $pageDataItem, $replaced);
                         }
                         foreach ($languages as $language) {
-                            $localizedSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
-                            if ($localizedSlug) {
-                                $this->expandedPages[$page][(string)$language]   = $localizedSlug;
-                                $expandedLocalizedPage                           = str_replace(':slug', $loc->getValue($language) ?? '', $localizedSlug);
-                                $expandedPages[$expandedLocalizedPage]           = $expandedPages[$expandedPage];
-                                $expandedMeta[$expandedLocalizedPage]            = $expandedMeta[$expandedPage];
-                                $expandedSlugs[$expandedPage][(string)$language] = $expandedLocalizedPage;
+                            $itemLocalizedSlug = $loc->getValue($language) ?? '';
+                            if ($itemLocalizedSlug) {
+                                $localizedSlug                                   = str_replace(':slug', $itemLocalizedSlug, $page);
+                                if (!isset($expandedPages[$localizedSlug])) {
+                                    $expandedSlugs[$expandedPage][(string)$language] = $localizedSlug;
+                                }
                             }
+
+                            // $localizedSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
+                            // if ($localizedSlug) {
+                            //     $this->expandedPages[$page][(string)$language]   = $localizedSlug;
+                            //     $expandedLocalizedPage                           = str_replace(':slug', $loc->getValue($language) ?? '', $localizedSlug);
+                            //     $expandedPages[$expandedLocalizedPage]           = $expandedPages[$expandedPage];
+                            //     $expandedMeta[$expandedLocalizedPage]            = $expandedMeta[$expandedPage];
+                            //     $expandedSlugs[$expandedPage][(string)$language] = $expandedLocalizedPage;
+                            // }
                         }
                     }
                 }
