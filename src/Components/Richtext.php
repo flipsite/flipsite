@@ -65,7 +65,7 @@ final class Richtext extends AbstractGroup
             $item = $this->getItem($itemData, $data, $component->getStyle());
             if ($item) {
                 $style = $item->getStyle();
-                if (($index === 0 || $index === $lastIndex) && $data['trimMargins'] ?? false) {
+                if (($index === 0 || $index === $lastIndex) && ($data['trimMargins'] ?? false)) {
                     $style = $this->trimMargins($style, $index === 0 ? 'top' : 'bottom');
                 }
                 $itemComponentData  = new YamlComponentData($component->getPath(), $component->getId().'.'.$index, $item->getType(), $item->getData(), $style);
