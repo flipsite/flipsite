@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -14,7 +13,8 @@ final class Select extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
-        $options = ArrayHelper::decodeJsonOrCsv($data['options']);
+        $data     = $component->getData();
+        $options  = ArrayHelper::decodeJsonOrCsv($data['options'] ?? []);
         $selected = $data['selected'] ?? '';
         foreach ($options as $value) {
             $option = new Element('option', true);
@@ -34,7 +34,6 @@ final class Select extends AbstractComponent
         }
         if (!isset($data['options'])) {
             $data['options'] = ['No options'];
-
         }
         return $data;
     }
