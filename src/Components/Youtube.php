@@ -79,7 +79,6 @@ final class Youtube extends AbstractGroup
             }
             $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']['value'] ?? 'simpleicons/youtube'], $style['playIcon'] ?? []);
             $icon              = $this->builder->build($iconComponentData, $inherited);
-            $this->setAttribute('data-youtube-play', true);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));
             $this->addChild($icon);
         } else {
