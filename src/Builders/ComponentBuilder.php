@@ -221,9 +221,7 @@ class ComponentBuilder
         if ($order) {
             $style = $this->optimizeStyle($style, $order['index'], $order['total']);
         }
-        if ($inheritedData->getNavState()) {
-            $style = $this->handleNavStyle($style, $inheritedData->getNavState());
-        }
+        $style = $this->handleNavStyle($style, $inheritedData->getNavState() ?? '');
 
         $data = $component->normalize($data);
 
@@ -457,10 +455,15 @@ class ComponentBuilder
                 return $str;
             }
             $style = new \Flipsite\Style\Style($str);
+
             if ('exact' === $navState && $style->hasVariant('nav-exact')) {
                 return $style->getValue('nav-exact');
-            } elseif ($style->hasVariant('nav-active')) {
+            } elseif ($style->hasVariant('nav-active') && $navState) {
                 return $style->getValue('nav-active');
+            } else {
+                $style->removeValue('nav-exact');
+                $style->removeValue('nav-active');
+                return $style->encode();
             }
         });
         return $style;
@@ -600,6 +603,9 @@ class ComponentBuilder
                     $css[$media] = ['.'.$bgClass => []];
                     if ($media) {
                         $imageAttributes                               = $this->assets->getImageAttributes($src, ['width' => intval($size['w']), 'height' => intval($size['h'])]);
+                        if (!$imageAttributes) {
+                            continue;
+                        }
                         $resSrc                                        = $imageAttributes->getSrc();
                         $css[$media]['.'.$bgClass]['background-image'] = $gradient.'url(' .$resSrc. ')';
                         if ($type === 'laptop') {
