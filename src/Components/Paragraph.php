@@ -12,6 +12,7 @@ final class Paragraph extends AbstractComponent
     use Traits\SiteDataTrait;
     use Traits\DateFilterTrait;
     use Traits\PhoneFilterTrait;
+    use Traits\UrlFilterTrait;
     use Traits\CheckTextTrait;
 
     protected string $tag = 'p';
@@ -41,6 +42,9 @@ final class Paragraph extends AbstractComponent
         }
         if (isset($data['formatPhone'])) {
             $html = $this->parsePhone($html, $data['formatPhone']);
+        }
+        if (isset($data['formatUrl'])) {
+            $html = $this->parseUrl($html, $data['formatUrl']);
         }
         $this->setContent((string)$html);
     }

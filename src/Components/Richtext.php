@@ -90,7 +90,7 @@ final class Richtext extends AbstractGroup
                 $tagStyle['tag'] = $type;
                 return new RichtextItemHeading($itemData['value'], $componentStyle['h'] ?? [], $tagStyle);
             case 'p':
-                return new RichtextItemParagraph($itemData['value'] ?? '', $componentStyle['p'] ?? [], $componentData['magicLinks'] ?? false);
+                return new RichtextItemParagraph($itemData['value'] ?? '', $componentStyle['p'] ?? [], $componentData);
             case 'img':
                 return new RichtextItemImage($itemData, $componentStyle['img'] ?? []);
             case 'ul':
@@ -152,12 +152,16 @@ class RichtextItemParagraph extends AbstractRichtextItem
 {
     protected string $type = 'paragraph';
 
-    public function __construct(string $value, array $style, bool $magicLinks = false)
+    public function __construct(string $value, array $style, array $args)
     {
         $this->data['value'] = $value;
-        if ($magicLinks) {
-            $this->data['magicLinks'] = $magicLinks;
+        if ($args['magicLinks'] ?? false) {
+            $this->data['magicLinks'] = true;
         }
+        $this->data['formatPhone'] = $args['formatPhone'] ?? null;
+        $this->data['formatDate']  = $args['formatDate'] ?? null;
+        $this->data['formatUrl']   = $args['formatUrl'] ?? null;
+
         $this->style         = $style;
     }
 }

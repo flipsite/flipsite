@@ -10,6 +10,7 @@ final class Text extends AbstractComponent
 {
     use Traits\DateFilterTrait;
     use Traits\PhoneFilterTrait;
+    use Traits\UrlFilterTrait;
     use Traits\CheckTextTrait;
 
     protected string $tag   = '';
@@ -28,6 +29,9 @@ final class Text extends AbstractComponent
         }
         if (isset($data['formatPhone'])) {
             $this->content = $this->parsePhone($this->content, $data['formatPhone']);
+        }
+        if (isset($data['formatUrl'])) {
+            $this->content = $this->parseUrl($this->content, $data['formatUrl']);
         }
     }
 
