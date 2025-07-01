@@ -95,7 +95,7 @@ final class Richtext extends AbstractGroup
                 return new RichtextItemImage($itemData, $componentStyle['img'] ?? []);
             case 'ul':
             case 'ol':
-                return new RichtextItemList($type, $itemData, $componentData['ul']['li']['icon']['value'] ?? null, $componentData['ul']['li']['number']['format'] ?? null, $componentStyle['ul'] ?? [], $componentStyle['p'] ?? []);
+                return new RichtextItemList($type, $itemData, $componentData['ul']['li']['icon']['value'] ?? null, $componentData['ul']['li']['number']['format'] ?? null, $componentData, $componentStyle['ul'] ?? [], $componentStyle['p'] ?? []);
             case 'table':
                 return new RichtextItemTable($itemData, $componentStyle['table'] ?? []);
             case 'youtube':
@@ -237,7 +237,7 @@ class RichtextItemList extends AbstractRichtextItem
 {
     protected string $type = 'ul';
 
-    public function __construct(string $type, array $value, ?string $icon, ?string $number, array $style)
+    public function __construct(string $type, array $value, ?string $icon, ?string $number, array $args, array $style)
     {
         $this->data['_repeat'] = $value['value'];
         $li                    = [];
@@ -257,9 +257,16 @@ class RichtextItemList extends AbstractRichtextItem
             $style['listStylePosition'] = 'list-inside';
             $style['listStyleType']     = 'list-decimal';
         }
-        $li['value']      = '{item}';
-        $this->data['li'] = $li;
-        $this->style      = $style;
+        $li['value']         = '{item}';
+        $this->data['li']    = $li;
+        $this->data['value'] = $value;
+        if ($args['magicLinks'] ?? false) {
+            $this->data['li']['magicLinks'] = true;
+        }
+        $this->data['li']['formatPhone'] = $args['formatPhone'] ?? null;
+        $this->data['li']['formatDate']  = $args['formatDate'] ?? null;
+        $this->data['li']['formatUrl']   = $args['formatUrl'] ?? null;
+        $this->style                     = $style;
     }
 }
 
