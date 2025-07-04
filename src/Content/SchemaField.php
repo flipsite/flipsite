@@ -1,9 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\Localization;
 
 class SchemaField implements \JsonSerializable
 {
@@ -105,6 +107,7 @@ class SchemaField implements \JsonSerializable
 
     public function appendDelta(array $delta)
     {
+
         if (array_key_exists('type', $delta)) {
             $this->type = $delta['type'];
             if (!in_array($this->type, self::TYPES)) {
@@ -161,6 +164,10 @@ class SchemaField implements \JsonSerializable
 
     public function validate(string|bool $value): string|bool
     {
+        if (is_string($value) && !$this->localizable && Localization::isLocalization($value)) {
+            $localization = new Localization([], $value);
+            return $localization->getValue();
+        }
         if ('richtext' === $this->type) {
             return $this->validateRichtext($value);
         }

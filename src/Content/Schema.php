@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Content;
 
 class Schema implements \JsonSerializable
@@ -14,7 +15,7 @@ class Schema implements \JsonSerializable
         }
     }
 
-    public function getFieldsOfType(array|string $types) : array
+    public function getFieldsOfType(array|string $types): array
     {
         if (!is_array($types)) {
             $types = [$types];
