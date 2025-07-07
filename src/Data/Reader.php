@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 use Flipsite\Exceptions\NoSiteFileFoundException;
@@ -620,8 +619,9 @@ class Reader implements SiteDataInterface
                         foreach ($languages as $language) {
                             $itemLocalizedSlug = $loc->getValue($language) ?? '';
                             if ($itemLocalizedSlug) {
-                                $localizedPageSlug = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
-                                $localizedSlug = str_replace(':slug', $itemLocalizedSlug, $localizedPageSlug);
+                                $localizedPageSlug                             = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
+                                $this->expandedPages[$page][(string)$language] = $slugs[$page][(string)$language] ?? (string)$language.'/'.$page;
+                                $localizedSlug                                 = str_replace(':slug', $itemLocalizedSlug, $localizedPageSlug);
                                 if (!isset($expandedPages[$localizedSlug])) {
                                     $expandedSlugs[$expandedPage][(string)$language] = $localizedSlug;
                                 }
