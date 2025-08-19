@@ -74,6 +74,7 @@ trait ActionTrait
                 ];
                 break;
             case 'download':
+            case 'file':
                 if (!isset($data['_target'])) {
                     return [
                         'tag'      => 'a',
@@ -86,6 +87,10 @@ trait ActionTrait
                     'href'     => $file ?? '#',
                     'download' => $data['_filename'] ?? true
                 ];
+                if ('file' === $data['_action']) {
+                    $attributes['rel'] = 'noopener noreferrer';
+                    unset($attributes['download']);
+                }
                 break;
             case 'scroll':
                 $attributes = [
@@ -157,6 +162,11 @@ trait ActionTrait
 
         $parts    = explode('#', $target);
         $target   = $parts[0];
+        $openFile = false;
+        if (str_starts_with($target, 'file://')) {
+            $openFile = true;
+            $target   = str_replace('file://', '', $target);
+        }
         $fragment = $parts[1] ?? null;
 
         $page = $this->siteData->getSlugs()->getPage($target);
@@ -164,6 +174,9 @@ trait ActionTrait
 
         if ($file) {
             $action = 'download';
+            if ($openFile) {
+                $action = 'file';
+            }
         } elseif ($page) {
             $action = 'page';
             if ($target === '') {
