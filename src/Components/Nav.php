@@ -15,7 +15,10 @@ final class Nav extends AbstractGroup
     public function normalize(array $data): array
     {
         $repeat = [];
-        if (!isset($data['_options']['pages'])) {
+        if (count($data['_options'] ?? []) === 0 && !isset($data['_repeat'])) {
+            $data['_repeat'] = '_pages-0';
+        }
+        if (!isset($data['_options']['pages']) && isset($data['_repeat'])) {
             $level           = 0;
             $parentPage      = $data['_options']['parentPage'] ?? null;
             if ($parentPage) {
@@ -24,7 +27,7 @@ final class Nav extends AbstractGroup
                 $level = intval(str_replace('_pages-', '', $data['_repeat']));
             }
             $repeat = $this->getPages($level, $parentPage, !!($data['_options']['includeParent'] ?? false));
-        } else {
+        } elseif (isset($data['_options']['pages'])) {
             $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
             foreach ($pages as $page) {
                 $pageItemData = $this->getPageItemData($page);
