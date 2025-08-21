@@ -629,10 +629,10 @@ class ComponentBuilder
                 }
                 // SVG
                 if (str_ends_with($src, '.svg')) {
-                    $element->setAttribute('style', 'background-image:' . $gradient . 'url(' . $imageAttributes->getSrc() . ');');
+                    $element->addCss('background-image', $gradient . 'url(' . $imageAttributes->getSrc() . ');');
                 } elseif ($imageAttributes && $srcset = $imageAttributes->getSrcset('url')) {
                     if ('eager' === $options['loading']) {
-                        $element->setAttribute('style', 'background-image:' . $gradient . '-webkit-image-set(' . $srcset . ')');
+                        $element->addCss('background-image', $gradient . '-webkit-image-set(' . $srcset . ')');
                     } else {
                         $element->setAttribute('data-lazybg', $gradient . '-webkit-image-set(' . $srcset . ')');
                         $this->dispatch(new Event('ready-script', 'lazy', file_get_contents(__DIR__ . '/../../js/dist/lazybg.min.js')));
@@ -643,7 +643,7 @@ class ComponentBuilder
                 }
             }
         } elseif ($gradient) {
-            $element->setAttribute('style', 'background-image:' . $gradient);
+            $element->addCss('background-image', $gradient);
             unset($style['options']);
         } else {
             unset($style['options'], $style['position'], $style['size'], $style['repeat']);

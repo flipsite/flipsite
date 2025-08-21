@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -17,10 +16,10 @@ final class Video extends AbstractComponent
     {
         $data = $component->getData();
         if (isset($data['base64bg'])) {
-            $this->setAttribute('style', 'background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
+            $this->addCss('background', 'url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
         if (isset($data['poster'])) {
-            $style = $component->getStyle();
+            $style           = $component->getStyle();
             $imageAttributes = $this->assets->getImageAttributes($data['poster'], $style['poster']['options'] ?? []);
             $this->setAttribute('poster', $imageAttributes->getSrc());
             unset($style['poster']);

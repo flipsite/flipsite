@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -15,17 +14,19 @@ abstract class AbstractElement
     protected string $content           = '';
     protected array $attributes         = [];
     protected array $style              = [];
+    protected array $css                = [];
     protected bool $render              = true;
     private ?string $cache              = null;
     private ?string $commentOut         = null;
     private ?string $commentBefore      = null;
     private ?string $commentAfter       = null;
-    private bool $wrap                 = true;
+    private bool $wrap                  = true;
 
     public function setWrap(bool $wrap): void
     {
         $this->wrap = $wrap;
     }
+
     public function getStyle(): array
     {
         return $this->style;
@@ -51,6 +52,13 @@ abstract class AbstractElement
             }
         }
         $this->cache = null;
+        return $this;
+    }
+
+    public function addCss(string $attribute, string $value): self
+    {
+        $this->css[$attribute] = $value;
+        $this->cache           = null;
         return $this;
     }
 
@@ -233,6 +241,14 @@ abstract class AbstractElement
 
         if (!$this->content && !count($this->children) && !$this->empty) {
             $this->oneline = true;
+        }
+
+        if (count($this->css)) {
+            $this->setAttribute('style', implode('; ', array_map(
+                fn ($key, $value) => "$key: $value",
+                array_keys($this->css),
+                $this->css
+            )));
         }
         //$this->purgeInvalidAttributes();
         $html = '';

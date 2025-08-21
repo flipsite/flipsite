@@ -34,7 +34,7 @@ final class Youtube extends AbstractGroup
             $iframe         = new Element('iframe', true);
         }
         if (isset($data['base64bg'])) {
-            $ifame->setAttribute('style', 'background: url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
+            $ifame->addCss('background', 'url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
         $iframe->setAttribute('loading', 'lazy');
         $iframe->setAttribute('frameborder', '0');
@@ -72,7 +72,7 @@ final class Youtube extends AbstractGroup
         }
         if ('onclick' === ($data['loading'] ?? 'onclick')) {
             $iframe->setAttribute('data-youtube-play', $src);
-            $iframe->setAttribute('style', 'pointer-events:none');
+            $iframe->addCss('pointer-events', 'none');
             $this->addChild($iframe);
             if (isset($style['aspectRatio'])) {
                 $this->addStyle(['aspectRatio' => $style['aspectRatio']]);

@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -10,10 +9,10 @@ use Flipsite\Components\Script;
 
 class IntegrationsBuilder implements BuilderInterface
 {
-    private ?string $gtm        = null;
-    private ?string $ga         = null;
-    private ?string $metaPixel  = null;
-    private ?string $plausible  = null;
+    private ?string $gtm             = null;
+    private ?string $ga              = null;
+    private ?string $metaPixel       = null;
+    private ?string $plausible       = null;
     private string $plausibleScript  = 'script.js';
 
     public function __construct(private bool $isLive, array $integrations)
@@ -51,7 +50,8 @@ class IntegrationsBuilder implements BuilderInterface
             $iframe->setAttribute('src', 'https://www.googletagmanager.com/ns.html?id='.$this->gtm);
             $iframe->setAttribute('height', '0');
             $iframe->setAttribute('width', '0');
-            $iframe->setAttribute('style', 'display:none;visibility:hidden');
+            $iframe->addCss('display', 'none');
+            $iframe->addCss('visibility', 'hidden');
             $noscript->addChild($iframe);
             $noscript->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('body')->prependChild($noscript);

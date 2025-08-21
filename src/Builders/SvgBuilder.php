@@ -3,10 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Builders\EventListenerInterface;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Builders\Event;
 
 class SvgBuilder implements BuilderInterface, EventListenerInterface
 {
@@ -22,7 +20,7 @@ class SvgBuilder implements BuilderInterface, EventListenerInterface
         $svg->setAttribute('version', '1.1');
         $svg->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         $svg->setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-        $svg->setAttribute('style', 'display:none;');
+        $svg->addCss('display', 'none');
 
         $defs = new Element('defs');
         foreach ($this->data as $id => $data) {
