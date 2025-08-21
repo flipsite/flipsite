@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 class InheritedComponentData
@@ -18,8 +17,20 @@ class InheritedComponentData
 
     private bool $aTag = false;
 
+    private bool $isComponent = true;
+
     public function __construct(private string $appearance, private array $dataSource = [])
     {
+    }
+
+    public function isComponent(): bool
+    {
+        return $this->isComponent;
+    }
+
+    public function setIsComponent(bool $isComponent): void
+    {
+        $this->isComponent = $isComponent;
     }
 
     public function getAppearance(): string

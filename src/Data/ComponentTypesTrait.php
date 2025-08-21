@@ -37,6 +37,7 @@ trait ComponentTypesTrait
             'container',
             'counter',
             'date',
+            'deviceMockup',
             'didYouMean',
             'divider',
             'dots',
