@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -101,6 +102,15 @@ abstract class AbstractComponentData
             unset($this->style[$setting]);
         }
         return $value;
+    }
+    public function setStyleValue(string $setting, string|array|bool|int $value): void
+    {
+        $this->style[$setting] = $value;
+    }
+
+    public function removeStyleValue(string $setting): void
+    {
+        unset($this->style[$setting]);
     }
 
     public function getChildren(): array

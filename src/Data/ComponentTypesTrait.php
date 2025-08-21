@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 trait ComponentTypesTrait
@@ -81,6 +82,7 @@ trait ComponentTypesTrait
             'container',
             'form',
             'gallery',
+            'deviceMockup',
             'languages',
             'link',
             'nav',
