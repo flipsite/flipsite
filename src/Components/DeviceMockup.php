@@ -69,7 +69,7 @@ final class DeviceMockup extends AbstractGroup
 
         $this->addChild($containerComponent);
 
-        $this->builder->dispatch(new Event('ready-script', 'map-to-screen', file_get_contents(__DIR__ . '/../../js/mapToScreen.js')));
+        $this->builder->dispatch(new Event('ready-script', 'map-to-screen', file_get_contents(__DIR__ . '/../../js/dist/mapToScreen.min.js')));
 
         parent::build($component, $inherited);
     }
