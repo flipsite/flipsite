@@ -4,8 +4,6 @@ ready(() => {
         const screenshot = el;
         const screenMap = el.getAttribute('data-screen-map').split(',').map(Number);
         const device = el.parentNode;
-
-        
         const computeMatrix3dWithDeltas = function (src, deltas) {
           // build destination points by adding deltas
           const dst = src.map((p, i) => ({
@@ -60,14 +58,15 @@ ready(() => {
           {x:screenshot.offsetWidth, y:screenshot.offsetHeight},
           {x:0,   y:screenshot.offsetHeight}
         ];
-        screenshot.style.transform = `matrix3d(${computeMatrix3dWithDeltas(src, [
+        screenshot.style.transform = 'matrix3d('+computeMatrix3dWithDeltas(src, [
             {x: screenMap[0] * device.offsetWidth,                          y: screenMap[1] * device.offsetHeight},
             {x: device.offsetWidth * screenMap[2] - screenshot.offsetWidth, y: screenMap[3] * device.offsetHeight},
             {x: device.offsetWidth * screenMap[4] - screenshot.offsetWidth, y: screenMap[5] * device.offsetHeight - screenshot.offsetHeight},
             {x: screenMap[6] * device.offsetWidth,                          y: screenMap[7] * device.offsetHeight - screenshot.offsetHeight},  
-          ])})`;
+          ]) +')';
       });
   };
-  mapToScreen();
   window.addEventListener('resize', mapToScreen);
+  mapToScreen();
+  setTimeout(mapToScreen, 100);
 });
