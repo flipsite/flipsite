@@ -16,13 +16,15 @@ final class DeviceMockup extends AbstractGroup
     {
         $data                  = $component->getData();
         $style                 = $component->getStyle();
-        $deviceScreen          = explode(',', $data['deviceScreen'] ?? '0,0,1,0,1,1,0,1');
+        $this->addStyle($style);
+        $deviceScreen          = explode(',', $data['_options']['deviceScreen'] ?? '0,0,1,0,1,1,0,1');
         $container             = new YamlComponentData($component->getPath(), $component->getId().'.container', 'group', [], ['position' => 'relative']);
         $clonedInherited       = clone $inherited;
+        $clonedInherited->setIsComponent(false);
         $containerComponent    = $this->builder->build($container, $clonedInherited);
 
-        $deviceData  = new YamlComponentData($component->getPath(), $component->getId().'.device', 'image', [
-            'value' => $data['device'] ?? '',
+        $deviceData  = new YamlComponentData($component->getPath(), $component->getId(), 'image', [
+            'value' => $data['value'] ?? '',
             'alt'   => '',
         ], ['maxWidth' => 'max-w-none', 'width' =>  'w-full', 'pointerEvents' => 'pointer-events-none']);
         $device = $this->builder->build($deviceData, $clonedInherited);
@@ -38,25 +40,15 @@ final class DeviceMockup extends AbstractGroup
             'objectFit'       => 'object-cover',
             'options'         => []
         ];
-        if (isset($data['screenPosition']) && 'behind' === $data['screenPosition']) {
+        if (isset($data['_options']['screenPosition']) && 'behind' === $data['_options']['screenPosition']) {
             $screenStyle['zIndex'] = '-z-1';
         }
-        if (isset($style['screenCorners'])) {
-            $screenStyle['borderRadius'] = $style['screenCorners'];
-            $component->removeStyleValue('screenCorners');
-        }
-        if (isset($style['screenCorners'])) {
-            $screenStyle['borderRadius'] = $style['screenCorners'];
-            $component->removeStyleValue('screenCorners');
-        }
-        if (isset($style['screenAspectRatio'])) {
-            $screenStyle['options']['width']       = 512;
-            $screenStyle['options']['aspectRatio'] = $style['screenAspectRatio'];
-            $component->removeStyleValue('screenAspectRatio');
-        }
+
         $screenData  = new YamlComponentData($component->getPath(), $component->getId(), 'group', [
             '_attr'  => ['data-screen-map' => implode(',', $deviceScreen)]
         ], $screenStyle);
+
+        unset($data['value'], $data['_options']);
 
         $children = $component->getChildren();
         $component->purgeChildren();
