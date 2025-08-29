@@ -12,8 +12,7 @@ final class Youtube extends AbstractGroup
 {
     use Traits\BuilderTrait;
 
-    protected bool $oneline = true;
-    protected string $tag   = 'iframe';
+    protected string $tag   = 'div';
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
@@ -27,12 +26,11 @@ final class Youtube extends AbstractGroup
         }
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);
-        $iframe = $this;
-        if ('onclick' === ($data['loading'] ?? 'onclick')) {
-            $this->tag      = 'div';
-            $this->oneline  = false;
-            $iframe         = new Element('iframe', true);
-        }
+
+        $this->addStyle($style);
+        $this->addStyle(['aspectRatio' => 'aspect-' . $width.'/'.$height]);
+
+        $iframe = new Element('iframe', true);
         if (isset($data['base64bg'])) {
             $ifame->addCss('background', 'url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
         }
@@ -43,7 +41,11 @@ final class Youtube extends AbstractGroup
         $iframe->setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         $iframe->setAttribute('title', $title);
         if ($width && $height && !isset($style['aspectRatio'])) {
-            $style['aspectRatio'] = 'aspect-'.$width.'/'.$height;
+            $iframe->addStyle([
+                'width'        => 'w-full',
+                'aspectRatio'  => 'aspect-' . $width.'/'.$height,
+                'borderRadius' => $style['borderRadius'] ?? null,
+            ]);
         }
 
         $src = $data['privacy'] ?? false ?
@@ -71,20 +73,30 @@ final class Youtube extends AbstractGroup
             $src .= http_build_query($query);
         }
         if ('onclick' === ($data['loading'] ?? 'onclick')) {
-            $iframe->setAttribute('data-youtube-play', $src);
+            $this->setAttribute('data-youtube-play', $src);
             $iframe->addCss('pointer-events', 'none');
-            $this->addChild($iframe);
-            if (isset($style['aspectRatio'])) {
-                $this->addStyle(['aspectRatio' => $style['aspectRatio']]);
-            }
             $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']['value'] ?? 'simpleicons/youtube'], $style['playIcon'] ?? []);
             $icon              = $this->builder->build($iconComponentData, $inherited);
             $this->builder->dispatch(new Event('ready-script', 'youtube-play', file_get_contents(__DIR__.'/../../js/dist/youtube-play.min.js')));
             $this->addChild($icon);
+
+            if (isset($data['poster'])) {
+                $posterStyle                  = $style['poster'];
+                $posterStyle['position']      = 'absolute';
+                $posterStyle['inset']         = 'inset-0';
+                $posterStyle['width']         = 'w-full';
+                $posterStyle['height']        = 'h-full';
+                $posterStyle['objectFit']     = 'object-cover';
+                $posterStyle['borderRadius']  = $style['borderRadius'] ?? null;
+                $posterStyle['pointerEvents'] = 'pointer-events-none';
+                $posterComponentData          = new YamlComponentData($component->getPath(), $component->getId().'.poster', 'image', $data['poster'], $posterStyle);
+                $poster                       = $this->builder->build($posterComponentData, $inherited);
+                $this->addChild($poster);
+            }
         } else {
             $iframe->setAttribute('data-lazyiframe', $src);
             $this->builder->dispatch(new Event('ready-script', 'lazyiframe', file_get_contents(__DIR__.'/../../js/dist/lazyiframe.min.js')));
         }
-        $iframe->addStyle($style);
+        $this->addChild($iframe);
     }
 }
