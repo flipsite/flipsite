@@ -1,8 +1,9 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components\Traits;
+
+use Flipsite\Utils\RichtextHelper;
 
 trait CheckTextTrait
 {
@@ -11,8 +12,13 @@ trait CheckTextTrait
         if (str_starts_with($text, '["')) {
             return implode(', ', json_decode($text, true));
         }
-        if (str_starts_with($text, '[{"type"')) {
-            return 'Richtext value not supported in '.$componentName.'.';
+        if (RichtextHelper::isRichtext($text)) {
+            $richtext = json_decode($text, true);
+            foreach ($richtext as $item) {
+                if ($item['type'] === 'p' && isset($item['value'])) {
+                    return $item['value'];
+                }
+            }
         }
         return $text;
     }

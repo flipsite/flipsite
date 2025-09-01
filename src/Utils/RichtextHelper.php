@@ -20,4 +20,9 @@ final class RichtextHelper
         }
         return $json;
     }
+
+    public static function isRichtext(string $encodedRichtext) : bool
+    {
+        return str_starts_with($encodedRichtext, '[{"type"') && str_ends_with($encodedRichtext, '}]');
+    }
 }
