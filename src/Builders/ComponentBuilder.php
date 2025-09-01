@@ -41,46 +41,8 @@ class ComponentBuilder
 
     public function build(AbstractComponentData $componentData, InheritedComponentData $inheritedData): ?AbstractComponent
     {
-        // Default style for border
-        if ($componentData->hasStyle(['border', 'borderTop', 'borderBottom', 'borderLeft', 'borderRight'], 'oneOf')) {
-            $style                = $componentData->getStyle();
-            $htmlStyle            = $this->siteData->getHtmlStyle();
-            if (!isset($style['borderColor'])) {
-                $style['borderColor'] = $htmlStyle['borderColor'];
-            }
-            if (!isset($style['dark']['borderColor'])) {
-                $style['dark'] ??= [];
-                $style['dark']['borderColor'] = $htmlStyle['dark']['borderColor'];
-            }
-            $componentData->addStyle($style);
-        }
-
-        if ($componentData->hasStyle(['divideX', 'divideY'], 'oneOf')) {
-            $style                = $componentData->getStyle();
-            $htmlStyle            = $this->siteData->getHtmlStyle();
-            if (!isset($style['divideColor'])) {
-                $style['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['borderColor']);
-            }
-            if (!isset($style['dark']['divideColor'])) {
-                $style['dark'] ??= [];
-                $style['dark']['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['dark']['borderColor']);
-            }
-            $componentData->addStyle($style);
-        }
-
-        if ($componentData->hasStyle('boxShadow')) {
-            $style                = $componentData->getStyle();
-            $htmlStyle            = $this->siteData->getHtmlStyle();
-            if (!isset($style['boxShadowColor'])) {
-                $style['boxShadowColor'] = $htmlStyle['boxShadowColor'];
-            }
-            if (!isset($style['dark']['boxShadowColor'])) {
-                $style['dark'] ??= [];
-                $style['dark']['boxShadowColor'] = $htmlStyle['dark']['boxShadowColor'];
-            }
-            $componentData->addStyle($style);
-        }
-
+        $style = $this->addDefaultStyles($componentData->getStyle());
+        $componentData->setStyle($style);
         // if (($options['recursionDepth'] ?? 0) > 50) {
         //     return null;
         // }
@@ -728,5 +690,45 @@ class ComponentBuilder
             return $item->jsonSerialize();
         }
         return [];
+    }
+
+    private function addDefaultStyles(array $style): array
+    {
+        foreach ($style as $setting => &$value) {
+            if (is_array($value)) {
+                $value = $this->addDefaultStyles($value);
+            }
+        }
+        if (isset($style['border']) || isset($style['borderTop']) || isset($style['borderBottom']) || isset($style['borderLeft']) || isset($style['borderRight'])) {
+            $htmlStyle = $this->siteData->getHtmlStyle();
+            if (!isset($style['borderColor'])) {
+                $style['borderColor'] = $htmlStyle['borderColor'];
+            }
+            if (!isset($style['dark']['borderColor'])) {
+                $style['dark'] ??= [];
+                $style['dark']['borderColor'] = $htmlStyle['dark']['borderColor'];
+            }
+        }
+        if (isset($style['divideX']) || isset($style['divideY'])) {
+            $htmlStyle = $this->siteData->getHtmlStyle();
+            if (!isset($style['divideColor'])) {
+                $style['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['borderColor']);
+            }
+            if (!isset($style['dark']['divideColor'])) {
+                $style['dark'] ??= [];
+                $style['dark']['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['dark']['borderColor']);
+            }
+        }
+        if (isset($style['boxShadow'])) {
+            $htmlStyle               = $this->siteData->getHtmlStyle();
+            if (!isset($style['boxShadowColor'])) {
+                $style['boxShadowColor'] = $htmlStyle['boxShadowColor'];
+            }
+            if (!isset($style['dark']['boxShadowColor'])) {
+                $style['dark'] ??= [];
+                $style['dark']['boxShadowColor'] = $htmlStyle['dark']['boxShadowColor'];
+            }
+        }
+        return $style;
     }
 }
