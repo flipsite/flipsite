@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 abstract class AbstractComponentData
@@ -90,6 +89,11 @@ abstract class AbstractComponentData
         return $this->style;
     }
 
+    public function hasStyle(string $setting): bool
+    {
+        return isset($this->style[$setting]);
+    }
+
     public function setStyle(array $style): void
     {
         $this->style = $style;
@@ -103,6 +107,7 @@ abstract class AbstractComponentData
         }
         return $value;
     }
+
     public function setStyleValue(string $setting, string|array|bool|int $value): void
     {
         $this->style[$setting] = $value;
