@@ -64,9 +64,10 @@ ready(() => {
             {x: device.offsetWidth * screenMap[4] - screenshot.offsetWidth, y: screenMap[5] * device.offsetHeight - screenshot.offsetHeight},
             {x: screenMap[6] * device.offsetWidth,                          y: screenMap[7] * device.offsetHeight - screenshot.offsetHeight},  
           ]) +')';
+        screenshot.style.opacity = '1';
       });
   };
   window.addEventListener('resize', mapToScreen);
-  mapToScreen();
-  setTimeout(mapToScreen, 100);
+  setTimeout(() => {
+    mapToScreen() }, 50)
 });

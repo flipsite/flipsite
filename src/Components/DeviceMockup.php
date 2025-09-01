@@ -38,7 +38,7 @@ final class DeviceMockup extends AbstractGroup
             'overflow'        => 'overflow-hidden',
             'transformOrigin' => 'origin-top-left',
             'objectFit'       => 'object-cover',
-            'options'         => []
+            'options'         => [],
         ];
         if (isset($data['_options']['screenPosition']) && 'behind' === $data['_options']['screenPosition']) {
             $screenStyle['zIndex'] = '-z-1';
@@ -56,8 +56,9 @@ final class DeviceMockup extends AbstractGroup
         foreach ($children as $child) {
             $screenData->addChild($child);
         }
-
-        $containerComponent->addChild($this->builder->build($screenData, $clonedInherited));
+        $screenComponent = $this->builder->build($screenData, $clonedInherited);
+        $screenComponent->addCss('opacity', '0.0');
+        $containerComponent->addChild($screenComponent);
 
         $this->addChild($containerComponent);
 
