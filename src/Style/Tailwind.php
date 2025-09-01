@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -210,6 +209,9 @@ final class Tailwind implements CallbackInterface
             if (false !== mb_strpos($class, 'border')) {
                 return true;
             }
+            if (false !== mb_strpos($class, 'divide')) {
+                return true;
+            }
         }
         return false;
     }
@@ -288,7 +290,6 @@ final class Tailwind implements CallbackInterface
         $css = '*,::before,::after{box-sizing:border-box;';
         if (!$this->preflight || $hasBorders) {
             $css .= 'border-width:0;border-style:solid;';
-            $css .= 'border-color:'.$borderColor;
         }
         $css .= '}';
         $preflight = new Preflight();

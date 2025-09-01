@@ -55,7 +55,6 @@
   box-sizing: content-box
   height: 0
   overflow: visible
-  border-top-width: borderWidth.DEFAULT
   margin: 0
 - for:
     - b

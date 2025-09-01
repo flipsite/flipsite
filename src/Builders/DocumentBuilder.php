@@ -3,16 +3,15 @@
 declare(strict_types=1);
 namespace Flipsite\Builders;
 
-use Flipsite\Components\AbstractElement;
 use Flipsite\Components\Document;
 use Flipsite\Components\Element;
-use Flipsite\Builders\ComponentBuilder;
-
 use Flipsite\Utils\Language;
 
 final class DocumentBuilder
 {
-    public function __construct(private ComponentBuilder $componentBuilder, private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = [], private string $appearance = 'light') {
+    public function __construct(private ComponentBuilder $componentBuilder, private ?Language $language = null, private array $htmlStyle = [], private array $bodyStyle = [], private string $appearance = 'light')
+    {
+        unset($this->htmlStyle['borderColor'], $this->htmlStyle['dark']['borderColor'], $this->htmlStyle['boxShadowColor'], $this->htmlStyle['dark']['boxShadowColor']);
     }
 
     public function getDocument() : Document
@@ -56,9 +55,9 @@ final class DocumentBuilder
         $document->addChild($head, 'head');
 
         // <body>
-        $body = new Element('body');
+        $body      = new Element('body');
         $bodyStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->bodyStyle, $this->appearance);
-        if (isset($bodyStyle['background']) && is_array($bodyStyle['background']) ) {
+        if (isset($bodyStyle['background']) && is_array($bodyStyle['background'])) {
             $this->componentBuilder->handleBackground($body, $bodyStyle['background']);
             unset($bodyStyle['background']);
         }

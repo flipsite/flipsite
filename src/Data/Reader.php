@@ -279,8 +279,12 @@ class Reader implements SiteDataInterface
     public function getHtmlStyle(?string $page = null): array
     {
         $style = $this->data['theme']['components']['html'] ?? [];
+        $style['borderColor'] ??= 'border-gray-l3';
+        $style['boxShadowColor'] ??= 'shadow-gray-l12/50';
+        $style['dark'] ??= [];
+        $style['dark']['borderColor'] ??= 'border-gray-d3';
+        $style['dark']['boxShadowColor'] ??= 'shadow-gray-d12/50';
         unset($style['appearance'], $style['textScale'], $style['spacingScale'], $style['borderRadiusScale']);
-
         return $style;
     }
 

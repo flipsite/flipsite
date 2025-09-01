@@ -89,14 +89,37 @@ abstract class AbstractComponentData
         return $this->style;
     }
 
-    public function hasStyle(string $setting): bool
+    public function hasStyle(string|array $settings, string $operator = 'allOf'): bool
     {
-        return isset($this->style[$setting]);
+        if (is_string($settings)) {
+            $settings = [$settings];
+        }
+        if ('oneOf' === $operator) {
+            foreach ($settings as $setting) {
+                if (isset($this->style[$setting])) {
+                    return true;
+                }
+            }
+        }
+        if ('allOf' === $operator) {
+            foreach ($settings as $setting) {
+                if (!isset($this->style[$setting])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public function setStyle(array $style): void
     {
         $this->style = $style;
+    }
+
+    public function addStyle(array $style): void
+    {
+        $this->style = array_merge($this->style, $style);
     }
 
     public function getStyleValue(string $setting, bool $remove = null): ?string
