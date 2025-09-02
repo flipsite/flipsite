@@ -51,11 +51,21 @@ abstract class AbstractGroup extends AbstractComponent
             $children        = [];
             $total           = count($repeatData);
             $index           = 0;
+            $addedNoRepeat   = [];
             foreach ($repeatData as $repeatDataItem) {
                 $collectionId = $repeatDataItem['_collectionId'] ?? null;
                 $itemId       = $repeatDataItem['_id'] ?? null;
                 unset($repeatDataItem['_collectionId'],$repeatDataItem['_id']);
                 foreach ($component->getChildren() as $childComponent) {
+                    $data            = $childComponent->getData();
+                    $clonedInherited = clone $inherited;
+                    if (isset($data['_options']['repeatable']) && false === $data['_options']['repeatable']) {
+                        if (!in_array($childComponent->getId(), $addedNoRepeat)) {
+                            $addedNoRepeat[] = $childComponent->getId();
+                            $children[]      = $this->builder->build($childComponent, $clonedInherited);
+                        }
+                        continue 1;
+                    }
                     $clonedChildComponent = clone $childComponent;
                     $clonedChildComponent->setDataValue('_dataSource', $repeatDataItem);
                     $clonedChildComponent->setMetaValue('isRepeated', true);
@@ -66,7 +76,6 @@ abstract class AbstractGroup extends AbstractComponent
                         'last'  => $total - 1 === $index,
                     ];
                     $clonedChildComponent->setMetaValue('order', $order);
-                    $clonedInherited = clone $inherited;
                     if ($collectionId) {
                         $clonedInherited->setRepeatItem($collectionId, $itemId);
                     }

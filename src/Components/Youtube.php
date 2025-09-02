@@ -81,7 +81,7 @@ final class Youtube extends AbstractGroup
             $this->addChild($icon);
 
             if (isset($data['poster'])) {
-                $posterStyle                  = $style['poster'];
+                $posterStyle                  = $style['poster'] ?? [];
                 $posterStyle['position']      = 'absolute';
                 $posterStyle['inset']         = 'inset-0';
                 $posterStyle['width']         = 'w-full';
