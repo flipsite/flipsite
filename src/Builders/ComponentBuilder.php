@@ -41,8 +41,6 @@ class ComponentBuilder
 
     public function build(AbstractComponentData $componentData, InheritedComponentData $inheritedData): ?AbstractComponent
     {
-        $style = $this->addDefaultStyles($componentData->getStyle());
-        $componentData->setStyle($style);
         // if (($options['recursionDepth'] ?? 0) > 50) {
         //     return null;
         // }
@@ -110,6 +108,8 @@ class ComponentBuilder
                 $style          = ArrayHelper::merge($inheritedStyle, $style);
             }
         }
+
+        $style = $this->addDefaultStyles($style);
 
         // Check if appearance changes
         if (isset($style['appearance']) && $style['appearance'] !== $inheritedData->getAppearance()) {
