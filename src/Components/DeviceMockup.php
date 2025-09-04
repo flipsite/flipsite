@@ -18,9 +18,8 @@ final class DeviceMockup extends AbstractGroup
         $style                 = $component->getStyle();
         $this->addStyle($style);
         $deviceScreen          = explode(',', $data['_options']['deviceScreen'] ?? '0,0,1,0,1,1,0,1');
-        $container             = new YamlComponentData($component->getPath(), $component->getId().'.container', 'group', [], ['position' => 'relative', 'height' => 'h-full']);
+        $container             = new YamlComponentData($component->getPath(), $component->getId(), 'group', [], ['position' => 'relative', 'height' => 'h-full']);
         $clonedInherited       = clone $inherited;
-        $clonedInherited->setIsComponent(false);
         $containerComponent    = $this->builder->build($container, $clonedInherited);
 
         $deviceData  = new YamlComponentData($component->getPath(), $component->getId(), 'image', [
