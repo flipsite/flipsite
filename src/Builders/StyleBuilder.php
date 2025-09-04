@@ -19,15 +19,26 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
 
     private array $customCss = [];
 
-    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private array $themeVars = [], private bool $minmizeClasses = false, private bool $preflight = true)
+    public function __construct(private array $colors, private array $fonts = [], private array $themeSettings = [], private array $themeVars = [], private bool $minmizeClasses = false)
     {
     }
 
     public function getDocument(Document $document): Document
     {
+        $css = $this->getCss($document, true);
+
+        $style = new Element('style', true);
+        $style->setContent($css);
+        $document->getChild('head')->addChild($style);
+
+        return $document;
+    }
+
+    public function getCss(AbstractElement $element, bool $preflight = true) : string
+    {
         $elements = [];
         $classes  = [];
-        $this->getElementsAndClasses($document, $elements, $classes);
+        $this->getElementsAndClasses($element, $elements, $classes);
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
         $classes  = array_filter($classes, function ($value) {
@@ -67,7 +78,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             $config['fontFamily'][$type] = $font;
         }
 
-        $tailwind = new Tailwind($config, $this->themeSettings, $this->preflight);
+        $tailwind = new Tailwind($config, $this->themeSettings, $preflight);
         $tailwind->addCallback('size', new UnitCallback());
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));
@@ -82,11 +93,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             $this->replaceClasses($document, $newClasses);
         }
 
-        $style = new Element('style', true);
-        $style->setContent($css);
-        $document->getChild('head')->addChild($style);
-
-        return $document;
+        return $css;
     }
 
     public function addListener(EventListenerInterface $listener): void

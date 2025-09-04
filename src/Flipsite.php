@@ -83,7 +83,6 @@ final class Flipsite
         'fonts'             => true,
         'preload'           => true,
         'style'             => true,
-        'style.preflight'   => true,
         'svg'               => true,
         'integrations'      => true,
         'customCode'        => true,
@@ -144,8 +143,7 @@ final class Flipsite
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
             $this->siteData->getThemeVars(),
-            $this->environment->minimizeCss(),
-            $this->renderOptions['style.preflight']
+            $this->environment->minimizeCss()
         );
 
         $svgBuilder = new SvgBuilder();
@@ -237,6 +235,32 @@ final class Flipsite
         }
 
         return $document;
+    }
+
+    public function findComponent(AbstractElement $element, string|int $id) : ?AbstractElement
+    {
+        if ($element->getId() === $id) {
+            return $element;
+        }
+        foreach ($element->getChildren() as $child) {
+            $component = $this->findComponent($child, $id);
+            if ($component) {
+                return $component;
+            }
+        }
+        return null;
+    }
+
+    public function getStyle(AbstractElement $element) : string
+    {
+        $styleBuilder   = new StyleBuilder(
+            $this->siteData->getColors(),
+            $this->siteData->getFonts(),
+            $this->siteData->getThemeSettings(),
+            $this->siteData->getThemeVars(),
+            $this->environment->minimizeCss()
+        );
+        return $styleBuilder->getCss($element, false);
     }
 
     public function getRedirect(string $rawPath): ?string

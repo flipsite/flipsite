@@ -287,16 +287,15 @@ final class Tailwind implements CallbackInterface
 
     private function getPreflight(array $elements, ?array $sansFonts = null, ?array $monoFonts = null, bool $hasBorders = false, ?string $borderColor = null, ?string $borderWidth = null)
     {
-        $css = '*,::before,::after{box-sizing:border-box;';
-        if (!$this->preflight || $hasBorders) {
-            $css .= 'border-width:0;border-style:solid;';
-        }
-        $css .= '}';
-        $preflight = new Preflight();
+        $css = '';
         if ($this->preflight) {
+            $css .= '*,::before,::after{box-sizing:border-box;';
+            if ($hasBorders) {
+                $css .= 'border-width:0;border-style:solid;';
+            }
+            $css .= '}';
+            $preflight = new Preflight();
             $css .= $preflight->getCss($elements);
-        } else {
-            $css .= $preflight->getAll();
         }
         $css = str_replace('fontFamily.sans', implode(',', $sansFonts), $css);
         $css = str_replace('fontFamily.mono', implode(',', $monoFonts), $css);
