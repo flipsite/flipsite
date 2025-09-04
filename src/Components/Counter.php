@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -28,6 +27,7 @@ final class Counter extends AbstractComponent
         $this->builder->dispatch(new \Flipsite\Builders\Event('ready-script', 'counter', file_get_contents(__DIR__.'/../../js/dist/counter.min.js')));
         $this->setAttribute('data-counter', true);
         $this->setAttribute('data-timing', (string)($data['timing'] ?? 'ease-in-out'));
+        $this->setAttribute('data-to', (string)($data['from'] ?? 0));
         $this->setAttribute('data-to', (string)($data['to'] ?? 100));
         $this->setAttribute('data-duration', (string)($data['duration'] ?? 500));
         if (isset($data['thousandsSeparator'])) {
