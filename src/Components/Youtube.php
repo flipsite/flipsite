@@ -11,6 +11,7 @@ use Flipsite\Data\YamlComponentData;
 final class Youtube extends AbstractGroup
 {
     use Traits\BuilderTrait;
+    use Traits\AspectRatioTrait;
 
     protected string $tag   = 'div';
 
@@ -21,15 +22,15 @@ final class Youtube extends AbstractGroup
         $width = $height = null;
         if (isset($data['dimensions'])) {
             $parts  = explode('x', $data['dimensions']);
-            $width  = $parts[0] ?? null;
-            $height = $parts[1] ?? null;
+            $width  = $parts[0] ?? 100;
+            $height = $parts[1] ?? 100;
         }
         $title = $this->getAttribute('title') ?? 'Youtube Video';
         $this->setAttribute('title', null);
-
+        $aspectRatioValues          = $this->simplifyAspectRatio(intval($width), intval($height));
+        $aspectRatio                = 'aspect-' . ($aspectRatioValues[0]).'/'.($aspectRatioValues[1]);
+        $style['aspectRatio']       = $aspectRatio;
         $this->addStyle($style);
-        $this->addStyle(['aspectRatio' => 'aspect-' . $width.'/'.$height]);
-
         $iframe = new Element('iframe', true);
         if (isset($data['base64bg'])) {
             $ifame->addCss('background', 'url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
@@ -40,13 +41,11 @@ final class Youtube extends AbstractGroup
         $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
         $iframe->setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         $iframe->setAttribute('title', $title);
-        if ($width && $height && !isset($style['aspectRatio'])) {
-            $iframe->addStyle([
-                'width'        => 'w-full',
-                'aspectRatio'  => 'aspect-' . $width.'/'.$height,
-                'borderRadius' => $style['borderRadius'] ?? null,
-            ]);
-        }
+        $iframe->addStyle([
+            'width'         => 'w-full',
+            'height'        => 'h-full',
+            'borderRadius'  => $style['borderRadius'] ?? null,
+        ]);
 
         $src = $data['privacy'] ?? false ?
             'https://www.youtube-nocookie.com/embed/' :
