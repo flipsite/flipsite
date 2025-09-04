@@ -164,6 +164,7 @@ class ComponentBuilder
         }
 
         $component = new $class();
+        $component->setId($componentData->getId());
 
         if (isset($data['_comment'])) {
             if (isset($data['_comment']['before'])) {

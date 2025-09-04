@@ -7,6 +7,7 @@ use Flipsite\Utils\ArrayHelper;
 
 abstract class AbstractElement
 {
+    protected int|string|null $id       = null;
     protected bool $empty               = false;
     protected bool $oneline             = false;
     protected string $tag               = '';
@@ -21,6 +22,16 @@ abstract class AbstractElement
     private ?string $commentBefore      = null;
     private ?string $commentAfter       = null;
     private bool $wrap                  = true;
+
+    public function getId() : int|string|null
+    {
+        return $this->id;
+    }
+
+    public function setId(int|string|null $id)
+    {
+        $this->id = $id;
+    }
 
     public function setWrap(bool $wrap): void
     {
