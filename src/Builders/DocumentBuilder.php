@@ -57,6 +57,7 @@ final class DocumentBuilder
         // <body>
         $body      = new Element('body');
         $bodyStyle = \Flipsite\Utils\StyleAppearanceHelper::apply($this->bodyStyle, $this->appearance);
+        unset($bodyStyle['fontWeight']);
         if (isset($bodyStyle['background']) && is_array($bodyStyle['background'])) {
             $this->componentBuilder->handleBackground($body, $bodyStyle['background']);
             unset($bodyStyle['background']);

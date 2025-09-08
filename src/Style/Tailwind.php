@@ -13,7 +13,7 @@ final class Tailwind implements CallbackInterface
     private array $variants  = [];
     private array $callbacks = [];
 
-    public function __construct(private array $config, private array $themeSettings = [], private bool $preflight = true)
+    public function __construct(private array $config, private array $themeSettings = [], private bool $preflight = true, private bool $optimize = false)
     {
         $this->rules = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
     }
@@ -101,24 +101,26 @@ final class Tailwind implements CallbackInterface
         }
         $css = preg_replace('/\s+/', ' ', $css);
 
-        // Optimize vars
-        $matches = [];
-        preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
-        $addDefaultValues = [];
-        $vars             = [];
-        foreach (array_unique($matches[0]) as $i => $var) {
-            $vars[] = $var;
-        }
-        usort($vars, function ($a, $b) {
-            return strlen($b) - strlen($a);
-        });
+        if ($this->optimize) {
+            $matches = [];
+            preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
+            $addDefaultValues = [];
+            $vars             = [];
+            foreach (array_unique($matches[0]) as $i => $var) {
+                $vars[] = $var;
+            }
+            usort($vars, function ($a, $b) {
+                return strlen($b) - strlen($a);
+            });
 
-        foreach ($vars as $i => $var) {
-            $addDefaultValues[$var] = '--'.$this->getVar($i);
-            $css                    = str_replace($var, '--'.$this->getVar($i), $css);
-        }
-        if (count($addDefaultValues)) {
-            $css = $this->addDefaultValues($css, $addDefaultValues);
+            foreach ($vars as $i => $var) {
+                $addDefaultValues[$var] = '--'.$this->getVar($i);
+                $css                    = str_replace($var, '--'.$this->getVar($i), $css);
+            }
+
+            if (count($addDefaultValues)) {
+                $css = $this->addDefaultValues($css, $addDefaultValues);
+            }
         }
 
         return $css;

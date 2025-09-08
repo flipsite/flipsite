@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -11,14 +10,10 @@ use Flipsite\Utils\GoogleFonts;
 class FontBuilder implements BuilderInterface
 {
     private array $links        = [];
-    private ?string $bodyWeight = null;
     private string $style       = '';
 
     public function __construct(array $fonts)
     {
-        if (isset($fonts['sans']['body'])) {
-            $this->bodyWeight = $fonts['sans']['body'];
-        }
         $googleFonts = new GoogleFonts($fonts);
         $googleUrl   = $googleFonts->getUrl();
         if (null !== $googleUrl) {
@@ -70,9 +65,6 @@ class FontBuilder implements BuilderInterface
             $style = new Element('style', true);
             $style->setContent($this->style);
             $document->getChild('head')->addChild($style);
-        }
-        if ($this->bodyWeight) {
-            $document->getChild('body')->addStyle(['fontWeight' => 'font-'.$this->bodyWeight]);
         }
         return $document;
     }

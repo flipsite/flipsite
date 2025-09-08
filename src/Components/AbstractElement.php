@@ -73,6 +73,19 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function getCss(?string $attribute = null): array|string|null
+    {
+        if (null === $attribute) {
+            return $this->css;
+        }
+        return $this->css[$attribute] ?? null;
+    }
+
+    public function hasCss(string $attribute): bool
+    {
+        return isset($this->css[$attribute]);
+    }
+
     public function replaceStyle(array $style)
     {
         return $this->style = $style;
@@ -226,6 +239,13 @@ abstract class AbstractElement
         return $this;
     }
 
+    public function purgeChildren(): self
+    {
+        $this->cache    = null;
+        $this->children = [];
+        return $this;
+    }
+
     public function replaceChildren(array $children): self
     {
         $this->cache    = null;
@@ -366,6 +386,14 @@ abstract class AbstractElement
         $allClasses = array_unique($allClasses);
         sort($allClasses);
         return 'string' === $format ? trim(implode(' ', $allClasses)) : $allClasses;
+    }
+
+    public function forEach(callable $callback): void
+    {
+        $callback($this);
+        foreach ($this->children as $child) {
+            $child->forEach($callback);
+        }
     }
 
     private function purgeInvalidAttributes(): void

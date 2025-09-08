@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -240,6 +239,12 @@ final class Flipsite
 
     public function findComponent(AbstractElement $element, string|int $id): ?AbstractElement
     {
+        if ('body' === $id) {
+            return $element->getChild('body');
+        }
+        if ('head' === $id) {
+            return $element->getChild('head');
+        }
         if ($element->getId() === $id) {
             return $element;
         }
@@ -252,7 +257,7 @@ final class Flipsite
         return null;
     }
 
-    public function getStyle(AbstractElement $element): string
+    public function getStyle(AbstractElement $element, bool $preflight = false): string
     {
         $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
@@ -261,8 +266,9 @@ final class Flipsite
             $this->siteData->getThemeVars(),
             $this->environment->minimizeCss()
         );
-        return $styleBuilder->getCss($element, false);
+        return $styleBuilder->getCss($element, $preflight);
     }
+
     public function getFonts(AbstractElement $element): array
     {
         $fonts    = $this->siteData->getFonts();
