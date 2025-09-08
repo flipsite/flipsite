@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -55,7 +56,12 @@ class FontBuilder implements BuilderInterface
         $this->style = $this->getLocal($fonts);
     }
 
-    public function getDocument(Document $document) : Document
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    public function getDocument(Document $document): Document
     {
         foreach ($this->links as $link) {
             $document->getChild('head')->addChild($link);
@@ -71,7 +77,7 @@ class FontBuilder implements BuilderInterface
         return $document;
     }
 
-    private function getLocal(array $fonts) : string
+    private function getLocal(array $fonts): string
     {
         $fonts = array_filter($fonts, function ($value, $key) {
             return is_array($value) && 'local' === trim(mb_strtolower($value['provider'] ?? ''));

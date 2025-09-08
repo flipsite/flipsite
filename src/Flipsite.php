@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -187,7 +188,7 @@ final class Flipsite
                 $attributionComponentData = new \Flipsite\Data\YamlComponentData(null, 'attribution', 'container', $attribution);
                 $section                  = $componentBuilder->build($attributionComponentData, new InheritedComponentData('light'));
                 $document->getChild('body')->addChild($section);
-                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh]', 'position' =>'relative']);
+                $document->getChild('body')->addStyle(['minHeight' => 'min-h-[100vh]', 'position' => 'relative']);
             }
         }
 
@@ -237,7 +238,7 @@ final class Flipsite
         return $document;
     }
 
-    public function findComponent(AbstractElement $element, string|int $id) : ?AbstractElement
+    public function findComponent(AbstractElement $element, string|int $id): ?AbstractElement
     {
         if ($element->getId() === $id) {
             return $element;
@@ -251,7 +252,7 @@ final class Flipsite
         return null;
     }
 
-    public function getStyle(AbstractElement $element) : string
+    public function getStyle(AbstractElement $element): string
     {
         $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
@@ -261,6 +262,14 @@ final class Flipsite
             $this->environment->minimizeCss()
         );
         return $styleBuilder->getCss($element, false);
+    }
+    public function getFonts(AbstractElement $element): array
+    {
+        $fonts    = $this->siteData->getFonts();
+        if ($fonts) {
+            $fontBuilder = new FontBuilder($fonts);
+            $document    = $fontBuilder->getDocument($document);
+        }
     }
 
     public function getRedirect(string $rawPath): ?string
