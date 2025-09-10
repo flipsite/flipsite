@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -59,6 +60,7 @@ abstract class AbstractGroup extends AbstractComponent
                 foreach ($component->getChildren() as $childComponent) {
                     $data            = $childComponent->getData();
                     $clonedInherited = clone $inherited;
+                    $clonedInherited->setRepeatComponentId($component->getId());
                     if (isset($data['_options']['repeatable']) && false === $data['_options']['repeatable']) {
                         if (!in_array($childComponent->getId(), $addedNoRepeat)) {
                             $addedNoRepeat[] = $childComponent->getId();

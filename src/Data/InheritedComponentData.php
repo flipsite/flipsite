@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 class InheritedComponentData
@@ -12,6 +13,7 @@ class InheritedComponentData
     private string|int|null $pageCollectionId = null;
     private string|int|null $pageItemId       = null;
 
+    private string|int|null $repeatComponentId     = null;
     private string|int|null $collectionId = null;
     private string|int|null $itemId       = null;
 
@@ -109,6 +111,14 @@ class InheritedComponentData
     public function getPageItemId(): string|int|null
     {
         return $this->pageItemId;
+    }
+    public function setRepeatComponentId(string|int $componentId): void
+    {
+        $this->repeatComponentId = $componentId;
+    }
+    public function getRepeatComponentId(): string|int|null
+    {
+        return $this->repeatComponentId ?? null;
     }
 
     public function setRepeatItem(string|int $collectionId, string|int $itemId): void

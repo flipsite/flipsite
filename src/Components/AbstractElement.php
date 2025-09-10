@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -22,8 +23,9 @@ abstract class AbstractElement
     private ?string $commentBefore      = null;
     private ?string $commentAfter       = null;
     private bool $wrap                  = true;
+    private array $meta               = [];
 
-    public function getId() : int|string|null
+    public function getId(): int|string|null
     {
         return $this->id;
     }
@@ -31,6 +33,15 @@ abstract class AbstractElement
     public function setId(int|string|null $id)
     {
         $this->id = $id;
+    }
+
+    public function setMeta(string $key, $value): void
+    {
+        $this->meta[$key] = $value;
+    }
+    public function getMeta(string $key)
+    {
+        return $this->meta[$key] ?? null;
     }
 
     public function setWrap(bool $wrap): void
