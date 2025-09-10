@@ -257,7 +257,7 @@ final class Flipsite
         return null;
     }
 
-    public function getStyle(AbstractElement $element, bool $preflight = false): string
+    public function getStyle(AbstractElement $element, bool $preflight = false, bool $siblingStyles = true): string
     {
         $styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
@@ -266,6 +266,9 @@ final class Flipsite
             $this->siteData->getThemeVars(),
             $this->environment->minimizeCss()
         );
+        if (!$siblingStyles) {
+            $element->purgeChildren();
+        }
         return $styleBuilder->getCss($element, $preflight);
     }
 
