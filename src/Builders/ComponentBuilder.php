@@ -703,31 +703,31 @@ class ComponentBuilder
         if (isset($style['border']) || isset($style['borderTop']) || isset($style['borderBottom']) || isset($style['borderLeft']) || isset($style['borderRight'])) {
             $htmlStyle = $this->siteData->getHtmlStyle();
             if (!isset($style['borderColor'])) {
-                $style['borderColor'] = $htmlStyle['borderColor'];
+                $style['borderColorDefault'] = $htmlStyle['borderColor'];
             }
             if (!isset($style['dark']['borderColor'])) {
                 $style['dark'] ??= [];
-                $style['dark']['borderColor'] = $htmlStyle['dark']['borderColor'];
+                $style['dark']['borderColorDefault'] = $htmlStyle['dark']['borderColor'];
             }
         }
         if (isset($style['divideX']) || isset($style['divideY'])) {
             $htmlStyle = $this->siteData->getHtmlStyle();
             if (!isset($style['divideColor'])) {
-                $style['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['borderColor']);
+                $style['divideColorDefault'] = str_replace('border-', 'divide-', $htmlStyle['borderColor']);
             }
             if (!isset($style['dark']['divideColor'])) {
                 $style['dark'] ??= [];
-                $style['dark']['divideColor'] = str_replace('border-', 'divide-', $htmlStyle['dark']['borderColor']);
+                $style['dark']['divideColorDefault'] = str_replace('border-', 'divide-', $htmlStyle['dark']['borderColor']);
             }
         }
         if (isset($style['boxShadow'])) {
             $htmlStyle               = $this->siteData->getHtmlStyle();
             if (!isset($style['boxShadowColor'])) {
-                $style['boxShadowColor'] = $htmlStyle['boxShadowColor'];
+                $style['boxShadowColorDefault'] = $htmlStyle['boxShadowColor'];
             }
             if (!isset($style['dark']['boxShadowColor'])) {
                 $style['dark'] ??= [];
-                $style['dark']['boxShadowColor'] = $htmlStyle['dark']['boxShadowColor'];
+                $style['dark']['boxShadowColorDefault'] = $htmlStyle['dark']['boxShadowColor'];
             }
         }
         return $style;
