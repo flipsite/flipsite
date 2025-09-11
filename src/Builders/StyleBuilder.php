@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -34,7 +35,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         return $document;
     }
 
-    public function getCss(AbstractElement $element, bool $preflight = true) : string
+    public function getCss(AbstractElement $element, bool $preflight = true): string
     {
         $elements = [];
         $classes  = [];

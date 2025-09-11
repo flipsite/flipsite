@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -76,6 +77,7 @@ class OpenToggleCallback extends AbstractDocumentCallback
 final class Flipsite
 {
     private array $callbacks     = [];
+    private ?StyleBuilder $styleBuilder = null;
     private array $renderOptions = [
         'meta'              => true,
         'scripts'           => true,
@@ -141,7 +143,7 @@ final class Flipsite
         $scriptBuilder  = new ScriptBuilder();
         $faviconBuilder = new FaviconBuilder($this->environment, $this->siteData);
         $perloadBuilder = new PreloadBuilder();
-        $styleBuilder   = new StyleBuilder(
+        $this->styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
@@ -156,8 +158,8 @@ final class Flipsite
         $componentBuilder->addListener($svgBuilder);
         $componentBuilder->addListener($scriptBuilder);
         $componentBuilder->addListener($perloadBuilder);
-        $componentBuilder->addListener($styleBuilder);
-        $styleBuilder->addListener($scriptBuilder);
+        $componentBuilder->addListener($this->styleBuilder);
+        $this->styleBuilder->addListener($scriptBuilder);
 
         $document = $documentBuilder->getDocument();
 
@@ -216,7 +218,7 @@ final class Flipsite
             }
         }
         if ($this->renderOptions['style']) {
-            $document = $styleBuilder->getDocument($document);
+            $document = $this->styleBuilder->getDocument($document);
         }
 
         // Integrations
@@ -267,7 +269,7 @@ final class Flipsite
 
     public function getStyle(AbstractElement $element, bool $preflight = false, bool $siblingStyles = true): string
     {
-        $styleBuilder   = new StyleBuilder(
+        $this->styleBuilder   ??= new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
@@ -277,7 +279,7 @@ final class Flipsite
         if (!$siblingStyles) {
             $element->purgeChildren();
         }
-        return $styleBuilder->getCss($element, $preflight);
+        return $this->styleBuilder->getCss($element, $preflight);
     }
 
     public function getFonts(AbstractElement $element): array
