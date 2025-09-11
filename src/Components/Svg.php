@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -43,6 +44,7 @@ class Svg extends AbstractComponent
         }
         $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         if ($svg) {
+            $this->setMeta('svgHash', $svg->getHash());
             $this->setAttribute('viewBox', $svg->getViewbox());
             $this->setContent('<use xlink:href="#'.$svg->getHash().'"></use>');
             $this->builder->dispatch(new Event('svg', $svg->getHash(), $svg->getDef()));

@@ -78,6 +78,7 @@ final class Flipsite
 {
     private array $callbacks     = [];
     private ?StyleBuilder $styleBuilder = null;
+    private ?SvgBuilder $svgBuilder = null;
     private array $renderOptions = [
         'meta'              => true,
         'scripts'           => true,
@@ -152,10 +153,10 @@ final class Flipsite
             $this->renderOptions['style.preflight'] ?? 'elements'
         );
 
-        $svgBuilder = new SvgBuilder();
+        $this->svgBuilder = new SvgBuilder();
 
         // Add listeners
-        $componentBuilder->addListener($svgBuilder);
+        $componentBuilder->addListener($this->svgBuilder);
         $componentBuilder->addListener($scriptBuilder);
         $componentBuilder->addListener($perloadBuilder);
         $componentBuilder->addListener($this->styleBuilder);
@@ -198,7 +199,7 @@ final class Flipsite
         }
 
         if ($this->renderOptions['svg']) {
-            $document = $svgBuilder->getDocument($document);
+            $document = $this->svgBuilder->getDocument($document);
         }
         if ($this->renderOptions['meta']) {
             $document = $metaBuilder->getDocument($document);
@@ -281,6 +282,26 @@ final class Flipsite
         }
         return $this->styleBuilder->getCss($element, $preflight);
     }
+
+    public function getSvgs(AbstractElement $element): array
+    {
+        $hashes = [];
+        $element->forEach(function ($component) use (&$hashes) {
+            $hash = $component->getMeta('svgHash');
+            if ($hash) {
+                $hashes[] = $hash;
+            }
+        });
+        $svgs = [];
+        foreach ($hashes as $hash) {
+            $data = $this->svgBuilder->getData($hash);
+            if ($data) {
+                $svgs[$hash] = $data;
+            }
+        }
+        return $svgs;
+    }
+
 
     public function getFonts(AbstractElement $element): array
     {

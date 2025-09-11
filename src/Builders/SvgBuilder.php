@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -36,7 +37,12 @@ class SvgBuilder implements BuilderInterface, EventListenerInterface
         return $document;
     }
 
-    public function handleEvent(Event $event) : void
+    public function getData(string $id): ?string
+    {
+        return $this->data[$id] ?? null;
+    }
+
+    public function handleEvent(Event $event): void
     {
         if ('svg' !== $event->getType()) {
             return;
