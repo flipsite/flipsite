@@ -47,6 +47,8 @@ interface SiteDataInterface
 
     public function getComponent(int|string $componentId): ?AbstractComponentData;
 
+    public function getAliases(int|string $sectionId) : array;
+
     public function getColors(): array;
 
     public function getFonts(): array;

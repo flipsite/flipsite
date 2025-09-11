@@ -111,6 +111,7 @@ final class Flipsite
             $this->siteData->getLanguages(),
             $this->siteData->getSlugs(),
         );
+
         $page = $path->getPage();
 
         // Create builders
@@ -130,11 +131,13 @@ final class Flipsite
             $this->siteData->getBodyStyle($path->getPage()),
             $appearance
         );
+
         $metaBuilder = new MetaBuilder(
             $this->environment,
             $this->siteData,
             $path
         );
+
         $scriptBuilder  = new ScriptBuilder();
         $faviconBuilder = new FaviconBuilder($this->environment, $this->siteData);
         $perloadBuilder = new PreloadBuilder();
@@ -143,7 +146,8 @@ final class Flipsite
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
             $this->siteData->getThemeVars(),
-            $this->environment->minimizeCss()
+            $this->environment->minimizeCss(),
+            $this->renderOptions['style.preflight'] ?? 'elements'
         );
 
         $svgBuilder = new SvgBuilder();
@@ -226,7 +230,11 @@ final class Flipsite
         if ($this->renderOptions['customCode']) {
             $customCodeBuilder = new CustomCodeBuilder($path->getPage(), $this->siteData, $scriptBuilder);
             $document          = $customCodeBuilder->getDocument($document);
-            $document          = $scriptBuilder->getDocument($document);
+        }
+
+        // Scripts
+        if ($this->renderOptions['scripts']) {
+            $document = $scriptBuilder->getDocument($document);
         }
 
         // Cleanup

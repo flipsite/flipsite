@@ -482,6 +482,17 @@ class Reader implements SiteDataInterface
         return null;
     }
 
+    public function getAliases(int|string $sectionId) : array
+    {
+        $aliases = [];
+        foreach ($this->data['theme']['components'] ?? [] as $sid => $style) {
+            if (($style['inherit'] ?? '') === $sectionId) {
+                $aliases[] = $sid;
+            }
+        }
+        return $aliases;
+    }
+
     public function findComponent(int|string $rootComponentId, string $attribute, string|bool $value): ?AbstractComponentData
     {
         $componentData = $this->getComponent($rootComponentId);
