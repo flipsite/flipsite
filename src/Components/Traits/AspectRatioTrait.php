@@ -12,6 +12,9 @@ trait AspectRatioTrait
 
     protected function simplifyAspectRatio(int $width, int $height) : array
     {
+        if ($width === 0 || $height === 0) {
+            return [1, 1];
+        }
         $divisor = $this->gcd($width, $height);
         return [$width / $divisor, $height / $divisor];
     }

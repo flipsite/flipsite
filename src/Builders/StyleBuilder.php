@@ -90,7 +90,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
 
         if ($this->minmizeClasses) {
             $css = $this->minmizeClasses($css, $classes, $newClasses);
-            $this->replaceClasses($document, $newClasses);
+            $this->replaceClasses($element, $newClasses);
         }
 
         return $css;
