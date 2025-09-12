@@ -13,7 +13,7 @@ final class Tailwind implements CallbackInterface
     private array $variants  = [];
     private array $callbacks = [];
 
-    public function __construct(private array $config, private array $themeSettings = [], private bool $preflight = true, private bool $optimize = false)
+    public function __construct(private array $config, private array $themeSettings = [])
     {
         $this->rules = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
     }
@@ -42,10 +42,11 @@ final class Tailwind implements CallbackInterface
         return $this;
     }
 
-    public function getCss(array $elements, array $classes): string
+    public function getCss(array $elements, array $classes, string $preflight = 'elements'): string
     {
         $hasBorders = $this->hasBorders($elements, $classes);
         $css        = $this->getPreflight(
+            $preflight,
             $elements,
             $this->config['fontFamily']['sans'] ?? null,
             $this->config['fontFamily']['mono'] ?? null,
@@ -53,6 +54,7 @@ final class Tailwind implements CallbackInterface
             $this->config['borderColor']['DEFAULT'],
             $this->config['borderWidth']['DEFAULT'] ?? '1px',
         );
+
         foreach ($classes as $class) {
             $variant = ['DEFAULT'];
             if (mb_strpos($class, ':')) {
@@ -101,27 +103,27 @@ final class Tailwind implements CallbackInterface
         }
         $css = preg_replace('/\s+/', ' ', $css);
 
-        if ($this->optimize) {
-            $matches = [];
-            preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
-            $addDefaultValues = [];
-            $vars             = [];
-            foreach (array_unique($matches[0]) as $i => $var) {
-                $vars[] = $var;
-            }
-            usort($vars, function ($a, $b) {
-                return strlen($b) - strlen($a);
-            });
+        // if ($this->optimize) {
+        //     $matches = [];
+        //     preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
+        //     $addDefaultValues = [];
+        //     $vars             = [];
+        //     foreach (array_unique($matches[0]) as $i => $var) {
+        //         $vars[] = $var;
+        //     }
+        //     usort($vars, function ($a, $b) {
+        //         return strlen($b) - strlen($a);
+        //     });
 
-            foreach ($vars as $i => $var) {
-                $addDefaultValues[$var] = '--'.$this->getVar($i);
-                $css                    = str_replace($var, '--'.$this->getVar($i), $css);
-            }
+        //     foreach ($vars as $i => $var) {
+        //         $addDefaultValues[$var] = '--'.$this->getVar($i);
+        //         $css                    = str_replace($var, '--'.$this->getVar($i), $css);
+        //     }
 
-            if (count($addDefaultValues)) {
-                $css = $this->addDefaultValues($css, $addDefaultValues);
-            }
-        }
+        //     if (count($addDefaultValues)) {
+        //         $css = $this->addDefaultValues($css, $addDefaultValues);
+        //     }
+        // }
 
         return $css;
     }
@@ -287,18 +289,24 @@ final class Tailwind implements CallbackInterface
         $this->variants[$variantId]->addClass($class);
     }
 
-    private function getPreflight(array $elements, ?array $sansFonts = null, ?array $monoFonts = null, bool $hasBorders = false, ?string $borderColor = null, ?string $borderWidth = null)
+    private function getPreflight(string $preflightMode, array $elements, ?array $sansFonts = null, ?array $monoFonts = null, bool $hasBorders = false, ?string $borderColor = null, ?string $borderWidth = null)
     {
         $css = '';
-        if ($this->preflight) {
+        if ('none' !== $preflightMode) {
             $css .= '*,::before,::after{box-sizing:border-box;';
-            if ($hasBorders) {
+            if ($hasBorders || 'all' === $preflightMode) {
                 $css .= 'border-width:0;border-style:solid;';
             }
             $css .= '}';
-            $preflight = new Preflight();
-            $css .= $preflight->getCss($elements);
         }
+
+        $preflight = new Preflight();
+        if ('elements' === $preflightMode) {
+            $css .= $preflight->getCss($elements);
+        } elseif ('all' === $preflightMode) {
+            $css .= $preflight->getAll();
+        }
+
         $css = str_replace('fontFamily.sans', implode(',', $sansFonts), $css);
         $css = str_replace('fontFamily.mono', implode(',', $monoFonts), $css);
         if ($hasBorders) {

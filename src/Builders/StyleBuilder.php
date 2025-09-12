@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -24,9 +23,9 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
     {
     }
 
-    public function getDocument(Document $document): Document
+    public function getDocument(Document $document, string $preflight = 'elements'): Document
     {
-        $css = $this->getCss($document, true);
+        $css = $this->getCss($document, $preflight);
 
         $style = new Element('style', true);
         $style->setContent($css);
@@ -35,7 +34,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         return $document;
     }
 
-    public function getCss(AbstractElement $element, bool $preflight = true): string
+    public function getCss(AbstractElement $element, string $preflight = 'elements'): string
     {
         $elements = [];
         $classes  = [];
@@ -79,12 +78,12 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             $config['fontFamily'][$type] = $font;
         }
 
-        $tailwind = new Tailwind($config, $this->themeSettings, $preflight);
+        $tailwind = new Tailwind($config, $this->themeSettings);
         $tailwind->addCallback('size', new UnitCallback());
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));
 
-        $css        = $tailwind->getCss($elements, $classes);
+        $css        = $tailwind->getCss($elements, $classes, $preflight);
         $newClasses = [];
 
         $css .= $this->addCustomClasses();

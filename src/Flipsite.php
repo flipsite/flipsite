@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite;
 
 use Flipsite\Components\AbstractElement;
@@ -76,16 +75,17 @@ class OpenToggleCallback extends AbstractDocumentCallback
 
 final class Flipsite
 {
-    private array $callbacks     = [];
+    private array $callbacks            = [];
     private ?StyleBuilder $styleBuilder = null;
-    private ?SvgBuilder $svgBuilder = null;
-    private array $renderOptions = [
+    private ?SvgBuilder $svgBuilder     = null;
+    private array $renderOptions        = [
         'meta'              => true,
         'scripts'           => true,
         'favicon'           => true,
         'fonts'             => true,
         'preload'           => true,
         'style'             => true,
+        'style.preflight'   => 'elements',
         'svg'               => true,
         'integrations'      => true,
         'customCode'        => true,
@@ -101,7 +101,7 @@ final class Flipsite
     {
         foreach ($options as $setting => $value) {
             if (array_key_exists($setting, $this->renderOptions)) {
-                $this->renderOptions[$setting] = !!$value;
+                $this->renderOptions[$setting] = $value;
             }
         }
     }
@@ -141,16 +141,15 @@ final class Flipsite
             $path
         );
 
-        $scriptBuilder  = new ScriptBuilder();
-        $faviconBuilder = new FaviconBuilder($this->environment, $this->siteData);
-        $perloadBuilder = new PreloadBuilder();
+        $scriptBuilder        = new ScriptBuilder();
+        $faviconBuilder       = new FaviconBuilder($this->environment, $this->siteData);
+        $perloadBuilder       = new PreloadBuilder();
         $this->styleBuilder   = new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
             $this->siteData->getThemeVars(),
-            $this->environment->minimizeCss(),
-            $this->renderOptions['style.preflight'] ?? 'elements'
+            $this->environment->minimizeCss()
         );
 
         $this->svgBuilder = new SvgBuilder();
@@ -219,7 +218,7 @@ final class Flipsite
             }
         }
         if ($this->renderOptions['style']) {
-            $document = $this->styleBuilder->getDocument($document);
+            $document = $this->styleBuilder->getDocument($document, $this->renderOptions['style.preflight'] ?? 'elements');
         }
 
         // Integrations
@@ -268,9 +267,9 @@ final class Flipsite
         return null;
     }
 
-    public function getStyle(AbstractElement $element, bool $preflight = false, bool $siblingStyles = true): string
+    public function getStyle(AbstractElement $element, string $preflight = 'elements', bool $siblingStyles = true): string
     {
-        $this->styleBuilder   ??= new StyleBuilder(
+        $this->styleBuilder ??= new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
@@ -301,7 +300,6 @@ final class Flipsite
         }
         return $svgs;
     }
-
 
     public function getFonts(AbstractElement $element): array
     {
