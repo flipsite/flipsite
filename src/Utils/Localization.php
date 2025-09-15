@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 final class Localization implements \JsonSerializable
 {
     private array $values = [];
+
     public function __construct(private array $languages, string $json)
     {
         if (self::isLocalization($json)) {
@@ -14,7 +14,7 @@ final class Localization implements \JsonSerializable
             if (count($languages) === 0) {
                 foreach ($values as $language => $value) {
                     if (is_string($language) && is_string($value)) {
-                        $this->languages[] = $language;
+                        $this->languages[]       = $language;
                         $this->values[$language] = $value;
                     }
                 }
@@ -27,7 +27,7 @@ final class Localization implements \JsonSerializable
                 }
             }
         } else {
-            $language = (string)$languages[0];
+            $language                = (string)$languages[0];
             $this->values[$language] = $json;
         }
     }
@@ -49,10 +49,8 @@ final class Localization implements \JsonSerializable
 
     public function setValue(Language $language, string $value)
     {
-        $language = (string)$language;
-        if (isset($this->values[$language])) {
-            $this->values[$language] = $value;
-        }
+        $language                = (string)$language;
+        $this->values[$language] = $value;
     }
 
     public function jsonSerialize(): mixed
