@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -78,7 +79,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             $config['fontFamily'][$type] = $font;
         }
 
-        $tailwind = new Tailwind($config, $this->themeSettings);
+        $tailwind = new Tailwind($config, $this->themeSettings, $this->minmizeClasses);
         $tailwind->addCallback('size', new UnitCallback());
         $tailwind->addCallback('size', new ScreenWidthCallback($config['screens']));
         $tailwind->addCallback('size', new ResponsiveSizeCallback($config['screens'], true));

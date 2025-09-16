@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 use Flipsite\Style\Rules\AbstractRule;
@@ -13,7 +14,7 @@ final class Tailwind implements CallbackInterface
     private array $variants  = [];
     private array $callbacks = [];
 
-    public function __construct(private array $config, private array $themeSettings = [])
+    public function __construct(private array $config, private array $themeSettings = [], private bool $minimizeClasses = false)
     {
         $this->rules = Yaml::parse(file_get_contents(__DIR__.'/rules.yaml'));
     }
@@ -103,27 +104,24 @@ final class Tailwind implements CallbackInterface
         }
         $css = preg_replace('/\s+/', ' ', $css);
 
-        // if ($this->optimize) {
-        //     $matches = [];
-        //     preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
-        //     $addDefaultValues = [];
-        //     $vars             = [];
-        //     foreach (array_unique($matches[0]) as $i => $var) {
-        //         $vars[] = $var;
-        //     }
-        //     usort($vars, function ($a, $b) {
-        //         return strlen($b) - strlen($a);
-        //     });
+        $matches = [];
+        preg_match_all('/--tw-[a-z\-]+/', $css, $matches);
+        $addDefaultValues = [];
+        $vars             = [];
+        foreach (array_unique($matches[0]) as $i => $var) {
+            $vars[] = $var;
+        }
+        usort($vars, function ($a, $b) {
+            return strlen($b) - strlen($a);
+        });
 
-        //     foreach ($vars as $i => $var) {
-        //         $addDefaultValues[$var] = '--'.$this->getVar($i);
-        //         $css                    = str_replace($var, '--'.$this->getVar($i), $css);
-        //     }
+        $css = $this->addDefaultValues($css, $vars);
 
-        //     if (count($addDefaultValues)) {
-        //         $css = $this->addDefaultValues($css, $addDefaultValues);
-        //     }
-        // }
+        if ($this->minimizeClasses) {
+            foreach ($vars as $i => $var) {
+                $css = str_replace($var, '--'.$this->getVar($i), $css);
+            }
+        }
 
         return $css;
     }
@@ -184,9 +182,9 @@ final class Tailwind implements CallbackInterface
             '--tw-backdrop-saturate'      => '',
             '--tw-backdrop-sepia'         => '',
         ];
-        foreach ($addDefaultValues as $var => $optimized) {
+        foreach ($addDefaultValues as $var) {
             if (isset($defaultValues[$var])) {
-                $default .= $optimized.':'.$defaultValues[$var].';';
+                $default .= $var.':'.$defaultValues[$var].';';
             }
         }
         return str_replace('*,::before,::after{', '*,::before,::after{'.$default, $css);
