@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -189,6 +188,10 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
             if (count($tmp) > 1) {
                 $class  = array_pop($tmp);
                 $prefix = implode(':', $tmp);
+            }
+            // Remove class names that are same as mimimized
+            if (strlen($class) < 4 && preg_match('/^[a-z]{0,3}$/', $class) === 1) {
+                continue;
             }
             $newClassName = $this->getClassName($i + 1);
 
