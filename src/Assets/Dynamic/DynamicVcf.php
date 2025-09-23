@@ -74,6 +74,9 @@ class DynamicVcf implements DynamicAssetsInterface
         if (isset($vCardData['phone'])) {
             $vcard['TEL'] = $vCardData['phone'];
         }
+        if (isset($vCardData['mobile'])) {
+            $vcard['TEL;TYPE=CELL'] = $vCardData['mobile'];
+        }
         if (isset($vCardData['email'])) {
             $vcard['EMAIL'] = $vCardData['email'];
         }
