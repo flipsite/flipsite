@@ -277,9 +277,16 @@ final class Flipsite
             $this->environment->minimizeCss()
         );
         if (!$siblingStyles) {
+            $children = $element->getChildren();
             $element->purgeChildren();
         }
-        return $this->styleBuilder->getCss($element, $preflight);
+        $css = $this->styleBuilder->getCss($element, $preflight);
+        if (!$siblingStyles) {
+            foreach ($children as $child) {
+                $element->addChild($child);
+            }
+        }
+        return $css;
     }
 
     public function getSvgs(AbstractElement $element): array

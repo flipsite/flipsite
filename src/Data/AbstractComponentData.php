@@ -33,8 +33,7 @@ abstract class AbstractComponentData
         if (!$this->path || count($this->path) < 2) {
             return null;
         }
-
-        return $this->path[count($this->path) - 1];
+        return $this->path[count($this->path) - 2];
     }
 
     public function getPath(): ?array

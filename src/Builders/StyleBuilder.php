@@ -39,6 +39,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         $elements = [];
         $classes  = [];
         $this->getElementsAndClasses($element, $elements, $classes);
+
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
         $classes  = array_filter($classes, function ($value) {
