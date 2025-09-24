@@ -46,7 +46,7 @@ class Reader implements SiteDataInterface
 
     private ?\Adbar\Dot $componentsStyles = null;
 
-    public function __construct(private string $siteDir, private ?Plugins $plugins = null, bool $expand = true)
+    public function __construct(private string $siteDir, private ?Plugins $plugins = null, private bool $expand = true)
     {
         if (file_exists($siteDir . '/site.yaml')) {
             $siteYaml  = Yaml::parseFile($siteDir . '/site.yaml');
@@ -65,6 +65,17 @@ class Reader implements SiteDataInterface
         if (file_exists($siteDir . '/custom.html')) {
             $customHtml         = file_get_contents($siteDir . '/custom.html');
             $this->customParser = new CustomHtmlParser($customHtml);
+        }
+    }
+
+    public function reload(?Plugins $plugins = null)
+    {
+        if ($plugins) {
+            $siteYaml          = Yaml::parseFile($this->siteDir . '/site.yaml');
+            $themeYaml         = Yaml::parseFile($this->siteDir . '/theme.yaml');
+            $siteYaml['theme'] = $themeYaml;
+            $siteYaml          = $plugins->run('beforeSiteLoad', $siteYaml);
+            $this->loadSite($siteYaml, $this->expand);
         }
     }
 
