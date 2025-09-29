@@ -68,14 +68,14 @@ class Reader implements SiteDataInterface
         }
     }
 
-    public function reload(?Plugins $plugins = null)
+    public function reload(?Plugins $plugins = null, bool $expand = true): void
     {
         if ($plugins) {
             $siteYaml          = Yaml::parseFile($this->siteDir . '/site.yaml');
             $themeYaml         = Yaml::parseFile($this->siteDir . '/theme.yaml');
             $siteYaml['theme'] = $themeYaml;
             $siteYaml          = $plugins->run('beforeSiteLoad', $siteYaml);
-            $this->loadSite($siteYaml, $this->expand);
+            $this->loadSite($siteYaml, $expand);
         }
     }
 
