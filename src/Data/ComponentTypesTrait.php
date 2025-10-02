@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Data;
 
 trait ComponentTypesTrait
@@ -60,6 +59,7 @@ trait ComponentTypesTrait
             'phone',
             'polygon',
             'richtext',
+            'schemaOrg',
             'script',
             'select',
             'social',

@@ -12,6 +12,7 @@ use Flipsite\Builders\FontBuilder;
 use Flipsite\Builders\IntegrationsBuilder;
 use Flipsite\Builders\MetaBuilder;
 use Flipsite\Builders\PreloadBuilder;
+use Flipsite\Builders\SchemaOrgBuilder;
 use Flipsite\Builders\ScriptBuilder;
 use Flipsite\Builders\StyleBuilder;
 use Flipsite\Builders\SvgBuilder;
@@ -89,7 +90,8 @@ final class Flipsite
         'svg'               => true,
         'integrations'      => true,
         'customCode'        => true,
-        'attribution'       => true
+        'attribution'       => true,
+        'schemaOrg'         => true,
     ];
 
     public function __construct(protected EnvironmentInterface $environment, protected SiteDataInterface $siteData, protected ?Plugins $plugins = null)
@@ -141,10 +143,11 @@ final class Flipsite
             $path
         );
 
-        $scriptBuilder        = new ScriptBuilder();
-        $faviconBuilder       = new FaviconBuilder($this->environment, $this->siteData);
-        $perloadBuilder       = new PreloadBuilder();
-        $this->styleBuilder   = new StyleBuilder(
+        $scriptBuilder           = new ScriptBuilder();
+        $schemaOrgBuilder        = new SchemaOrgBuilder($this->siteData);
+        $faviconBuilder          = new FaviconBuilder($this->environment, $this->siteData);
+        $perloadBuilder          = new PreloadBuilder();
+        $this->styleBuilder      = new StyleBuilder(
             $this->siteData->getColors(),
             $this->siteData->getFonts(),
             $this->siteData->getThemeSettings(),
@@ -159,6 +162,7 @@ final class Flipsite
         $componentBuilder->addListener($scriptBuilder);
         $componentBuilder->addListener($perloadBuilder);
         $componentBuilder->addListener($this->styleBuilder);
+        $componentBuilder->addListener($schemaOrgBuilder);
         $this->styleBuilder->addListener($scriptBuilder);
 
         $document = $documentBuilder->getDocument();
@@ -237,6 +241,11 @@ final class Flipsite
         // Scripts
         if ($this->renderOptions['scripts']) {
             $document = $scriptBuilder->getDocument($document);
+        }
+
+        // Schema.org
+        if ($this->renderOptions['schemaOrg']) {
+            $document = $schemaOrgBuilder->getDocument($document);
         }
 
         // Cleanup

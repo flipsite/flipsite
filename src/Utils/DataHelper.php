@@ -39,4 +39,34 @@ final class DataHelper
         }
         return $data;
     }
+
+    public static function applyDataToBranch(array $data, array $dataSource): array
+    {
+        foreach ($data as $key => &$value) {
+            if (is_string($value) && strpos($value, '{') !== false) {
+                // Dont apply data on JSON
+                if (str_starts_with($value, '[{"')) {
+                    $json = json_decode($value, true);
+                    if (is_array($json)) {
+                        continue;
+                    }
+                }
+                $matches = [];
+                preg_match_all('/\{[^{}]+\}/', $value, $matches);
+                $original = $value;
+                foreach ($matches[0] as $match) {
+                    $var   = trim($match, '{}');
+                    if (isset($dataSource[$var])) {
+                        $value      = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        $replaced[] = $match;
+                    } elseif ($match === $value) {
+                        $value = null;
+                    }
+                }
+            } elseif (is_array($value)) {
+                $value = self::applyDataToBranch($value, $dataSource);
+            }
+        }
+        return $data;
+    }
 }
