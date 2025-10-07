@@ -17,7 +17,8 @@ final class SchemaOrg extends AbstractGroup
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data = $component->getData();
-        unset($data['render']);
+        unset($data['render'], $data['_types']);
+
         $data = $this->expandRepeat($data);
         $this->builder->dispatch(new Event('schemaorg.graph', $component->getId(), $data));
         $this->render = false;

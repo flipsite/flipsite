@@ -406,11 +406,18 @@ final class Flipsite
                 $compileUrl .= $compile['basePath'];
             }
         }
+        $siteSocial = [];
+        foreach ($social as $type => $handle) {
+            if (!in_array($type, ['phone', 'email', 'maps', 'open'])) {
+                $siteSocial[] = \Flipsite\Utils\SocialHelper::getUrl($type, $handle);
+            }
+        }
         $globalVars = [
             'site.name'             => $this->siteData->getName(),
             'site.description'      => $this->siteData->getDescription($path->getLanguage()),
             'site.image'            => $this->siteData->getShare(),
             'site.url'              => $compileUrl ?? $this->environment->getAbsoluteUrl(''),
+            'site.social'           => $siteSocial,
             'copyright.year'        => '<span data-copyright>' . date('Y') . '</span>'
         ];
         if (isset($social['phone'])) {

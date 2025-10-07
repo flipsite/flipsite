@@ -23,7 +23,11 @@ final class DataHelper
                 foreach ($matches[0] as $match) {
                     $var   = trim($match, '{}');
                     if (isset($dataSource[$var])) {
-                        $value      = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        if (is_array($dataSource[$var]) && $match === $value) {
+                            $value = $dataSource[$var];
+                        } else {
+                            $value = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        }
                         $replaced[] = $match;
                     } elseif ($match === $value) {
                         $value = null;
@@ -57,7 +61,11 @@ final class DataHelper
                 foreach ($matches[0] as $match) {
                     $var   = trim($match, '{}');
                     if (isset($dataSource[$var])) {
-                        $value      = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        if (is_array($dataSource[$var]) && $match === $value) {
+                            $value = $dataSource[$var];
+                        } else {
+                            $value = str_replace($match, (string)$dataSource[$var], (string)$value);
+                        }
                         $replaced[] = $match;
                     } elseif ($match === $value) {
                         $value = null;
