@@ -30,7 +30,7 @@ class YamlComponentData extends AbstractComponentData
                 foreach ($value ?? [] as $metaAttr => $metaValue) {
                     $this->meta[$metaAttr] = $metaValue;
                 }
-            } elseif (!$this->isComponent($type)) {
+            } elseif (!$this->isComponent($type) || 'schemaOrg' === $this->type) {
                 $this->data[$attr] = $value;
             } elseif (null !== $value) {
                 if (!is_array($value)) {
