@@ -8,7 +8,7 @@ use Flipsite\Data\InheritedComponentData;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Builders\Event;
 
-final class SchemaOrg extends AbstractComponent
+final class SchemaOrg extends AbstractGroup
 {
     use Traits\BuilderTrait;
     use Traits\SiteDataTrait;
@@ -30,10 +30,14 @@ final class SchemaOrg extends AbstractComponent
             $collection = $this->siteData->getCollection($repeat, $this->path->getLanguage());
             unset($data['_repeat']);
             if ($collection) {
-                $tpl      = $data;
-                $data     = [];
-                $replaced = [];
-                foreach ($collection->getItemsArray(true) as $item) {
+                $tpl = $data;
+                unset($tpl['_options']);
+                // Normalize
+                $data       = $this->normalizeRepeat($data, $collection->getItemsArray(true));
+                $repeatData = $data['_repeatData'] ?? [];
+                $data       = [];
+                $replaced   = [];
+                foreach ($repeatData as $item) {
                     $tplWithData = DataHelper::applyDataToBranch($tpl, $item);
                     unset($tplWithData['_original']);
                     $data[] = $tplWithData;
