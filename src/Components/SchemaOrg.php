@@ -45,6 +45,20 @@ final class SchemaOrg extends AbstractGroup
                 }
             }
         }
+        if (isset($data['_dataSource'])) {
+            $dataSource = $data['_dataSource'];
+            unset($data['_dataSource']);
+            $tmp        = explode('.', (string)$dataSource, 2);
+            $collection = $this->siteData->getCollection($tmp[0], $this->path->getLanguage());
+            if ($collection) {
+                $itemId = $tmp[1] ?? null;
+                $item   = $collection->getItem(intval($itemId));
+                if ($item) {
+                    $data = DataHelper::applyDataToBranch($data, $item->jsonSerialize());
+                    unset($data['_original']);
+                }
+            }
+        }
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 $data[$key] = $this->expandRepeat($value);
