@@ -5,6 +5,8 @@ namespace Flipsite\Compiler;
 
 class AssetParser
 {
+    const EXTENSIONS = ['webp', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'ogg', 'pdf', 'txt', 'csv', 'xls', 'vcf', 'ics'];
+
     public static function parse(string $html, string $host): array
     {
         $assets = [];
@@ -81,6 +83,21 @@ class AssetParser
             }
         }
 
+        $scriptTags = $doc->getElementsByTagName('script');
+        foreach ($scriptTags as $tag) {
+            if ('application/ld+json' === $tag->getAttribute('type')) {
+                $json = json_decode($tag->nodeValue, true) ?? [];
+                $dot  = new \Adbar\Dot($json);
+                $all  = $dot->flatten();
+                foreach ($all as $value) {
+                    $ext = pathinfo($value, PATHINFO_EXTENSION);
+                    if (in_array($ext, self::EXTENSIONS)) {
+                        $assets[] = $value;
+                    }
+                }
+            }
+        }
+
         $xpath    = new \DOMXPath($doc);
         $elements = $xpath->query('//*[@data-backgrounds]');
         foreach ($elements as $element) {
@@ -105,6 +122,8 @@ class AssetParser
 
         $assets = array_values(array_unique($assets));
 
+        error_log(print_r($assets, true));
+
         $internal = [];
 
         foreach ($assets as $asset) {
@@ -112,7 +131,7 @@ class AssetParser
             if (!isset($pathinfo['extension'])) {
                 continue;
             }
-            if (!in_array($pathinfo['extension'], ['webp', 'svg', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'ogg', 'pdf', 'txt', 'csv', 'xls', 'vcf', 'ics', 'txt', 'csv'])) {
+            if (!in_array($pathinfo['extension'], self::EXTENSIONS)) {
                 continue;
             }
             if (str_starts_with($asset, 'http')) {

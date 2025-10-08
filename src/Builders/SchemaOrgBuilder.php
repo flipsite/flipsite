@@ -25,7 +25,13 @@ class SchemaOrgBuilder implements BuilderInterface, EventListenerInterface
 
         $script = new InlineScript();
         $script->setAttribute('type', 'application/ld+json');
-        $script->addCode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+        $json = json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        $json = preg_replace_callback(
+            '/^( +)/m',
+            fn ($m) => str_repeat(' ', strlen($m[1]) / 2),
+            $json
+        );
+        $script->addCode($json);
         $document->getChild('body')->addChild($script);
         return $document;
     }

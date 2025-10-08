@@ -6,10 +6,13 @@ namespace Flipsite\Components;
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
 use Flipsite\Utils\DataHelper;
+use Flipsite\Utils\ArrayHelper;
 use Flipsite\Builders\Event;
 
 final class SchemaOrg extends AbstractGroup
 {
+    use Traits\AssetsTrait;
+    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     use Traits\SiteDataTrait;
     use Traits\PathTrait;
@@ -19,7 +22,20 @@ final class SchemaOrg extends AbstractGroup
         $data = $component->getData();
         unset($data['render'], $data['_types']);
 
-        $data = $this->expandRepeat($data);
+        $data        = $this->expandRepeat($data);
+        $assets      = $this->assets; // For use in closure
+        $environment = $this->environment; // For use in closure
+        $data        = ArrayHelper::applyStringCallback($data, function (string $value) use ($assets, $environment) {
+            if (str_starts_with($value, '["') && str_ends_with($value, '"]')) {
+                return json_decode($value, true);
+            }
+            $imageAttributes = $assets->getImageAttributes($value, ['width' => 512]);
+            if ($imageAttributes) {
+                $value = $environment->getAbsoluteSrc($imageAttributes->getSrc());
+            }
+
+            return $value;
+        });
         $this->builder->dispatch(new Event('schemaorg.graph', $component->getId(), $data));
         $this->render = false;
     }
