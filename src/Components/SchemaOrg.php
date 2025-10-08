@@ -36,7 +36,7 @@ final class SchemaOrg extends AbstractGroup
 
             return $value;
         });
-        $this->builder->dispatch(new Event('schemaorg.graph', $component->getId(), $data));
+        $this->builder->dispatch(new Event('schemaorg.graph', $data['@type'], $data));
         $this->render = false;
     }
 
