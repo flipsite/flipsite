@@ -9,6 +9,7 @@ class Item implements \JsonSerializable
 {
     private int $id;
     private array $data;
+    private array $custom = [];
 
     public function __construct(private Schema $schema, private array $rawData)
     {
@@ -46,9 +47,14 @@ class Item implements \JsonSerializable
         return $this->data[$field] ?? null;
     }
 
+    public function addCustom(string $field, mixed $value): void
+    {
+        $this->custom[$field] = $value;
+    }
+
     public function jsonSerialize(): mixed
     {
-        return array_merge(['_id' => $this->id], $this->data);
+        return array_merge(['_id' => $this->id], $this->data, $this->custom);
     }
 
     public function getArray(): array
@@ -56,6 +62,9 @@ class Item implements \JsonSerializable
         $values = [];
         foreach ($this->schema->getFields() as $field) {
             $values[$field] = $this->data[$field] ?? null;
+        }
+        foreach ($this->custom as $key => $value) {
+            $values[$key] = $value;
         }
         return $values;
     }

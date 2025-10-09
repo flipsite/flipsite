@@ -11,6 +11,7 @@ use Flipsite\Data\InheritedComponentData;
 
 abstract class AbstractGroup extends AbstractComponent
 {
+    use Traits\EnvironmentTrait;
     use Traits\BuilderTrait;
     use Traits\ActionTrait;
     use Traits\SiteDataTrait;
@@ -123,7 +124,7 @@ abstract class AbstractGroup extends AbstractComponent
                 $repeatCollectionId = $repeat;
                 $collection         = $this->getCollection($repeat, true);
                 if ($collection) {
-                    $repeat               = $collection->getItemsArray(true);
+                    $repeat = $collection->getItemsArray(true, $this->environment, $this->siteData, $this->path);
                 } else {
                     $repeat = [];
                 }

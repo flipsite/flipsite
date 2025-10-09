@@ -3,6 +3,10 @@
 declare(strict_types=1);
 namespace Flipsite\Content;
 
+use Flipsite\EnvironmentInterface;
+use Flipsite\Data\SiteDataInterface;
+use Flipsite\Utils\Path;
+
 class Collection implements \JsonSerializable
 {
     private string $name;
@@ -45,20 +49,33 @@ class Collection implements \JsonSerializable
         return $this->name;
     }
 
-    public function getItems(bool $onlyPublished = false): array
+    public function getItems(bool $onlyPublished = false, ?EnvironmentInterface $environment = null, ?SiteDataInterface $siteData = null, ?Path $path = null): array
     {
         $publishedFieldId = $this->schema->getFieldsOfType('published')[0] ?? null;
         if ($onlyPublished && $publishedFieldId) {
-            return array_filter($this->items, function ($item) use ($publishedFieldId) {
+            $items = array_filter($this->items, function ($item) use ($publishedFieldId) {
                 return !!$item->get($publishedFieldId);
             });
+        } else {
+            $items = $this->items;
         }
-        return $this->items;
+
+        $slugField = $this->getSlugField();
+        if ($slugField && $environment && $siteData && $path) {
+            $page               = $siteData->getExpandedByCollectionId($this->id);
+            $expanded           = $siteData->getExpanded($page);
+            $urlTpl             = $environment->getAbsoluteUrl($expanded[(string)$path->getLanguage()]);
+            foreach ($items as $item) {
+                $slug = $item->get($slugField);
+                $item->addCustom('slugUrl', $slug ? str_replace(':slug', $slug, $urlTpl) : null);
+            }
+        }
+        return $items;
     }
 
-    public function getItemsArray(bool $onlyPublished = false): array
+    public function getItemsArray(bool $onlyPublished = false, ?EnvironmentInterface $environment = null, ?SiteDataInterface $siteData = null, ?Path $path = null): array
     {
-        $items = $this->getItems($onlyPublished);
+        $items = $this->getItems($onlyPublished, $environment, $siteData, $path);
         return json_decode(json_encode($items), true);
     }
 

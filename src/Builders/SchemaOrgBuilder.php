@@ -40,7 +40,7 @@ class SchemaOrgBuilder implements BuilderInterface, EventListenerInterface
     {
         switch ($event->getType()) {
             case 'schemaorg.graph':
-                $this->graph[$event->getId()] = $event->getData();
+                $this->graph[] = $event->getData();
                 return;
         }
     }

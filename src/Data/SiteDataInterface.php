@@ -30,6 +30,8 @@ interface SiteDataInterface
 
     public function getExpanded(string $page): ?array;
 
+    public function getExpandedByCollectionId(string $collectionId): ?string;
+
     public function getFavicon(): null|string|array;
 
     public function getIntegrations(): ?array;

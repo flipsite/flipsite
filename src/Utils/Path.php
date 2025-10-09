@@ -11,6 +11,7 @@ final class Path
     /**
      * @var array<Language>
      */
+    private string $path;
     private array $languages  = [];
     private ?string $page     = '404';
     private ?string $redirect = null;
@@ -23,6 +24,7 @@ final class Path
         if ($path === 'home') {
             $path = '';
         }
+        $this->path      = $path;
         $this->languages = $languages;
         $all             = $slugs->getAll();
         if (isset($all[$path])) {
@@ -35,6 +37,11 @@ final class Path
             }
         }
         $this->language = $languages[0];
+    }
+
+    public function getPath() :string
+    {
+        return $this->path;
     }
 
     public function getLanguage(): Language

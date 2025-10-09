@@ -437,6 +437,7 @@ final class Flipsite
                 $globalVars['meta.'.$key] = $value;
             }
         }
+        $globalVars['meta.url'] = $this->environment->getAbsoluteUrl($path->getPath());
         unset($globalVars['meta.content']);
         foreach ($social ?? [] as $type => $handle) {
             $globalVars['social.'.$type] = $handle;

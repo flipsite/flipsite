@@ -393,6 +393,16 @@ class Reader implements SiteDataInterface
         return $this->expandedPages[$page] ?? null;
     }
 
+    public function getExpandedByCollectionId(string $collectionId): ?string
+    {
+        foreach ($this->expandedPages as $page => $data) {
+            if (($data['_collectionId'] ?? '') === $collectionId) {
+                return $page;
+            }
+        }
+        return null;
+    }
+
     public function getPageName(string $page, ?Language $language = null, array $exclude = []): string
     {
         $language ??= $this->getDefaultLanguage();
@@ -607,8 +617,9 @@ class Reader implements SiteDataInterface
         foreach ($pages as $page => $sections) {
             $page = (string)$page;
             if (substr_count($page, ':slug') && isset($meta[$page]['content'])) {
-                $this->expandedPages[$page] = [(string)$mainLanguage => $page];
-                $collection                 = $this->getCollection($meta[$page]['content']);
+                $this->expandedPages[$page]                  = [(string)$mainLanguage => $page];
+                $this->expandedPages[$page]['_collectionId'] = $meta[$page]['content'];
+                $collection                                  = $this->getCollection($meta[$page]['content']);
                 if (!$collection) {
                     continue;
                 }

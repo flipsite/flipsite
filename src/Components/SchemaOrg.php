@@ -22,7 +22,7 @@ final class SchemaOrg extends AbstractGroup
         $data = $component->getData();
         unset($data['render'], $data['_types']);
 
-        $data        = $this->expandRepeat($data);
+        $data        = $this->expandRepeat($data, $inherited->getDataSource());
         $assets      = $this->assets; // For use in closure
         $environment = $this->environment; // For use in closure
         $data        = ArrayHelper::applyStringCallback($data, function (string $value) use ($assets, $environment) {
@@ -40,7 +40,7 @@ final class SchemaOrg extends AbstractGroup
         $this->render = false;
     }
 
-    private function expandRepeat(array $data): array
+    private function expandRepeat(array $data, array $dataSource): array
     {
         if (isset($data['_repeat'])) {
             $repeat     = $data['_repeat'];
@@ -50,7 +50,8 @@ final class SchemaOrg extends AbstractGroup
                 $tpl = $data;
                 unset($tpl['_options']);
                 // Normalize
-                $data       = $this->normalizeRepeat($data, $collection->getItemsArray(true));
+                $repeat     = $collection->getItemsArray(true, $this->environment, $this->siteData, $this->path);
+                $data       = $this->normalizeRepeat($data, $repeat);
                 $repeatData = $data['_repeatData'] ?? [];
                 $data       = [];
                 $replaced   = [];
@@ -75,9 +76,12 @@ final class SchemaOrg extends AbstractGroup
                 }
             }
         }
+        $replaced = [];
+        $data     = DataHelper::applyData($data, $dataSource, $replaced);
+        unset($data['_original']);
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                $data[$key] = $this->expandRepeat($value);
+                $data[$key] = $this->expandRepeat($value, $dataSource);
             }
         }
         return $data;
