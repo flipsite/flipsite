@@ -36,8 +36,14 @@ final class SchemaOrg extends AbstractGroup
 
             return $value;
         });
-        $this->builder->dispatch(new Event('schemaorg.graph', $data['@type'], $data));
+        $this->json = $data;
+        $this->builder->dispatch(new Event('schemaorg.graph', $data['@type'], $this->json));
         $this->render = false;
+    }
+
+    public function getJson(): array
+    {
+        return $this->json;
     }
 
     private function expandRepeat(array $data, array $dataSource): array
