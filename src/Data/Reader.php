@@ -388,7 +388,7 @@ class Reader implements SiteDataInterface
         return $this->slugs;
     }
 
-    public function getExpanded(string $page): ?array
+    public function getExpanded(?string $page = null): ?array
     {
         return $this->expandedPages[$page] ?? null;
     }

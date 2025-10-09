@@ -64,10 +64,12 @@ class Collection implements \JsonSerializable
         if ($slugField && $environment && $siteData && $path) {
             $page               = $siteData->getExpandedByCollectionId($this->id);
             $expanded           = $siteData->getExpanded($page);
-            $urlTpl             = $environment->getAbsoluteUrl($expanded[(string)$path->getLanguage()]);
-            foreach ($items as $item) {
-                $slug = $item->get($slugField);
-                $item->addCustom('slugUrl', $slug ? str_replace(':slug', $slug, $urlTpl) : null);
+            if ($expanded) {
+                $urlTpl             = $environment->getAbsoluteUrl($expanded[(string)$path->getLanguage()]);
+                foreach ($items as $item) {
+                    $slug = $item->get($slugField);
+                    $item->addCustom('slugUrl', $slug ? str_replace(':slug', $slug, $urlTpl) : null);
+                }
             }
         }
         return $items;
