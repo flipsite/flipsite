@@ -90,6 +90,9 @@ class AssetParser
                 $dot  = new \Adbar\Dot($json);
                 $all  = $dot->flatten();
                 foreach ($all as $value) {
+                    if (!is_string($value)) {
+                        continue;
+                    }
                     $ext = pathinfo($value, PATHINFO_EXTENSION);
                     if (in_array($ext, self::EXTENSIONS)) {
                         $assets[] = $value;
