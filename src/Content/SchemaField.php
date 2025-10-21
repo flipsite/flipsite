@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Content;
 
 use Flipsite\Utils\ArrayHelper;
@@ -12,6 +11,7 @@ class SchemaField implements \JsonSerializable
     private const TYPES = [
         'color',
         'date',
+        'time',
         'enum',
         'file',
         'gallery',
@@ -107,7 +107,6 @@ class SchemaField implements \JsonSerializable
 
     public function appendDelta(array $delta)
     {
-
         if (array_key_exists('type', $delta)) {
             $this->type = $delta['type'];
             if (!in_array($this->type, self::TYPES)) {
