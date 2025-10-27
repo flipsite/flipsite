@@ -268,15 +268,17 @@ class Reader implements SiteDataInterface
     public function getThemeVars(): array
     {
         $fallback = [
-            'theme-section-x'   => '3.75|12.5',
-            'theme-section-y'   => '20|30',
-            'theme-section-gap' => '15|20',
-            'theme-gap-lg'      => '7.5',
-            'theme-gap-md'      => '5',
-            'theme-gap-sm'      => '3.5',
-            'theme-gap-xs'      => '2',
-            'theme-text-sm'     => '3.5',
-            'theme-text-lg'     => '4.5|5',
+            'theme-section-x'    => '3.75|12.5',
+            'theme-section-y'    => '20|30',
+            'theme-section-gap'  => '15|20',
+            'theme-gap-lg'       => '7.5',
+            'theme-gap-md'       => '5',
+            'theme-gap-sm'       => '3.5',
+            'theme-gap-xs'       => '2',
+            'theme-gap-xxs'      => '1',
+            'theme-text-xs'      => '3',
+            'theme-text-sm'      => '3.5',
+            'theme-text-lg'      => '4.5|5',
         ];
         $vars = $this->data['theme']['variables'] ?? [];
         return ArrayHelper::merge($fallback, $vars);
