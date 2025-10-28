@@ -285,7 +285,7 @@ class ComponentBuilder
         if (($style['textScale'] ?? '') === 'text-scale') {
             $data['_attr'] ??= [];
             $data['_attr']['data-text-scale'] = true;
-            $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/dist/text-scale.min.js')));
+            $this->dispatch(new Event('ready-script', 'text-scale', file_get_contents(__DIR__.'/../../js/dist/textScale.min.js')));
         }
         unset($style['textScale']);
 
