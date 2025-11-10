@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Assets\Dynamic;
 
 use Flipsite\Data\SiteDataInterface;
@@ -110,6 +111,12 @@ class DynamicVcf implements DynamicAssetsInterface
             $vcard['PHOTO;ENCODING=b;TYPE=JPEG'] = $base64;
         }
 
+        foreach ($vcard as $attr => &$value) {
+            if (is_string($value) && \Flipsite\Utils\Localization::isLocalization($value)) {
+                $loc = new \Flipsite\Utils\Localization($this->siteData->getLanguages(), $value);
+                $value = $loc->getValue();
+            }
+        }
         $vcard['PRODID'] = '-//FlipSite//FlipSite v1.0//EN';
         $encoded         = "BEGIN:VCARD\nVERSION:3.0\n";
         foreach ($vcard as $key => $value) {
