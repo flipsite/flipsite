@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -29,20 +30,23 @@ final class ArrayHelper
 
     public static function renameKey(array $array, string $old, string $new, bool $recursive = false): array
     {
+        $result = [];
+
         foreach ($array as $key => $value) {
-            // If the key matches the old key, rename it
-            if ($key === $old) {
-                $array[$new] = $value;
-                unset($array[$key]);
+            // Recursively rename keys in nested arrays if enabled
+            if ($recursive && is_array($value)) {
+                $value = self::renameKey($value, $old, $new, true);
             }
 
-            // If recursion is enabled and the value is an array, recursively call renameKey
-            if ($recursive && is_array($value)) {
-                $array[$key] = self::renameKey($value, $old, $new, true);
+            // Rename the key while preserving order
+            if ($key === $old) {
+                $result[$new] = $value;
+            } else {
+                $result[$key] = $value;
             }
         }
 
-        return $array;
+        return $result;
     }
 
     public static function merge(array ...$arrays): array
