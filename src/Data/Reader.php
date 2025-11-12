@@ -111,7 +111,20 @@ class Reader implements SiteDataInterface
 
     public function getCompile(): ?array
     {
-        return $this->get('compile');
+        $compile = $this->get('compile');
+        if (!isset($compile['production'])) {
+            $compile['production'] = true;
+        }
+        if (!isset($compile['optimize'])) {
+            $compile['optimize'] = 'css';
+        }
+        if (!isset($compile['downloadFonts'])) {
+            $compile['downloadFonts'] = true;
+        }
+        if (!isset($compile['https'])) {
+            $compile['https'] = true;
+        }
+        return $compile;
     }
 
     public function getPublish(): ?array
