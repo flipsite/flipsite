@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\Assets;
@@ -56,8 +55,8 @@ class MetaBuilder implements BuilderInterface
                     if (!$language->isSame($l)) {
                         $el = new Element('link', true, true);
                         $el->setAttribute('rel', 'alternate');
-                        $slug = $this->siteData->getSlugs()->getSlug($page, $l);
-                        $el->setAttribute('href', $this->environment->getAbsoluteUrl($slug));
+                        $langSlug = $this->siteData->getSlugs()->getSlug($page, $l);
+                        $el->setAttribute('href', $this->environment->getAbsoluteUrl($langSlug));
                         $el->setAttribute('hreflang', (string)$l);
                         $elements[] = $el;
                     }
