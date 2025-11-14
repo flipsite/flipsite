@@ -425,6 +425,9 @@ class ComponentBuilder
                     $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/dist/anim.min.js')));
                     $animate      = $setting->removeValue('offscreen');
                     $notAnimate   = $setting->getValue();
+                    if ('enter' === ($data['_attr']['data-event'] ?? 'enter')) {
+                        $setting->setValue('', $animate);
+                    }
                     if (isset($data['_attr']['data-animate'])) {
                         $data['_attr']['data-animate'] .= ' '.$animate.' '.$notAnimate;
                     } else {

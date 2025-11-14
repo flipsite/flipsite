@@ -57,11 +57,6 @@ ready(() => {
     const offscreenClasses = el.getAttribute('data-animate').split(' ');
     const event = el.getAttribute('data-event') || 'enter';
     if (!isScrollTransform) {
-      if ('enter' === event) {
-        offscreenClasses.forEach((className) => {
-          el.classList.toggle(className)
-        });
-      }
       appearAnimations.push({
         el: el,
         ev: event,
@@ -73,21 +68,16 @@ ready(() => {
         st: false
       });
     } else {
-      const onscreenStyle = getStyle(window.getComputedStyle(el));
+      const offscreenStyle = getStyle(window.getComputedStyle(el));
       let transitionDuration = null;
-      if (onscreenStyle['transition-duration'] !== '0s') {
-        transitionDuration = onscreenStyle['transition-duration'];
+      if (offscreenStyle['transition-duration'] !== '0s') {
+        transitionDuration = offscreenStyle['transition-duration'];
         el.style.transitionDuration = '0s';
       }
       offscreenClasses.forEach((className) => {
         el.classList.toggle(className)
       });
-      const offscreenStyle = getStyle(window.getComputedStyle(el));
-      if('enter' === event) {
-        offscreenClasses.forEach((className) => {
-          el.classList.toggle(className)
-        });
-      }
+      const onscreenStyle = getStyle(window.getComputedStyle(el));
       scrollAnimations.push({
         el: el,
         ev: event,
@@ -176,5 +166,4 @@ ready(() => {
   };
   window.addEventListener('scroll', updateAnimations );
   updateAnimations();
-  
 });
