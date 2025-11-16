@@ -1,12 +1,14 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
 use Flipsite\Utils\DataHelper;
 use Flipsite\Utils\ArrayHelper;
+use Flipsite\Utils\RichtextHelper;
 use Flipsite\Builders\Event;
 
 final class SchemaOrg extends AbstractGroup
@@ -62,6 +64,9 @@ final class SchemaOrg extends AbstractGroup
                 $data       = [];
                 $replaced   = [];
                 foreach ($repeatData as $item) {
+                    $item = ArrayHelper::applyStringCallback($item, function (string $value) {
+                        return RichtextHelper::toPlainText($value);
+                    });
                     $tplWithData = DataHelper::applyDataToBranch($tpl, $item);
                     unset($tplWithData['_original']);
                     $data[] = $tplWithData;
@@ -69,15 +74,19 @@ final class SchemaOrg extends AbstractGroup
             }
         }
         if (isset($data['_dataSource'])) {
-            $dataSource = $data['_dataSource'];
+            $itemDataSource = $data['_dataSource'];
             unset($data['_dataSource']);
-            $tmp        = explode('.', (string)$dataSource, 2);
+            $tmp        = explode('.', (string)$itemDataSource, 2);
             $collection = $this->siteData->getCollection($tmp[0], $this->path->getLanguage());
             if ($collection) {
                 $itemId = $tmp[1] ?? null;
                 $item   = $collection->getItem(intval($itemId));
                 if ($item) {
-                    $data = DataHelper::applyDataToBranch($data, $item->jsonSerialize());
+                    $itemData = $item->jsonSerialize();
+                    $itemData = ArrayHelper::applyStringCallback($itemData, function (string $value) {
+                        return RichtextHelper::toPlainText($value);
+                    });
+                    $data = DataHelper::applyDataToBranch($data, $itemData);
                     unset($data['_original']);
                 }
             }
