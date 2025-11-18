@@ -166,4 +166,8 @@ ready(() => {
   };
   window.addEventListener('scroll', updateAnimations );
   updateAnimations();
+  setTimeout(() => {
+    updateAnimations();
+  }, 100);
+
 });
