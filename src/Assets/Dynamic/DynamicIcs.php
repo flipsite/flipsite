@@ -68,17 +68,36 @@ class DynamicIcs implements DynamicAssetsInterface
         $iCalendarData = \Flipsite\Utils\DataHelper::applyData($field->getJson(), $dataSource, $replaced);
         unset($iCalendarData['_original']);
 
+        $timezone  = $iCalendarData['timezone'] ?? 'Europe/London';
+        $startDate = $iCalendarData['startDate'] ?? date('Y-m-d');
+        $endDate   = $iCalendarData['endDate'] ?? $startDate;
+        $startTime = $iCalendarData['startTime'] ?? '00:00';
+        $startTime .= ':00';
+        $endTime   = $iCalendarData['endTime'] ?? '00:00';
+        $endTime .= ':00';
+
+        $start = str_replace(['-', ':'], '', $startDate . 'T' . $startTime);
+        $end   = str_replace(['-', ':'], '', $endDate . 'T' . $endTime);
+
+        $iCalendar['DTSTART;TZID=' . $timezone] = $start;
+        $iCalendar['DTEND;TZID=' . $timezone]   = $end;
+        $iCalendar['SUMMARY']                   = $iCalendarData['title'] ?? 'Event';
+        $iCalendar['DESCRIPTION']               = $iCalendarData['description'] ?? '';
+        $iCalendar['LOCATION']                  = $iCalendarData['location'] ?? '';
+
         foreach ($iCalendar as $attr => &$value) {
             if (is_string($value) && \Flipsite\Utils\Localization::isLocalization($value)) {
                 $loc   = new \Flipsite\Utils\Localization($this->siteData->getLanguages(), $value);
                 $value = $loc->getValue();
             }
         }
-
-        // TODO
-
-        $encoded = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FlipSite//FlipSite v1.0//EN\nBEGIN:VEVENT\n";
+        $iCalendar = json_decode(json_encode($iCalendar), true);
+        $encoded   = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//FlipSite//FlipSite v1.0//EN\nBEGIN:VEVENT\n";
         foreach ($iCalendar as $key => $value) {
+            $value = str_replace('\\', '\\\\', $value);
+            $value = str_replace(',', '\,', $value);
+            $value = str_replace(';', '\;', $value);
+
             $line = '';
             if (is_array($value)) {
                 $line .= $key.':' . implode(';', $value);
@@ -89,6 +108,7 @@ class DynamicIcs implements DynamicAssetsInterface
         }
         $encoded .= "END:VEVENT\n";
         $encoded .= "END:VCALENDAR\n";
+
         return $encoded;
     }
 }
