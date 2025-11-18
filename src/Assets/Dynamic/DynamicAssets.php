@@ -41,9 +41,12 @@ class DynamicAssets implements DynamicAssetsInterface
 
     private function getInterface(string $asset): ?DynamicAssetsInterface
     {
-        if (!str_ends_with($asset, 'vcf')) {
-            return null;
+        if (str_ends_with($asset, 'vcf')) {
+            return new DynamicVcf($this->siteData, $this->assetSources);
         }
-        return new DynamicVcf($this->siteData, $this->assetSources);
+        if (str_ends_with($asset, 'ics')) {
+            return new DynamicIcs($this->siteData, $this->assetSources);
+        }
+        return null;
     }
 }

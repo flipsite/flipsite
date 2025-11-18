@@ -11,11 +11,11 @@ class SchemaField implements \JsonSerializable
     private const TYPES = [
         'color',
         'date',
-        'time',
         'enum',
         'file',
         'gallery',
         'gradient',
+        'icalendar',
         'icon',
         'image',
         'list',
@@ -26,6 +26,7 @@ class SchemaField implements \JsonSerializable
         'slug',
         'svg',
         'text',
+        'time',
         'vcard',
         'video',
     ];
