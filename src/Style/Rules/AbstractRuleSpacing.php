@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style\Rules;
 
 abstract class AbstractRuleSpacing extends AbstractRule
@@ -16,6 +15,12 @@ abstract class AbstractRuleSpacing extends AbstractRule
      */
     protected function process(array $args): void
     {
+        if (in_array($args[0], ['none', 'auto'])) {
+            foreach ($this->properties as $property) {
+                $this->setDeclaration($property, $args[0]);
+            }
+            return;
+        }
         $scale = $this->themeSettings['spacingScale'] ?? 1.0;
         if ($scale != 1.0) {
             $args[] = $scale;

@@ -32,10 +32,6 @@ colors:
   fuchsia: "#d946ef"
   pink: "#ec4899"
   rose: "#f43f5e"
-spacing:
-  none: none
-  auto: auto
-  px: 1px
 animation:
   spin: spin var(--tw-animation-duration) linear infinite
   ping: ping var(--tw-animation-duration) cubic-bezier(0, 0, 0.2, 1) infinite
@@ -79,38 +75,12 @@ keyframes:
       transform: translateX(0%);
     100%:
       transform: translateX(-50%);
-backgroundImage:
-  none: none
-backgroundPosition:
-  bottom: bottom
-  center: center
-  left: left
-  left-bottom: left bottom
-  left-center: left center
-  left-top: left top
-  right: right
-  right-bottom: right bottom
-  right-center: right center
-  right-top: right top
-  top: top
-backgroundSize:
-  auto: auto
-  cover: cover
-  contain: contain
 borderColor:
   DEFAULT: rgba(0,0,0,0.08)
 borderRadius:
   full: 9999px
 borderWidth:
   DEFAULT: 1px
-cursor:
-  auto: auto
-  DEFAULT: default
-  pointer: pointer
-  wait: wait
-  text: text
-  move: move
-  not-allowed': not-allowed
 divideWidth:
   DEFAULT: 1px
 dropShadow:
@@ -142,10 +112,9 @@ flexShrink:
   DEFAULT: 1
 fontFamily:
   sans:
-    # Workaround for Chrome bug
-    # - "system-ui"
-    # - "-apple-system"
-    # - "BlinkMacSystemFont"
+    - "system-ui"
+    - "-apple-system"
+    - "BlinkMacSystemFont"
     - '"Segoe UI"'
     - "Roboto"
     - '"Helvetica Neue"'
@@ -179,8 +148,6 @@ fontWeight:
   bold: 700
   extrabold: 800
   black: 900
-gridTemplateColumns:
-  none: none
 inset:
   0: 0px
 letterSpacing:

@@ -3,14 +3,10 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-final class RuleW extends AbstractRule
+final class RuleW extends AbstractRuleSize
 {
     /**
-     * @param array<string> $args
+     * @var array<string>
      */
-    protected function process(array $args) : void
-    {
-        $value = $this->checkCallbacks('size', $args);
-        $this->setDeclaration('width', $value);
-    }
+    protected array $properties = ['width'];
 }

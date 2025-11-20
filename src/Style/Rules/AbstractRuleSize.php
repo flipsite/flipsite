@@ -3,7 +3,7 @@
 declare(strict_types=1);
 namespace Flipsite\Style\Rules;
 
-abstract class AbstractRulePosition extends AbstractRule
+abstract class AbstractRuleSize extends AbstractRule
 {
     /**
      * @var array<string>
@@ -15,12 +15,6 @@ abstract class AbstractRulePosition extends AbstractRule
      */
     protected function process(array $args): void
     {
-        if (in_array($args[0], ['none', 'auto'])) {
-            foreach ($this->properties as $property) {
-                $this->setDeclaration($property, $args[0]);
-            }
-            return;
-        }
         $value = $this->checkCallbacks('size', $args);
         foreach ($this->properties as $i => $property) {
             $this->setDeclaration($property, $value);

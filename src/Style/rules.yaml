@@ -56,12 +56,24 @@ bg-fixed: background-attachment:fixed
 bg-local: background-attachment:local
 bg-no-repeat: background-repeat:no-repeat
 bg-none: background-image:none
+bg-bottom: background-position:bottom
+bg-center: background-position:center
+bg-left: background-position:left
+bg-left-bottom: background-position:left bottom
+bg-left-center: background-position:left center
+bg-left-top: left top
+bg-right: background-position:right
+bg-right-bottom: background-position:right bottom
+bg-right-center: background-position:right center
+bg-right-top: background-position:right top
+bg-top: background-position:top
 bg-repeat-round: background-repeat:round
 bg-repeat-space: background-repeat:space
 bg-repeat-x: background-repeat:repeat-x
 bg-repeat-y: background-repeat:repeat-y
 bg-repeat: background-repeat:repeat
 bg-scroll: background-attachment:scroll
+bg-transparent: background-color:transparent
 block: display:block
 border-collapse: border-collapse:collapse
 border-dashed: border-style:dashed
