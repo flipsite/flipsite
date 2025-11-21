@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Data;
 
 use Flipsite\Utils\ArrayHelper;
@@ -47,8 +48,7 @@ class YamlComponentData extends AbstractComponentData
         }
         // Remove style for components in data
         foreach ($style as $attr => $value) {
-            $type = explode(':', $attr)[0];
-            if (!in_array($type, $componentsInData)) {
+            if (!in_array($attr, $componentsInData)) {
                 $this->style[$attr] = $value;
             }
         }
