@@ -713,16 +713,6 @@ class ComponentBuilder
                 $style['dark']['borderColorDefault'] = $htmlStyle['dark']['borderColor'];
             }
         }
-        if (isset($style['divideX']) || isset($style['divideY'])) {
-            $htmlStyle = $this->siteData->getHtmlStyle();
-            if (!isset($style['divideColor'])) {
-                $style['divideColorDefault'] = str_replace('border-', 'divide-', $htmlStyle['borderColor']);
-            }
-            if (!isset($style['dark']['divideColor'])) {
-                $style['dark'] ??= [];
-                $style['dark']['divideColorDefault'] = str_replace('border-', 'divide-', $htmlStyle['dark']['borderColor']);
-            }
-        }
         if (isset($style['boxShadow'])) {
             $htmlStyle               = $this->siteData->getHtmlStyle();
             if (!isset($style['boxShadowColor'])) {
