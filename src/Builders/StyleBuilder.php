@@ -26,7 +26,6 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
     public function getDocument(Document $document, string $preflight = 'elements'): Document
     {
         $css = $this->getCss($document, $preflight);
-        $css = $this->prettifyCss($css);
 
         $style = new Element('style', true);
         $style->setContent($css);
