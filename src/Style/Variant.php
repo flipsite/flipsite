@@ -53,7 +53,7 @@ class Variant
             $pseudo .= $type->getPseudo();
         }
         if (count($mediaQueries)) {
-            $css .= '@media'.$mediaQueries[0].'{';
+            $css .= '@media'.implode(' and ', $mediaQueries).'{';
         }
         $css .= $this->getRulesets($parent, $prefix, $pseudo, $added);
         if (count($mediaQueries)) {

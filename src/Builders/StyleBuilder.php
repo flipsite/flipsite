@@ -26,6 +26,7 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
     public function getDocument(Document $document, string $preflight = 'elements'): Document
     {
         $css = $this->getCss($document, $preflight);
+        $css = $this->prettifyCss($css);
 
         $style = new Element('style', true);
         $style->setContent($css);
@@ -275,5 +276,143 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         foreach ($element->getChildren() as $child) {
             $this->replaceClasses($child, $newClasses);
         }
+    }
+
+    private function prettifyCss(string $css, string $indent = '  '): string
+    {
+        $len        = strlen($css);
+        $out        = '';
+        $buffer     = '';
+        $depth      = 0;
+        $parenDepth = 0;
+        $inString   = false;
+        $stringChar = '';
+        $inComment  = false;
+        $prevChar   = '';
+        $newline    = "\n";
+
+        for ($i = 0; $i < $len; $i++) {
+            $ch   = $css[$i];
+            $next = ($i + 1 < $len) ? $css[$i + 1] : '';
+
+            // handle comment start/end
+            if ($inComment) {
+                $buffer .= $ch;
+                if ($prevChar === '*' && $ch === '/') {
+                    $inComment = false;
+                }
+                $prevChar = $ch;
+                continue;
+            }
+            if (!$inString && $ch === '/' && $next === '*') {
+                // start comment
+                $inComment = true;
+                $buffer .= '/*';
+                $i++; // skip next char too
+                $prevChar = '';
+                continue;
+            }
+
+            // handle strings
+            if ($inString) {
+                $buffer .= $ch;
+                if ($ch === $stringChar && $prevChar !== '\\') {
+                    $inString   = false;
+                    $stringChar = '';
+                }
+                $prevChar = $ch;
+                continue;
+            }
+            if (($ch === '"' || $ch === "'")) {
+                $inString   = true;
+                $stringChar = $ch;
+                $buffer .= $ch;
+                $prevChar = $ch;
+                continue;
+            }
+
+            // track parentheses depth so semicolons inside functions don't split declarations
+            if ($ch === '(') {
+                $parenDepth++;
+                $buffer .= $ch;
+                $prevChar = $ch;
+                continue;
+            }
+            if ($ch === ')') {
+                if ($parenDepth > 0) {
+                    $parenDepth--;
+                }
+                $buffer .= $ch;
+                $prevChar = $ch;
+                continue;
+            }
+
+            // opening brace => selector block start
+            if ($ch === '{') {
+                $selector = trim($buffer);
+                // tidy up selector spacing: collapse multiple spaces, keep commas
+                $selector = preg_replace('/\s+/', ' ', $selector);
+                if ($selector !== '') {
+                    $out .= $selector . $newline;
+                }
+                $out .= str_repeat($indent, $depth) . '{' . $newline;
+                $depth++;
+                $buffer   = '';
+                $prevChar = $ch;
+                continue;
+            }
+
+            // semicolon inside a block => end of declaration (only if not inside parentheses)
+            if ($ch === ';' && $depth > 0 && $parenDepth === 0) {
+                $decl = trim($buffer);
+                if ($decl !== '') {
+                    // ensure "prop: value" spacing
+                    $decl = preg_replace('/\s*:\s*/', ': ', $decl, 1);
+                    $out .= str_repeat($indent, $depth) . $decl . ';' . $newline;
+                } else {
+                    // stray semicolon — still output indented
+                    $out .= str_repeat($indent, $depth) . ';' . $newline;
+                }
+                $buffer   = '';
+                $prevChar = $ch;
+                continue;
+            }
+
+            // closing brace => block end
+            if ($ch === '}') {
+                // flush any leftover declaration (in case it didn't end with ;)
+                $left = trim($buffer);
+                if ($left !== '') {
+                    $left = preg_replace('/\s*:\s*/', ': ', $left, 1);
+                    $out .= str_repeat($indent, $depth) . $left . ';' . $newline;
+                    $buffer = '';
+                }
+
+                $depth = max(0, $depth - 1);
+                $out .= str_repeat($indent, $depth) . '}' . $newline;
+                $buffer   = '';
+                $prevChar = $ch;
+                continue;
+            }
+
+            // for other chars, append to buffer
+            $buffer .= $ch;
+            $prevChar = $ch;
+        }
+
+        // if any trailing buffer outside braces (e.g., trailing at-rules), append
+        $tail = trim($buffer);
+        if ($tail !== '') {
+            // If it looks like an at-rule block without braces, just append
+            $out .= $tail . $newline;
+        }
+
+        // cleanup: remove duplicate blank lines
+        $out = preg_replace("/\n{3,}/", "\n\n", $out);
+
+        // trim leading/trailing whitespace and ensure trailing newline
+        $out = trim($out, " \t\n\r") . $newline;
+
+        return $out;
     }
 }

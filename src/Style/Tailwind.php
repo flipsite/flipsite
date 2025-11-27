@@ -321,6 +321,8 @@ final class Tailwind implements CallbackInterface
             }
             if (isset($this->config['screens'][$variantId])) {
                 $type = new Variants\ResponsiveType($variantId, intval($this->config['screens'][$variantId]));
+            } elseif ('dark' === $variantId) {
+                $type = new Variants\DarkType($this->dark);
             } else {
                 // Change foo-bar to FooBar
                 $variantId = explode('-', $variantId);
