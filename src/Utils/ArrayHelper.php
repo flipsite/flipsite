@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Utils;
 
 use Ckr\Util\ArrayMerger;
@@ -166,6 +165,15 @@ final class ArrayHelper
         } catch (\JsonException $e) {
             $list = explode(',', $string);
         }
-        return array_map('trim', $list);
+
+        if (!is_array($list)) {
+            return [];
+        }
+        foreach ($list as &$item) {
+            if (is_string($item)) {
+                $item = trim($item);
+            }
+        }
+        return $list;
     }
 }

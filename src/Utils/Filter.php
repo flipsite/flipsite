@@ -9,7 +9,7 @@ final class Filter
     {
     }
 
-    public function filterValue(string|null $value): bool
+    public function filterValue($value): bool
     {
         if (!$value) {
             $value = null;
@@ -24,8 +24,15 @@ final class Filter
             return !!preg_match('/'.$this->pattern.'/', $value);
         }
 
+        if (is_numeric($value)) {
+            $value = '["'.(string)$value.'"]';
+        }
+
         $filter = ArrayHelper::decodeJsonOrCsv($this->filter);
         $value  = ArrayHelper::decodeJsonOrCsv($value);
+
+        $filter = is_array($filter) ? array_map('strval', $filter) : [(string)$filter];
+        $value  = is_array($value) ? array_map('strval', $value) : [(string)$value];
 
         if ('or' === $this->type) {
             foreach ($value as $v) {

@@ -166,55 +166,21 @@ abstract class AbstractGroup extends AbstractComponent
         return $data;
     }
 
-    protected function normalizeRepeat(string|int|bool|array $data, array $repeat): array
+    protected function normalizeRepeat(string|int|bool|array $data, array $rawRepeatData): array
     {
-        // TODO remove at some point, backwards compability
-        if (isset($data['_options']['filterBy']) && !isset($data['_options']['filterField'])) {
-            $data['_options']['filterField'] = $data['_options']['filterBy'];
-            unset($data['_options']['filterBy']);
-        }
-
-        if ($data['_options']['shuffle'] ?? false) {
-            shuffle($repeat);
-        }
-
-        if (isset($data['_options']['filterField']) && (isset($data['_options']['filter']) || isset($data['_options']['filterType']) || isset($data['_options']['filterPattern']))) {
-            $field = $data['_options']['filterField'];
-            if (strpos($field, '|') !== false) {
-                $parts = explode('|', $field);
-                $field = $parts[1];
-            }
-            $filter = new Filter($data['_options']['filterType'] ?? 'or', $data['_options']['filter'] ?? null, $data['_options']['filterPattern'] ?? null);
-            $repeat = $filter->filterList($repeat, $field);
-        }
-
-        if (isset($data['_options']['sortBy'])) {
-            $sortField = $data['_options']['sortBy'];
-            uasort($repeat, function ($a, $b) use ($sortField) {
-                if (isset($a[$sortField],$b[$sortField])) {
-                    return $a[$sortField] <=> $b[$sortField];
-                }
-                return 0;
-            });
-        }
-        if (isset($data['_options']['sort']) && 'desc' === $data['_options']['sort']) {
-            $repeat = array_reverse($repeat);
-        }
-        if ($data['_options']['shuffle'] ?? false && isset($data['_options']['length'])) {
-            $length = intval($data['_options']['length'] ?? 999999);
-            while ($length < count($repeat)) {
-                $removeIndex = rand(0, count($repeat) - 1);
-                unset($repeat[$removeIndex]);
-                $repeat = array_values($repeat);
-            }
-        } elseif (isset($data['_options']['offset']) || isset($data['_options']['length'])) {
-            $offset = intval($data['_options']['offset'] ?? 0);
-            $length = intval($data['_options']['length'] ?? 999999);
-            if (!$length) {
-                $length = 999999;
-            }
-            $repeat = array_splice($repeat, $offset, $length);
-        }
+        $repeatOptions = new RepeatOptions(
+            intval($data['_options']['offset'] ?? 0),
+            intval($data['_options']['length'] ?? 999999),
+            !!($data['_options']['shuffle'] ?? false),
+            intval($data['_options']['duplicate'] ?? 0),
+            $data['_options']['sortBy'] ?? null,
+            $data['_options']['sort'] ?? null,
+            $data['_options']['filter'] ?? null,
+            $data['_options']['filterField'] ?? null,
+            $data['_options']['filterType'] ?? null,
+            $data['_options']['filterPattern'] ?? null
+        );
+        $repeat = new Repeat($rawRepeatData, $repeatOptions);
 
         $components = array_filter($data, function ($key): bool {
             return !str_starts_with($key, '_');
@@ -222,26 +188,11 @@ abstract class AbstractGroup extends AbstractComponent
         foreach (array_keys($components) as $key) {
             unset($data[$key]);
         }
-        $data['_repeatData'] = $repeat ?? [];
+        $data['_repeatData'] = $repeat->getItems();
 
-        if (!is_array($repeat) || !count($repeat)) {
+        if ($repeat->isEmpty()) {
             unset($data['_repeatData']);
-
             $data['_isEmpty'] = true;
-        } else {
-            $index0 = 0;
-            foreach ($data['_repeatData'] as &$item) {
-                $item['index'] = ++$index0;
-            }
-        }
-
-        if ($data['_options']['duplicate'] ?? false) {
-            $count            = intval($data['_options']['duplicate']) ?? 1;
-            $duplicated       = [];
-            for ($i = 0; $i <= $count; $i++) {
-                $duplicated = array_merge($duplicated, $data['_repeatData']);
-            }
-            $data['_repeatData'] = $duplicated;
         }
 
         return $data;
@@ -258,5 +209,93 @@ abstract class AbstractGroup extends AbstractComponent
             return null;
         }
         return $collection;
+    }
+}
+
+class RepeatOptions
+{
+    public function __construct(
+        public int $offset = 0,
+        public int $length = 999999,
+        public bool $shuffle = false,
+        public int $duplicate = 0,
+        public ?string $sortBy = null,
+        public ?string $sort = null,
+        public ?string $filter = null,
+        public ?string $filterField = null,
+        public ?string $filterType = 'or',
+        public ?string $filterPattern = null,
+    ) {
+        if (!$this->length) {
+            $this->length = 999999;
+        }
+    }
+}
+
+class Repeat
+{
+    private array $items = [];
+
+    public function __construct(private array $rawItems, private RepeatOptions $options)
+    {
+        $this->rawItems = $rawItems;
+    }
+
+    public function getItems() : array
+    {
+        $items = $this->rawItems;
+        // 1️⃣ Apply shuffle
+        if ($this->options->shuffle) {
+            // TODO add seed support
+            shuffle($items);
+        }
+
+        // 2️⃣ Apply filter
+        if (isset($this->options->filterField) && (isset($this->options->filter) || isset($this->options->filterType) || isset($this->options->filterPattern))) {
+            $filter = new Filter($this->options->filterType, $this->options->filter ?? null, $this->options->filterPattern ?? null);
+            $items  = $filter->filterList($items, $this->options->filterField);
+        }
+
+        // 3️⃣ Apply sort
+        if (isset($this->options->sortBy)) {
+            $sortField = $this->options->sortBy;
+            uasort($items, function ($a, $b) use ($sortField) {
+                if (isset($a[$sortField],$b[$sortField])) {
+                    return $a[$sortField] <=> $b[$sortField];
+                }
+                return 0;
+            });
+        }
+        if (isset($this->options->sort) && 'desc' === $this->options->sort) {
+            $items = array_reverse($items);
+        }
+
+        // 4️⃣ Apply offset & length
+        $offset = $this->options->offset;
+        $length = $this->options->length;
+        $items  = array_splice($items, $offset, $length);
+
+        // 5️⃣ Apply duplicate
+        if ($this->options->duplicate) {
+            $count      = is_int($this->options->duplicate) ? $this->options->duplicate : 1;
+            $duplicated = [];
+            for ($i = 0; $i < $count; $i++) {
+                $duplicated = array_merge($duplicated, $items);
+            }
+            $items = $duplicated;
+        }
+
+        // 6️⃣ Add index
+        $index0 = 0;
+        foreach ($items as &$item) {
+            $item['index'] = ++$index0;
+        }
+
+        return $items;
+    }
+
+    public function isEmpty(): bool
+    {
+        return count($this->getItems()) === 0;
     }
 }
