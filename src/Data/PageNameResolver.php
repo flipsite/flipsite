@@ -73,6 +73,12 @@ class HomeNameResolver implements PageNameResolverInterface
             switch ((string)$language) {
                 case 'sv': return 'Hem';
                 case 'fi': return 'Koti';
+                case 'de': return 'Startseite';
+                case 'fr': return 'Accueil';
+                case 'es': return 'Inicio';
+                case 'it': return 'Home';
+                case 'pt': return 'Início';
+                case 'nl': return 'Home';
                 default: return 'Home';
             }
         }

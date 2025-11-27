@@ -97,7 +97,7 @@ final class Nav extends AbstractGroup
             $data['_options']['filterField'] = 'slug';
         }
 
-        return  $this->normalizeRepeat($data, $repeat);
+        return $this->normalizeRepeat($data, $repeat);
     }
 
     private function getPages(int $level, ?string $parentPage = null, bool $includeParent = false): array
