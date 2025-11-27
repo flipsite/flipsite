@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Components\Document;
@@ -43,6 +44,12 @@ class StyleBuilder implements BuilderInterface, EventListenerInterface
         $elements = array_values(array_unique($elements));
         $classes  = array_values(array_unique($classes));
         $classes  = array_filter($classes, function ($value) {
+            if (str_starts_with($value, 'divide-')) {
+                return false;
+            }
+            if (str_starts_with($value, 'space-')) {
+                return false;
+            }
             return !empty($value);
         });
 

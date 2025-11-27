@@ -1,72 +1,142 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Style;
 
 final class Style
 {
-    private array $values = [];
+    private $isDark = false;
+    private array $values = [
+        'base' => [],
+        'xs'   => [],
+        'sm'   => [],
+        'md'   => [],
+        'lg'   => [],
+        'xl'   => [],
+        '2xl'  => [],
+    ];
+    public const CSS   = [
+        'hover',
+        'focus',
+        'ltr',
+        'rtl',
+        'print'
+    ];
 
-    public function __construct(?string $encoded, private string $prefix = '')
+    public function __construct(?string $encoded)
     {
-        $encoded         = ' :'.$encoded;
-        $encodedVariants = explode(' ', str_replace($prefix, '', $encoded));
-        foreach ($encodedVariants as $encodedVariant) {
-            $parts                  = explode(':', $encodedVariant);
-            $value                  = array_pop($parts);
-            $variant                = trim(implode(':', $parts), ':');
-            if ($value !== null) {
-                $this->values[$variant] = $value;
+        if (strpos((string)$encoded, 'dark:') !== false) {
+            $this->isDark = true;
+            $encoded = str_replace('dark:', '', (string)$encoded);
+        }
+        $classes = explode(' ', (string)$encoded);
+        foreach ($classes as $cls) {
+            $this->parse($cls);
+        }
+    }
+
+    private function parse(string $class): void
+    {
+        $parts = explode(':', $class);
+        $bp    = 'base';
+        if (in_array($parts[0], array_keys($this->values), true)) {
+            $bp = array_shift($parts);
+        }
+        $state = 'default';
+        if (count($parts) > 1 && !in_array($parts[0], self::CSS, true)) {
+            $state = array_shift($parts);
+        }
+        $this->values[$bp][$state] ??= [];
+        $this->values[$bp][$state][] = implode(':', $parts);
+    }
+
+    public function handleOrder(int $total, int $index)
+    {
+        if ($this->hasState('first') === false &&
+            $this->hasState('last') === false &&
+            $this->hasState('even') === false &&
+            $this->hasState('odd') === false) {
+            return;
+        }
+        $order = 'odd';
+        if ($index === 0) {
+            $order = 'first';
+        } elseif ($index === $total - 1) {
+            $order = 'last';
+        } elseif ($total > 2 && $index % 2 === 0) {
+            $order = 'even';
+        }
+        foreach ($this->values as $bp => &$states) {
+            if (isset($states[$order])) {
+                $states['default'] = $states[$order];
+            }
+            unset($states['odd'], $states['even'], $states['first'], $states['last']);
+        }
+    }
+
+    public function hasState(string $state): bool
+    {
+        foreach ($this->values as $bp => $states) {
+            if (isset($states[$state])) {
+                return true;
             }
         }
+        return false;
     }
 
-    public function getValues(): array
+    public function encodeState(string $state): string
     {
-        return $this->values;
-    }
-
-    public function getVariants(): array
-    {
-        return array_keys($this->values);
-    }
-
-    public function hasVariant(string $variant): bool
-    {
-        return isset($this->values[$variant]);
-    }
-
-    public function getValue(string $variant = ''): ?string
-    {
-        return $this->values[$variant] ?? null;
-    }
-
-    public function removeValue(string $variant): ?string
-    {
-        if ('' === $variant) {
-            return null;
+        $classes = [];
+        foreach ($this->values as $bp => $states) {
+            foreach ($states[$state] ?? [] as $class) {
+                if ($bp === 'base') {
+                    $classes[] = $class;
+                } else {
+                    $classes[] = $bp . ':' . $class;
+                }
+            }
         }
-        $value = $this->values[$variant] ?? null;
-        unset($this->values[$variant]);
-        return $value;
+        if ($this->isDark) {
+            array_walk($classes, function (&$item) {
+                $item = 'dark:' . $item;
+            });
+        }
+        return implode(' ', $classes);
     }
 
-    public function setValue(string $variant, string|int $value)
+    public function removeState(string $state): string
     {
-        $this->values[$variant] = (string)$value;
+        $encodedState = $this->encodeState($state);
+        foreach ($this->values as $bp => &$states) {
+            if (isset($states[$state])) {
+                unset($states[$state]);
+            }
+        }
+        return $encodedState;
     }
-
     public function encode(): string
     {
-        $encoded = [];
-        foreach ($this->values as $variant => $value) {
-            if ('' === $variant) {
-                $encoded[] = $this->prefix.(string)$value;
-            } else {
-                $encoded[] = $variant.':'.$this->prefix.(string)$value;
+        $classes = [];
+        foreach ($this->values as $bp => $states) {
+            foreach ($states as $st => $stateClasses) {
+                if ($st !== 'default') {
+                    continue;
+                }
+                foreach ($stateClasses as $class) {
+                    if ($bp === 'base') {
+                        $classes[] = $class;
+                    } else {
+                        $classes[] = $bp . ':' . $class;
+                    }
+                }
             }
         }
-        $this->encoded = implode(' ', $encoded);
-        return $this->encoded;
+        if ($this->isDark) {
+            array_walk($classes, function (&$item) {
+                $item = 'dark:' . $item;
+            });
+        }
+        return implode(' ', $classes);
     }
 }

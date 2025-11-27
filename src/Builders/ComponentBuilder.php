@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Builders;
 
 use Flipsite\Assets\ImageHandler;
@@ -195,7 +196,7 @@ class ComponentBuilder
         $style = \Flipsite\Utils\StyleAppearanceHelper::apply($style, $inheritedData->getAppearance());
 
         $that   = $this;
-        $filter = function (string $attribute) use ($that) :bool {
+        $filter = function (string $attribute) use ($that): bool {
             return $that::isComponent($attribute);
         };
         $replaced = [];
@@ -288,7 +289,7 @@ class ComponentBuilder
 
         if (isset($style['background'])) {
             //$style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
-            //$style['background'] = $this->handleStyleStates($style['background'], $data);
+            $style['background'] = $this->modifyStyle($style['background'], $data, $order['index'] ?? null, $order['total'] ?? null, $inheritedData->getNavState() ?? null);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
@@ -383,30 +384,23 @@ class ComponentBuilder
                 continue;
             }
             // Order
-            $setting = new \Flipsite\Style\Style2($classes);
-            if ($total && $index === 0 && $setting->hasState('first')) {
-                $classes = $setting->encodeState('first');
-            } elseif ($total && $index === $total - 1 && $setting->hasState('last')) {
-                $classes = $setting->encodeState('last');
-            } elseif ($total && $index !== null && $total > 2 && $index % 2 === 0 && $setting->hasState('even')) {
-                $classes = $setting->encodeState('even');
-            } elseif ($total && $index !== null && $total > 2 && $index % 2 === 1 && $setting->hasState('odd')) {
-                $classes = $setting->encodeState('odd');
+            $setting = new \Flipsite\Style\Style($classes);
+            if ($total !== null) {
+                $setting->handleOrder($total, $index);
             }
 
             // States
             if ($setting->hasState('open')) {
                 $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
-
-                $open    = $setting->encodeState('open');
+                $open    = $setting->removeState('open');
                 $default = $setting->encodeState('default');
 
                 $data['_attr'] ??= [];
                 $data['_attr']['data-toggle'] ??= '';
                 $data['_attr']['data-toggle'] = trim($data['_attr']['data-toggle'].' '.$open.' '.$default);
-
-                $classes = $default;
             }
+
+            $classes = $setting->encode();
         }
         return $style;
     }
@@ -729,21 +723,21 @@ class ComponentBuilder
         if (isset($style['border']) || isset($style['borderTop']) || isset($style['borderBottom']) || isset($style['borderLeft']) || isset($style['borderRight'])) {
             $htmlStyle = $this->siteData->getHtmlStyle();
             if (!isset($style['borderColor'])) {
-                $style['borderColorDefault'] = $htmlStyle['borderColor'];
+                $style['borderColor'] = $htmlStyle['borderColor'];
             }
             if (!isset($style['dark']['borderColor'])) {
                 $style['dark'] ??= [];
-                $style['dark']['borderColorDefault'] = $htmlStyle['dark']['borderColor'];
+                $style['dark']['borderColor'] = $htmlStyle['dark']['borderColor'];
             }
         }
         if (isset($style['boxShadow'])) {
             $htmlStyle               = $this->siteData->getHtmlStyle();
             if (!isset($style['boxShadowColor'])) {
-                $style['boxShadowColorDefault'] = $htmlStyle['boxShadowColor'];
+                $style['boxShadowColor'] = $htmlStyle['boxShadowColor'];
             }
             if (!isset($style['dark']['boxShadowColor'])) {
                 $style['dark'] ??= [];
-                $style['dark']['boxShadowColorDefault'] = $htmlStyle['dark']['boxShadowColor'];
+                $style['dark']['boxShadowColor'] = $htmlStyle['dark']['boxShadowColor'];
             }
         }
         return $style;
