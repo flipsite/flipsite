@@ -222,10 +222,7 @@ class ComponentBuilder
         }
 
         $order = $componentData->getMetaValue('order');
-        if ($order) {
-            $style = $this->optimizeStyle($style, $order['index'], $order['total']);
-        }
-        $style = $this->handleNavStyle($style, $inheritedData->getNavState() ?? '');
+        $style = $this->modifyStyle($style, $data, $order['index'] ?? null, $order['total'] ?? null, $inheritedData->getNavState() ?? null);
 
         $data = $component->normalize($data);
 
@@ -262,7 +259,7 @@ class ComponentBuilder
             }
             unset($data['_attr']['_data']);
         }
-        $style = $this->handleStyleStates($style, $data);
+
         $style = $this->handleApplyStyleData($style, $inheritedData->getDataSource());
 
         if (isset($style['tag'])) {
@@ -290,8 +287,8 @@ class ComponentBuilder
         unset($style['textScale']);
 
         if (isset($style['background'])) {
-            $style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
-            $style['background'] = $this->handleStyleStates($style['background'], $data);
+            //$style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
+            //$style['background'] = $this->handleStyleStates($style['background'], $data);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
         }
@@ -376,24 +373,63 @@ class ComponentBuilder
         return in_array($type, ['container', 'logo', 'button', 'link', 'toggle', 'question', 'nav', 'social']);
     }
 
+    public function modifyStyle(array $style, array &$data, ?int $index, ?int $total, ?string $navState): array
+    {
+        if (!in_array($navState, ['active', 'exact'])) {
+            $navState = null;
+        }
+        foreach ($style as $attr => &$classes) {
+            if (!is_string($classes) || strpos($classes, ':') === false) {
+                continue;
+            }
+            // Order
+            $setting = new \Flipsite\Style\Style2($classes);
+            if ($total && $index === 0 && $setting->hasState('first')) {
+                $classes = $setting->encodeState('first');
+            } elseif ($total && $index === $total - 1 && $setting->hasState('last')) {
+                $classes = $setting->encodeState('last');
+            } elseif ($total && $index !== null && $total > 2 && $index % 2 === 0 && $setting->hasState('even')) {
+                $classes = $setting->encodeState('even');
+            } elseif ($total && $index !== null && $total > 2 && $index % 2 === 1 && $setting->hasState('odd')) {
+                $classes = $setting->encodeState('odd');
+            }
+
+            // States
+            if ($setting->hasState('open')) {
+                $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
+
+                $open    = $setting->encodeState('open');
+                $default = $setting->encodeState('default');
+
+                $data['_attr'] ??= [];
+                $data['_attr']['data-toggle'] ??= '';
+                $data['_attr']['data-toggle'] = trim($data['_attr']['data-toggle'].' '.$open.' '.$default);
+
+                $classes = $default;
+            }
+        }
+        return $style;
+    }
+
     private function handleStyleStates(array $style, array &$data)
     {
         foreach ($style as $attr => &$value) {
             if (is_string($value)) {
                 $update  = false;
                 $setting = new Style($value);
+
                 if ($setting->hasVariant('open')) {
+                    $style2 = new \Flipsite\Style\Style2($value);
                     $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
-                    $setting->removeValue('!open');
-                    $open    = $setting->removeValue('open');
-                    $notOpen = $setting->getValue();
-                    if (isset($data['_attr']['data-toggle'])) {
-                        $data['_attr']['data-toggle'] .= ' '.$open.' '.$notOpen;
-                    } else {
-                        $data['_attr'] ??= [];
-                        $data['_attr']['data-toggle'] = $open.' '.$notOpen;
-                    }
-                    $update = true;
+
+                    $open    = $style2->encodeState('open');
+                    $notOpen = $style2->encodeState('default');
+
+                    $data['_attr'] ??= [];
+                    $data['_attr']['data-toggle'] ??= '';
+                    $data['_attr']['data-toggle'] = trim($data['_attr']['data-toggle'].' '.$open.' '.$notOpen);
+
+                    $value = $notOpen;
                 }
                 if ($setting->hasVariant('stuck')) {
                     $this->dispatch(new Event('ready-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/stuck.min.js')));
@@ -407,20 +443,7 @@ class ComponentBuilder
                     }
                     $update = true;
                 }
-                foreach (['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as $bp) {
-                    if ($setting->hasVariant($bp.':open')) {
-                        $this->dispatch(new Event('global-script', 'toggle', file_get_contents(__DIR__ . '/../../js/dist/toggle.min.js')));
-                        $open    = $bp.':'.$setting->removeValue($bp.':open');
-                        $notOpen = $bp.':'.$setting->getValue($bp);
-                        if (isset($data['_attr']['data-toggle'])) {
-                            $data['_attr']['data-toggle'] .= ' '.$open.' '.$notOpen;
-                        } else {
-                            $data['_attr'] ??= [];
-                            $data['_attr']['data-toggle'] = $open.' '.$notOpen;
-                        }
-                        $update = true;
-                    }
-                }
+
                 if ($setting->hasVariant('offscreen')) {
                     $this->dispatch(new Event('ready-script', 'anim', file_get_contents(__DIR__ . '/../../js/dist/anim.min.js')));
                     $animate      = $setting->removeValue('offscreen');
