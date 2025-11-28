@@ -256,7 +256,12 @@ class Repeat
             $items  = $filter->filterList($items, $this->options->filterField);
         }
 
-        // 3️⃣ Apply sort
+        // 3️⃣ Apply offset & length
+        $offset = $this->options->offset;
+        $length = $this->options->length;
+        $items  = array_splice($items, $offset, $length);
+
+        // 4️⃣ Apply sort
         if (isset($this->options->sortBy)) {
             $sortField = $this->options->sortBy;
             uasort($items, function ($a, $b) use ($sortField) {
@@ -269,11 +274,6 @@ class Repeat
         if (isset($this->options->sort) && 'desc' === $this->options->sort) {
             $items = array_reverse($items);
         }
-
-        // 4️⃣ Apply offset & length
-        $offset = $this->options->offset;
-        $length = $this->options->length;
-        $items  = array_splice($items, $offset, $length);
 
         // 5️⃣ Apply duplicate
         if ($this->options->duplicate) {

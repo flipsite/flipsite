@@ -7,14 +7,14 @@ use Flipsite\Builders\Event;
 use Flipsite\Data\AbstractComponentData;
 use Flipsite\Data\InheritedComponentData;
 
-final class Image extends AbstractComponent
+class Image extends AbstractComponent
 {
     use Traits\AssetsTrait;
     use Traits\BuilderTrait;
 
-    protected string $tag  = 'img';
-    protected bool $empty  = true;
-    protected bool $online = true;
+    protected string $tag   = 'img';
+    protected bool $empty   = true;
+    protected bool $oneline = true;
 
     public function normalize(array $data): array
     {
@@ -34,8 +34,28 @@ final class Image extends AbstractComponent
 
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
+        $data      = $component->getData();
+        $src       = $component->getDataValue('src');
+        if (!$src) {
+            $this->render = false;
+            return;
+        }
+        $inlineSvg = $component->getDataValue('inlineSvg') ?? false;
+
+        if (!$this->isExternal($src ?? '') && $this->isSvg($src) && $inlineSvg) {
+            $this->buildSvg($component, $inherited);
+            return;
+        }
         $data  = $component->getData();
         $style = $component->getStyle();
+
+        unset($style['strokeWidth'],
+            $style['strokeColor'],
+            $style['fill'],
+            $style['dark:strokeColor'],
+            $style['dark:fill']
+        );
+
         if (isset($data['base64'])) {
             $this->setAttribute('alt', (string)($data['alt'] ?? ''));
             $this->setAttribute('src', $data['base64']);
@@ -65,6 +85,32 @@ final class Image extends AbstractComponent
             if ($isEager) {
                 $this->builder->dispatch(new Event('preload', 'image', $imageAttributes));
             }
+        }
+    }
+
+    private function buildSvg(AbstractComponentData $component, InheritedComponentData $inherited): void
+    {
+        $data          = $component->getData();
+        $style         = $component->getStyle();
+        unset($style['options']);
+        if (!isset($style['fill'])) {
+            $style['fill'] = 'fill-current';
+        }
+
+        $this->tag     = 'svg';
+        $this->empty   = false;
+        $this->oneline = true;
+        $svg           = $this->assets->getSvg($data['src'] ?? '');
+        $this->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        if ($svg) {
+            $this->setMeta('svgHash', $svg->getHash());
+            $this->setAttribute('viewBox', $svg->getViewbox());
+            $this->setContent('<use xlink:href="#'.$svg->getHash().'"></use>');
+            $this->builder->dispatch(new Event('svg', $svg->getHash(), $svg->getDef()));
+        } else {
+            $this->setAttribute('viewBox', '0 0 100 100');
+            $this->setContent('<use xlink:href="#empty"></use>');
+            $this->builder->dispatch(new Event('svg', 'empty', '<rect width="100%" height="100%" fill="#eee" />'));
         }
     }
 
