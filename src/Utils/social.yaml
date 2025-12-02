@@ -54,6 +54,11 @@ pinterest:
   color: "#BD081C"
   icon: simple-icons/pinterest.svg
   url: https://www.pinterest.com/{handle}
+reddit:
+  name: Reddit
+  color: "#FF4500"
+  icon: simple-icons/reddit.svg
+  url: https://reddit.com/u/{handle}
 scholar:
   name: Google Scholar
   color: "#4285F4"
@@ -64,21 +69,51 @@ slack:
   color: "#4A154B"
   icon: simple-icons/slack.svg
   url: "{handle}"
+snapchat:
+  name: Snapchat
+  color: "#FFFC00"
+  icon: simple-icons/snapchat.svg
+  url: https://www.snapchat.com/add/{handle}
 soundcloud:
   name: SoundCloud
   color: "#FF3300"
   icon: simple-icons/soundcloud.svg
   url: https://soundcloud.com/{handle}
+spotify:
+  name: Spotify
+  color: "#1DB954"
+  icon: simple-icons/spotify.svg
+  url: https://open.spotify.com/user/{handle}
+telegram:
+  name: Telegram
+  color: "#26A5E4"
+  icon: simple-icons/telegram.svg
+  url: https://t.me/{handle}
+threads:
+  name: Threads
+  color: "#000000"
+  icon: simple-icons/threads.svg
+  url: https://www.threads.net/@{handle}
 tiktok:
-  name: Toktok
+  name: TikTok
   color: "#000000"
   icon: simple-icons/tiktok.svg
   url: https://www.tiktok.com/{handle}
+twitch:
+  name: Twitch
+  color: "#9146FF"
+  icon: simple-icons/twitch.svg
+  url: https://www.twitch.tv/{handle}
 twitter:
   name: Twitter
   color: "#1DA1F2"
   icon: simple-icons/twitter.svg
   url: https://twitter.com/{handle}
+vimeo:
+  name: Vimeo
+  color: "#1AB7EA"
+  icon: simple-icons/vimeo.svg
+  url: https://vimeo.com/{handle}
 vimeo-livestream:
   name: Vimeo Livestream
   color: "#0A0A20"
