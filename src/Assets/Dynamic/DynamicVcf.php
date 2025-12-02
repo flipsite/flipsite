@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Assets\Dynamic;
 
 use Flipsite\Data\SiteDataInterface;
@@ -113,22 +112,25 @@ class DynamicVcf implements DynamicAssetsInterface
 
         foreach ($vcard as $attr => &$value) {
             if (is_string($value) && \Flipsite\Utils\Localization::isLocalization($value)) {
-                $loc = new \Flipsite\Utils\Localization($this->siteData->getLanguages(), $value);
+                $loc   = new \Flipsite\Utils\Localization($this->siteData->getLanguages(), $value);
                 $value = $loc->getValue();
             }
         }
+        unset($value); // Break the reference to avoid issues
+
         $vcard['PRODID'] = '-//FlipSite//FlipSite v1.0//EN';
         $encoded         = "BEGIN:VCARD\nVERSION:3.0\n";
         foreach ($vcard as $key => $value) {
             $line = '';
             if (is_array($value)) {
-                $line .= $key.':' . implode(';', $value);
+                $line = $key.':' . implode(';', $value);
             } else {
-                $line .= $key.':'.$value;
+                $line = $key.':'.$value;
             }
             $encoded .= trim(wordwrap($line, 73, "\n ", true)). "\n";
         }
         $encoded .= "END:VCARD\n";
+
         return $encoded;
     }
 }
