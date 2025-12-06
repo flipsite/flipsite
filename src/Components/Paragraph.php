@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -38,7 +39,7 @@ final class Paragraph extends AbstractComponent
         $html          = $this->getMarkdownLine($data['value'] ?? '', ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $magicLinks);
 
         if (isset($data['formatDate'])) {
-            $html = $this->parseDate($html, $data['formatDate']);
+            $html = $this->parseDate($html, $this->path->getLanguage(), $data['formatDate']);
         }
         if (isset($data['formatPhone'])) {
             $html = $this->parsePhone($html, $data['formatPhone']);

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -25,7 +26,7 @@ final class Text extends AbstractComponent
             return;
         }
         if (isset($data['formatDate'])) {
-            $this->content = $this->parseDate($this->content, $data['formatDate']);
+            $this->content = $this->parseDate($this->content, $this->path->getLanguage(), $data['formatDate']);
         }
         if (isset($data['formatPhone'])) {
             $this->content = $this->parsePhone($this->content, $data['formatPhone']);
