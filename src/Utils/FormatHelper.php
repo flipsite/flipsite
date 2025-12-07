@@ -40,4 +40,29 @@ final class FormatHelper
         );
         return $dateFormatter->format($timestamp);
     }
+
+    public static function convertToPhoneFormat(string $number, string $format = 'international'): string
+    {
+        $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+        try {
+            $phoneNumber = $phoneUtil->parse($number, '');
+        } catch (\libphonenumber\NumberParseException $e) {
+            return $number;
+        }
+        switch ($format) {
+            case 'e164':
+                $formatType = \libphonenumber\PhoneNumberFormat::E164;
+                break;
+            case 'rfc3966':
+                $formatType = \libphonenumber\PhoneNumberFormat::RFC3966;
+                break;
+            case 'national':
+                $formatType = \libphonenumber\PhoneNumberFormat::NATIONAL;
+                break;
+            case 'international':
+            default:
+                $formatType = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
+        }
+        return $phoneUtil->format($phoneNumber, $formatType);
+    }
 }
