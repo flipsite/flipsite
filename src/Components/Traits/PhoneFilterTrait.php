@@ -3,6 +3,8 @@
 declare(strict_types=1);
 namespace Flipsite\Components\Traits;
 
+use Flipsite\Utils\FormatHelper;
+
 trait PhoneFilterTrait
 {
     protected function parsePhone(string $html, string $format = 'international'): string
@@ -27,7 +29,7 @@ trait PhoneFilterTrait
                 '/\+(\d{7,15})/',
                 function ($matches) use ($format) {
                     $number = '+' . $matches[1];
-                    return $this->convertToPhoneFormat($number, $format);
+                    return FormatHelper::convertToPhoneFormat($number, $format);
                 },
                 $originalText
             );
@@ -49,30 +51,5 @@ trait PhoneFilterTrait
         }
 
         return $innerHTML;
-    }
-
-    protected function convertToPhoneFormat(string $number, string $format): string
-    {
-        $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
-        try {
-            $phoneNumber = $phoneUtil->parse($number, '');
-        } catch (\libphonenumber\NumberParseException $e) {
-            return $number;
-        }
-        switch ($format) {
-            case 'e164':
-                $format = \libphonenumber\PhoneNumberFormat::E164;
-                break;
-            case 'rfc3966':
-                $format = \libphonenumber\PhoneNumberFormat::RFC3966;
-                break;
-            case 'national':
-                $format = \libphonenumber\PhoneNumberFormat::NATIONAL;
-                break;
-            case 'international':
-            default:
-                $format = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
-        }
-        return $phoneUtil->format($phoneNumber, $format);
     }
 }

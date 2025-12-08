@@ -17,10 +17,10 @@ final class Counter extends AbstractComponent
         if (isset($data['value'])) {
             $parts        = explode('|', $data['value']);
             if (count($parts) === 1) {
-                $data['to']   = (int)($parts[0] ?? 100);
+                $data['to']   = floatval($parts[0] ?? 100);
             } else {
-                $data['from'] = (int)($parts[0] ?? 0);
-                $data['to']   = (int)($parts[1] ?? 100);
+                $data['from'] = floatval($parts[0] ?? 0);
+                $data['to']   = floatval($parts[1] ?? 100);
             }
             unset($data['value']);
         }
@@ -33,8 +33,31 @@ final class Counter extends AbstractComponent
         if (isset($data['thousandsSeparator'])) {
             $this->setAttribute('data-thousands', (string)($data['thousandsSeparator']));
         }
+        if (isset($data['decimals'])) {
+            $this->setAttribute('data-decimals', (string)($data['decimals']));
+        }
+        if (isset($data['decimalSeparator'])) {
+            $this->setAttribute('data-decimal-separator', (string)($data['decimalSeparator']));
+        }
+
+        // Format the initial display value
+        $initialValue = (string)($data['from'] ?? 0);
+        if (isset($data['decimals']) || isset($data['decimalSeparator']) || isset($data['thousandsSeparator'])) {
+            $separators = [
+                'none'       => '',
+                'space'      => ' ',
+                'comma'      => ',',
+                'period'     => '.',
+                'apostrophe' => '\'',
+            ];
+            $decimals           = intval($data['decimals'] ?? 0);
+            $decimalSeparator   = $data['decimalSeparator'] ?? 'period';
+            $thousandsSeparator = $data['thousandsSeparator'] ?? 'space';
+            $initialValue       = number_format(floatval($initialValue), $decimals, $separators[$decimalSeparator], $separators[$thousandsSeparator]);
+        }
+
         $value = new Element('span', true);
-        $value->setContent((string)($data['from'] ?? 0));
+        $value->setContent($initialValue);
         $span = trim($value->render());
         if (isset($data['prefix']) || isset($data['suffix'])) {
             $prefix = $data['prefix'] ?? '';
