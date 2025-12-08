@@ -2,11 +2,13 @@ const counters = [];
 
 const runCounter = (el) => {
   const valEl = el.querySelector("span");
-  const from = parseInt(el.dataset.from, 10) || 0;
-  const to = parseInt(el.dataset.to, 10) || 0;
+  const from = parseFloat(el.dataset.from) || 0;
+  const to = parseFloat(el.dataset.to) || 0;
   const duration = parseInt(el.dataset.duration, 10) || 2000;
   const timing = el.dataset.timing || "ease-in-out";
   const thousands = el.dataset.thousands || "none";
+  const decimals = parseInt(el.dataset.decimals, 10) || 0;
+  const decimalSeparator = el.dataset.decimalSeparator || "period";
   const start = performance.now();
 
   // --- Helpers (private to runCounter) ---
@@ -17,22 +19,32 @@ const runCounter = (el) => {
     "ease-in-out": (x) => -(Math.cos(Math.PI * x) - 1) / 2,
   };
 
-  const formatNumber = (num, style) => {
-    switch (style) {
-      case "space":  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "&nbsp;");
-      case "comma":  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      case "period": return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      default:       return num;
-    }
+  const separators = {
+    none: "",
+    space: "&nbsp;",
+    comma: ",",
+    period: ".",
+    apostrophe: "'"
+  };
+
+  const formatNumber = (num, decimals, decimalSep, thousandsSep) => {
+    const parts = num.toFixed(decimals).split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+    return parts.join(decimalSep);
   };
 
   // --- Animation loop ---
   const step = (now) => {
     const progress = Math.min((now - start) / duration, 1);
     const ease = easing[timing] ? easing[timing](progress) : easing.linear(progress);
-    const currentValue = Math.round((to - from) * ease + from);
+    const currentValue = (to - from) * ease + from;
 
-    valEl.innerHTML = formatNumber(currentValue, thousands);
+    valEl.innerHTML = formatNumber(
+      currentValue,
+      decimals,
+      separators[decimalSeparator],
+      separators[thousands]
+    );
 
     if (progress < 1) {
       requestAnimationFrame(step);
