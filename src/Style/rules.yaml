@@ -416,6 +416,12 @@ touch-pan-up: touch-action:pan-up
 touch-pan-x: touch-action:pan-x
 touch-pan-y: touch-action:pan-y
 touch-pinch-zoom: touch-action:pinch-zoom
+tracking-tighter: letter-spacing:-0.05em
+tracking-tight: letter-spacing:-0.025em
+tracking-normal: letter-spacing:0
+tracking-wide: letter-spacing:0.025em
+tracking-wider: letter-spacing:0.05em
+tracking-widest: letter-spacing:0.1em
 transform-3d: transform-style:preserve-3d
 transform-flat: transform-style:flat
 transform-gpu: translate3d(var(--tw-translate-x),var(--tw-translate-y),0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
