@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Data\AbstractComponentData;
@@ -82,10 +81,11 @@ final class Table extends AbstractComponent
             foreach ($data['th'] as $columnIndex => $thCell) {
                 $th          = new Element('th');
                 $styleTh     = $this->builder->optimizeStyle($styleThBase, $columnIndex, $columnsCount);
+                $styleTh     = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTh, $inherited->getAppearance());
                 if (isset($styleTh['background'])) {
                     $this->builder->handleBackground($tr, $styleTh['background']);
+                    $styleTh['background'] = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTh['background'], $inherited->getAppearance());
                 }
-                $styleTh = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTh, $inherited->getAppearance());
                 $th->addStyle($styleTh);
                 $th->setContent($thCell);
                 $tr->addChild($th);
@@ -106,19 +106,20 @@ final class Table extends AbstractComponent
             foreach ($data['td'] as $rowIndex => $row) {
                 $tr          = new Element('tr');
                 $styleTr     = $this->builder->optimizeStyle($style['tr'] ?? [], $rowIndex, $rowsCount);
+                $styleTr     = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTr, $inherited->getAppearance());
                 if (isset($styleTr['background'])) {
                     $this->builder->handleBackground($tr, $styleTr['background']);
+                    $styleTr['background'] = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTr['background'], $inherited->getAppearance());
                 }
-                $styleTr = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTr, $inherited->getAppearance());
                 $tr->addStyle($styleTr);
                 foreach ($row as $columnIndex => $cell) {
-                    $td = new Element('td', true);
-
-                    $styleTd     = $this->builder->optimizeStyle($styleTdBase ?? [], $columnIndex, $columnsCount);
+                    $td      = new Element('td', true);
+                    $styleTd = $this->builder->optimizeStyle($styleTdBase ?? [], $columnIndex, $columnsCount);
+                    $styleTd = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTd, $inherited->getAppearance());
                     if (isset($styleTd['background'])) {
                         $this->builder->handleBackground($td, $styleTd['background']);
+                        $styleTd['background'] = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTd['background'], $inherited->getAppearance());
                     }
-                    $styleTd = \Flipsite\Utils\StyleAppearanceHelper::apply($styleTd, $inherited->getAppearance());
                     $td->addStyle($styleTd);
                     $html = '';
                     if (is_string($cell)) {
