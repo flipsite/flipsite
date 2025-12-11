@@ -5,7 +5,7 @@ namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
 
-final class Nav extends AbstractGroup
+class Nav extends AbstractGroup
 {
     protected string $tag  = 'nav';
 
@@ -18,7 +18,7 @@ final class Nav extends AbstractGroup
         if (count($data['_options'] ?? []) === 0 && !isset($data['_repeat'])) {
             $data['_repeat'] = '_pages-0';
         }
-        if (!isset($data['_options']['pages']) && (isset($data['_repeat']) || $data['_options']['parentPage'])) {
+        if (!isset($data['_options']['pages']) && (($data['_repeat'] ?? false) || isset($data['_options']['parentPage']))) {
             $level           = 0;
             $parentPage      = $data['_options']['parentPage'] ?? null;
             if ($parentPage) {
