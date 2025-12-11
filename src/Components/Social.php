@@ -16,7 +16,7 @@ final class Social extends AbstractGroup
         $filterType = $data['filterType'] ?? 'or';
         $sort       = ArrayHelper::decodeJsonOrCsv($data['sort'] ?? null);
 
-        unset($data['filter'],$data['filterType'],$data['phoneFormat'],$data['phoneValue'], $data['phoneIcon'],$data['emailIcon'],$data['mapsIcon'],$data['openIcon']);
+        unset($data['filter'],$data['filterType'],$data['phoneValue'], $data['phoneIcon'],$data['emailIcon'],$data['mapsIcon'],$data['openIcon']);
 
         $data = $this->normalizeRepeat($data, $dataSourceList);
         if ($filter) {
@@ -93,9 +93,6 @@ final class Social extends AbstractGroup
                 case 'phone':
                     $item['icon'] = $data['phoneIcon'] ?? $item['icon'];
                     $item['name'] = $data['phoneValue'] ?? $item['name'];
-                    if (!isset($data['phoneValue']) && isset($data['phoneFormat'])) {
-                        $item['name'] = $this->getFormattedPhoneNumber($item['handle'], $data['phoneFormat']);
-                    }
                     break;
                 case 'email':
                     $item['icon'] = $data['emailIcon'] ?? $item['icon'];
@@ -111,31 +108,5 @@ final class Social extends AbstractGroup
             }
         }
         return $social;
-    }
-
-    private function getFormattedPhoneNumber(string $value, string $format) : string
-    {
-        $phoneUtil = \libphonenumber\PhoneNumberUtil::getInstance();
-        try {
-            $phoneNumber = $phoneUtil->parse($value, '');
-        } catch (\libphonenumber\NumberParseException $e) {
-            return $value;
-        }
-        switch ($format) {
-            case 'e164':
-                $format = \libphonenumber\PhoneNumberFormat::E164;
-                break;
-            case 'rfc3966':
-                $format = \libphonenumber\PhoneNumberFormat::RFC3966;
-                break;
-            case 'national':
-                $format = \libphonenumber\PhoneNumberFormat::NATIONAL;
-                break;
-            case 'international':
-            default:
-                $format = \libphonenumber\PhoneNumberFormat::INTERNATIONAL;
-        }
-
-        return  $phoneUtil->format($phoneNumber, $format);
     }
 }
