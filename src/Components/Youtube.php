@@ -18,19 +18,17 @@ final class Youtube extends AbstractGroup
     public function build(AbstractComponentData $component, InheritedComponentData $inherited): void
     {
         $data  = $component->getData();
-        $style = $component->getStyle();
-        $width = $height = null;
-        if (isset($data['dimensions'])) {
-            $parts  = explode('x', $data['dimensions']);
-            $width  = $parts[0] ?? 100;
-            $height = $parts[1] ?? 100;
-        }
-        $title = $this->getAttribute('title') ?? 'Youtube Video';
-        $this->setAttribute('title', null);
-        $aspectRatioValues          = $this->simplifyAspectRatio(intval($width), intval($height));
-        $aspectRatio                = 'aspect-' . ($aspectRatioValues[0]).'/'.($aspectRatioValues[1]);
-        $style['aspectRatio']       = $aspectRatio;
+
+        $isOnClick = 'onclick' === ($data['loading'] ?? 'onclick');
+
+        $style             = $component->getStyle();
+        $style['overflow'] = 'overflow-hidden';
+        $this->addAspectRatioToStyle($data, $style);
         $this->addStyle($style);
+
+        $title = $this->getAttribute('title') ?? 'YouTube video player';
+        $this->setAttribute('title', null);
+
         $iframe = new Element('iframe', true);
         if (isset($data['base64bg'])) {
             $ifame->addCss('background', 'url('.$data['base64bg'].') 0% 0% / cover no-repeat;');
@@ -44,7 +42,6 @@ final class Youtube extends AbstractGroup
         $iframe->addStyle([
             'width'         => 'w-full',
             'height'        => 'h-full',
-            'borderRadius'  => $style['borderRadius'] ?? null,
         ]);
 
         $src = $data['privacy'] ?? false ?
@@ -71,7 +68,8 @@ final class Youtube extends AbstractGroup
             strpos($src, '?') ? $src .= '&' : $src .= '?';
             $src .= http_build_query($query);
         }
-        if ('onclick' === ($data['loading'] ?? 'onclick')) {
+
+        if ($isOnClick) {
             $this->setAttribute('data-youtube-play', $src);
             $iframe->addCss('pointer-events', 'none');
             $iconComponentData = new YamlComponentData($component->getPath(), $component->getId().'.icon', 'icon', ['value' => $data['playIcon']['value'] ?? 'simpleicons/youtube'], $style['playIcon'] ?? []);
@@ -97,5 +95,19 @@ final class Youtube extends AbstractGroup
             $this->builder->dispatch(new Event('ready-script', 'lazyiframe', file_get_contents(__DIR__.'/../../js/dist/lazyiframe.min.js')));
         }
         $this->addChild($iframe);
+    }
+
+    private function addAspectRatioToStyle(array $data, array &$style)
+    {
+        $width  = 560;
+        $height = 315;
+        if (isset($data['dimensions'])) {
+            $parts  = explode('x', $data['dimensions']);
+            $width  = $parts[0] ?? 560;
+            $height = $parts[1] ?? 315;
+        }
+        $aspectRatioValues    = $this->simplifyAspectRatio(intval($width), intval($height));
+        $aspectRatio          = 'aspect-' . ($aspectRatioValues[0]).'/'.($aspectRatioValues[1]);
+        $style['aspectRatio'] = $aspectRatio;
     }
 }
