@@ -14,68 +14,28 @@ class Nav extends AbstractGroup
 
     public function normalize(array $data): array
     {
+        $activePage     = $this->path->getPage();
+        $activeLanguage = $this->path->getLanguage();
+        $options        = new NavOptions($data, $activePage);
+        unset($data['_repeat'], $data['_options']['parentPage'], $data['_options']['includeParent'], $data['_options']['pages'], $data['_options']['languages'], $data['_options']['hideActiveLanguage'], $data['_options']['hideActive']);
+
+        $pages  = $options->pages ?? $this->getPages($options->parentPage, $options->includeParent);
         $repeat = [];
-        if (count($data['_options'] ?? []) === 0 && !isset($data['_repeat'])) {
-            $data['_repeat'] = '_pages-0';
-        }
-        if (!isset($data['_options']['pages']) && (($data['_repeat'] ?? false) || isset($data['_options']['parentPage']))) {
-            $level           = 0;
-            $parentPage      = $data['_options']['parentPage'] ?? null;
-            if ($parentPage) {
-                $level = substr_count($parentPage, '/') + 1;
-            } elseif (isset($data['_repeat']) && str_starts_with($data['_repeat'], '_pages-')) {
-                $level = intval(str_replace('_pages-', '', $data['_repeat']));
-            }
-            $repeat = $this->getPages($level, $parentPage, !!($data['_options']['includeParent'] ?? false));
-        } elseif (isset($data['_options']['pages'])) {
-            $pages = ArrayHelper::decodeJsonOrCsv($data['_options']['pages']);
-            foreach ($pages as $page) {
-                $pageItemData = $this->getPageItemData($page);
-                if ($pageItemData) {
-                    $repeat[] = $pageItemData;
-                } else {
-                    $name     = null;
-                    $fragment = null;
-                    if (str_starts_with($page, '[') && str_ends_with($page, ')')) {
-                        $tmp        = explode('](', substr($page, 1, -1));
-                        $name       = $tmp[0];
-                        $page       = $tmp[1];
-                    }
-                    $tmp      = explode('#', $page);
-                    if (count($tmp) > 1) {
-                        $page     = $tmp[0];
-                        $fragment = $tmp[1];
-                    }
-                    $page = trim($page, '/');
-                    if ($page) {
-                        $pageItemData = $this->getPageItemData($page);
-                        if ($pageItemData) {
-                            $pageItemData['name'] = $name ?? $pageItemData['name'];
-                            if ($fragment) {
-                                $pageItemData['slug'] .= '#'.$fragment;
-                            }
-                            $repeat[]                      = $pageItemData;
-                            continue;
-                        }
-                    } elseif ($fragment) {
-                        $repeat[] = [
-                            'slug' => '#'.$fragment,
-                            'name' => $name ?? ucwords(str_replace('-', ' ', $fragment))
-                        ];
-                    }
-                }
+        foreach ($pages as $page) {
+            if ($pageItemData = $this->getPageItemData($page)) {
+                $repeat[] = $pageItemData;
             }
         }
 
-        if ($data['_options']['languages'] ?? false) {
-            $languages            = $this->siteData->getLanguages();
-            $hideActiveLanguage   = $data['_options']['hideActiveLanguage'] ?? false;
+        // Languages
+        if ($options->showLanguages) {
+            $languages = $this->siteData->getLanguages();
             if (count($languages) > 1) {
-                $active = $this->path->getLanguage();
                 foreach ($languages as $language) {
-                    if (!$hideActiveLanguage || !$language->isSame($active)) {
+                    if (!$options->hideActiveLanguage || !$language->isSame($activeLanguage)) {
                         $repeat[] = [
                             'slug'      => (string)$language,
+                            'code'      => (string)$language,
                             'name'      => $language->getInLanguage(),
                         ];
                     }
@@ -83,10 +43,9 @@ class Nav extends AbstractGroup
             }
         }
 
-        if ($data['_options']['hideActive'] ?? false) {
-            $active = $this->path->getPage();
-            $repeat = array_filter($repeat, function ($item) use ($active) {
-                return $item['slug'] !== $active;
+        if ($options->hideActive) {
+            $repeat = array_filter($repeat, function ($item) use ($activePage) {
+                return $item['slug'] !== $activePage;
             });
         }
 
@@ -100,29 +59,30 @@ class Nav extends AbstractGroup
         return $this->normalizeRepeat($data, $repeat);
     }
 
-    private function getPages(int $level, ?string $parentPage = null, bool $includeParent = false): array
+    private function getPages(?string $parentPage = null, bool $includeParent = false): array
     {
         $pages      = [];
         $all        = $this->siteData->getSlugs()->getPages();
         $firstExact = false;
-        if ($level === 0) {
+        if (!$parentPage) {
             foreach ($all as $page) {
                 if ('404' === $page) {
                     continue;
                 }
-                if (strpos($page, '/') === false && $pageItemData = $this->getPageItemData($page)) {
-                    $pages[] = $pageItemData;
+                if (strpos($page, '/') === false) {
+                    $pages[] = $page;
                 }
             }
         } else {
-            $parts           = explode('/', $parentPage ?? $this->path->getPage());
+            $level           = substr_count($parentPage, '/') + 1;
+            $parts           = explode('/', $parentPage);
             $startsWith      = implode('/', array_splice($parts, 0, $level));
             foreach ($all as $page) {
                 $count = substr_count((string)$page, '/');
-                if ($includeParent && str_starts_with((string)$page, $startsWith) && $pageItemData = $this->getPageItemData($page)) {
-                    $pages[] = $pageItemData;
-                } elseif (str_starts_with((string)$page, $startsWith.'/') && $count >= $level - 1 && $count <= $level && $pageItemData = $this->getPageItemData($page)) {
-                    $pages[] = $pageItemData;
+                if ($includeParent && str_starts_with((string)$page, $startsWith)) {
+                    $pages[] = $page;
+                } elseif (str_starts_with((string)$page, $startsWith.'/') && $count >= $level - 1 && $count <= $level) {
+                    $pages[] = $page;
                 }
             }
         }
@@ -134,36 +94,82 @@ class Nav extends AbstractGroup
         if ('404' === $page) {
             return null;
         }
-        if (!$this->siteData->getSlugs()->isPage($page)) {
-            $pattern = '/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/';
-            preg_match($pattern, $page, $matches);
-            if (count($matches) === 3) {
-                return [
-                    'slug'          => $matches[2],
-                    'name'          => $matches[1]
-                ];
-            } else {
+
+        $name     = null;
+        $slug     = null;
+        $fragment = null;
+        $meta     = [];
+
+        // Parse [Name](slug) syntax
+        $pattern = '/\[([^\]]+)\]\(([^\)]+)\)/';
+        preg_match($pattern, $page, $matches);
+        if (count($matches) === 3) {
+            echo $slug = $matches[2];
+            $name      = $matches[1];
+        } else {
+            $slug = $page;
+        }
+
+        if (strpos($slug, '#') !== false) {
+            $tmp      = explode('#', $slug);
+            $slug     = $tmp[0];
+            $fragment = $tmp[1] ?? null;
+        }
+
+        // Parse section link #section syntax
+        if ($this->siteData->getSlugs()->isPage($slug)) {
+            $meta = $this->siteData->getPageMeta($slug, $this->path->getLanguage()) ?? [];
+            $name ??= $this->siteData->getPageName($slug, $this->path->getLanguage()) ?? $name;
+            if (isset($meta['hidden']) && $meta['hidden']) {
                 return null;
             }
-            return null;
-        }
-        $pageMeta = $this->siteData->getPageMeta($page, $this->path->getLanguage()) ?? [];
-
-        if (isset($pageMeta['hidden']) && $pageMeta['hidden']) {
-            return null;
+            if (isset($meta['unpublished']) && $meta['unpublished']) {
+                return null;
+            }
         }
 
-        if (isset($pageMeta['unpublished']) && $pageMeta['unpublished']) {
-            return null;
-        }
-        unset($pageMeta['name']);
-        $pageItemData = [
-            '_collectionId' => '_pages',
-            '_id'           => $page,
-            'slug'          => $page,
-            'name'          => $this->siteData->getPageName($page, $this->path->getLanguage()),
-            ...$pageMeta
+        return [
+            'slug'          => $slug . ($fragment ? '#'.$fragment : ''),
+            'name'          => $name ?? ucwords(str_replace('-', ' ', $slug)),
+            ...$meta
         ];
-        return $pageItemData;
+    }
+}
+
+class NavOptions
+{
+    public readonly ?array $pages;
+    public readonly ?string $parentPage;
+    public readonly bool $includeParent;
+    public readonly bool $hideActive;
+    public readonly bool $showLanguages;
+    public readonly bool $hideActiveLanguage;
+
+    public function __construct(array $data, string $currentPage)
+    {
+        $pages       = $data['_options']['pages'] ?? null;
+        if ($pages) {
+            $this->pages      = ArrayHelper::decodeJsonOrCsv($pages);
+            $this->parentPage = null;
+        } elseif (isset($data['_options']['parentPage'])) {
+            $this->pages      = null;
+            $this->parentPage = trim($data['_options']['parentPage'], '/');
+        } elseif ($data['_repeat'] !== false) {
+            $this->pages     = null;
+            $level           = intval(str_replace('_pages-', '', ($data['_repeat'] ?? '0'))) ?? 0;
+            if ($level) {
+                $parts            = explode('/', $currentPage);
+                $this->parentPage = implode('/', array_splice($parts, 0, $level));
+            } else {
+                $this->parentPage = null;
+            }
+        } else {
+            $this->pages      = null;
+            $this->parentPage = null;
+        }
+        $this->includeParent           = !!($data['_options']['includeParent'] ?? false);
+        $this->hideActive              = !!($data['_options']['hideActive'] ?? false);
+        $this->showLanguages           = !!($data['_options']['languages'] ?? false);
+        $this->hideActiveLanguage      = !!($data['_options']['hideActiveLanguage'] ?? false);
     }
 }
