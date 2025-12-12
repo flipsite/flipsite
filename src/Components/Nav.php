@@ -104,8 +104,8 @@ class Nav extends AbstractGroup
         $pattern = '/\[([^\]]+)\]\(([^\)]+)\)/';
         preg_match($pattern, $page, $matches);
         if (count($matches) === 3) {
-            echo $slug = $matches[2];
-            $name      = $matches[1];
+            $slug = $matches[2];
+            $name = $matches[1];
         } else {
             $slug = $page;
         }
@@ -127,10 +127,16 @@ class Nav extends AbstractGroup
                 return null;
             }
         }
+        if (!$name) {
+            $name = ucwords(str_replace(['-', '_'], ' ', basename($slug)));
+        }
+        if (!$name) {
+            $name = ucwords(str_replace(['-', '_'], ' ', $fragment));
+        }
 
         return [
             'slug'          => $slug . ($fragment ? '#'.$fragment : ''),
-            'name'          => $name ?? ucwords(str_replace('-', ' ', $slug)),
+            'name'          => $name,
             ...$meta
         ];
     }
