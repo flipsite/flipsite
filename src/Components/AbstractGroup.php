@@ -254,7 +254,6 @@ class Repeat
         // 2️⃣ Apply filter
 
         if (isset($this->options->filterField) && (isset($this->options->filter) || isset($this->options->filterType) || isset($this->options->filterPattern))) {
-            print_r($this->options);
             $filter = new Filter($this->options->filterType, $this->options->filter ?? null, $this->options->filterPattern ?? null);
             $items  = $filter->filterList($items, $this->options->filterField);
         }
