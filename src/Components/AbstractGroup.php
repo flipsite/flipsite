@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Builders\Event;
@@ -177,7 +178,7 @@ abstract class AbstractGroup extends AbstractComponent
             $data['_options']['sort'] ?? null,
             $data['_options']['filter'] ?? null,
             $data['_options']['filterField'] ?? null,
-            $data['_options']['filterType'] ?? null,
+            $data['_options']['filterType'] ?? 'or',
             $data['_options']['filterPattern'] ?? null
         );
         $repeat = new Repeat($rawRepeatData, $repeatOptions);
@@ -241,7 +242,7 @@ class Repeat
         $this->rawItems = $rawItems;
     }
 
-    public function getItems() : array
+    public function getItems(): array
     {
         $items = $this->rawItems;
         // 1️⃣ Apply shuffle
@@ -251,7 +252,9 @@ class Repeat
         }
 
         // 2️⃣ Apply filter
+
         if (isset($this->options->filterField) && (isset($this->options->filter) || isset($this->options->filterType) || isset($this->options->filterPattern))) {
+            print_r($this->options);
             $filter = new Filter($this->options->filterType, $this->options->filter ?? null, $this->options->filterPattern ?? null);
             $items  = $filter->filterList($items, $this->options->filterField);
         }
