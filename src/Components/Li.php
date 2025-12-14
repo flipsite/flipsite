@@ -27,7 +27,7 @@ final class Li extends AbstractGroup
         $value  = $this->getMarkdownLine($value, ['a', 'strong', 'em', 'code'], $style, $inherited->getAppearance(), $inherited->hasATag(), $data['magicLinks'] ?? false);
 
         if (isset($data['formatDate'])) {
-            $value = $this->parseDate($value, $data['formatDate']);
+            $value = $this->parseDate($value, $this->path->getLanguage(), $data['formatDate']);
         }
         if (isset($data['formatPhone'])) {
             $value = $this->parsePhone($value, $data['formatPhone']);
