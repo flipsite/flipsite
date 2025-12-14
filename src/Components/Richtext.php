@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -100,6 +101,8 @@ final class Richtext extends AbstractGroup
                 return new RichtextItemTable($itemData, $componentStyle['table'] ?? []);
             case 'youtube':
                 return new RichtextItemYoutube($itemData, $componentStyle['youtube'] ?? []);
+            case 'codeBlock':
+                return new RichtextItemCodeBlock($itemData, $componentStyle['codeBlock'] ?? []);
         }
         return null;
     }
@@ -294,5 +297,17 @@ class RichtextItemYoutube extends AbstractRichtextItem
         $height                   = $value['height'] ?? '315';
         $this->data['dimensions'] = $width.'x'.$height;
         $this->style              = $style;
+    }
+}
+
+class RichtextItemCodeBlock extends AbstractRichtextItem
+{
+    protected string $type = 'codeBlock';
+
+    public function __construct(array $value, array $style)
+    {
+        $this->data['value']      = $value['value'];
+        $this->data['theme']      = $value['theme'] ?? 'default';
+        $this->style = $style;
     }
 }
