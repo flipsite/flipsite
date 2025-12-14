@@ -75,6 +75,22 @@ final class Style
         }
     }
 
+    public function handleNavState(string $navState)
+    {
+        if ($this->hasState('nav-exact') === false &&
+            $this->hasState('nav-active') === false) {
+            return;
+        }
+        foreach ($this->values as $bp => &$states) {
+            if ('exact' === $navState && isset($states['nav-exact'])) {
+                $states['default'] = $states['nav-exact'];
+            } elseif ($navState && isset($states['nav-active'])) {
+                $states['default'] = $states['nav-active'];
+            }
+            unset($states['nav-active'], $states['nav-exact']);
+        }
+    }
+
     public function hasState(string $state): bool
     {
         foreach ($this->values as $bp => $states) {

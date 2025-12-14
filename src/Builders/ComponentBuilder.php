@@ -383,10 +383,15 @@ class ComponentBuilder
             if (!is_string($classes) || strpos($classes, ':') === false) {
                 continue;
             }
-            // Order
+            // Order (first/last/even/odd)
             $setting = new \Flipsite\Style\Style($classes);
             if ($total !== null) {
                 $setting->handleOrder($total, $index);
+            }
+
+            // Nav state (active/exact)
+            if ($navState) {
+                $setting->handleNavState($navState);
             }
 
             // States
@@ -469,27 +474,6 @@ class ComponentBuilder
                 }
             }
         }
-        return $style;
-    }
-
-    private function handleNavStyle(array $style, string $navState): array
-    {
-        $style = ArrayHelper::applyStringCallback($style, function ($str) use ($navState) {
-            if (strpos($str, 'nav-active:') === false && strpos($str, 'nav-exact:') === false) {
-                return $str;
-            }
-            $style = new \Flipsite\Style\Style($str);
-
-            if ('exact' === $navState && $style->hasVariant('nav-exact')) {
-                return $style->getValue('nav-exact');
-            } elseif ($style->hasVariant('nav-active') && $navState) {
-                return $style->getValue('nav-active');
-            } else {
-                $style->removeValue('nav-exact');
-                $style->removeValue('nav-active');
-                return $style->encode();
-            }
-        });
         return $style;
     }
 
