@@ -5,7 +5,7 @@ namespace Flipsite\Style\Callbacks;
 
 class UnitCallback
 {
-    public const UNITS = ['%', 'px', 'em', 'vh', 'vw', 'vmin', 'vmax', 'ch', 'svh', 'lvh', 'dvh', 'svw', 'lvw', 'dvw', 'svmin', 'lvmin', 'dvmin', 'svmax', 'lvmax', 'dvmax', 'vi', 'svi', 'lvi', 'dvi', 'vb', 'svb', 'lvb', 'dvb'];
+    public const UNITS = ['%', 'px', 'em', 'rem', 'vh', 'vw', 'vmin', 'vmax', 'ch', 'svh', 'lvh', 'dvh', 'svw', 'lvw', 'dvw', 'svmin', 'lvmin', 'dvmin', 'svmax', 'lvmax', 'dvmax', 'vi', 'svi', 'lvi', 'dvi', 'vb', 'svb', 'lvb', 'dvb'];
 
     public function __invoke(array $args)
     {

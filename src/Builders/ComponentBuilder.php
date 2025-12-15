@@ -286,7 +286,7 @@ class ComponentBuilder
         unset($style['textScale']);
 
         if (isset($style['background'])) {
-            //$style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
+            $style['background'] = $this->handleApplyStyleData($style['background'], $inheritedData->getDataSource());
             $style['background'] = $this->modifyStyle($style['background'], $data, $order['index'] ?? null, $order['total'] ?? null, $inheritedData->getNavState() ?? null);
             $this->handleBackground($component, $style['background']);
             unset($style['background']);
