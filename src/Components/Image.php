@@ -94,7 +94,7 @@ class Image extends AbstractComponent
         $style         = $component->getStyle();
         unset($style['options']);
         if (!isset($style['fill'])) {
-            $style['fill'] = 'fill-current';
+            $this->addStyle(['fill' => 'fill-current']);
         }
 
         $this->tag     = 'svg';
