@@ -1,12 +1,11 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Style;
 
 final class Style
 {
-    private $isDark = false;
+    private $isDark       = false;
     private array $values = [
         'base' => [],
         'xs'   => [],
@@ -28,7 +27,7 @@ final class Style
     {
         if (strpos((string)$encoded, 'dark:') !== false) {
             $this->isDark = true;
-            $encoded = str_replace('dark:', '', (string)$encoded);
+            $encoded      = str_replace('dark:', '', (string)$encoded);
         }
         $classes = explode(' ', (string)$encoded);
         foreach ($classes as $cls) {
@@ -59,17 +58,20 @@ final class Style
             $this->hasState('odd') === false) {
             return;
         }
-        $order = 'odd';
-        if ($index === 0) {
-            $order = 'first';
-        } elseif ($index === $total - 1) {
-            $order = 'last';
-        } elseif ($total > 2 && $index % 2 === 0) {
-            $order = 'even';
-        }
+        $first = $index === 0;
+        $last  = $index === $total - 1;
+        $odd   = ($index + 1) % 2 === 0;
+        $even  = !$odd;
+
         foreach ($this->values as $bp => &$states) {
-            if (isset($states[$order])) {
-                $states['default'] = $states[$order];
+            if ($first && isset($states['first'])) {
+                $states['default'] = $states['first'];
+            } elseif ($last && isset($states['last'])) {
+                $states['default'] = $states['last'];
+            } elseif ($even && isset($states['even'])) {
+                $states['default'] = $states['even'];
+            } elseif ($odd && isset($states['odd'])) {
+                $states['default'] = $states['odd'];
             }
             unset($states['odd'], $states['even'], $states['first'], $states['last']);
         }
@@ -131,6 +133,16 @@ final class Style
         }
         return $encodedState;
     }
+
+    public function replaceState(string $state, string $value): void
+    {
+        foreach ($this->values as $bp => &$states) {
+            if (isset($states[$state])) {
+                $states[$state] = explode(' ', $value);
+            }
+        }
+    }
+
     public function encode(): string
     {
         $classes = [];
