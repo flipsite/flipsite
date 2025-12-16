@@ -142,25 +142,25 @@ class ComponentBuilder
 
         // Handle transition delay
 
-        if (isset($style['transitionDelayStep']) && $componentData->getMetaValue('order')) {
-            $order      = $componentData->getMetaValue('order');
-            $multiplier = intval($order['index']);
-            $style['transitionDelay'] ??= 'delay-0';
-            $delay        = new Style($style['transitionDelay'], 'delay-');
+        // if (isset($style['transitionDelayStep']) && $componentData->getMetaValue('order')) {
+        //     $order      = $componentData->getMetaValue('order');
+        //     $multiplier = intval($order['index']);
+        //     $style['transitionDelay'] ??= 'delay-0';
+        //     $delay        = new Style($style['transitionDelay'], 'delay-');
 
-            $step         = new Style($style['transitionDelayStep'] ?? null, 'delay-step-');
-            $initialDelay = intval($delay->getValue());
-            $variants     = $delay->getVariants();
-            foreach ($variants as $variant) {
-                $value = $initialDelay + $multiplier * intval($step->getValue($variant));
-                $delay->setValue($variant, $value);
-            }
-            $style['transitionDelay'] = $delay->encode();
-            if (!$style['transitionDelay']) {
-                unset($style['transitionDelay']);
-            }
-            unset($style['transitionDelayStep']);
-        }
+        //     $step         = new Style($style['transitionDelayStep'] ?? null, 'delay-step-');
+        //     $initialDelay = intval($delay->getValue());
+        //     $variants     = $delay->getVariants();
+        //     foreach ($variants as $variant) {
+        //         $value = $initialDelay + $multiplier * intval($step->getValue($variant));
+        //         $delay->setValue($variant, $value);
+        //     }
+        //     $style['transitionDelay'] = $delay->encode();
+        //     if (!$style['transitionDelay']) {
+        //         unset($style['transitionDelay']);
+        //     }
+        //     unset($style['transitionDelayStep']);
+        // }
 
         $component = new $class();
         $component->setId($componentData->getId());

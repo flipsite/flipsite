@@ -5,12 +5,20 @@ const runTextScale = (el) => {
   let baseFontSize = parseFloat(el.dataset.textScaleBase);
   if (!baseFontSize) {
     baseFontSize = parseFloat(window.getComputedStyle(el).fontSize) || 16;
-    el.dataset.textScaleBase = baseFontSize; // remember it for future runs
+    el.dataset.textScaleBase = baseFontSize;
   }
 
-  const getFontSize = (element, maxWidth) => {
-    let fontSize = baseFontSize;
+  const parent = el.parentNode;
+  const parentStyle = window.getComputedStyle(parent);
+  const maxWidth =
+    parent.clientWidth -
+    parseFloat(parentStyle.paddingLeft) -
+    parseFloat(parentStyle.paddingRight);
 
+  // Early exit if no space available
+  if (maxWidth <= 0) return;
+
+  const getFontSize = (element, maxWidth) => {
     // Create an offscreen clone for measurement
     const offscreen = element.cloneNode(true);
     Object.assign(offscreen.style, {
@@ -22,43 +30,31 @@ const runTextScale = (el) => {
       display: 'inline-block',
       width: 'auto',
       height: 'auto',
-      fontSize: fontSize + 'px',
     });
     document.body.appendChild(offscreen);
-
-    const textLength = element.textContent.trim().length || 1;
 
     // Binary search for optimal fit — only shrink (never exceed base size)
     let min = 6;
     let max = baseFontSize;
-    let attempts = 0;
+    let optimalSize = min;
+    const tolerance = 0.5;
 
-    while (attempts < 20) {
-      fontSize = (min + max) / 2;
+    while (max - min > tolerance) {
+      const fontSize = (min + max) / 2;
       offscreen.style.fontSize = fontSize + 'px';
       const width = offscreen.offsetWidth;
 
-      if (width > maxWidth) {
-        max = fontSize;
-      } else {
+      if (width <= maxWidth) {
+        optimalSize = fontSize;
         min = fontSize;
+      } else {
+        max = fontSize;
       }
-
-      if (Math.abs(width - maxWidth) < 0.5) break;
-      attempts++;
     }
 
     offscreen.remove();
-    // Clamp font size between 6px and baseFontSize
-    return Math.max(Math.min(fontSize, baseFontSize), 6) + 'px';
+    return Math.max(Math.min(optimalSize, baseFontSize), 6) + 'px';
   };
-
-  const parent = el.parentNode;
-  const parentStyle = window.getComputedStyle(parent);
-  const maxWidth =
-    parent.clientWidth -
-    parseFloat(parentStyle.paddingLeft) -
-    parseFloat(parentStyle.paddingRight);
 
   el.style.fontSize = getFontSize(el, maxWidth);
 };
@@ -67,15 +63,30 @@ const runTextScale = (el) => {
 ready(() => {
   const elements = new Set();
   const runAll = () => elements.forEach(runTextScale);
+  
+  // Debounce resize callback to avoid excessive recalculations
+  const createDebouncedCallback = (el) => {
+    let rafId = null;
+    return () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        runTextScale(el);
+        rafId = null;
+      });
+    };
+  };
 
   // Initialize and observe all matching elements
   document.querySelectorAll('[data-text-scale]').forEach((el) => {
     runTextScale(el);
     elements.add(el);
 
-    const observer = new ResizeObserver(() => runTextScale(el));
+    const debouncedCallback = createDebouncedCallback(el);
+    const observer = new ResizeObserver(debouncedCallback);
     observer.observe(el);
-    observer.observe(el.parentNode);
+    if (el.parentNode) {
+      observer.observe(el.parentNode);
+    }
   });
 
   // Re-run when fonts finish loading
@@ -83,8 +94,13 @@ ready(() => {
     document.fonts.ready.then(runAll).catch(() => {});
   }
 
-  // Also re-run on window resize
+  // Debounce window resize
+  let resizeRafId = null;
   window.addEventListener('resize', () => {
-    requestAnimationFrame(runAll);
+    if (resizeRafId) return;
+    resizeRafId = requestAnimationFrame(() => {
+      runAll();
+      resizeRafId = null;
+    });
   });
 });
