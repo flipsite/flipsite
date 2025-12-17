@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 namespace Flipsite\Components;
 
 use Flipsite\Utils\ArrayHelper;
@@ -23,7 +22,7 @@ abstract class AbstractElement
     private ?string $commentBefore      = null;
     private ?string $commentAfter       = null;
     private bool $wrap                  = true;
-    private array $meta               = [];
+    private array $meta                 = [];
 
     public function getId(): int|string|null
     {
@@ -39,6 +38,7 @@ abstract class AbstractElement
     {
         $this->meta[$key] = $value;
     }
+
     public function getMeta(string $key)
     {
         return $this->meta[$key] ?? null;
@@ -395,7 +395,7 @@ abstract class AbstractElement
             $allClasses  = array_merge($allClasses, $classes);
         }
         $allClasses = array_unique($allClasses);
-        sort($allClasses);
+        //sort($allClasses);
         return 'string' === $format ? trim(implode(' ', $allClasses)) : $allClasses;
     }
 
