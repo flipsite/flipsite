@@ -378,6 +378,10 @@ class ComponentBuilder
             $navState = null;
         }
         foreach ($style as $attr => &$classes) {
+            if ($attr === 'src') {
+                continue;
+            }
+
             if (!is_string($classes) || strpos($classes, ':') === false) {
                 continue;
             }
