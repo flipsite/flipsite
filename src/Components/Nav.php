@@ -20,6 +20,7 @@ class Nav extends AbstractGroup
         unset($data['_repeat'], $data['_options']['parentPage'], $data['_options']['includeParent'], $data['_options']['pages'], $data['_options']['languages'], $data['_options']['hideActiveLanguage'], $data['_options']['hideActive']);
 
         $pages  = $options->pages ?? $this->getPages($options->parentPage, $options->includeParent);
+
         $repeat = [];
         foreach ($pages as $page) {
             if ($pageItemData = $this->getPageItemData($page)) {
@@ -160,7 +161,7 @@ class NavOptions
         } elseif (isset($data['_options']['parentPage'])) {
             $this->pages      = null;
             $this->parentPage = trim($data['_options']['parentPage'], '/');
-        } elseif ($data['_repeat'] !== false) {
+        } elseif (($data['_repeat'] ?? false)) {
             $this->pages     = null;
             $level           = intval(str_replace('_pages-', '', ($data['_repeat'] ?? '0'))) ?? 0;
             if ($level) {
