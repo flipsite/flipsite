@@ -13,6 +13,7 @@ class IntegrationsBuilder implements BuilderInterface
     private ?string $ga              = null;
     private ?string $metaPixel       = null;
     private ?string $plausible       = null;
+    private ?string $privatus        = null;
 
     public function __construct(private bool $isLive, array $integrations)
     {
@@ -27,6 +28,12 @@ class IntegrationsBuilder implements BuilderInterface
         }
         if (isset($integrations['plausibleAnalytics'])) {
             $this->plausible = (string)$integrations['plausibleAnalytics'];
+        }
+        if (isset($integrations['privatusAnalytics'])) {
+            $siteId = trim((string)$integrations['privatusAnalytics']);
+            if (preg_match('/^pa_[A-Za-z0-9]+$/', $siteId)) {
+                $this->privatus = $siteId;
+            }
         }
     }
 
@@ -97,6 +104,17 @@ class IntegrationsBuilder implements BuilderInterface
             $script = new Element('script', true);
             $script->setAttribute('async', true);
             $script->setAttribute('src', 'https://plausible.io/js/'.$this->plausible.'.js');
+            $script->commentOut(!$this->isLive, 'Not live environment');
+            $document->getChild('head')->prependChild($script);
+        }
+
+        // Privatus Analytics (cookieless, no consent banner needed)
+        if ($this->privatus) {
+            $script = new Element('script', true);
+            $script->setAttribute('defer', true);
+            $script->setAttribute('src', 'https://privatusstats.com/js/pa.js');
+            $script->setAttribute('data-site', $this->privatus);
+            $script->setAttribute('data-modules', 'engage,auto,vitals,clicks,ask');
             $script->commentOut(!$this->isLive, 'Not live environment');
             $document->getChild('head')->prependChild($script);
         }
